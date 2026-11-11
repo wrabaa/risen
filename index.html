@@ -135,6 +135,124 @@
     -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transition:opacity .25s ease,transform .25s ease}
   .toast.show{opacity:1;transform:translate(-50%,0)}
 
+  /* ===== GYM ===== */
+  .seg{display:flex;margin:6px 0 20px;padding:4px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+  .seg button{flex:1;height:40px;border:0;border-radius:999px;background:none;color:var(--muted);cursor:pointer;
+    font-family:Oswald,sans-serif;font-weight:500;font-size:15px;letter-spacing:.16em;transition:background .2s ease,color .2s ease}
+  .seg button[aria-selected="true"]{background:var(--volt);color:#0B0B0B}
+  .gh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 14px}
+  .gh h2{font-family:Oswald,sans-serif;font-weight:700;font-size:28px;line-height:1.05;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
+  .gh .meta{flex:none;font-size:13px;color:var(--muted);letter-spacing:.06em}
+  .label{margin:24px 2px 10px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .gstack{display:flex;flex-direction:column;gap:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  button.card{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer}
+  button.card:active{background:#202020}
+  .wrow{display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .wrow .t{font-family:Oswald,sans-serif;font-weight:700;font-size:21px;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
+  .wrow .s{margin-top:4px;font-size:14px;color:var(--muted)}
+  .status{flex:none;font-family:Oswald,sans-serif;font-weight:500;font-size:13px;letter-spacing:.14em;color:var(--muted)}
+  .status.ok{color:var(--volt)}
+  .play.sm{width:48px;height:48px}.play.sm svg{width:20px;height:20px}
+  .dashed{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border:1.5px dashed #3A3A3A;border-radius:14px;
+    background:none;color:var(--text);font:500 15px Inter,sans-serif;cursor:pointer}
+  .dashed:active{background:var(--line)}
+  .btnrow{display:flex;gap:10px;margin-top:14px}
+  .btnrow .ghost{flex:1}
+  .quiet{display:block;margin:18px auto 0;min-height:44px;padding:0 16px;border:0;background:none;color:var(--muted);font:500 14px Inter,sans-serif;cursor:pointer}
+  .empty{padding:28px 20px;text-align:center}
+  .empty .wname{margin-bottom:6px}
+  .empty .primary{margin-top:20px}
+
+  /* Logging sets */
+  .ex h3{font-family:Oswald,sans-serif;font-weight:700;font-size:21px;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
+  .ex .notes{margin-top:4px;font-size:13px;color:var(--muted);white-space:pre-wrap}
+  .last{margin-top:6px;font-size:14px;color:var(--muted)}
+  .last b{font-weight:500;color:var(--text)}
+  .sets{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+  .setrow{display:grid;grid-template-columns:26px 1fr 1fr 48px;gap:8px;align-items:center}
+  .sethead{font-size:11px;letter-spacing:.16em;color:var(--muted);text-align:center}
+  .sethead span:first-child{text-align:left}
+  .setrow .n{font-family:Oswald,sans-serif;font-weight:500;font-size:16px;color:var(--muted)}
+  .num{width:100%;min-width:0;height:46px;padding:0 6px;border-radius:12px;border:1px solid var(--line);background:#0F0F0F;color:var(--text);
+    font:500 17px Inter,sans-serif;text-align:center;outline:none;-webkit-user-select:text;user-select:text;-webkit-appearance:none;appearance:none}
+  .num:focus{border-color:var(--text)}
+  .tick{width:48px;height:46px;border-radius:12px;border:1px solid var(--line);background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+  .tick svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .setrow.done .tick{background:var(--volt);border-color:var(--volt);color:#0B0B0B}
+  .setrow.done .num{border-color:rgba(204,255,0,.35)}
+  .setrow.done .n{color:var(--volt)}
+  .addset{margin-top:10px;min-height:44px}
+  .ex .pslot-add{height:56px}
+  .ex .pslot-img img{max-height:200px}
+  .exbar{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+  .finish{margin-top:24px}
+  .elapsed{font-variant-numeric:tabular-nums}
+
+  /* Rest timer bar (above the tab bar) */
+  .restbar{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + var(--tabh) + 10px);z-index:6;
+    display:flex;align-items:center;gap:8px;padding:8px 10px 8px 18px;border-radius:20px;border:1px solid var(--line);
+    background:rgba(26,26,26,.88);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);
+    transform:translateY(16px);opacity:0;pointer-events:none;transition:transform .3s cubic-bezier(.32,.72,0,1),opacity .25s ease}
+  .restbar.show{transform:none;opacity:1;pointer-events:auto}
+  .restbar .lbl{font-size:11px;letter-spacing:.2em;color:var(--muted)}
+  .restbar .cd{flex:1;font-family:Oswald,sans-serif;font-weight:700;font-size:36px;line-height:1;font-variant-numeric:tabular-nums}
+  .restbar button{height:44px;min-width:50px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:#0F0F0F;color:var(--text);
+    font:500 14px Inter,sans-serif;cursor:pointer}
+  .restbar button:active{background:var(--line)}
+  .restbar.zero{animation:flash .5s ease-in-out 8 alternate;border-color:var(--volt)}
+  .restbar.zero .cd{color:var(--volt)}
+  @keyframes flash{from{background:rgba(26,26,26,.88)}to{background:rgba(204,255,0,.32)}}
+  #app.resting .view{padding-bottom:calc(env(safe-area-inset-bottom) + var(--tabh) + 100px)}
+
+  /* Plan editing */
+  .field{color-scheme:dark;width:100%;height:52px;padding:0 16px;border-radius:14px;border:1px solid var(--line);background:#0F0F0F;color:var(--text);
+    font:500 17px Inter,sans-serif;outline:none;-webkit-user-select:text;user-select:text;-webkit-appearance:none;appearance:none}
+  .field:focus{border-color:var(--text)}
+  textarea.field{height:auto;min-height:72px;padding:12px 16px;resize:none;font-size:16px;line-height:1.4}
+  .days-pick{display:flex;justify-content:space-between;gap:6px}
+  .days-pick button{flex:1;max-width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#0F0F0F;color:var(--muted);
+    font:500 14px Inter,sans-serif;cursor:pointer}
+  .days-pick button[aria-pressed="true"]{background:var(--volt);border-color:var(--volt);color:#0B0B0B}
+  .targets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .targets label{display:flex;flex-direction:column;gap:6px;font-size:11px;letter-spacing:.16em;color:var(--muted);text-align:center}
+  .exhead{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .tools{flex:none;display:flex;gap:4px;margin:-6px -8px 0 0}
+  .tools button{width:40px;height:40px;border:0;border-radius:50%;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+  .tools button:active{background:var(--line)}
+  .tools button:disabled{opacity:.25}
+  .tools .icon{width:20px;height:20px}
+  .ro .exhead{display:block}
+  .danger{color:#FF6B6B}
+
+  /* Sub-pages (workout editor, exercise library, archived routine) slide in from the right */
+  .subpage{position:absolute;inset:0;z-index:12;background:var(--bg);overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+    padding:calc(env(safe-area-inset-top) + 4px) 20px calc(env(safe-area-inset-bottom) + 40px);
+    transform:translateX(100%);visibility:hidden;transition:transform .3s cubic-bezier(.32,.72,0,1),visibility 0s .3s}
+  .subpage.open{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.32,.72,0,1)}
+  #libPage{z-index:13}
+  .subtop{display:flex;align-items:center;height:44px;margin-bottom:8px}
+  .subtop .iconbtn{margin:0 0 0 -10px}
+  .subtop h1{margin-left:4px;font-family:Oswald,sans-serif;font-weight:700;font-size:22px;letter-spacing:.08em;text-transform:uppercase;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .search{position:sticky;top:calc(env(safe-area-inset-top) * -1 - 4px);z-index:2;margin:0 -20px;padding:8px 20px 10px;background:var(--bg)}
+  .libgroup .row{font-size:16px}
+  .libgroup .row small{color:var(--muted);font-size:13px}
+
+  /* Gym sheets (skip day, extra workout, summary, routine name, custom exercise) */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chips button{min-height:42px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:#0F0F0F;color:var(--text);
+    font:500 15px Inter,sans-serif;cursor:pointer}
+  .chips button[aria-pressed="true"]{background:var(--volt);border-color:var(--volt);color:#0B0B0B}
+  .sheet .field{margin-top:12px}
+  .sheet .list{margin-top:16px;display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow-y:auto}
+  .sheet .list button{min-height:52px;padding:0 16px;border-radius:14px;border:1px solid var(--line);background:#0F0F0F;color:var(--text);
+    font:500 16px Inter,sans-serif;text-align:left;cursor:pointer}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px}
+  .stats div{padding:14px 8px;border-radius:14px;background:#0F0F0F;border:1px solid var(--line);text-align:center}
+  .stats b{display:block;font-family:Oswald,sans-serif;font-weight:700;font-size:30px;line-height:1.1}
+  .stats span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+
   /* EXERCISE PHOTO slot (photo.js): goes under each exercise in Plan and Today */
   .pslot{position:relative;margin-top:12px}
   .pslot-add{display:flex;align-items:center;justify-content:center;gap:10px;height:96px;border:1.5px dashed #3A3A3A;border-radius:14px;
@@ -205,10 +323,37 @@
     </div>
 
     <!-- GYM (Today + Plan) is built next; MEALS, MEDS, CLASSES come later -->
-    <div class="view" id="view-gym" hidden><div class="soon"><h2>Gym</h2><p>Coming in a next step.</p></div></div>
+    <div class="view" id="view-gym" hidden>
+      <div class="seg" role="tablist">
+        <button role="tab" data-seg="today" aria-selected="true">TODAY</button>
+        <button role="tab" data-seg="plan" aria-selected="false">PLAN</button>
+      </div>
+      <div id="gymToday"></div>
+      <div id="gymPlan" hidden></div>
+    </div>
     <div class="view" id="view-meals" hidden><div class="soon"><h2>Meals</h2><p>Coming soon.</p></div></div>
     <div class="view" id="view-meds" hidden><div class="soon"><h2>Meds</h2><p>Coming soon.</p></div></div>
     <div class="view" id="view-classes" hidden><div class="soon"><h2>Classes</h2><p>Coming soon.</p></div></div>
+
+    <!-- Rest timer: starts when a set is ticked -->
+    <div class="restbar" id="restbar" aria-live="polite">
+      <div><div class="lbl">REST</div></div>
+      <div class="cd" id="restCd">1:30</div>
+      <button type="button" data-rest="-15">&minus;15</button>
+      <button type="button" data-rest="15">+15</button>
+      <button type="button" data-rest="skip">Skip</button>
+    </div>
+
+    <!-- Gym sub-pages -->
+    <section class="subpage" id="gymPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-close="gymPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="gymPageTitle"></h1></div>
+      <div id="gymPageBody"></div>
+    </section>
+    <section class="subpage" id="libPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-close="libPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1>Add exercise</h1></div>
+      <div class="search"><input class="field" id="libSearch" type="search" placeholder="Search exercises" autocomplete="off" enterkeyhint="search"></div>
+      <div id="libBody"></div>
+    </section>
 
     <nav class="tabbar" role="tablist">
       <button class="tab" role="tab" data-view="home" aria-selected="true">
@@ -268,6 +413,9 @@
   <div class="toast" id="toast"></div>
   <pre id="debug" hidden></pre>
 
+  <!-- Gym pop-ups -->
+  <div class="sheet-wrap" id="gymSheet" hidden><div class="sheet" id="gymSheetBody"></div></div>
+
   <!-- First launch: ask the name once -->
   <div class="sheet-wrap" id="nameSheet" hidden>
     <form class="sheet" id="nameForm" autocomplete="off">
@@ -286,9 +434,10 @@
   const intro=$('intro'), app=$('app');
 
   // ---- Data: lives in IndexedDB (db.js). This is an in-memory copy for drawing the screens. ----
-  const S={settings:{name:'',nameAsked:false,restSec:90},routines:[],workouts:[],sessions:[]};
+  const S={settings:{name:'',nameAsked:false,restSec:90},routines:[],workouts:[],sessions:[],exercises:[]};
   async function load(){
-    [S.settings,S.routines,S.workouts,S.sessions]=await Promise.all([RisenDB.getSettings(),RisenDB.all('routines'),RisenDB.all('workouts'),RisenDB.all('sessions')]);
+    [S.settings,S.routines,S.workouts,S.sessions,S.exercises]=await Promise.all([RisenDB.getSettings(),RisenDB.all('routines'),
+      RisenDB.all('workouts'),RisenDB.all('sessions'),RisenDB.all('exercises')]);
   }
   const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -305,16 +454,17 @@
     return S.workouts.filter(w=>w.routineId===r.id&&(w.days||[]).includes(isoDay(d)))
       .sort((a,b)=>(a.time||'99').localeCompare(b.time||'99')||(a.order||0)-(b.order||0));
   }
-  const doneIds=d=>new Set(S.sessions.filter(x=>x.date===dayKey(d)&&x.finishedAt).map(x=>x.workoutId));
+  const doneIds=d=>new Set(S.sessions.filter(x=>x.date===dayKey(d)&&x.finishedAt&&!x.extra).map(x=>x.workoutId));
+  const skippedIds=d=>new Set(S.sessions.filter(x=>x.date===dayKey(d)&&x.skipped).map(x=>x.workoutId));
   function weekDays(){ // Monday to Sunday of this week
     const t=new Date(); t.setHours(0,0,0,0); const mon=new Date(t); mon.setDate(t.getDate()-isoDay(t)+1);
     return [...Array(7)].map((_,i)=>{const d=new Date(mon); d.setDate(mon.getDate()+i); return d});
   }
   function streak(){ // planned sessions done in a row, counting back from today (today doesn't break it if not done yet)
-    let n=0; const d=new Date(); d.setHours(0,0,0,0);
+    let n=0; const d=new Date(); d.setHours(0,0,0,0);   // a skipped session (with a reason) neither counts nor breaks it
     for(let i=0;i<730;i++,d.setDate(d.getDate()-1)){
-      const ids=doneIds(d);
-      for(const w of plannedOn(d).reverse()){ if(ids.has(w.id)) n++; else if(i>0) return n; }
+      const ids=doneIds(d), sk=skippedIds(d);
+      for(const w of plannedOn(d).reverse()){ if(ids.has(w.id)) n++; else if(sk.has(w.id)) continue; else if(i>0) return n; }
     }
     return n;
   }
@@ -324,11 +474,13 @@
   const TILES=[
     {title:'Training', html(){
       if(!activeRoutine()) return `<div><div class="wname">No plan yet</div><div class="sub">Build your week in Gym</div></div>
-        <button class="ghost" data-go="gym">SET UP</button>`;
+        <button class="ghost" data-go="plan">SET UP</button>`;
       const today=new Date(), list=plannedOn(today), ids=doneIds(today);
       if(!list.length) return `<div><div class="wname">Rest day</div><div class="sub">Recover. Back at it tomorrow.</div></div>`;
-      const w=list.find(x=>!ids.has(x.id));
-      if(!w) return `<div><div class="wname">Done today</div><div class="sub">${list.map(x=>esc(x.name)).join(' · ')}</div></div>`;
+      const sk=skippedIds(today), w=list.find(x=>!ids.has(x.id)&&!sk.has(x.id));
+      if(!w){ const doneL=list.filter(x=>ids.has(x.id));
+        return doneL.length?`<div><div class="wname">Done today</div><div class="sub">${doneL.map(x=>esc(x.name)).join(' · ')}</div></div>`
+          :`<div><div class="wname">Skipped today</div><div class="sub">Back at it next time.</div></div>`; }
       const n=(w.exercises||[]).length;
       return `<div><div class="wname">${esc(w.name)}</div><div class="sub">${n} exercise${n===1?'':'s'}${w.time?' · '+esc(w.time):''}</div></div>
         <button class="play" aria-label="Start workout" data-workout="${esc(w.id)}">${PLAY}</button>`;
@@ -361,8 +513,11 @@
     document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+view);
     document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
   }
-  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(t) show(t.dataset.view)};
-  $('tiles').onclick=e=>{const b=e.target.closest('[data-go]'); if(b) show(b.dataset.go)};
+  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open('today'); else show(t.dataset.view)};
+  $('tiles').onclick=e=>{
+    const b=e.target.closest('[data-go]'); if(b) return Gym.open(b.dataset.go);
+    const p=e.target.closest('[data-workout]'); if(p) Gym.start(p.dataset.workout);
+  };
 
   // ---- Name: asked once, on first ENTER. Skip = no name, greeting says just "Hello" ----
   async function closeName(name){
@@ -471,5 +626,7 @@
   if('caches' in window) caches.keys().then(k=>{const v=k.find(n=>n.startsWith('risen-'));
     if(v) document.getElementById('version').textContent='v'+v.slice(6)});
 </script>
+<script src="library.js"></script>
+<script src="gym.js"></script>
 </body>
 </html>

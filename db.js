@@ -6,10 +6,11 @@
 //   workouts   {id, routineId, name, days:[1..7] (1=Mon … 7=Sun), time:'HH:MM', order,
 //               exercises:[{exerciseId, sets, kg, reps}]}
 //   exercises  {id, name, ...}   exercise library, referenced by ID (its photo lives in `photos`)
-//   sessions   {id, date:'YYYY-MM-DD', workoutId, routineId, startedAt, finishedAt}
-//   logs       {id, exerciseId, sessionId, date, sets:[{kg, reps}]}
+//   sessions   {id, date:'YYYY-MM-DD', workoutId, routineId, name, extra, startedAt, finishedAt}
+//              extra:true = unplanned session.  Skipped:  {..., skipped:true, reason, finishedAt:null}
+//   logs       {id, exerciseId, sessionId, date, at, sets:[{kg, reps}]}
 //              History is stored per EXERCISE ID, so changing routines never loses progress.
-//   settings   {key, value}   name, nameAsked, restSec
+//   settings   {key, value}   name, nameAsked, restSec, activeSession (workout in progress)
 //   photos     {exerciseId, type, data:ArrayBuffer, width, height, updated}
 //              ONE photo per exercise, keyed by exercise ID. Resized to max 1000px JPEG before saving.
 //
@@ -81,10 +82,19 @@ const RisenDB = (() => {
     if (r.status !== 'active') throw new Error('Archived routines are read-only');
   }
 
+  async function renameRoutine(id, name) {
+    await assertEditable(id); const r = await get('routines', id); return put('routines', { ...r, name });
+  }
+
   // ---- Workouts ----
   async function saveWorkout(w) {
     await assertEditable(w.routineId);
     return put('workouts', { id: uid(), days: [], time: '', order: 0, exercises: [], ...w });
+  }
+  async function deleteWorkout(id) {
+    const w = await get('workouts', id); if (!w) return;
+    await assertEditable(w.routineId);
+    const db = await open(), t = db.transaction('workouts', 'readwrite'); t.objectStore('workouts').delete(id); await done(t);
   }
   const workoutsOf = routineId => byIndex('workouts', 'routineId', routineId);
 
@@ -92,14 +102,22 @@ const RisenDB = (() => {
   const saveExercise = e => put('exercises', { id: uid(), ...e });
 
   // ---- Sessions + per-exercise logs, saved together ----
-  async function logSession({ date, workoutId, routineId, startedAt, entries }) {
-    const db = await open(), t = db.transaction(['sessions', 'logs'], 'readwrite');
-    const session = { id: uid(), date, workoutId, routineId, startedAt: startedAt || now(), finishedAt: now() };
+  async function logSession({ date, workoutId, routineId, name, extra, startedAt, entries }) {
+    const db = await open(), t = db.transaction(['sessions', 'logs'], 'readwrite'), at = now();
+    const session = { id: uid(), date, workoutId: workoutId || null, routineId: routineId || null, name: name || '', extra: !!extra,
+      startedAt: startedAt || at, finishedAt: at };
     t.objectStore('sessions').put(session);
-    for (const e of entries || []) t.objectStore('logs').put({ id: uid(), exerciseId: e.exerciseId, sessionId: session.id, date, sets: e.sets });
+    for (const e of entries || []) t.objectStore('logs').put({ id: uid(), exerciseId: e.exerciseId, sessionId: session.id, date, at, sets: e.sets });
     await done(t); return session;
   }
-  const historyOf = exerciseId => byIndex('logs', 'exerciseId', exerciseId);
+  async function skipWorkouts({ date, workoutIds, routineId, reason }) {
+    const db = await open(), t = db.transaction('sessions', 'readwrite');
+    for (const workoutId of workoutIds) t.objectStore('sessions').put({ id: uid(), date, workoutId, routineId, skipped: true, reason, startedAt: null, finishedAt: null });
+    await done(t);
+  }
+  // Newest first
+  const historyOf = async exerciseId => (await byIndex('logs', 'exerciseId', exerciseId))
+    .sort((a, b) => (b.at || b.date).localeCompare(a.at || a.date));
 
   // ---- Exercise photos (stored as bytes: the most reliable form in iPhone Safari) ----
   async function setPhoto(exerciseId, blob, width, height) {
@@ -155,6 +173,6 @@ const RisenDB = (() => {
     try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch (e) {}
   }
 
-  return { DB_VERSION, init, all, getSettings, setSetting, activeRoutine, createRoutine, saveWorkout, workoutsOf,
-    saveExercise, logSession, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
+  return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, saveWorkout, deleteWorkout, workoutsOf,
+    saveExercise, logSession, skipWorkouts, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();
