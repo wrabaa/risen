@@ -21,7 +21,8 @@
   :root{--bg:#0B0B0B;--card:#1A1A1A;--line:#262626;--text:#F2F2F2;--muted:#9A9A9A;--volt:#CCFF00}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
-  .screen{position:fixed;inset:0;transition:opacity .5s ease,transform .5s ease}
+  /* --vh = real full screen height (iPhone home-screen apps report it short by the status bar) */
+  .screen{position:fixed;top:0;left:0;right:0;height:var(--vh,100%);transition:opacity .5s ease,transform .5s ease}
   .hidden{opacity:0;pointer-events:none;transform:scale(1.04)}
 
   /* INTRO — full image, LOG IN button is part of the picture */
@@ -67,8 +68,14 @@
   const intro=document.getElementById('intro'), app=document.getElementById('app'), btn=document.getElementById('login');
   // LOG IN button position inside the intro image (852 x 1846 px), mapped onto the screen like object-fit: cover
   const IMG={w:852,h:1846}, BTN={x1:81,y1:1434,x2:770,y2:1533};
+  function screenH(){
+    // Home-screen app on iPhone: innerHeight is too short, screen.height is the true size (portrait)
+    return navigator.standalone ? Math.max(innerHeight, Math.max(screen.height,screen.width)) : innerHeight;
+  }
   function placeButton(){
-    const W=innerWidth, H=innerHeight, s=Math.max(W/IMG.w,H/IMG.h), ox=(W-IMG.w*s)/2, oy=(H-IMG.h*s)/2;
+    const W=innerWidth, H=screenH();
+    document.documentElement.style.setProperty('--vh',H+'px');
+    const s=Math.max(W/IMG.w,H/IMG.h), ox=(W-IMG.w*s)/2, oy=(H-IMG.h*s)/2;
     Object.assign(btn.style,{left:ox+BTN.x1*s+'px',top:oy+BTN.y1*s+'px',width:(BTN.x2-BTN.x1)*s+'px',height:(BTN.y2-BTN.y1)*s+'px'});
   }
   placeButton(); addEventListener('resize',placeButton);
