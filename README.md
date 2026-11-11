@@ -16,3 +16,9 @@ The version installed on the phone shows as small text at the bottom of the app 
 
 ## Fonts
 Oswald and Inter are stored in `assets/fonts/` (SIL Open Font License), so they work offline from the first launch.
+
+## Data
+All data is stored in IndexedDB on the phone (`db.js`), never on a server.
+The model (routines → workouts → exercises, with sessions and per-exercise history) is described at the top of `db.js`.
+To change the data layout, raise `DB_VERSION` and add an upgrade step. Never delete a store, so updates never lose data.
+Settings → Export backup saves everything to one file; Import backup restores it.

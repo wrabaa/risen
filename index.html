@@ -83,12 +83,13 @@
     font-family:Oswald,sans-serif;font-weight:500;font-size:13px;letter-spacing:.16em;cursor:pointer}
   .ghost:active{background:var(--line)}
   .tile-body.stack{flex-direction:column;align-items:stretch}
-  .days{display:flex;justify-content:space-between;margin-top:4px}
+  .days{display:flex;justify-content:space-between;margin-top:4px;padding-bottom:10px}
   .days span{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:500;color:#5A5A5A;
     border:1px solid transparent}
   .days .plan{border-color:#4A4A4A;color:var(--text)}
   .days .done{background:var(--volt);border-color:var(--volt);color:#0B0B0B}
-  .days .today{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--text)}
+  .days span{position:relative}
+  .days .today::after{content:"";position:absolute;left:50%;bottom:-10px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--volt)}
   .version{margin-top:28px;text-align:center;font-size:11px;letter-spacing:.1em;color:var(--muted);opacity:.6}
 
   /* Placeholder views (Plan, Calendar, Progress come in a later step) */
@@ -98,7 +99,7 @@
 
   /* Bottom tab bar: frosted glass */
   .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:5;display:flex;
-    padding:0 8px env(safe-area-inset-bottom);background:rgba(18,18,18,.72);border-top:1px solid rgba(255,255,255,.06);
+    padding:0 4px env(safe-area-inset-bottom);background:rgba(18,18,18,.72);border-top:1px solid rgba(255,255,255,.06);
     -webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%)}
   .tab{flex:1;height:var(--tabh);border:0;background:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
     font-family:Inter,sans-serif;font-size:11px;font-weight:500;letter-spacing:.04em;cursor:pointer;transition:color .2s ease}
@@ -143,7 +144,7 @@
 
   /* First-launch name question */
   .sheet-wrap{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-start;justify-content:center;
-    padding:calc(env(safe-area-inset-top) + 14vh) 20px 20px;background:rgba(0,0,0,.45);
+    padding:calc(env(safe-area-inset-top) + 14vh) 20px 20px;background:rgba(0,0,0,.72);
     -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:opacity .3s ease}
   .sheet-wrap[hidden]{display:none}
   .sheet{width:100%;max-width:420px;background:rgba(26,26,26,.86);border:1px solid var(--line);border-radius:22px;padding:26px 22px 18px;
@@ -190,6 +191,7 @@
     <div class="view" id="view-plan" hidden><div class="soon"><h2>Plan</h2><p>Coming in a next step.</p></div></div>
     <div class="view" id="view-calendar" hidden><div class="soon"><h2>Calendar</h2><p>Coming in a next step.</p></div></div>
     <div class="view" id="view-progress" hidden><div class="soon"><h2>Progress</h2><p>Coming in a next step.</p></div></div>
+    <div class="view" id="view-classes" hidden><div class="soon"><h2>Classes</h2><p>Coming soon.</p></div></div>
 
     <nav class="tabbar" role="tablist">
       <button class="tab" role="tab" data-view="home" aria-selected="true">
@@ -200,6 +202,8 @@
         <svg class="icon" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendar</button>
       <button class="tab" role="tab" data-view="progress" aria-selected="false">
         <svg class="icon" viewBox="0 0 24 24"><path d="M4 19h16"/><path d="m5 15 4.5-4.5 3.5 3L19 7"/></svg>Progress</button>
+      <button class="tab" role="tab" data-view="classes" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 20v-1a5.5 5.5 0 0 1 11 0v1"/><path d="M16 5.2a3 3 0 0 1 0 5.6"/><path d="M17.5 14a5.5 5.5 0 0 1 3 4.9V20"/></svg>Classes</button>
     </nav>
   </section>
 
@@ -258,32 +262,41 @@
     </form>
   </div>
 
+<script src="db.js"></script>
 <script>
   const $=id=>document.getElementById(id);
   const intro=$('intro'), app=$('app');
 
-  // ---- Saved data (stays on this phone) ----
-  const KEY='risen', DEFAULT_NAME='Siza';
-  const store={restSec:90};
-  try{Object.assign(store,JSON.parse(localStorage.getItem(KEY))||{})}catch(e){}
-  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}};
+  // ---- Data: lives in IndexedDB (db.js). This is an in-memory copy for drawing the screens. ----
+  const S={settings:{name:'',nameAsked:false,restSec:90},routines:[],workouts:[],sessions:[]};
+  async function load(){
+    [S.settings,S.routines,S.workouts,S.sessions]=await Promise.all([RisenDB.getSettings(),RisenDB.all('routines'),RisenDB.all('workouts'),RisenDB.all('sessions')]);
+  }
   const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  // ---- Gym data helpers (the plan and log arrive with the Plan step) ----
-  // store.plan = {days:{1:{name,exercises:[...]}, ...}}  (keys 0=Sun .. 6=Sat)
-  // store.log  = ['2026-11-10', ...]  dates a planned session was done
+  // ---- Schedule helpers ----
   const dayKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  const planned=d=>!!(store.plan&&store.plan.days&&store.plan.days[d.getDay()]);
-  const done=d=>(store.log||[]).includes(dayKey(d));
+  const isoDay=d=>(d.getDay()+6)%7+1;                       // 1=Mon … 7=Sun
+  const activeRoutine=()=>S.routines.find(r=>r.status==='active')||null;
+  function routineOn(d){                                    // the routine that was active on that date
+    const k=dayKey(d);
+    return S.routines.find(r=>dayKey(new Date(r.created))<=k&&(!r.archived||dayKey(new Date(r.archived))>k))||null;
+  }
+  function plannedOn(d){                                    // workouts scheduled that day, earliest first
+    const r=routineOn(d); if(!r) return [];
+    return S.workouts.filter(w=>w.routineId===r.id&&(w.days||[]).includes(isoDay(d)))
+      .sort((a,b)=>(a.time||'99').localeCompare(b.time||'99')||(a.order||0)-(b.order||0));
+  }
+  const doneIds=d=>new Set(S.sessions.filter(x=>x.date===dayKey(d)&&x.finishedAt).map(x=>x.workoutId));
   function weekDays(){ // Monday to Sunday of this week
-    const t=new Date(); t.setHours(0,0,0,0); const mon=new Date(t); mon.setDate(t.getDate()-((t.getDay()+6)%7));
+    const t=new Date(); t.setHours(0,0,0,0); const mon=new Date(t); mon.setDate(t.getDate()-isoDay(t)+1);
     return [...Array(7)].map((_,i)=>{const d=new Date(mon); d.setDate(mon.getDate()+i); return d});
   }
   function streak(){ // planned sessions done in a row, counting back from today (today doesn't break it if not done yet)
     let n=0; const d=new Date(); d.setHours(0,0,0,0);
     for(let i=0;i<730;i++,d.setDate(d.getDate()-1)){
-      if(!planned(d)) continue;
-      if(done(d)) n++; else if(i>0) break;
+      const ids=doneIds(d);
+      for(const w of plannedOn(d).reverse()){ if(ids.has(w.id)) n++; else if(i>0) return n; }
     }
     return n;
   }
@@ -292,18 +305,25 @@
   const PLAY='<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>';
   const TILES=[
     {title:'Training', html(){
-      const w=store.plan&&store.plan.days?store.plan.days[new Date().getDay()]:null;
-      if(!store.plan) return `<div><div class="wname">No plan yet</div><div class="sub">Build your week in Plan</div></div>
+      if(!activeRoutine()) return `<div><div class="wname">No plan yet</div><div class="sub">Build your week in Plan</div></div>
         <button class="ghost" data-go="plan">SET UP</button>`;
-      if(!w) return `<div><div class="wname">Rest day</div><div class="sub">Recover. Back at it tomorrow.</div></div>`;
+      const today=new Date(), list=plannedOn(today), ids=doneIds(today);
+      if(!list.length) return `<div><div class="wname">Rest day</div><div class="sub">Recover. Back at it tomorrow.</div></div>`;
+      const w=list.find(x=>!ids.has(x.id));
+      if(!w) return `<div><div class="wname">Done today</div><div class="sub">${list.map(x=>esc(x.name)).join(' · ')}</div></div>`;
       const n=(w.exercises||[]).length;
-      return `<div><div class="wname">${esc(w.name)}</div><div class="sub">${n} exercise${n===1?'':'s'}</div></div>
-        <button class="play" aria-label="Start workout">${PLAY}</button>`;
+      return `<div><div class="wname">${esc(w.name)}</div><div class="sub">${n} exercise${n===1?'':'s'}${w.time?' · '+esc(w.time):''}</div></div>
+        <button class="play" aria-label="Start workout" data-workout="${esc(w.id)}">${PLAY}</button>`;
     }},
     {title:'This week', stack:true, html(){
       const days=weekDays(), today=dayKey(new Date());
-      const plannedN=days.filter(planned).length, doneN=days.filter(d=>planned(d)&&done(d)).length;
-      const dots=days.map(d=>`<span class="${planned(d)?'plan':''} ${planned(d)&&done(d)?'done':''} ${dayKey(d)===today?'today':''}">${'MTWTFSS'[(d.getDay()+6)%7]}</span>`).join('');
+      let plannedN=0, doneN=0;
+      const dots=days.map(d=>{
+        const list=plannedOn(d), ids=doneIds(d), dn=list.filter(w=>ids.has(w.id)).length;
+        plannedN+=list.length; doneN+=dn;
+        const cls=[list.length?'plan':'', list.length&&dn===list.length?'done':'', dayKey(d)===today?'today':''].join(' ');
+        return `<span class="${cls}">${'MTWTFSS'[isoDay(d)-1]}</span>`;
+      }).join('');
       return `<div><div class="big">${doneN}<small>/${plannedN}</small></div><div class="sub">Sessions done</div></div><div class="days">${dots}</div>`;
     }},
     {title:'Streak', html(){
@@ -312,7 +332,7 @@
     }},
   ];
   function renderHome(){
-    $('hello').textContent='Hello '+(store.name||DEFAULT_NAME);
+    $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile"><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
       <div class="tile-body${t.stack?' stack':''}">${t.html()}</div></article>`).join('');
@@ -326,25 +346,29 @@
   document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(t) show(t.dataset.view)};
   $('tiles').onclick=e=>{const b=e.target.closest('[data-go]'); if(b) show(b.dataset.go)};
 
-  // ---- Name: asked once, on first ENTER ----
-  function closeName(name){
-    store.name=(name||'').trim()||DEFAULT_NAME; save(); $('nameInput').blur(); $('nameSheet').hidden=true; renderHome();
+  // ---- Name: asked once, on first ENTER. Skip = no name, greeting says just "Hello" ----
+  async function closeName(name){
+    S.settings.name=(name||'').trim(); S.settings.nameAsked=true;
+    $('nameInput').blur(); $('nameSheet').hidden=true; renderHome();
+    await RisenDB.setSetting('name',S.settings.name); await RisenDB.setSetting('nameAsked',true);
   }
   $('nameForm').onsubmit=e=>{e.preventDefault(); closeName($('nameInput').value)};
   $('nameSkip').onclick=()=>closeName('');
 
   // ---- ENTER: intro to Home (intro shows only when the app opens) ----
-  $('login').onclick=()=>{
-    renderHome(); show('home');
+  const ready=RisenDB.init().then(load).catch(e=>{console.error(e); toast('Could not open storage: '+e.message)});
+  $('login').onclick=async()=>{
+    await ready; renderHome(); show('home');
     intro.classList.add('hidden'); app.classList.remove('hidden');
-    if(!store.name){ $('nameSheet').hidden=false; setTimeout(()=>$('nameInput').focus(),350); }
+    if(!S.settings.nameAsked){ $('nameSheet').hidden=false; setTimeout(()=>$('nameInput').focus(),350); }
   };
+
   // ---- Settings ----
   const fmtRest=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
-  function toast(msg){const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),2200)}
+  function toast(msg){const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),2600)}
   function openSettings(){
-    $('setName').value=store.name&&store.name!==DEFAULT_NAME?store.name:(store.name||'');
-    $('restVal').textContent=fmtRest(store.restSec);
+    $('setName').value=S.settings.name;
+    $('restVal').textContent=fmtRest(S.settings.restSec);
     $('settings').classList.add('open'); $('settings').setAttribute('aria-hidden','false'); $('settings').scrollTop=0;
   }
   function closeSettings(){
@@ -352,9 +376,10 @@
   }
   $('gearBtn').onclick=openSettings;
   $('settingsBack').onclick=closeSettings;
-  $('setName').oninput=()=>{store.name=$('setName').value.trim()||DEFAULT_NAME; save()};
+  $('setName').oninput=()=>{S.settings.name=$('setName').value.trim(); RisenDB.setSetting('name',S.settings.name)};
   $('setName').onkeydown=e=>{if(e.key==='Enter') $('setName').blur()};
-  const stepRest=d=>{store.restSec=Math.min(600,Math.max(15,store.restSec+d)); $('restVal').textContent=fmtRest(store.restSec); save()};
+  const stepRest=d=>{S.settings.restSec=Math.min(600,Math.max(15,S.settings.restSec+d)); $('restVal').textContent=fmtRest(S.settings.restSec);
+    RisenDB.setSetting('restSec',S.settings.restSec)};
   $('restMinus').onclick=()=>stepRest(-15);
   $('restPlus').onclick=()=>stepRest(15);
   $('viewIntro').onclick=()=>{
@@ -365,7 +390,7 @@
   // ---- Backup: export to a file, import from a file ----
   $('exportBtn').onclick=async()=>{
     const name='risen-backup-'+dayKey(new Date())+'.json';
-    const blob=new Blob([JSON.stringify({app:'RISEN',format:1,exported:new Date().toISOString(),data:store},null,2)],{type:'application/json'});
+    const blob=new Blob([JSON.stringify(await RisenDB.exportAll(),null,2)],{type:'application/json'});
     const file=new File([blob],name,{type:'application/json'});
     try{
       if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); return; } // iPhone: Save to Files
@@ -377,11 +402,11 @@
   $('importFile').onchange=async()=>{
     const f=$('importFile').files[0]; if(!f) return;
     let b; try{ b=JSON.parse(await f.text()) }catch(e){ toast('That file is not a RISEN backup'); return; }
-    if(!b||b.app!=='RISEN'||typeof b.data!=='object'||!b.data){ toast('That file is not a RISEN backup'); return; }
+    if(!b||b.app!=='RISEN'){ toast('That file is not a RISEN backup'); return; }
     const when=b.exported?new Date(b.exported).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'an earlier date';
     if(!confirm('Replace everything on this phone with the backup from '+when+'?')) return;
-    for(const k of Object.keys(store)) delete store[k];
-    Object.assign(store,{restSec:90},b.data); save(); openSettings(); renderHome(); toast('Backup restored');
+    try{ await RisenDB.importAll(b); }catch(e){ toast(e.message==='Not a RISEN backup'?'That file is not a RISEN backup':e.message); return; }
+    await load(); openSettings(); renderHome(); toast('Backup restored');
   };
 
   // ---- TEMPORARY: screen-size debug panel. Remove once the full-screen fix is chosen. ----
