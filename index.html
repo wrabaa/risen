@@ -187,21 +187,21 @@
       <div class="tiles" id="tiles"></div>
     </div>
 
-    <!-- PLAN / CALENDAR / PROGRESS: built in a later step -->
-    <div class="view" id="view-plan" hidden><div class="soon"><h2>Plan</h2><p>Coming in a next step.</p></div></div>
-    <div class="view" id="view-calendar" hidden><div class="soon"><h2>Calendar</h2><p>Coming in a next step.</p></div></div>
-    <div class="view" id="view-progress" hidden><div class="soon"><h2>Progress</h2><p>Coming in a next step.</p></div></div>
+    <!-- GYM (Today + Plan) is built next; MEALS, MEDS, CLASSES come later -->
+    <div class="view" id="view-gym" hidden><div class="soon"><h2>Gym</h2><p>Coming in a next step.</p></div></div>
+    <div class="view" id="view-meals" hidden><div class="soon"><h2>Meals</h2><p>Coming soon.</p></div></div>
+    <div class="view" id="view-meds" hidden><div class="soon"><h2>Meds</h2><p>Coming soon.</p></div></div>
     <div class="view" id="view-classes" hidden><div class="soon"><h2>Classes</h2><p>Coming soon.</p></div></div>
 
     <nav class="tabbar" role="tablist">
       <button class="tab" role="tab" data-view="home" aria-selected="true">
         <svg class="icon" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>Home</button>
-      <button class="tab" role="tab" data-view="plan" aria-selected="false">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>Plan</button>
-      <button class="tab" role="tab" data-view="calendar" aria-selected="false">
-        <svg class="icon" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendar</button>
-      <button class="tab" role="tab" data-view="progress" aria-selected="false">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M4 19h16"/><path d="m5 15 4.5-4.5 3.5 3L19 7"/></svg>Progress</button>
+      <button class="tab" role="tab" data-view="gym" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>Gym</button>
+      <button class="tab" role="tab" data-view="meals" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v5a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V3M9 3v5"/><path d="M17 21V3c-2 1-3 3.5-3 7 0 2 1 3 3 3"/></svg>Meals</button>
+      <button class="tab" role="tab" data-view="meds" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="2.8" y="8.2" width="18.4" height="7.6" rx="3.8" transform="rotate(-45 12 12)"/><path d="m8.6 8.6 6.8 6.8"/></svg>Meds</button>
       <button class="tab" role="tab" data-view="classes" aria-selected="false">
         <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 20v-1a5.5 5.5 0 0 1 11 0v1"/><path d="M16 5.2a3 3 0 0 1 0 5.6"/><path d="M17.5 14a5.5 5.5 0 0 1 3 4.9V20"/></svg>Classes</button>
     </nav>
@@ -305,8 +305,8 @@
   const PLAY='<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>';
   const TILES=[
     {title:'Training', html(){
-      if(!activeRoutine()) return `<div><div class="wname">No plan yet</div><div class="sub">Build your week in Plan</div></div>
-        <button class="ghost" data-go="plan">SET UP</button>`;
+      if(!activeRoutine()) return `<div><div class="wname">No plan yet</div><div class="sub">Build your week in Gym</div></div>
+        <button class="ghost" data-go="gym">SET UP</button>`;
       const today=new Date(), list=plannedOn(today), ids=doneIds(today);
       if(!list.length) return `<div><div class="wname">Rest day</div><div class="sub">Recover. Back at it tomorrow.</div></div>`;
       const w=list.find(x=>!ids.has(x.id));
