@@ -14,11 +14,9 @@
 <link rel="icon" href="assets/icon-192.png">
 <link rel="preload" href="assets/fonts/oswald.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/doto.woff2" as="font" type="font/woff2" crossorigin>
 <style>
   /* Fonts live in the app (Oswald and Inter, SIL Open Font License), so they work offline from the first launch */
   @font-face{font-family:Oswald;font-weight:200 700;font-display:swap;src:url(assets/fonts/oswald.woff2) format("woff2")}
-  @font-face{font-family:Doto;font-weight:100 900;font-display:swap;src:url(assets/fonts/doto.woff2) format("woff2")}
   @font-face{font-family:Inter;font-weight:100 900;font-display:swap;src:url(assets/fonts/inter.woff2) format("woff2")}
   :root{--bg:#0B0B0B;--card:#1A1A1A;--line:#262626;--text:#F2F2F2;--muted:#9A9A9A;--volt:#CCFF00;--tabh:64px}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -50,17 +48,17 @@
   /* APP shell: each view scrolls on its own, tab bar stays put */
   #app{background:var(--bg)}
   .view{position:absolute;inset:0;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
-    padding:calc(env(safe-area-inset-top) + 12px) 20px calc(env(safe-area-inset-bottom) + var(--tabh) + 28px)}
+    padding:calc(env(safe-area-inset-top) + 4px) 20px calc(env(safe-area-inset-bottom) + var(--tabh) + 28px)}
   .view[hidden]{display:none}
   .icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
   /* Home header */
-  .topbar{display:flex;align-items:center;justify-content:space-between;height:48px}
-  .iconbtn{width:44px;height:44px;margin-left:-10px;border:0;border-radius:50%;background:none;color:var(--text);
+  .topbar{display:flex;align-items:center;justify-content:space-between;height:44px}
+  .iconbtn{width:44px;height:44px;margin-right:-10px;border:0;border-radius:50%;background:none;color:var(--text);
     display:grid;place-items:center;cursor:pointer}
   .iconbtn:active{background:var(--card)}
   .topbar .mark{height:20px;width:auto;opacity:.9}
-  .greet{margin:18px 0 26px}
+  .greet{margin:6px 0 20px}
   .greet .date{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
   .greet h1{margin-top:6px;font-family:Oswald,sans-serif;font-weight:700;font-size:36px;line-height:1.05;text-transform:uppercase;letter-spacing:.02em;
     overflow-wrap:anywhere}
@@ -73,8 +71,8 @@
   .tile-head{display:flex;align-items:baseline;gap:10px;font-family:Oswald,sans-serif;font-weight:500;font-size:14px;letter-spacing:.2em;text-transform:uppercase}
   .tile-head b{font-weight:500;color:var(--muted)}
   .tile-body{margin-top:14px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
-  .big{font-family:Doto,monospace;font-weight:900;font-size:64px;line-height:.9;letter-spacing:.02em}
-  .big small{font-size:.55em;color:var(--muted)}
+  .big{font-family:Oswald,sans-serif;font-weight:700;font-size:64px;line-height:.95;letter-spacing:.01em;color:var(--text)}
+  .big small{margin-left:2px;font-size:.5em;font-weight:500;color:var(--muted)}
   .sub{margin-top:8px;font-size:14px;color:var(--muted)}
   .wname{font-family:Oswald,sans-serif;font-weight:700;font-size:26px;line-height:1.1;text-transform:uppercase;overflow-wrap:anywhere}
   .play{flex:none;width:60px;height:60px;border:0;border-radius:50%;background:var(--volt);color:#0B0B0B;display:grid;place-items:center;cursor:pointer;
@@ -105,6 +103,43 @@
   .tab{flex:1;height:var(--tabh);border:0;background:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
     font-family:Inter,sans-serif;font-size:11px;font-weight:500;letter-spacing:.04em;cursor:pointer;transition:color .2s ease}
   .tab[aria-selected="true"]{color:var(--volt)}
+
+  /* SETTINGS: page slides in from the right */
+  #settings{position:absolute;inset:0;z-index:10;background:var(--bg);overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+    padding:calc(env(safe-area-inset-top) + 4px) 20px calc(env(safe-area-inset-bottom) + 28px);
+    transform:translateX(100%);visibility:hidden;transition:transform .3s cubic-bezier(.32,.72,0,1),visibility 0s .3s}
+  #settings.open{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.32,.72,0,1)}
+  .settings-top{display:flex;align-items:center;height:44px}
+  .settings-top .iconbtn{margin:0 0 0 -10px}
+  .settings-top h1{margin-left:4px;font-family:Oswald,sans-serif;font-weight:700;font-size:22px;letter-spacing:.08em;text-transform:uppercase}
+  .group-label{margin:26px 4px 8px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .group{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:0 16px;font-size:16px}
+  .row+.row{border-top:1px solid var(--line)}
+  button.row{width:100%;border:0;background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+  button.row:active{background:var(--line)}
+  .row .chev{width:18px;height:18px;color:var(--muted)}
+  .row input{flex:1;min-width:0;height:44px;border:0;background:none;color:var(--text);font:500 16px Inter,sans-serif;text-align:right;outline:none;
+    -webkit-user-select:text;user-select:text}
+  .row input::placeholder{color:#5A5A5A}
+  .stepper{display:flex;align-items:center;gap:6px}
+  .stepper button{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:#0F0F0F;color:var(--text);font:500 20px Inter,sans-serif;
+    line-height:1;cursor:pointer}
+  .stepper button:active{background:var(--line)}
+  .stepper output{min-width:56px;text-align:center;font-family:Oswald,sans-serif;font-weight:500;font-size:20px}
+  .note{margin:10px 4px 0;font-size:13px;line-height:1.5;color:var(--muted)}
+  .settings-version{margin-top:30px;padding:10px;text-align:center;font-size:11px;letter-spacing:.1em;color:var(--muted);opacity:.6}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);z-index:30;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+    padding:12px 20px;border-radius:999px;background:rgba(40,40,40,.92);color:var(--text);font-size:14px;white-space:nowrap;
+    -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transition:opacity .25s ease,transform .25s ease}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* TEMPORARY screen-size debug panel (?debug in the URL, or tap the version 5 times in Settings) */
+  #debug{position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top) + 50px);z-index:50;padding:12px 14px;border-radius:12px;
+    background:rgba(0,0,0,.88);border:1px solid var(--volt);color:var(--volt);font:12px/1.55 ui-monospace,Menlo,monospace;white-space:pre;
+    -webkit-user-select:text;user-select:text;pointer-events:auto}
+  #debug[hidden]{display:none}
+  .probe{position:fixed;top:0;left:-10px;width:1px;visibility:hidden;pointer-events:none}
 
   /* First-launch name question */
   .sheet-wrap{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-start;justify-content:center;
@@ -139,17 +174,16 @@
     <!-- HOME -->
     <div class="view" id="view-home">
       <div class="topbar">
-        <button class="iconbtn" id="menuBtn" aria-label="Menu">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-        </button>
         <img class="mark" src="assets/mark.png" alt="RISEN">
+        <button class="iconbtn" id="gearBtn" aria-label="Settings">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
       </div>
       <div class="greet">
         <div class="date" id="today"></div>
         <h1 id="hello">Hello Siza</h1>
       </div>
       <div class="tiles" id="tiles"></div>
-      <div class="version" id="version"></div>
     </div>
 
     <!-- PLAN / CALENDAR / PROGRESS: built in a later step -->
@@ -168,6 +202,50 @@
         <svg class="icon" viewBox="0 0 24 24"><path d="M4 19h16"/><path d="m5 15 4.5-4.5 3.5 3L19 7"/></svg>Progress</button>
     </nav>
   </section>
+
+  <!-- SETTINGS -->
+  <section id="settings" aria-hidden="true">
+    <div class="settings-top">
+      <button class="iconbtn" id="settingsBack" aria-label="Back">
+        <svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <h1>Settings</h1>
+    </div>
+
+    <div class="group-label">Profile</div>
+    <div class="group">
+      <label class="row">Name <input id="setName" type="text" maxlength="20" placeholder="Siza" autocapitalize="words" enterkeyhint="done"></label>
+    </div>
+
+    <div class="group-label">Workout</div>
+    <div class="group">
+      <div class="row">Default rest timer
+        <div class="stepper">
+          <button type="button" id="restMinus" aria-label="Less rest">&minus;</button>
+          <output id="restVal">1:30</output>
+          <button type="button" id="restPlus" aria-label="More rest">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="group-label">Backup</div>
+    <div class="group">
+      <button class="row" id="exportBtn">Export backup <svg class="icon chev" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
+      <button class="row" id="importBtn">Import backup <svg class="icon chev" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
+    </div>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+    <p class="note">Everything is stored only on this phone. Export a backup now and then and keep it in Files or iCloud Drive.</p>
+
+    <div class="group-label">App</div>
+    <div class="group">
+      <button class="row" id="viewIntro">View intro <svg class="icon chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+    </div>
+
+    <div class="settings-version" id="version"></div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+  <pre id="debug" hidden></pre>
 
   <!-- First launch: ask the name once -->
   <div class="sheet-wrap" id="nameSheet" hidden>
@@ -261,6 +339,80 @@
     intro.classList.add('hidden'); app.classList.remove('hidden');
     if(!store.name){ $('nameSheet').hidden=false; setTimeout(()=>$('nameInput').focus(),350); }
   };
+  // ---- Settings ----
+  const fmtRest=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+  function toast(msg){const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),2200)}
+  function openSettings(){
+    $('setName').value=store.name&&store.name!==DEFAULT_NAME?store.name:(store.name||'');
+    $('restVal').textContent=fmtRest(store.restSec);
+    $('settings').classList.add('open'); $('settings').setAttribute('aria-hidden','false'); $('settings').scrollTop=0;
+  }
+  function closeSettings(){
+    $('setName').blur(); $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true'); renderHome();
+  }
+  $('gearBtn').onclick=openSettings;
+  $('settingsBack').onclick=closeSettings;
+  $('setName').oninput=()=>{store.name=$('setName').value.trim()||DEFAULT_NAME; save()};
+  $('setName').onkeydown=e=>{if(e.key==='Enter') $('setName').blur()};
+  const stepRest=d=>{store.restSec=Math.min(600,Math.max(15,store.restSec+d)); $('restVal').textContent=fmtRest(store.restSec); save()};
+  $('restMinus').onclick=()=>stepRest(-15);
+  $('restPlus').onclick=()=>stepRest(15);
+  $('viewIntro').onclick=()=>{
+    $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true');
+    app.classList.add('hidden'); intro.classList.remove('hidden');
+  };
+
+  // ---- Backup: export to a file, import from a file ----
+  $('exportBtn').onclick=async()=>{
+    const name='risen-backup-'+dayKey(new Date())+'.json';
+    const blob=new Blob([JSON.stringify({app:'RISEN',format:1,exported:new Date().toISOString(),data:store},null,2)],{type:'application/json'});
+    const file=new File([blob],name,{type:'application/json'});
+    try{
+      if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); return; } // iPhone: Save to Files
+    }catch(e){ if(e.name==='AbortError') return; }
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove()},1000); toast('Backup saved');
+  };
+  $('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
+  $('importFile').onchange=async()=>{
+    const f=$('importFile').files[0]; if(!f) return;
+    let b; try{ b=JSON.parse(await f.text()) }catch(e){ toast('That file is not a RISEN backup'); return; }
+    if(!b||b.app!=='RISEN'||typeof b.data!=='object'||!b.data){ toast('That file is not a RISEN backup'); return; }
+    const when=b.exported?new Date(b.exported).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'an earlier date';
+    if(!confirm('Replace everything on this phone with the backup from '+when+'?')) return;
+    for(const k of Object.keys(store)) delete store[k];
+    Object.assign(store,{restSec:90},b.data); save(); openSettings(); renderHome(); toast('Backup restored');
+  };
+
+  // ---- TEMPORARY: screen-size debug panel. Remove once the full-screen fix is chosen. ----
+  let debugOn=/[?&]debug\b/.test(location.search); try{debugOn=debugOn||localStorage.getItem('risen-debug')==='1'}catch(e){}
+  function probe(css){const d=document.createElement('div'); d.className='probe'; d.style.cssText+=css; document.body.appendChild(d); const h=d.getBoundingClientRect().height; d.remove(); return Math.round(h*10)/10}
+  function debugTick(){
+    if(!debugOn){ $('debug').hidden=true; return; }
+    const vv=window.visualViewport, tb=document.querySelector('.tabbar').getBoundingClientRect();
+    $('debug').hidden=false;
+    $('debug').textContent=[
+      'DEBUG  (tap version 5x to hide)',
+      'standalone       '+(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches),
+      'screen.height    '+screen.height,
+      'innerHeight      '+innerHeight,
+      'visualViewport   '+(vv?Math.round(vv.height*10)/10:'n/a'),
+      'clientHeight     '+document.documentElement.clientHeight,
+      '100%  (#app)     '+Math.round(app.getBoundingClientRect().height*10)/10,
+      '100vh            '+probe('height:100vh'),
+      '100svh           '+probe('height:100svh'),
+      '100dvh           '+probe('height:100dvh'),
+      '100lvh           '+probe('height:100lvh'),
+      'safe top         '+probe('height:env(safe-area-inset-top)'),
+      'safe bottom      '+probe('height:env(safe-area-inset-bottom)'),
+      'tab bar bottom   '+Math.round(tb.bottom*10)/10+'  (gap '+Math.round((screen.height-tb.bottom)*10)/10+')',
+    ].join('\n');
+  }
+  let taps=0, tapT;
+  $('version').onclick=()=>{ taps++; clearTimeout(tapT); tapT=setTimeout(()=>taps=0,1500);
+    if(taps>=5){ taps=0; debugOn=!debugOn; try{localStorage.setItem('risen-debug',debugOn?'1':'0')}catch(e){} debugTick(); } };
+  setInterval(debugTick,1000); addEventListener('resize',debugTick); debugTick();
+
   if('serviceWorker' in navigator){
     // Check for a new release on launch and each time the app comes back to the foreground
     navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
