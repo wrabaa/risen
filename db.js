@@ -5,17 +5,19 @@
 //              Only ONE active routine. Creating a new one archives the old one (kept, read-only).
 //   workouts   {id, routineId, name, days:[1..7] (1=Mon … 7=Sun), time:'HH:MM', order,
 //               exercises:[{exerciseId, sets, kg, reps}]}
-//   exercises  {id, name, ...}   exercise library, referenced by ID (photos come later)
+//   exercises  {id, name, ...}   exercise library, referenced by ID (its photo lives in `photos`)
 //   sessions   {id, date:'YYYY-MM-DD', workoutId, routineId, startedAt, finishedAt}
 //   logs       {id, exerciseId, sessionId, date, sets:[{kg, reps}]}
 //              History is stored per EXERCISE ID, so changing routines never loses progress.
 //   settings   {key, value}   name, nameAsked, restSec
+//   photos     {exerciseId, type, data:ArrayBuffer, width, height, updated}
+//              ONE photo per exercise, keyed by exercise ID. Resized to max 1000px JPEG before saving.
 //
 // SCHEMA VERSION: raise DB_VERSION and add a new `if (old < N)` step in upgrade().
 // Never delete or rename a store in an upgrade, so updates never lose data.
 const RisenDB = (() => {
-  const DB_NAME = 'risen', DB_VERSION = 1;
-  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs'];
+  const DB_NAME = 'risen', DB_VERSION = 2;
+  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos'];
   let dbp;
 
   function upgrade(db, old) {
@@ -29,7 +31,9 @@ const RisenDB = (() => {
       const l = db.createObjectStore('logs', { keyPath: 'id' });
       l.createIndex('exerciseId', 'exerciseId'); l.createIndex('sessionId', 'sessionId');
     }
-    // if (old < 2) { db.createObjectStore('photos', ...) }   <- example of a future step
+    if (old < 2) {
+      db.createObjectStore('photos', { keyPath: 'exerciseId' });   // v2: one photo per exercise
+    }
   }
 
   function open() {
@@ -97,10 +101,25 @@ const RisenDB = (() => {
   }
   const historyOf = exerciseId => byIndex('logs', 'exerciseId', exerciseId);
 
-  // ---- Backup: everything in one file ----
+  // ---- Exercise photos (stored as bytes: the most reliable form in iPhone Safari) ----
+  async function setPhoto(exerciseId, blob, width, height) {
+    const data = await blob.arrayBuffer();
+    return put('photos', { exerciseId, type: blob.type || 'image/jpeg', data, width, height, updated: now() });
+  }
+  async function getPhoto(exerciseId) {
+    const p = await get('photos', exerciseId);
+    return p ? { ...p, blob: new Blob([p.data], { type: p.type }) } : null;
+  }
+  async function deletePhoto(exerciseId) { const db = await open(); const t = db.transaction('photos', 'readwrite'); t.objectStore('photos').delete(exerciseId); await done(t); }
+
+  const toB64 = buf => { let s = ''; const b = new Uint8Array(buf); for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); };
+  const fromB64 = str => { const s = atob(str), b = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) b[i] = s.charCodeAt(i); return b.buffer; };
+
+  // ---- Backup: everything in one file (photos as base64 text) ----
   async function exportAll() {
     const stores = {};
     for (const s of STORES) stores[s] = await all(s);
+    stores.photos = stores.photos.map(p => ({ ...p, data: toB64(p.data) }));
     return { app: 'RISEN', format: 2, schema: DB_VERSION, exported: now(), stores };
   }
   async function importAll(b) {
@@ -111,6 +130,7 @@ const RisenDB = (() => {
       stores = { settings: [{ key: 'name', value: d.name || '' }, { key: 'nameAsked', value: true }, { key: 'restSec', value: d.restSec || 90 }] };
     } else throw new Error('Not a RISEN backup');
     if (b.schema > DB_VERSION) throw new Error('Backup is from a newer RISEN. Update the app first.');
+    stores = { ...stores, photos: (stores.photos || []).map(p => ({ ...p, data: fromB64(p.data) })) };
     const db = await open(), t = db.transaction(STORES, 'readwrite');
     for (const s of STORES) { const st = t.objectStore(s); st.clear(); for (const row of stores[s] || []) st.put(row); }
     await done(t);
@@ -136,5 +156,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, getSettings, setSetting, activeRoutine, createRoutine, saveWorkout, workoutsOf,
-    saveExercise, logSession, historyOf, exportAll, importAll };
+    saveExercise, logSession, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();
