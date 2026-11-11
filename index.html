@@ -14,11 +14,13 @@
 <link rel="icon" href="assets/icon-192.png">
 <link rel="preload" href="assets/fonts/oswald.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/doto.woff2" as="font" type="font/woff2" crossorigin>
 <style>
   /* Fonts live in the app (Oswald and Inter, SIL Open Font License), so they work offline from the first launch */
   @font-face{font-family:Oswald;font-weight:200 700;font-display:swap;src:url(assets/fonts/oswald.woff2) format("woff2")}
+  @font-face{font-family:Doto;font-weight:100 900;font-display:swap;src:url(assets/fonts/doto.woff2) format("woff2")}
   @font-face{font-family:Inter;font-weight:100 900;font-display:swap;src:url(assets/fonts/inter.woff2) format("woff2")}
-  :root{--bg:#0B0B0B;--card:#1A1A1A;--line:#262626;--text:#F2F2F2;--muted:#9A9A9A;--volt:#CCFF00}
+  :root{--bg:#0B0B0B;--card:#1A1A1A;--line:#262626;--text:#F2F2F2;--muted:#9A9A9A;--volt:#CCFF00;--tabh:64px}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
   .screen{position:fixed;top:0;left:0;right:0;height:100%;transition:opacity .5s ease,transform .5s ease}
@@ -45,19 +47,81 @@
   @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(204,255,0,0)}50%{box-shadow:0 0 22px 2px rgba(204,255,0,.5)}}
   @keyframes rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
   @keyframes fade{from{opacity:0}to{opacity:1}}
+  /* APP shell: each view scrolls on its own, tab bar stays put */
   #app{background:var(--bg)}
+  .view{position:absolute;inset:0;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+    padding:calc(env(safe-area-inset-top) + 12px) 20px calc(env(safe-area-inset-bottom) + var(--tabh) + 28px)}
+  .view[hidden]{display:none}
+  .icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-  /* APP screens scroll; the intro stays fixed */
-  .scroll{overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
-  .page{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;
-    padding:calc(env(safe-area-inset-top) + 24px) 24px calc(env(safe-area-inset-bottom) + 24px)}
-  #app img{width:96px}
-  #app h1{font-family:Oswald,sans-serif;font-weight:700;font-size:30px;letter-spacing:.06em;text-transform:uppercase}
-  #app p{color:var(--muted);font-size:15px}
-  .page>:first-child{margin-top:auto}
-  .version{margin-top:auto;padding-top:24px;font-size:11px;letter-spacing:.1em;color:var(--muted);opacity:.6}
-  .pill{margin-top:10px;min-height:48px;padding:0 28px;border-radius:999px;border:1px solid var(--line);background:var(--card);
-    color:var(--text);font-family:Oswald,sans-serif;font-size:14px;letter-spacing:.2em;cursor:pointer}
+  /* Home header */
+  .topbar{display:flex;align-items:center;justify-content:space-between;height:48px}
+  .iconbtn{width:44px;height:44px;margin-left:-10px;border:0;border-radius:50%;background:none;color:var(--text);
+    display:grid;place-items:center;cursor:pointer}
+  .iconbtn:active{background:var(--card)}
+  .topbar .mark{height:20px;width:auto;opacity:.9}
+  .greet{margin:18px 0 26px}
+  .greet .date{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .greet h1{margin-top:6px;font-family:Oswald,sans-serif;font-weight:700;font-size:36px;line-height:1.05;text-transform:uppercase;letter-spacing:.02em;
+    overflow-wrap:anywhere}
+
+  /* Tiles: full-width cards, numbered */
+  .tiles{display:flex;flex-direction:column;gap:14px}
+  .tile{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px 20px;
+    animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+  .tile:nth-child(2){animation-delay:.06s}.tile:nth-child(3){animation-delay:.12s}
+  .tile-head{display:flex;align-items:baseline;gap:10px;font-family:Oswald,sans-serif;font-weight:500;font-size:14px;letter-spacing:.2em;text-transform:uppercase}
+  .tile-head b{font-weight:500;color:var(--muted)}
+  .tile-body{margin-top:14px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+  .big{font-family:Doto,monospace;font-weight:900;font-size:64px;line-height:.9;letter-spacing:.02em}
+  .big small{font-size:.55em;color:var(--muted)}
+  .sub{margin-top:8px;font-size:14px;color:var(--muted)}
+  .wname{font-family:Oswald,sans-serif;font-weight:700;font-size:26px;line-height:1.1;text-transform:uppercase;overflow-wrap:anywhere}
+  .play{flex:none;width:60px;height:60px;border:0;border-radius:50%;background:var(--volt);color:#0B0B0B;display:grid;place-items:center;cursor:pointer;
+    transition:transform .12s ease}
+  .play:active{transform:scale(.93)}
+  .play svg{width:24px;height:24px;margin-left:3px;fill:currentColor}
+  .ghost{flex:none;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--text);
+    font-family:Oswald,sans-serif;font-weight:500;font-size:13px;letter-spacing:.16em;cursor:pointer}
+  .ghost:active{background:var(--line)}
+  .tile-body.stack{flex-direction:column;align-items:stretch}
+  .days{display:flex;justify-content:space-between;margin-top:4px}
+  .days span{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:500;color:#5A5A5A;
+    border:1px solid transparent}
+  .days .plan{border-color:#4A4A4A;color:var(--text)}
+  .days .done{background:var(--volt);border-color:var(--volt);color:#0B0B0B}
+  .days .today{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--text)}
+  .version{margin-top:28px;text-align:center;font-size:11px;letter-spacing:.1em;color:var(--muted);opacity:.6}
+
+  /* Placeholder views (Plan, Calendar, Progress come in a later step) */
+  .soon{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+  .soon h2{font-family:Oswald,sans-serif;font-weight:700;font-size:30px;letter-spacing:.06em;text-transform:uppercase}
+  .soon p{color:var(--muted);font-size:15px}
+
+  /* Bottom tab bar: frosted glass */
+  .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:5;display:flex;
+    padding:0 8px env(safe-area-inset-bottom);background:rgba(18,18,18,.72);border-top:1px solid rgba(255,255,255,.06);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%)}
+  .tab{flex:1;height:var(--tabh);border:0;background:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    font-family:Inter,sans-serif;font-size:11px;font-weight:500;letter-spacing:.04em;cursor:pointer;transition:color .2s ease}
+  .tab[aria-selected="true"]{color:var(--volt)}
+
+  /* First-launch name question */
+  .sheet-wrap{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-start;justify-content:center;
+    padding:calc(env(safe-area-inset-top) + 14vh) 20px 20px;background:rgba(0,0,0,.45);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:opacity .3s ease}
+  .sheet-wrap[hidden]{display:none}
+  .sheet{width:100%;max-width:420px;background:rgba(26,26,26,.86);border:1px solid var(--line);border-radius:22px;padding:26px 22px 18px;
+    animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+  .sheet h2{font-family:Oswald,sans-serif;font-weight:700;font-size:26px;text-transform:uppercase;letter-spacing:.03em}
+  .sheet p{margin-top:6px;color:var(--muted);font-size:14px}
+  .sheet input{margin-top:20px;width:100%;height:54px;padding:0 18px;border-radius:14px;border:1px solid var(--line);background:#0F0F0F;
+    color:var(--text);font:500 17px Inter,sans-serif;outline:none;-webkit-user-select:text;user-select:text}
+  .sheet input:focus{border-color:var(--volt)}
+  .primary{margin-top:16px;width:100%;min-height:54px;border:0;border-radius:999px;background:var(--volt);color:#0B0B0B;
+    font-family:Oswald,sans-serif;font-weight:700;font-size:17px;letter-spacing:.12em;cursor:pointer}
+  .primary:active{transform:scale(.98)}
+  .textbtn{display:block;margin:8px auto 0;min-height:44px;padding:0 16px;border:0;background:none;color:var(--muted);font:500 14px Inter,sans-serif;cursor:pointer}
 </style>
 </head>
 <body>
@@ -71,20 +135,132 @@
     </div>
   </section>
 
-  <section id="app" class="screen scroll hidden">
-    <div class="page">
-      <img src="assets/icon-192.png" alt="">
-      <h1>Hello Siza</h1>
-      <p>The gym is being built. Coming soon.</p>
-      <button class="pill" id="back">BACK</button>
+  <section id="app" class="screen hidden">
+    <!-- HOME -->
+    <div class="view" id="view-home">
+      <div class="topbar">
+        <button class="iconbtn" id="menuBtn" aria-label="Menu">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <img class="mark" src="assets/mark.png" alt="RISEN">
+      </div>
+      <div class="greet">
+        <div class="date" id="today"></div>
+        <h1 id="hello">Hello Siza</h1>
+      </div>
+      <div class="tiles" id="tiles"></div>
       <div class="version" id="version"></div>
     </div>
+
+    <!-- PLAN / CALENDAR / PROGRESS: built in a later step -->
+    <div class="view" id="view-plan" hidden><div class="soon"><h2>Plan</h2><p>Coming in a next step.</p></div></div>
+    <div class="view" id="view-calendar" hidden><div class="soon"><h2>Calendar</h2><p>Coming in a next step.</p></div></div>
+    <div class="view" id="view-progress" hidden><div class="soon"><h2>Progress</h2><p>Coming in a next step.</p></div></div>
+
+    <nav class="tabbar" role="tablist">
+      <button class="tab" role="tab" data-view="home" aria-selected="true">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>Home</button>
+      <button class="tab" role="tab" data-view="plan" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>Plan</button>
+      <button class="tab" role="tab" data-view="calendar" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendar</button>
+      <button class="tab" role="tab" data-view="progress" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M4 19h16"/><path d="m5 15 4.5-4.5 3.5 3L19 7"/></svg>Progress</button>
+    </nav>
   </section>
 
+  <!-- First launch: ask the name once -->
+  <div class="sheet-wrap" id="nameSheet" hidden>
+    <form class="sheet" id="nameForm" autocomplete="off">
+      <h2>What's your name?</h2>
+      <p>So RISEN can greet you. You can change it later in Settings.</p>
+      <input id="nameInput" type="text" maxlength="20" placeholder="Your name" autocapitalize="words" enterkeyhint="done">
+      <button class="primary" type="submit">CONTINUE</button>
+      <button class="textbtn" type="button" id="nameSkip">Skip</button>
+    </form>
+  </div>
+
 <script>
-  const intro=document.getElementById('intro'), app=document.getElementById('app'), btn=document.getElementById('login');
-  btn.onclick=()=>{intro.classList.add('hidden');app.classList.remove('hidden')};
-  document.getElementById('back').onclick=()=>{app.classList.add('hidden');intro.classList.remove('hidden')};
+  const $=id=>document.getElementById(id);
+  const intro=$('intro'), app=$('app');
+
+  // ---- Saved data (stays on this phone) ----
+  const KEY='risen', DEFAULT_NAME='Siza';
+  const store={restSec:90};
+  try{Object.assign(store,JSON.parse(localStorage.getItem(KEY))||{})}catch(e){}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}};
+  const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  // ---- Gym data helpers (the plan and log arrive with the Plan step) ----
+  // store.plan = {days:{1:{name,exercises:[...]}, ...}}  (keys 0=Sun .. 6=Sat)
+  // store.log  = ['2026-11-10', ...]  dates a planned session was done
+  const dayKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const planned=d=>!!(store.plan&&store.plan.days&&store.plan.days[d.getDay()]);
+  const done=d=>(store.log||[]).includes(dayKey(d));
+  function weekDays(){ // Monday to Sunday of this week
+    const t=new Date(); t.setHours(0,0,0,0); const mon=new Date(t); mon.setDate(t.getDate()-((t.getDay()+6)%7));
+    return [...Array(7)].map((_,i)=>{const d=new Date(mon); d.setDate(mon.getDate()+i); return d});
+  }
+  function streak(){ // planned sessions done in a row, counting back from today (today doesn't break it if not done yet)
+    let n=0; const d=new Date(); d.setHours(0,0,0,0);
+    for(let i=0;i<730;i++,d.setDate(d.getDate()-1)){
+      if(!planned(d)) continue;
+      if(done(d)) n++; else if(i>0) break;
+    }
+    return n;
+  }
+
+  // ---- Tiles: add a new tile by adding an entry here ----
+  const PLAY='<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>';
+  const TILES=[
+    {title:'Training', html(){
+      const w=store.plan&&store.plan.days?store.plan.days[new Date().getDay()]:null;
+      if(!store.plan) return `<div><div class="wname">No plan yet</div><div class="sub">Build your week in Plan</div></div>
+        <button class="ghost" data-go="plan">SET UP</button>`;
+      if(!w) return `<div><div class="wname">Rest day</div><div class="sub">Recover. Back at it tomorrow.</div></div>`;
+      const n=(w.exercises||[]).length;
+      return `<div><div class="wname">${esc(w.name)}</div><div class="sub">${n} exercise${n===1?'':'s'}</div></div>
+        <button class="play" aria-label="Start workout">${PLAY}</button>`;
+    }},
+    {title:'This week', stack:true, html(){
+      const days=weekDays(), today=dayKey(new Date());
+      const plannedN=days.filter(planned).length, doneN=days.filter(d=>planned(d)&&done(d)).length;
+      const dots=days.map(d=>`<span class="${planned(d)?'plan':''} ${planned(d)&&done(d)?'done':''} ${dayKey(d)===today?'today':''}">${'MTWTFSS'[(d.getDay()+6)%7]}</span>`).join('');
+      return `<div><div class="big">${doneN}<small>/${plannedN}</small></div><div class="sub">Sessions done</div></div><div class="days">${dots}</div>`;
+    }},
+    {title:'Streak', html(){
+      const n=streak();
+      return `<div><div class="big">${n}</div><div class="sub">Planned session${n===1?'':'s'} in a row</div></div>`;
+    }},
+  ];
+  function renderHome(){
+    $('hello').textContent='Hello '+(store.name||DEFAULT_NAME);
+    $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile"><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
+      <div class="tile-body${t.stack?' stack':''}">${t.html()}</div></article>`).join('');
+  }
+
+  // ---- Tabs ----
+  function show(view){
+    document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+view);
+    document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
+  }
+  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(t) show(t.dataset.view)};
+  $('tiles').onclick=e=>{const b=e.target.closest('[data-go]'); if(b) show(b.dataset.go)};
+
+  // ---- Name: asked once, on first ENTER ----
+  function closeName(name){
+    store.name=(name||'').trim()||DEFAULT_NAME; save(); $('nameInput').blur(); $('nameSheet').hidden=true; renderHome();
+  }
+  $('nameForm').onsubmit=e=>{e.preventDefault(); closeName($('nameInput').value)};
+  $('nameSkip').onclick=()=>closeName('');
+
+  // ---- ENTER: intro to Home (intro shows only when the app opens) ----
+  $('login').onclick=()=>{
+    renderHome(); show('home');
+    intro.classList.add('hidden'); app.classList.remove('hidden');
+    if(!store.name){ $('nameSheet').hidden=false; setTimeout(()=>$('nameInput').focus(),350); }
+  };
   if('serviceWorker' in navigator){
     // Check for a new release on launch and each time the app comes back to the foreground
     navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
