@@ -24,24 +24,14 @@
   .screen{position:fixed;inset:0;transition:opacity .5s ease,transform .5s ease}
   .hidden{opacity:0;pointer-events:none;transform:scale(1.04)}
 
-  /* INTRO */
-  #intro{background:url(assets/bg.jpg) center top/cover no-repeat}
-  #intro::after{content:"";position:absolute;inset:0;
-    background:linear-gradient(180deg,rgba(11,11,11,.35) 0%,rgba(11,11,11,0) 25%,rgba(11,11,11,0) 45%,rgba(11,11,11,.85) 70%,#0B0B0B 100%)}
-  .bottom{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;align-items:center;
-    padding:0 24px calc(env(safe-area-inset-bottom) + 34px)}
-  #enter{background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:14px;
-    animation:rise 1.1s cubic-bezier(.2,.8,.2,1) both}
-  #enter img{width:min(62vw,260px);height:auto;animation:glow 2.4s ease-in-out 1.2s infinite}
-  #enter:active img{transform:scale(.95)}
-  .slogan{font-family:Oswald,sans-serif;font-weight:700;letter-spacing:.32em;font-size:15px;color:var(--text);
-    animation:fade 1s ease .7s both}
-  .tap{margin-top:22px;font-family:Oswald,sans-serif;font-weight:500;font-size:12px;letter-spacing:.3em;color:var(--volt);
-    animation:fade 1s ease 1.4s both, blink 2.4s ease-in-out 2.4s infinite}
-  @keyframes rise{from{opacity:0;transform:translateY(40px) scale(.9)}to{opacity:1;transform:none}}
+  /* INTRO — full image, LOG IN button is part of the picture */
+  #intro{overflow:hidden;animation:fade .8s ease both}
+  #intro img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+  #login{position:absolute;border:0;background:transparent;border-radius:999px;cursor:pointer;
+    animation:glow 2.4s ease-in-out 1s infinite;transition:transform .12s ease,background .12s ease}
+  #login:active{transform:scale(.96);background:rgba(204,255,0,.12)}
+  @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(204,255,0,0)}50%{box-shadow:0 0 22px 2px rgba(204,255,0,.55)}}
   @keyframes fade{from{opacity:0}to{opacity:1}}
-  @keyframes glow{0%,100%{filter:drop-shadow(0 0 0 rgba(204,255,0,0))}50%{filter:drop-shadow(0 0 18px rgba(204,255,0,.55))}}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 
   /* APP screens scroll; the intro stays fixed */
   .scroll{overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
@@ -58,13 +48,8 @@
 </head>
 <body>
   <section id="intro" class="screen">
-    <div class="bottom">
-      <button id="enter" aria-label="Enter RISEN">
-        <img src="assets/logo.png" alt="RISEN">
-        <span class="slogan">NEVER TOO LATE</span>
-      </button>
-      <div class="tap">TAP TO ENTER</div>
-    </div>
+    <img src="assets/intro.jpg" alt="RISEN - Stronger every day">
+    <button id="login" aria-label="Log in"></button>
   </section>
 
   <section id="app" class="screen scroll hidden">
@@ -78,8 +63,15 @@
   </section>
 
 <script>
-  const intro=document.getElementById('intro'), app=document.getElementById('app');
-  document.getElementById('enter').onclick=()=>{intro.classList.add('hidden');app.classList.remove('hidden')};
+  const intro=document.getElementById('intro'), app=document.getElementById('app'), btn=document.getElementById('login');
+  // LOG IN button position inside the intro image (852 x 1846 px), mapped onto the screen like object-fit: cover
+  const IMG={w:852,h:1846}, BTN={x1:81,y1:1434,x2:770,y2:1533};
+  function placeButton(){
+    const W=innerWidth, H=innerHeight, s=Math.max(W/IMG.w,H/IMG.h), ox=(W-IMG.w*s)/2, oy=(H-IMG.h*s)/2;
+    Object.assign(btn.style,{left:ox+BTN.x1*s+'px',top:oy+BTN.y1*s+'px',width:(BTN.x2-BTN.x1)*s+'px',height:(BTN.y2-BTN.y1)*s+'px'});
+  }
+  placeButton(); addEventListener('resize',placeButton);
+  btn.onclick=()=>{intro.classList.add('hidden');app.classList.remove('hidden')};
   document.getElementById('back').onclick=()=>{app.classList.add('hidden');intro.classList.remove('hidden')};
   if('serviceWorker' in navigator){
     // Check for a new release on launch and each time the app comes back to the foreground
