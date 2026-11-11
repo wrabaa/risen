@@ -6,12 +6,8 @@
 <meta name="theme-color" content="#0B0B0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="RISEN">
-<script>
-  // Home-screen app: iOS makes 100% too short by the status bar (812 vs 874 on the screen), so the app is sized with 100lvh there.
-  if(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches) document.documentElement.classList.add('standalone');
-</script>
 <title>RISEN</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
@@ -26,9 +22,6 @@
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
   .screen{position:fixed;top:0;left:0;right:0;height:100%;transition:opacity .5s ease,transform .5s ease}
-  /* Home-screen app only: full screen height. A Safari tab keeps 100% (lvh there would hide under the toolbar). */
-  .standalone .screen,.standalone .sheet-wrap,.standalone .pviewer{bottom:auto;height:100vh;height:100lvh}
-  .standalone .toast{bottom:auto;top:calc(100vh - env(safe-area-inset-bottom) - 72px);top:calc(100lvh - env(safe-area-inset-bottom) - 72px)}
   .hidden{opacity:0;pointer-events:none;transform:scale(1.04)}
 
   /* INTRO: plain photo + real logo, text and button in code (stays right on every screen size) */
