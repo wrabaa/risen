@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0B0B0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RISEN">
+<title>RISEN</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0B0B0B;--card:#1A1A1A;--line:#262626;--text:#F2F2F2;--muted:#9A9A9A;--volt:#CCFF00}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
+  .screen{position:fixed;inset:0;transition:opacity .5s ease,transform .5s ease}
+  .hidden{opacity:0;pointer-events:none;transform:scale(1.04)}
+
+  /* INTRO */
+  #intro{background:url(assets/bg.jpg) center top/cover no-repeat}
+  #intro::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(11,11,11,.35) 0%,rgba(11,11,11,0) 25%,rgba(11,11,11,0) 45%,rgba(11,11,11,.85) 70%,#0B0B0B 100%)}
+  .bottom{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;align-items:center;
+    padding:0 24px calc(env(safe-area-inset-bottom) + 34px)}
+  #enter{background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:14px;
+    animation:rise 1.1s cubic-bezier(.2,.8,.2,1) both}
+  #enter img{width:min(62vw,260px);height:auto;animation:glow 2.4s ease-in-out 1.2s infinite}
+  #enter:active img{transform:scale(.95)}
+  .slogan{font-family:Oswald,sans-serif;font-weight:700;letter-spacing:.32em;font-size:15px;color:var(--text);
+    animation:fade 1s ease .7s both}
+  .tap{margin-top:22px;font-family:Oswald,sans-serif;font-weight:500;font-size:12px;letter-spacing:.3em;color:var(--volt);
+    animation:fade 1s ease 1.4s both, blink 2.4s ease-in-out 2.4s infinite}
+  @keyframes rise{from{opacity:0;transform:translateY(40px) scale(.9)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes glow{0%,100%{filter:drop-shadow(0 0 0 rgba(204,255,0,0))}50%{filter:drop-shadow(0 0 18px rgba(204,255,0,.55))}}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* APP placeholder */
+  #app{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}
+  #app img{width:96px}
+  #app h1{font-family:Oswald,sans-serif;font-weight:700;font-size:30px;letter-spacing:.06em;text-transform:uppercase}
+  #app p{color:var(--muted);font-size:15px}
+  .pill{margin-top:10px;min-height:48px;padding:0 28px;border-radius:999px;border:1px solid var(--line);background:var(--card);
+    color:var(--text);font-family:Oswald,sans-serif;font-size:14px;letter-spacing:.2em;cursor:pointer}
+</style>
+</head>
+<body>
+  <section id="intro" class="screen">
+    <div class="bottom">
+      <button id="enter" aria-label="Enter RISEN">
+        <img src="assets/logo.png" alt="RISEN">
+        <span class="slogan">NEVER TOO LATE</span>
+      </button>
+      <div class="tap">TAP TO ENTER</div>
+    </div>
+  </section>
+
+  <section id="app" class="screen hidden">
+    <img src="assets/icon-192.png" alt="">
+    <h1>Hello Siza</h1>
+    <p>The gym is being built. Coming soon.</p>
+    <button class="pill" id="back">BACK</button>
+  </section>
+
+<script>
+  const intro=document.getElementById('intro'), app=document.getElementById('app');
+  document.getElementById('enter').onclick=()=>{intro.classList.add('hidden');app.classList.remove('hidden')};
+  document.getElementById('back').onclick=()=>{app.classList.add('hidden');intro.classList.remove('hidden')};
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
