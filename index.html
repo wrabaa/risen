@@ -24,19 +24,28 @@
   .screen{position:fixed;top:0;left:0;right:0;height:100%;transition:opacity .5s ease,transform .5s ease}
   .hidden{opacity:0;pointer-events:none;transform:scale(1.04)}
 
-  /* INTRO — full image, LOG IN button is part of the picture */
+  /* INTRO: plain photo + real logo, text and button in code (stays right on every screen size) */
   #intro{overflow:hidden;background:var(--bg)}
-  /* Photo starts below the clock (iOS blurs the strip under the status bar) */
-  #intro img{position:absolute;left:0;top:env(safe-area-inset-top);width:100%;height:calc(100% - env(safe-area-inset-top));
-    object-fit:cover;object-position:center;animation:fade .8s ease both}
-  /* iPhone home-screen bug: the page ends one status-bar height early, leaving an empty strip at the bottom */
-  @media (display-mode: standalone){ .screen{height:calc(100% + env(safe-area-inset-top))} }
-  #app{background:var(--bg)}
-  #login{position:absolute;border:0;background:transparent;border-radius:999px;cursor:pointer;
-    animation:glow 2.4s ease-in-out 1s infinite;transition:transform .12s ease,background .12s ease}
-  #login:active{transform:scale(.96);background:rgba(204,255,0,.12)}
-  @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(204,255,0,0)}50%{box-shadow:0 0 22px 2px rgba(204,255,0,.55)}}
+  #intro .photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;animation:fade .8s ease both}
+  #intro::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(11,11,11,.75) 0%,rgba(11,11,11,0) 18%,rgba(11,11,11,0) 50%,rgba(11,11,11,.7) 72%,#0B0B0B 100%)}
+  .brand{position:absolute;z-index:2;top:calc(env(safe-area-inset-top) + 18px);left:24px;display:flex;align-items:center;gap:12px;
+    animation:fade 1s ease .3s both}
+  .brand img{height:30px;width:auto}
+  .brand span{font-family:Oswald,sans-serif;font-weight:500;font-size:22px;letter-spacing:.32em;color:var(--text)}
+  .hero{position:absolute;z-index:2;left:28px;right:28px;bottom:calc(env(safe-area-inset-bottom) + 36px);
+    animation:rise 1s cubic-bezier(.2,.8,.2,1) .2s both}
+  .hero h1{font-family:Oswald,sans-serif;font-weight:700;font-size:clamp(44px,13vw,60px);line-height:.98;text-transform:uppercase;letter-spacing:.01em}
+  .hero h1 em{display:block;font-style:normal;color:var(--volt)}
+  .hero p{margin-top:14px;font-size:13px;letter-spacing:.24em;line-height:1.7;color:#C9C9C9;text-transform:uppercase}
+  #login{margin-top:30px;width:100%;min-height:56px;border-radius:999px;border:1.5px solid var(--text);background:rgba(11,11,11,.55);
+    color:var(--text);font-family:Oswald,sans-serif;font-weight:700;font-size:20px;letter-spacing:.1em;cursor:pointer;
+    animation:glow 2.4s ease-in-out 1.4s infinite;transition:transform .12s ease,background .12s ease}
+  #login:active{transform:scale(.97);background:rgba(204,255,0,.15)}
+  @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(204,255,0,0)}50%{box-shadow:0 0 22px 2px rgba(204,255,0,.5)}}
+  @keyframes rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
   @keyframes fade{from{opacity:0}to{opacity:1}}
+  #app{background:var(--bg)}
 
   /* APP screens scroll; the intro stays fixed */
   .scroll{overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
@@ -53,8 +62,13 @@
 </head>
 <body>
   <section id="intro" class="screen">
-    <img src="assets/intro.jpg" alt="RISEN - Stronger every day">
-    <button id="login" aria-label="Log in"></button>
+    <img class="photo" src="assets/bg.jpg" alt="">
+    <div class="brand"><img src="assets/mark.png" alt=""><span>RISEN</span></div>
+    <div class="hero">
+      <h1>Stronger<em>Every day</em></h1>
+      <p>Train &bull; Track &bull; Progress<br>Rise again</p>
+      <button id="login">LOG IN</button>
+    </div>
   </section>
 
   <section id="app" class="screen scroll hidden">
@@ -69,16 +83,6 @@
 
 <script>
   const intro=document.getElementById('intro'), app=document.getElementById('app'), btn=document.getElementById('login');
-  // LOG IN button position inside the intro image (852 x 1846 px), mapped onto the screen like object-fit: cover
-  const IMG={w:852,h:1846}, BTN={x1:81,y1:1434,x2:770,y2:1533};
-  // Put the tap zone on the LOG IN button, measured from where the photo actually is on screen (object-fit: cover)
-  const img=document.querySelector('#intro img');
-  function placeButton(){
-    const r=img.getBoundingClientRect(), s=Math.max(r.width/IMG.w,r.height/IMG.h);
-    const ox=r.left+(r.width-IMG.w*s)/2, oy=r.top+(r.height-IMG.h*s)/2;
-    Object.assign(btn.style,{left:ox+BTN.x1*s+'px',top:oy+BTN.y1*s+'px',width:(BTN.x2-BTN.x1)*s+'px',height:(BTN.y2-BTN.y1)*s+'px'});
-  }
-  placeButton(); addEventListener('resize',placeButton); addEventListener('load',placeButton); setTimeout(placeButton,300);
   btn.onclick=()=>{intro.classList.add('hidden');app.classList.remove('hidden')};
   document.getElementById('back').onclick=()=>{app.classList.add('hidden');intro.classList.remove('hidden')};
   if('serviceWorker' in navigator){
