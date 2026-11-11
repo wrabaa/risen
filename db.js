@@ -10,7 +10,7 @@
 //              extra:true = unplanned session.  Skipped:  {..., skipped:true, reason, finishedAt:null}
 //   logs       {id, exerciseId, sessionId, date, at, sets:[{kg, reps}]}
 //              History is stored per EXERCISE ID, so changing routines never loses progress.
-//   settings   {key, value}   name, nameAsked, restSec, activeSession (workout in progress)
+//   settings   {key, value}   name, nameAsked, restSec, activeSession (workout in progress), lastExport
 //   photos     {exerciseId, type, data:ArrayBuffer, width, height, updated}
 //              ONE photo per exercise, keyed by exercise ID. Resized to max 1000px JPEG before saving.
 //
@@ -20,7 +20,6 @@ const RisenDB = (() => {
   const DB_NAME = 'risen', DB_VERSION = 2;
   const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos'];
   let dbp;
-  const openInfo = { version: null, oldVersion: null, error: null };   // for the debug panel
 
   function upgrade(db, old) {
     if (old < 1) {
@@ -41,10 +40,9 @@ const RisenDB = (() => {
   function open() {
     return dbp || (dbp = new Promise((res, rej) => {
       const r = indexedDB.open(DB_NAME, DB_VERSION);
-      r.onupgradeneeded = e => { openInfo.oldVersion = e.oldVersion; upgrade(r.result, e.oldVersion); };
-      r.onsuccess = () => { openInfo.version = r.result.version; if (openInfo.oldVersion == null) openInfo.oldVersion = r.result.version;
-        r.result.onversionchange = () => r.result.close(); res(r.result); };
-      r.onerror = () => { openInfo.error = String(r.error); rej(r.error); };
+      r.onupgradeneeded = e => upgrade(r.result, e.oldVersion);
+      r.onsuccess = () => { r.result.onversionchange = () => r.result.close(); res(r.result); };
+      r.onerror = () => rej(r.error);
       r.onblocked = () => rej(new Error('Database blocked: close other RISEN tabs'));
     }));
   }
@@ -183,5 +181,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, saveWorkout, deleteWorkout, workoutsOf,
-    saveExercise, logSession, skipWorkouts, resetAll, info: () => ({ ...openInfo }), historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
+    saveExercise, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();

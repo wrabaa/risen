@@ -8,6 +8,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="RISEN">
+<script>
+  // Home-screen app: iOS makes 100% too short by the status bar (812 vs 874 on the screen), so the app is sized with 100lvh there.
+  if(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches) document.documentElement.classList.add('standalone');
+</script>
 <title>RISEN</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
@@ -22,6 +26,9 @@
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
   .screen{position:fixed;top:0;left:0;right:0;height:100%;transition:opacity .5s ease,transform .5s ease}
+  /* Home-screen app only: full screen height. A Safari tab keeps 100% (lvh there would hide under the toolbar). */
+  .standalone .screen,.standalone .sheet-wrap,.standalone .pviewer{bottom:auto;height:100vh;height:100lvh}
+  .standalone .toast{bottom:auto;top:calc(100vh - env(safe-area-inset-bottom) - 72px);top:calc(100lvh - env(safe-area-inset-bottom) - 72px)}
   .hidden{opacity:0;pointer-events:none;transform:scale(1.04)}
 
   /* INTRO: plain photo + real logo, text and button in code (stays right on every screen size) */
@@ -90,6 +97,10 @@
   .days .done{background:var(--volt);border-color:var(--volt);color:#0B0B0B}
   .days span{position:relative}
   .days .today::after{content:"";position:absolute;left:50%;bottom:-10px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--volt)}
+  .backup-line{display:block;margin:22px auto 0;min-height:44px;padding:0 12px;border:0;background:none;color:var(--muted);
+    font:400 13px Inter,sans-serif;cursor:pointer}
+  .backup-line[hidden]{display:none}
+  .backup-line u{color:var(--text);text-decoration-color:#5A5A5A;text-underline-offset:3px}
   .version{margin-top:28px;text-align:center;font-size:11px;letter-spacing:.1em;color:var(--muted);opacity:.6}
 
   /* Placeholder views (Plan, Calendar, Progress come in a later step) */
@@ -281,12 +292,6 @@
   .pviewer-x{position:absolute;top:calc(env(safe-area-inset-top) + 10px);right:14px;width:44px;height:44px;border:0;border-radius:50%;
     display:grid;place-items:center;background:rgba(255,255,255,.12);color:#fff;cursor:pointer}
 
-  /* TEMPORARY screen-size debug panel (?debug in the URL, or tap the version 5 times in Settings) */
-  #debug{position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top) + 50px);z-index:50;padding:12px 14px;border-radius:12px;
-    background:rgba(0,0,0,.88);border:1px solid var(--volt);color:var(--volt);font:12px/1.55 ui-monospace,Menlo,monospace;white-space:pre;
-    -webkit-user-select:text;user-select:text;pointer-events:auto}
-  #debug[hidden]{display:none}
-  .probe{position:fixed;top:0;left:-10px;width:1px;visibility:hidden;pointer-events:none}
 
   /* First-launch name question */
   .sheet-wrap{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-start;justify-content:center;
@@ -331,6 +336,7 @@
         <h1 id="hello">Hello Siza</h1>
       </div>
       <div class="tiles" id="tiles"></div>
+      <button class="backup-line" id="backupLine" hidden></button>
     </div>
 
     <!-- GYM (Today + Plan) is built next; MEALS, MEDS, CLASSES come later -->
@@ -427,7 +433,6 @@
   </section>
 
   <div class="toast" id="toast"></div>
-  <pre id="debug" hidden></pre>
 
   <!-- Gym pop-ups -->
   <div class="sheet-wrap" id="gymSheet" hidden><div class="sheet" id="gymSheetBody"></div></div>
@@ -528,7 +533,14 @@
       return `<div><div class="big">${n}</div><div class="sub">Planned session${n===1?'':'s'} in a row</div></div>`;
     }},
   ];
+  // Quiet backup reminder: shows when there's a plan and the last export is missing or older than 7 days
+  function renderBackupLine(){
+    const last=S.settings.lastExport, days=last?Math.floor((Date.now()-new Date(last))/864e5):null, el=$('backupLine');
+    el.hidden=!activeRoutine()||(days!=null&&days<7);
+    el.innerHTML=(days==null?'No backup yet':`Last backup: ${days} days ago`)+' · <u>Back up</u>';
+  }
   function renderHome(){
+    renderBackupLine();
     $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile"><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
@@ -556,9 +568,7 @@
   $('nameSkip').onclick=()=>closeName('');
 
   // ---- ENTER: intro to Home (intro shows only when the app opens) ----
-  let storageState='opening…', launchNameAsked='?';
-  const ready=RisenDB.init().then(load).then(()=>{storageState='OK'; launchNameAsked=S.settings.nameAsked})
-    .catch(e=>{console.error(e); storageState='error: '+e.message; toast('Could not open storage: '+e.message)});
+  const ready=RisenDB.init().then(load).catch(e=>{console.error(e); toast('Could not open storage: '+e.message)});
   $('login').onclick=async()=>{
     await ready; renderHome(); show('home');
     intro.classList.add('hidden'); app.classList.remove('hidden');
@@ -602,15 +612,17 @@
   };
 
   // ---- Backup: export to a file, import from a file ----
+  async function exported(){ S.settings.lastExport=new Date().toISOString(); await RisenDB.setSetting('lastExport',S.settings.lastExport); renderHome(); }
+  $('backupLine').onclick=()=>$('exportBtn').click();
   $('exportBtn').onclick=async()=>{
     const name='risen-backup-'+dayKey(new Date())+'.json';
     const blob=new Blob([JSON.stringify(await RisenDB.exportAll(),null,2)],{type:'application/json'});
     const file=new File([blob],name,{type:'application/json'});
     try{
-      if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); return; } // iPhone: Save to Files
+      if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); await exported(); return; } // iPhone: Save to Files
     }catch(e){ if(e.name==='AbortError') return; }
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
-    setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove()},1000); toast('Backup saved');
+    setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove()},1000); toast('Backup saved'); await exported();
   };
   $('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
   $('importFile').onchange=async()=>{
@@ -622,46 +634,6 @@
     try{ await RisenDB.importAll(b); }catch(e){ toast(e.message==='Not a RISEN backup'?'That file is not a RISEN backup':e.message); return; }
     await load(); openSettings(); renderHome(); toast('Backup restored');
   };
-
-  // ---- TEMPORARY: screen-size debug panel. Remove once the full-screen fix is chosen. ----
-  let debugOn=/[?&]debug\b/.test(location.search); try{debugOn=debugOn||localStorage.getItem('risen-debug')==='1'}catch(e){}
-  function probe(css){const d=document.createElement('div'); d.className='probe'; d.style.cssText+=css; document.body.appendChild(d); const h=d.getBoundingClientRect().height; d.remove(); return Math.round(h*10)/10}
-  const dbg={nameAsked:'?',persisted:'?'};
-  async function debugStorage(){
-    try{ dbg.nameAsked=(await RisenDB.getSettings()).nameAsked }catch(e){ dbg.nameAsked='error: '+e.message }
-    try{ dbg.persisted=navigator.storage&&navigator.storage.persisted?await navigator.storage.persisted():'not supported' }catch(e){ dbg.persisted='error: '+e.message }
-  }
-  function debugTick(){
-    if(!debugOn){ $('debug').hidden=true; return; }
-    debugStorage(); const info=RisenDB.info();
-    const vv=window.visualViewport, tb=document.querySelector('.tabbar').getBoundingClientRect();
-    $('debug').hidden=false;
-    $('debug').textContent=[
-      'DEBUG  (tap version 5x to hide)',
-      'standalone       '+(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches),
-      'screen.height    '+screen.height,
-      'innerHeight      '+innerHeight,
-      'visualViewport   '+(vv?Math.round(vv.height*10)/10:'n/a'),
-      'clientHeight     '+document.documentElement.clientHeight,
-      '100%  (#app)     '+Math.round(app.getBoundingClientRect().height*10)/10,
-      '100vh            '+probe('height:100vh'),
-      '100svh           '+probe('height:100svh'),
-      '100dvh           '+probe('height:100dvh'),
-      '100lvh           '+probe('height:100lvh'),
-      'safe top         '+probe('height:env(safe-area-inset-top)'),
-      'safe bottom      '+probe('height:env(safe-area-inset-bottom)'),
-      'tab bar bottom   '+Math.round(tb.bottom*10)/10+'  (gap '+Math.round((screen.height-tb.bottom)*10)/10+')',
-      '---- storage ----',
-      'storage open     '+storageState,
-      'DB version       '+info.version+'  (launch: '+(info.oldVersion===0?'0 = new DB':info.oldVersion)+')',
-      'nameAsked        '+dbg.nameAsked+'  (launch: '+launchNameAsked+')',
-      'persisted()      '+dbg.persisted,
-    ].join('\n');
-  }
-  let taps=0, tapT;
-  $('version').onclick=()=>{ taps++; clearTimeout(tapT); tapT=setTimeout(()=>taps=0,1500);
-    if(taps>=5){ taps=0; debugOn=!debugOn; try{localStorage.setItem('risen-debug',debugOn?'1':'0')}catch(e){} debugTick(); } };
-  setInterval(debugTick,1000); addEventListener('resize',debugTick); debugTick();
 
   if('serviceWorker' in navigator){
     // Check for a new release on launch and each time the app comes back to the foreground
