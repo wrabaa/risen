@@ -20,6 +20,7 @@ const RisenDB = (() => {
   const DB_NAME = 'risen', DB_VERSION = 2;
   const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos'];
   let dbp;
+  const openInfo = { version: null, oldVersion: null, error: null };   // for the debug panel
 
   function upgrade(db, old) {
     if (old < 1) {
@@ -40,9 +41,10 @@ const RisenDB = (() => {
   function open() {
     return dbp || (dbp = new Promise((res, rej) => {
       const r = indexedDB.open(DB_NAME, DB_VERSION);
-      r.onupgradeneeded = e => upgrade(r.result, e.oldVersion);
-      r.onsuccess = () => { r.result.onversionchange = () => r.result.close(); res(r.result); };
-      r.onerror = () => rej(r.error);
+      r.onupgradeneeded = e => { openInfo.oldVersion = e.oldVersion; upgrade(r.result, e.oldVersion); };
+      r.onsuccess = () => { openInfo.version = r.result.version; if (openInfo.oldVersion == null) openInfo.oldVersion = r.result.version;
+        r.result.onversionchange = () => r.result.close(); res(r.result); };
+      r.onerror = () => { openInfo.error = String(r.error); rej(r.error); };
       r.onblocked = () => rej(new Error('Database blocked: close other RISEN tabs'));
     }));
   }
@@ -167,6 +169,13 @@ const RisenDB = (() => {
     try { localStorage.removeItem('risen'); } catch (e) {}
   }
 
+  // ---- Reset: empty every store (back to first launch) ----
+  async function resetAll() {
+    const db = await open(), t = db.transaction(STORES, 'readwrite');
+    for (const s of STORES) t.objectStore(s).clear();
+    await done(t);
+  }
+
   async function init() {
     await open();
     await migrateLocalStorage();
@@ -174,5 +183,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, saveWorkout, deleteWorkout, workoutsOf,
-    saveExercise, logSession, skipWorkouts, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
+    saveExercise, logSession, skipWorkouts, resetAll, info: () => ({ ...openInfo }), historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();

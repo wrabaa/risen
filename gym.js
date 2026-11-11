@@ -254,12 +254,15 @@ const Gym = (() => {
       <button class="primary" data-act="newroutine">CREATE ROUTINE</button></div>`;
     else {
       const ws = S.workouts.filter(w => w.routineId === r.id).sort((a, b) => (a.order || 0) - (b.order || 0));
-      h += `<div class="label" style="margin-top:0">Active routine</div><div class="card"><div class="wname">${esc(r.name)}</div><div class="sub">Since ${fmtDate(r.created)}</div>
-        <div class="btnrow"><button class="ghost" data-act="rename">RENAME</button><button class="ghost" data-act="newroutine">NEW ROUTINE</button></div></div>
+      h += `<div class="label" style="margin-top:0">Active routine</div><div class="card">
+        <div class="wrow"><div><div class="wname">${esc(r.name)}</div><div class="sub">Since ${fmtDate(r.created)}</div></div><button class="ghost sm" data-act="rename">RENAME</button></div>
+        <button class="cta" data-act="newroutine">+ NEW ROUTINE</button>
+        <p class="note">Starting a new program? The current routine is archived and your “Last time” history is kept.</p></div>
         <div class="label">Workouts</div><div class="gstack">`;
       for (const w of ws) { const n = w.exercises.length;
-        h += `<button class="card" data-edit="${esc(w.id)}"><div class="wrow"><div><div class="t">${esc(w.name)}</div>
-          <div class="s">${daysText(w.days)}${w.time ? ' · ' + esc(w.time) : ''} · ${n} exercise${n === 1 ? '' : 's'}</div></div>${I.chev}</div></button>`; }
+        h += `<div class="card wcard"><div class="wrow"><button class="wmain" data-edit="${esc(w.id)}"><div><div class="t">${esc(w.name)}</div>
+          <div class="s">${daysText(w.days)}${w.time ? ' · ' + esc(w.time) : ''} · ${n} exercise${n === 1 ? '' : 's'}</div></div>${I.chev}</button>
+          <div class="tools"><button data-delw="${esc(w.id)}" aria-label="Delete workout">${I.trash}</button></div></div></div>`; }
       h += `<button class="dashed" data-act="addworkout">+ Add workout</button></div>`;
     }
     if (archived.length) h += `<div class="label">Archived</div><div class="group">${archived.map(a =>
@@ -280,6 +283,11 @@ const Gym = (() => {
     const t = e.target.closest('button'); if (!t) return;
     if (t.dataset.edit) return openEditor(t.dataset.edit);
     if (t.dataset.archived) return openArchived(t.dataset.archived);
+    if (t.dataset.delw) {
+      const w = S.workouts.find(x => x.id === t.dataset.delw);
+      if (!confirm(`Delete the workout “${w.name}”? Its history is kept.`)) return;
+      await RisenDB.deleteWorkout(w.id); await load(); renderPlan(); renderHome(); return;
+    }
     switch (t.dataset.act) {
       case 'newroutine': return routineSheet('new');
       case 'rename': return routineSheet('rename');
@@ -400,5 +408,7 @@ const Gym = (() => {
     }
   });
 
-  return { open, start };
+  function reset() { Rest.stop(); closeAll(); seg = 'today'; }
+
+  return { open, start, reset };
 })();
