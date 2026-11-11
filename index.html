@@ -12,10 +12,12 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="icon" href="assets/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/fonts/oswald.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+  /* Fonts live in the app (Oswald and Inter, SIL Open Font License), so they work offline from the first launch */
+  @font-face{font-family:Oswald;font-weight:200 700;font-display:swap;src:url(assets/fonts/oswald.woff2) format("woff2")}
+  @font-face{font-family:Inter;font-weight:100 900;font-display:swap;src:url(assets/fonts/inter.woff2) format("woff2")}
   :root{--bg:#0B0B0B;--card:#1A1A1A;--line:#262626;--text:#F2F2F2;--muted:#9A9A9A;--volt:#CCFF00}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
@@ -41,11 +43,15 @@
   @keyframes glow{0%,100%{filter:drop-shadow(0 0 0 rgba(204,255,0,0))}50%{filter:drop-shadow(0 0 18px rgba(204,255,0,.55))}}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 
-  /* APP placeholder */
-  #app{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}
+  /* APP screens scroll; the intro stays fixed */
+  .scroll{overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
+  .page{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;
+    padding:calc(env(safe-area-inset-top) + 24px) 24px calc(env(safe-area-inset-bottom) + 24px)}
   #app img{width:96px}
   #app h1{font-family:Oswald,sans-serif;font-weight:700;font-size:30px;letter-spacing:.06em;text-transform:uppercase}
   #app p{color:var(--muted);font-size:15px}
+  .page>:first-child{margin-top:auto}
+  .version{margin-top:auto;padding-top:24px;font-size:11px;letter-spacing:.1em;color:var(--muted);opacity:.6}
   .pill{margin-top:10px;min-height:48px;padding:0 28px;border-radius:999px;border:1px solid var(--line);background:var(--card);
     color:var(--text);font-family:Oswald,sans-serif;font-size:14px;letter-spacing:.2em;cursor:pointer}
 </style>
@@ -61,18 +67,34 @@
     </div>
   </section>
 
-  <section id="app" class="screen hidden">
-    <img src="assets/icon-192.png" alt="">
-    <h1>Hello Siza</h1>
-    <p>The gym is being built. Coming soon.</p>
-    <button class="pill" id="back">BACK</button>
+  <section id="app" class="screen scroll hidden">
+    <div class="page">
+      <img src="assets/icon-192.png" alt="">
+      <h1>Hello Siza</h1>
+      <p>The gym is being built. Coming soon.</p>
+      <button class="pill" id="back">BACK</button>
+      <div class="version" id="version"></div>
+    </div>
   </section>
 
 <script>
   const intro=document.getElementById('intro'), app=document.getElementById('app');
   document.getElementById('enter').onclick=()=>{intro.classList.add('hidden');app.classList.remove('hidden')};
   document.getElementById('back').onclick=()=>{app.classList.add('hidden');intro.classList.remove('hidden')};
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+  if('serviceWorker' in navigator){
+    // Check for a new release on launch and each time the app comes back to the foreground
+    navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+      document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update()});
+    });
+    // When a new release takes over, reload once so the new files show
+    let reloading=false;
+    if(navigator.serviceWorker.controller) navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(!reloading){reloading=true;location.reload()}
+    });
+  }
+  // Show the installed version (small text on the app screen) to confirm an update arrived
+  if('caches' in window) caches.keys().then(k=>{const v=k.find(n=>n.startsWith('risen-'));
+    if(v) document.getElementById('version').textContent='v'+v.slice(6)});
 </script>
 </body>
 </html>
