@@ -678,13 +678,16 @@
     return S.routines.find(r=>dayKey(new Date(r.created))<=k&&(!r.archived||dayKey(new Date(r.archived))>k))||null;
   }
   const wTitle=w=>typeof workoutTitle==='function'?workoutTitle(w):w.name;   // "Chest · Triceps" (gym.js)
-  function plannedOn(d){                                    // workouts scheduled that day, earliest first
-    const r=routineOn(d); if(!r) return [];
-    return S.workouts.filter(w=>w.routineId===r.id&&(w.days||[]).includes(isoDay(d))&&(w.exercises||[]).length)
+  function plannedOn(d){ // workouts scheduled that day, earliest first (a day's plan only counts from the date it got exercises)
+    const r=routineOn(d), k=dayKey(d); if(!r) return [];
+    return S.workouts.filter(w=>w.routineId===r.id&&(w.days||[]).includes(isoDay(d))&&(w.exercises||[]).length&&(!w.since||w.since<=k))
       .sort((a,b)=>(a.time||'99').localeCompare(b.time||'99')||(a.order||0)-(b.order||0));
   }
   const doneIds=d=>new Set(S.sessions.filter(x=>x.date===dayKey(d)&&x.finishedAt&&!x.extra).map(x=>x.workoutId));
   const skippedIds=d=>new Set(S.sessions.filter(x=>x.date===dayKey(d)&&x.skipped).map(x=>x.workoutId));
+  // Planned workouts finished that day whose day plan has changed since (emptied, refilled, other program): a workout that
+  // was done stays done, whatever happens to the plan afterwards.
+  const keptDone=(list,ids)=>{const p=new Set(list.map(w=>w.id)); return [...ids].filter(id=>!p.has(id)).length};
   function weekDays(){ // Monday to Sunday of this week
     const t=new Date(); t.setHours(0,0,0,0); const mon=new Date(t); mon.setDate(t.getDate()-isoDay(t)+1);
     return [...Array(7)].map((_,i)=>{const d=new Date(mon); d.setDate(mon.getDate()+i); return d});
@@ -693,7 +696,8 @@
     let n=0; const d=new Date(); d.setHours(0,0,0,0);   // a skipped session (with a reason) neither counts nor breaks it
     for(let i=0;i<730;i++,d.setDate(d.getDate()-1)){
       const ids=doneIds(d), sk=skippedIds(d);
-      for(const w of plannedOn(d).reverse()){ if(ids.has(w.id)) n++; else if(sk.has(w.id)) continue; else if(i>0) return n; }
+      const list=plannedOn(d); n+=keptDone(list,ids);
+      for(const w of list.reverse()){ if(ids.has(w.id)) n++; else if(sk.has(w.id)) continue; else if(i>0) return n; }
     }
     return n;
   }
@@ -717,9 +721,9 @@
       const days=weekDays(), today=dayKey(new Date());
       let plannedN=0, doneN=0;
       const dots=days.map(d=>{
-        const sk=skippedIds(d), list=plannedOn(d).filter(w=>!sk.has(w.id)), ids=doneIds(d), dn=list.filter(w=>ids.has(w.id)).length;
-        plannedN+=list.length; doneN+=dn;
-        const cls=[list.length?'plan':'', list.length&&dn===list.length?'done':'', dayKey(d)===today?'today':''].join(' ');
+        const sk=skippedIds(d), list=plannedOn(d).filter(w=>!sk.has(w.id)), ids=doneIds(d), kept=keptDone(list,ids), dn=list.filter(w=>ids.has(w.id)).length+kept, all=list.length+kept;
+        plannedN+=all; doneN+=dn;
+        const cls=[all?'plan':'', all&&dn===all?'done':'', dayKey(d)===today?'today':''].join(' ');
         return `<span class="${cls}">${'MTWTFSS'[isoDay(d)-1]}</span>`;
       }).join('');
       return `<div><div class="big">${doneN}<small>/${plannedN}</small></div><div class="sub">Sessions done</div></div><div class="days">${dots}</div>`;

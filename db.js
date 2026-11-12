@@ -7,6 +7,8 @@
 //               exercises:[{exerciseId, sets, kg, reps}]}
 //              Since the week flow: ONE record per weekday of a routine (days has exactly one entry, time is empty,
 //              name is kept in step with the muscle groups). Older multi-day records are converted by migrateWeekdays().
+//              since:'YYYY-MM-DD' = the day this weekday's plan (last) went from empty to having exercises. Earlier dates are not
+//              "planned", so filling in a day never turns past weeks into misses (stampSince() fills it in for older records).
 //   exercises  {id, name, ...}   exercise library, referenced by ID (its photo lives in `photos`)
 //   sessions   {id, date:'YYYY-MM-DD', workoutId, routineId, name, extra, startedAt, finishedAt}
 //              extra:true = unplanned session.  Skipped:  {..., skipped:true, reason, finishedAt:null}
@@ -248,6 +250,7 @@ const RisenDB = (() => {
     } catch (e) { try { t.abort(); } catch (x) {} await finished.catch(() => {}); throw new Error(DAMAGED); }
     try { await finished; } catch (e) { throw new Error('Could not restore the backup. Nothing was changed.'); }
     await migrateWeekdays();                 // a backup made before the week flow gets converted too
+    await stampSince();
     return { settingsOnly: false };
   }
 
@@ -283,6 +286,21 @@ const RisenDB = (() => {
     await done(t); return true;
   }
 
+  // ---- Day plans know since when they exist (week count and streak never judge a date before that) ----
+  // Safe to run any time: only touches day plans that have exercises but no `since` yet (made before release .30, or from an
+  // older backup). They count from their first logged or skipped workout; a day never used counts from today.
+  async function stampSince() {
+    const db = await open(), t = db.transaction(['workouts', 'sessions'], 'readwrite'), ws = t.objectStore('workouts');
+    const [workouts, sessions] = await Promise.all([req(ws.getAll()), req(t.objectStore('sessions').getAll())]);
+    const d = new Date(), today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    for (const w of workouts) {
+      if (w.since || !(w.exercises || []).length) continue;
+      const first = sessions.filter(x => x.workoutId === w.id && x.date && !x.extra && (x.finishedAt || x.skipped)).map(x => String(x.date)).sort()[0];
+      ws.put({ ...w, since: first && first < today ? first : today });
+    }
+    await done(t);
+  }
+
   // ---- One-time move from the old localStorage (releases .12/.13) ----
   async function migrateLocalStorage() {
     let old; try { old = JSON.parse(localStorage.getItem('risen')); } catch (e) { return; }
@@ -307,6 +325,7 @@ const RisenDB = (() => {
     await open();
     await migrateLocalStorage();
     await migrateWeekdays();
+    await stampSince();
     try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch (e) {}
   }
 

@@ -103,6 +103,7 @@ const Gym = (() => {
   async function persistDay(d) {
     const w = dayRec(d); if (!w) return;
     w.name = workoutTitle(w);
+    if (!w.exercises.length) delete w.since; else if (!w.since) w.since = dayKey(new Date());   // planned from the day it got exercises
     try { await RisenDB.saveWorkout(w); flashSaved(); } catch (err) { toast(err.message); }
     if (syncDraft()) { renderGym(); toast('Workout closed: no exercises left'); }
   }
