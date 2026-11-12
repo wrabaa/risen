@@ -138,6 +138,12 @@ const RisenDB = (() => {
     await done(t);
   }
   const logDose = (medId, date, time) => put('medlogs', { id: `${medId}|${date}|${time}`, medId, date, time, takenAt: now() });
+  async function moveDose(oldId, time) {    // a dose already taken follows its med to a new time (same day, same "taken at")
+    const db = await open(), t = db.transaction('medlogs', 'readwrite'), st = t.objectStore('medlogs');
+    const l = await req(st.get(oldId)); let out = null;
+    if (l) { out = { ...l, id: `${l.medId}|${l.date}|${time}`, time }; st.delete(oldId); st.put(out); }
+    await done(t); return out;
+  }
   // ---- Recipes ----
   const saveRecipe = r => put('recipes', r);
   async function deleteRecipe(id) {         // the recipe and its photo
@@ -330,5 +336,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, saveWorkout, deleteWorkout, workoutsOf,
-    saveExercise, saveMed, deleteMed, logDose, undoDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
+    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();

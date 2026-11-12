@@ -148,6 +148,20 @@ const Meds = (() => {
 
   // ================= Editor =================
   let med = null, persisted = false;   // persisted: has this med been written to the database yet?
+  // tickAt[i] = the time under which today's tick of time row i is stored. When a time is edited, a dose already taken
+  // today moves with it, so it never shows as "not taken" again (which would invite a double dose).
+  let tickAt = [];
+  async function moveTicks() {
+    const today = dayKey(new Date());
+    for (let i = 0; i < med.times.length; i++) {
+      const cur = med.times[i], was = tickAt[i]; if (!cur || cur === was) continue;
+      tickAt[i] = cur; if (!was) continue;
+      const from = logId(med.id, today, was), to = logId(med.id, today, cur);
+      if (!S.medlogs.some(l => l.id === from) || S.medlogs.some(l => l.id === to)) continue;
+      const moved = await RisenDB.moveDose(from, cur);
+      if (moved) S.medlogs = S.medlogs.filter(l => l.id !== from).concat(moved);
+    }
+  }
   let savedT;
   function flashSaved() { const m = $('medSaved'); m.classList.add('show'); clearTimeout(savedT); savedT = setTimeout(() => m.classList.remove('show'), 1200); }
   const problem = () => !med.name.trim() ? 'Add a name to save this med.' : !med.times.some(Boolean) ? 'Add at least one time to save this med.'
@@ -161,7 +175,7 @@ const Meds = (() => {
   const saveMed = debounce(async () => {
     if (!med || problem()) return;
     try {
-      const rec = normalized(); await RisenDB.saveMed(rec); persisted = true;
+      const rec = normalized(); await RisenDB.saveMed(rec); persisted = true; if (med) await moveTicks();
       S.meds = S.meds.some(x => x.id === rec.id) ? S.meds.map(x => x.id === rec.id ? rec : x) : [...S.meds, rec];
       flashSaved();
     } catch (err) { toast(err.message); }
@@ -181,7 +195,7 @@ const Meds = (() => {
     const ex = id ? S.meds.find(m => m.id === id) : null;
     persisted = !!ex;
     med = ex ? JSON.parse(JSON.stringify(ex)) : { id: RisenDB.uid(), name: '', dose: '', times: ['08:00'], freq: 'daily', days: [], food: 'any', notes: '', paused: false, created: new Date().toISOString() };
-    med.times = med.times || []; med.days = med.days || [];
+    med.times = med.times || []; med.days = med.days || []; tickAt = ex ? [...med.times] : [];
     $('medTitle').textContent = ex ? 'Edit med' : 'New med';
     renderEditor(); openPage();
     if (!ex) setTimeout(() => $('mName').focus(), 320);
@@ -241,9 +255,9 @@ const Meds = (() => {
       renderFreq(); return touch();
     }
     if (t.dataset.food) { med.food = t.dataset.food; $('mFood').querySelectorAll('[data-food]').forEach(b => b.setAttribute('aria-pressed', b === t)); return touch(); }
-    if (t.dataset.tdel != null) { med.times.splice(+t.dataset.tdel, 1); renderTimes(); return touch(); }
+    if (t.dataset.tdel != null) { med.times.splice(+t.dataset.tdel, 1); tickAt.splice(+t.dataset.tdel, 1); renderTimes(); return touch(); }
     if (t.dataset.act === 'addtime') {
-      med.times.push(['20:00', '12:00', '14:00', '18:00', '22:00'].find(x => !med.times.includes(x)) || ''); renderTimes(); touch();
+      med.times.push(['20:00', '12:00', '14:00', '18:00', '22:00'].find(x => !med.times.includes(x)) || ''); tickAt.push(null); renderTimes(); touch();
       const ins = $('mTimes').querySelectorAll('input'); return ins[ins.length - 1].focus();
     }
     if (t.id === 'mPause') { med.paused = !med.paused; renderPauseBtn(); return touch(); }
