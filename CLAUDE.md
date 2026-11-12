@@ -70,6 +70,63 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 8. **Design pass** over the whole app (animations, premium feel) — later.
 9. Later: iCloud sync when RISEN becomes a native app (Capacitor). For now: Export/Import.
 
+## Decisions & history (WHY things are the way they are — do not "fix" these)
+**App-wide**
+- Web app (PWA) first because the Apple Developer account is blocked by payment from
+  Lebanon. Later it may be wrapped as a native app (Capacitor) for iCloud sync + Apple Health.
+- Personal + a few friends. Each phone is separate; friends can't affect each other's data.
+- Storage moved from localStorage to IndexedDB early (photos would exceed ~5 MB).
+- `persisted()` is false on iPhone → that's why Home shows a backup reminder after 7 days
+  (only when there's a plan; date saved only when export really completes).
+- Full-screen bug history: iOS standalone with `black-translucent` paints only 812 of 874 pt
+  → 62 pt dead strip at the bottom. `100lvh` made it worse (content cut). Fix = opaque
+  `black` status bar. Debug panel was removed after the fix.
+- Intro: text and buttons baked into a picture broke on every screen size → rule: photos are
+  backgrounds only; all text/buttons are real HTML. Intro photo = Siza's real B&W photo.
+- Navigation: ☰ menu was removed; bottom tab bar is the only navigation (gear = Settings).
+  Calendar and Progress tabs were removed on purpose (not needed; "Last time" on each
+  exercise IS the progress tracking).
+- Name: asked once on first ENTER; Skip → greeting just "HELLO" (friends use the app too).
+- Every editor: auto-save (0.4 s) + visible "✓ Saved" + DONE button + flush on
+  background (`visibilitychange` / `pagehide`).
+- Delete levels: 🗑 exercise (history kept) · 🗑 day/workout · "New program" (archives,
+  history kept) · Settings "Reset all data" (export first, double confirm).
+
+**GYM**
+- Siza thinks in DAYS, not "workouts": Week → Day → Exercise. No workout names, no days
+  picker, no time field (the time field pre-filled "now" — that was a bug, removed).
+- Day title is automatic from muscle groups (e.g. "Chest · Triceps").
+- Old "workouts with days" data was converted once to one plan per weekday (done, .23).
+- Home TRAINING tile = shortcut: shows the DAY name; tap → today's Day page (not the logger).
+  0 exercises → "Rest day", no ▶. Running workout stays in sync with the plan (.24).
+- THIS WEEK: a skipped workout drops out of the total (excused, like the streak).
+  Extra workouts count for history / "Last time" only, not THIS WEEK or STREAK.
+  STREAK: today not done yet doesn't break it; skipped-with-reason doesn't break it.
+- 🗑 inside a running workout removes the exercise only for that day.
+- Reps required to tick a set; empty kg = 0 (bodyweight). No sets ticked → offer discard.
+- Rest timer starts automatically on ✓, default from Settings (1:30), ±15 s, flashes lime at 0.
+- One photo per exercise, linked to exercise ID, shown everywhere; addable in the gym too.
+- Exercise library (66 generic) will be REPLACED by Siza's real gym list + built-in images.
+
+**MEDS**
+- A med counts from the day it's added (earlier days = "not scheduled", not "missed").
+- Known small flaw (accepted for now): changing a schedule re-judges past days.
+- Weekly = one weekday. Groups by exact time. Undo is per dose (on purpose, safer).
+- No notifications yet (separate project for later).
+
+**CLASSES**
+- Gym = Fitness Zone; 3 studios: Energy, Balance, Power. 37 classes, 15 instructors
+  (Cesar has no photo; Zumba Thu 19:30 instructor unknown = TBA).
+  Fri Pound time set to 17:30 (not labeled on the board — Siza's call).
+- Seed loads once on YES; afterwards it's normal editable data.
+- Instructor photos are public in the repo — Siza decided this is fine (they're already
+  public in the gym's own app). Current crops are low quality; better ones coming.
+- "Clear all classes" also removes instructors (they belong to the old gym).
+
+**MEALS**
+- 5 fixed categories. Ingredients stored as objects `{text}` so grams/kcal can be added
+  later without breaking recipes. Calories/barcode come later, planned in small steps.
+
 ## How we work (important)
 - **Siza + Claude (chat) plan; Claude Code builds; Siza tests on his iPhone.**
 - Build ONLY what the message asks. Do not redesign, rename, move or remove anything else.
