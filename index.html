@@ -277,6 +277,62 @@
   .stats b{display:block;font-family:Oswald,sans-serif;font-weight:700;font-size:30px;line-height:1.1}
   .stats span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 
+  /* ===== MEDS ===== */
+  #medPage .subtop h1{flex:1;min-width:0}
+  #medPage .saved,#medPage .donebtn{display:block}
+  .hint{margin:0 2px 10px;color:#FF6B6B}
+  .hint[hidden]{display:none}
+  .timerow{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+  .timerow .field{flex:1;min-width:0}
+  .timex{flex:none;width:52px;height:52px;border-radius:14px;border:1px solid var(--line);background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+  .timex:active{background:var(--line)}
+  .card.paused{opacity:.55}
+  .ringcard{display:flex;flex-direction:column;align-items:center;padding:22px 16px 20px}
+  .ringwrap{position:relative;width:168px;height:168px}
+  .ringwrap svg{display:block;width:100%;height:100%}
+  .rtrack{fill:none;stroke:var(--line);stroke-width:10}
+  .rfill{fill:none;stroke:var(--volt);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.32,.72,0,1)}
+  .rnum{position:absolute;inset:0;display:grid;place-items:center;font-family:Oswald,sans-serif;font-weight:700;font-size:54px;line-height:1}
+  .rnum small{margin-left:2px;font-size:.45em;font-weight:500;color:var(--muted)}
+  .rlabel{margin-top:14px;font-size:15px;color:var(--muted)}
+  .rlabel.ok{color:var(--volt);font-family:Oswald,sans-serif;font-weight:500;font-size:17px;letter-spacing:.12em;text-transform:uppercase}
+  .dose{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;transition:background .25s ease,border-color .25s ease,color .25s ease}
+  .dose.taken{background:var(--volt);border-color:var(--volt);color:#0B0B0B}
+  .drow{display:flex;align-items:center;gap:14px}
+  .dphoto{flex:none;width:88px;height:88px;border-radius:14px;overflow:hidden;background:#0F0F0F;display:grid;place-items:center;color:#5A5A5A}
+  .dphoto img{display:block;width:100%;height:100%;object-fit:cover}
+  .dphoto .icon{width:34px;height:34px}
+  .dose.taken .dphoto{background:rgba(0,0,0,.15);color:rgba(0,0,0,.4)}
+  .dmain{flex:1;min-width:0}
+  .dname{font-family:Oswald,sans-serif;font-weight:700;font-size:20px;line-height:1.1;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
+  .ddose{margin-top:4px;font-size:14px}
+  .dtime{margin-top:4px;font-size:13px;color:var(--muted)}
+  .dtaken{margin-top:4px;font-size:14px;font-weight:600}
+  .dose.taken .dtime{color:rgba(0,0,0,.65)}
+  .dtick{flex:none;width:64px;height:64px;border-radius:50%;border:1.5px solid #3A3A3A;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer;
+    transition:background .2s ease,color .2s ease}
+  .dtick svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .dtick:active{background:var(--line)}
+  .dose.taken .dtick{background:#0B0B0B;border-color:#0B0B0B;color:var(--volt)}
+  .mstrip{display:flex;justify-content:space-between;margin-top:14px;padding:0 6px}
+  .sd{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;width:32px;padding-bottom:9px}
+  .sd b{font-size:10px;font-weight:500;color:#6A6A6A}
+  .sd.today::after{content:"";position:absolute;bottom:0;width:4px;height:4px;border-radius:50%;background:var(--volt)}
+  .md{width:16px;height:16px;border-radius:50%;box-sizing:border-box}
+  .md.full{background:var(--volt)}
+  .md.half{background:linear-gradient(90deg,var(--volt) 50%,transparent 50%);border:1.5px solid var(--volt)}
+  .md.miss{background:#4A4A4A}
+  .md.pend{border:1.5px solid #5A5A5A}
+  .md.off{width:6px;height:6px;margin:5px;background:#2A2A2A}
+  .dose.taken .md.full{background:#0B0B0B}
+  .dose.taken .md.half{background:linear-gradient(90deg,#0B0B0B 50%,transparent 50%);border-color:#0B0B0B}
+  .dose.taken .md.miss{background:rgba(0,0,0,.28)}
+  .dose.taken .md.pend{border-color:rgba(0,0,0,.4)}
+  .dose.taken .md.off{background:rgba(0,0,0,.18)}
+  .dose.taken .sd b{color:rgba(0,0,0,.55)}
+  .dose.taken .sd.today::after{background:#0B0B0B}
+  @media (max-width:350px){.dphoto{width:72px;height:72px}.dtick{width:56px;height:56px}.drow{gap:10px}}
+
   /* EXERCISE PHOTO slot (photo.js): goes under each exercise in Plan and Today */
   .pslot{position:relative;margin-top:12px}
   .pslot-add{display:flex;align-items:center;justify-content:center;gap:10px;height:96px;border:1.5px dashed #3A3A3A;border-radius:14px;
@@ -351,7 +407,7 @@
       <div id="gymPlan" hidden></div>
     </div>
     <div class="view" id="view-meals" hidden><div class="soon"><h2>Meals</h2><p>Coming soon.</p></div></div>
-    <div class="view" id="view-meds" hidden><div class="soon"><h2>Meds</h2><p>Coming soon.</p></div></div>
+    <div class="view" id="view-meds" hidden><div id="medsBody"></div></div>
     <div class="view" id="view-classes" hidden><div class="soon"><h2>Classes</h2><p>Coming soon.</p></div></div>
 
     <!-- Rest timer: starts when a set is ticked -->
@@ -369,6 +425,12 @@
         <span class="saved" id="savedMark" aria-live="polite">✓ Saved</span>
         <button class="donebtn" data-close="gymPage">DONE</button></div>
       <div id="gymPageBody"></div>
+    </section>
+    <section class="subpage" id="medPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" id="medBack" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="medTitle">Med</h1>
+        <span class="saved" id="medSaved" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" id="medDone">DONE</button></div>
+      <div id="medBody"></div>
     </section>
     <section class="subpage" id="libPage" aria-hidden="true">
       <div class="subtop"><button class="iconbtn" data-close="libPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1>Add exercise</h1></div>
@@ -445,7 +507,7 @@
   <div class="sheet-wrap" id="resetSheet" hidden>
     <div class="sheet">
       <h2>Reset all data?</h2>
-      <p>Deletes everything on this phone: routines, workouts, history, photos, name and settings. Export a backup first if you might want it back.</p>
+      <p>Deletes everything on this phone: routines, workouts, meds, history, photos, name and settings. Export a backup first if you might want it back.</p>
       <button class="primary" type="button" id="resetExport">EXPORT BACKUP FIRST</button>
       <button class="dangerbtn" type="button" id="resetGo">RESET EVERYTHING</button>
       <button class="textbtn" type="button" id="resetCancel">Cancel</button>
@@ -470,10 +532,11 @@
   const intro=$('intro'), app=$('app');
 
   // ---- Data: lives in IndexedDB (db.js). This is an in-memory copy for drawing the screens. ----
-  const S={settings:{name:'',nameAsked:false,restSec:90},routines:[],workouts:[],sessions:[],exercises:[]};
+  const S={settings:{name:'',nameAsked:false,restSec:90},routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[]};
   async function load(){
     [S.settings,S.routines,S.workouts,S.sessions,S.exercises]=await Promise.all([RisenDB.getSettings(),RisenDB.all('routines'),
       RisenDB.all('workouts'),RisenDB.all('sessions'),RisenDB.all('exercises')]);
+    [S.meds,S.medlogs]=await Promise.all([RisenDB.all('meds'),RisenDB.all('medlogs')]);
   }
   const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -536,6 +599,14 @@
       const n=streak();
       return `<div><div class="big">${n}</div><div class="sub">Planned session${n===1?'':'s'} in a row</div></div>`;
     }},
+    {title:'Meds', html(){
+      if(typeof Meds==='undefined') return '';
+      const s=Meds.summary();
+      if(!s.hasMeds) return `<div><div class="wname">No meds yet</div><div class="sub">Add them in Meds</div></div><button class="ghost" data-tab="meds">ADD</button>`;
+      if(!s.total) return `<div><div class="wname">No doses today</div><div class="sub">Nothing scheduled</div></div>`;
+      if(s.taken===s.total) return `<div><div class="wname">All done today ✓</div><div class="sub">${s.taken} of ${s.total} taken</div></div>`;
+      return `<div><div class="wname">${s.taken} of ${s.total} taken today</div><div class="sub">Next: ${esc(s.next.m.name)} · ${esc(s.next.t)}</div></div>`;
+    }},
   ];
   // Quiet backup reminder: shows when there's a plan and the last export is missing or older than 7 days
   function renderBackupLine(){
@@ -556,8 +627,9 @@
     document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+view);
     document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
   }
-  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open('today'); else show(t.dataset.view)};
+  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open('today'); else if(t.dataset.view==='meds') Meds.open(); else show(t.dataset.view)};
   $('tiles').onclick=e=>{
+    const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     const b=e.target.closest('[data-go]'); if(b) return Gym.open(b.dataset.go);
     const p=e.target.closest('[data-workout]'); if(p) Gym.start(p.dataset.workout);
   };
@@ -656,5 +728,6 @@
 </script>
 <script src="library.js"></script>
 <script src="gym.js"></script>
+<script src="meds.js"></script>
 </body>
 </html>

@@ -13,12 +13,16 @@
 //   settings   {key, value}   name, nameAsked, restSec, activeSession (workout in progress), lastExport
 //   photos     {exerciseId, type, data:ArrayBuffer, width, height, updated}
 //              ONE photo per exercise, keyed by exercise ID. Resized to max 1000px JPEG before saving.
+//              A med's box photo lives here too, under the key 'med-<medId>'.
+//   meds       {id, name, dose, times:['08:00',..], freq:'daily'|'days'|'weekly', days:[1..7],
+//               food:'yes'|'no'|'any', notes, paused, created}
+//   medlogs    {id:'<medId>|<date>|<time>', medId, date, time, takenAt}   one row per dose taken
 //
 // SCHEMA VERSION: raise DB_VERSION and add a new `if (old < N)` step in upgrade().
 // Never delete or rename a store in an upgrade, so updates never lose data.
 const RisenDB = (() => {
-  const DB_NAME = 'risen', DB_VERSION = 2;
-  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos'];
+  const DB_NAME = 'risen', DB_VERSION = 3;
+  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs'];
   let dbp;
 
   function upgrade(db, old) {
@@ -34,6 +38,10 @@ const RisenDB = (() => {
     }
     if (old < 2) {
       db.createObjectStore('photos', { keyPath: 'exerciseId' });   // v2: one photo per exercise
+    }
+    if (old < 3) {                                                  // v3: Meds
+      db.createObjectStore('meds', { keyPath: 'id' });
+      db.createObjectStore('medlogs', { keyPath: 'id' }).createIndex('date', 'date');
     }
   }
 
@@ -100,6 +108,18 @@ const RisenDB = (() => {
 
   // ---- Exercise library ----
   const saveExercise = e => put('exercises', { id: uid(), ...e });
+
+  // ---- Meds ----
+  const saveMed = m => put('meds', m);
+  async function deleteMed(id) {            // the med, its box photo and every dose logged for it
+    const db = await open(), t = db.transaction(['meds', 'medlogs', 'photos'], 'readwrite');
+    t.objectStore('meds').delete(id);
+    t.objectStore('photos').delete('med-' + id);
+    t.objectStore('medlogs').delete(IDBKeyRange.bound(id + '|', id + '|\uffff'));
+    await done(t);
+  }
+  const logDose = (medId, date, time) => put('medlogs', { id: `${medId}|${date}|${time}`, medId, date, time, takenAt: now() });
+  async function undoDose(id) { const db = await open(), t = db.transaction('medlogs', 'readwrite'); t.objectStore('medlogs').delete(id); await done(t); }
 
   // ---- Sessions + per-exercise logs, saved together ----
   async function logSession({ date, workoutId, routineId, name, extra, startedAt, entries }) {
@@ -181,5 +201,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, saveWorkout, deleteWorkout, workoutsOf,
-    saveExercise, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
+    saveExercise, saveMed, deleteMed, logDose, undoDose, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();
