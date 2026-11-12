@@ -5,10 +5,6 @@ const Meds = (() => {
   const I = {
     check: '<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7.5"/></svg>',
     pill: '<svg class="icon" viewBox="0 0 24 24"><rect x="2.8" y="8.2" width="18.4" height="7.6" rx="3.8" transform="rotate(-45 12 12)"/><path d="m8.6 8.6 6.8 6.8"/></svg>',
-    pause: '<svg class="icon" viewBox="0 0 24 24"><path d="M8.5 5v14M15.5 5v14"/></svg>',
-    play: '<svg class="icon" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg>',
-    trash: '<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',
-    chev: '<svg class="icon chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>',
     x: '<svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   };
 
@@ -73,25 +69,32 @@ const Meds = (() => {
   }
   function doseCard(d, lm) {
     const m = d.m, log = lm.get(d.id), food = foodText(m);
+    const meta = [log ? `<b>Taken ${hhmm(log.takenAt)}</b>` : '', food].filter(Boolean).join(' · ');
     return `<div class="dose${log ? ' taken' : ''}"><div class="drow">
       <div class="dphoto" data-mphoto="${esc(m.id)}">${thumbHtml(m.id)}</div>
-      <div class="dmain"><div class="dname">${esc(m.name)}</div>${m.dose ? `<div class="ddose">${esc(m.dose)}</div>` : ''}
-        <div class="dtime">${esc(d.t)}${food ? ' · ' + food : ''}</div>${log ? `<div class="dtaken">Taken ${hhmm(log.takenAt)}</div>` : ''}</div>
+      <div class="dmain"><div class="dname">${esc(m.name)}</div>${m.dose ? `<div class="ddose">${esc(m.dose)}</div>` : ''}${meta ? `<div class="dtime">${meta}</div>` : ''}</div>
       <button class="dtick" data-dose="${esc(d.id)}" aria-label="${log ? 'Taken, tap to undo' : 'Mark as taken'}">${I.check}</button></div>
       ${stripHtml(m, lm)}</div>`;
   }
+  // Doses with the same time sit under one header, e.g. "14:00 · LUNCH"
+  function dayPart(t) { const h = +String(t).slice(0, 2); return h >= 5 && h < 11 ? 'Morning' : h >= 11 && h < 15 ? 'Lunch' : h >= 15 && h < 21 ? 'Evening' : 'Night'; }
+  function groupHtml(g, lm) {
+    const left = g.ds.filter(d => !lm.has(d.id)).length;
+    return `<div class="dgroup"><div class="dhead"><span class="dh">${esc(g.t)} · ${dayPart(g.t)}</span>${left
+      ? `<button class="takeall" data-takeall="${esc(g.t)}">✓ TAKE ALL</button>` : '<span class="alldone">ALL TAKEN ✓</span>'}</div>
+      <div class="dstack">${g.ds.map(d => doseCard(d, lm)).join('')}</div></div>`;
+  }
+  // A row of "My meds": the whole row opens the editor (pause and delete live there)
   function listCard(m) {
     const sub = [m.dose, (m.times || []).join(', '), freqText(m), m.paused ? 'Paused' : ''].filter(Boolean).map(esc).join(' · ');
-    return `<div class="card wcard${m.paused ? ' paused' : ''}"><div class="wrow"><button class="wmain" data-edit="${esc(m.id)}"><div><div class="t">${esc(m.name)}</div>
-      <div class="s">${sub}</div></div>${I.chev}</button>
-      <div class="tools"><button data-pause="${esc(m.id)}" aria-label="${m.paused ? 'Resume' : 'Pause'}">${m.paused ? I.play : I.pause}</button>
-      <button data-del="${esc(m.id)}" aria-label="Delete">${I.trash}</button></div></div></div>`;
+    return `<button class="card${m.paused ? ' paused' : ''}" data-edit="${esc(m.id)}"><div class="wrow"><div><div class="t">${esc(m.name)}</div><div class="s">${sub}</div></div></div></button>`;
   }
 
   function render() {
     const el = $('medsBody'); lastDay = dayKey(new Date());
     const now = new Date(), lm = logMap(), doses = dosesOn(now), total = doses.length, taken = doses.filter(d => lm.has(d.id)).length;
     let h = `<div class="gh"><h2>Meds</h2><span class="meta">${now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}</span></div>`;
+    const groups = []; for (const d of doses) { const g = groups[groups.length - 1]; if (g && g.t === d.t) g.ds.push(d); else groups.push({ t: d.t, ds: [d] }); }
     let ring = null;
     if (!S.meds.length) {
       h += `<div class="card empty"><div class="wname">No meds yet</div><div class="sub">Add your medication and supplements to tick off what you take each day.</div>
@@ -104,8 +107,9 @@ const Meds = (() => {
       h += `<div class="gstack"><div class="card ringcard"><div class="ringwrap"><svg viewBox="0 0 120 120"><circle class="rtrack" cx="60" cy="60" r="52"/>
         <circle class="rfill" id="rfill" cx="60" cy="60" r="52" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - from)}" transform="rotate(-90 60 60)"/></svg>
         <div class="rnum"><span>${taken}<small>/${total}</small></span></div></div><div class="rlabel${complete ? ' ok' : ''}">${label}</div></div>
-        ${doses.map(d => doseCard(d, lm)).join('')}</div>`;
-      const list = [...S.meds].sort((a, b) => ((a.times || [])[0] || '').localeCompare((b.times || [])[0] || '') || a.name.localeCompare(b.name));
+        ${groups.map(g => groupHtml(g, lm)).join('')}</div>`;
+      const list = [...S.meds].sort((a, b) => (a.paused ? 1 : 0) - (b.paused ? 1 : 0)           // active first (by time), paused last
+        || ((a.times || [])[0] || '').localeCompare((b.times || [])[0] || '') || a.name.localeCompare(b.name));
       h += `<div class="label">My meds</div><div class="gstack">${list.map(listCard).join('')}<button class="dashed" data-act="add">+ Add med</button></div>`;
     }
     el.innerHTML = h;
@@ -127,17 +131,15 @@ const Meds = (() => {
       }
       render(); renderHome(); return;
     }
+    if (t.dataset.takeall) {
+      const lm = logMap();
+      for (const d of dosesOn(new Date()).filter(x => x.t === t.dataset.takeall && !lm.has(x.id))) {
+        const [medId, date, time] = d.id.split('|'); S.medlogs.push(await RisenDB.logDose(medId, date, time));
+      }
+      render(); renderHome(); return;
+    }
     if (t.dataset.edit) return openEditor(t.dataset.edit);
     if (t.dataset.act === 'add') return openEditor(null);
-    if (t.dataset.pause) {
-      const m = S.meds.find(x => x.id === t.dataset.pause), rec = { ...m, paused: !m.paused };
-      await RisenDB.saveMed(rec); S.meds = S.meds.map(x => x.id === rec.id ? rec : x); render(); renderHome(); return;
-    }
-    if (t.dataset.del) {
-      const m = S.meds.find(x => x.id === t.dataset.del);
-      if (!confirm(`Delete “${m.name}”? Its photo and history are deleted too.`)) return;
-      await removeMed(m.id); render(); renderHome();
-    }
   });
   async function removeMed(id) {
     await RisenDB.deleteMed(id);
