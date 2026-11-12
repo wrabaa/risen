@@ -5,6 +5,8 @@
 //              Only ONE active routine. Creating a new one archives the old one (kept, read-only).
 //   workouts   {id, routineId, name, days:[1..7] (1=Mon … 7=Sun), time:'HH:MM', order,
 //               exercises:[{exerciseId, sets, kg, reps}]}
+//              Since the week flow: ONE record per weekday of a routine (days has exactly one entry, time is empty,
+//              name is kept in step with the muscle groups). Older multi-day records are converted by migrateWeekdays().
 //   exercises  {id, name, ...}   exercise library, referenced by ID (its photo lives in `photos`)
 //   sessions   {id, date:'YYYY-MM-DD', workoutId, routineId, name, extra, startedAt, finishedAt}
 //              extra:true = unplanned session.  Skipped:  {..., skipped:true, reason, finishedAt:null}
@@ -172,6 +174,39 @@ const RisenDB = (() => {
     const db = await open(), t = db.transaction(STORES, 'readwrite');
     for (const s of STORES) { const st = t.objectStore(s); st.clear(); for (const row of stores[s] || []) st.put(row); }
     await done(t);
+    await migrateWeekdays();                 // a backup made before the week flow gets converted too
+  }
+
+  // ---- Week flow: one record per weekday in the active routine ----
+  // Safe to run any time (does nothing when the plan already has that shape). It never loses an exercise:
+  //   a workout on several days becomes one copy per day, two workouts on the same day are merged (earliest first),
+  //   and past sessions are pointed at the record of their weekday, so history and streak stay right.
+  async function migrateWeekdays() {
+    const db = await open(), t = db.transaction(['routines', 'workouts', 'sessions'], 'readwrite');
+    const rs = t.objectStore('routines'), ws = t.objectStore('workouts'), ss = t.objectStore('sessions');
+    const [routines, workouts, sessions] = await Promise.all([req(rs.getAll()), req(ws.getAll()), req(ss.getAll())]);
+    const active = routines.find(r => r.status === 'active');
+    const mine = active ? workouts.filter(w => w.routineId === active.id && (w.days || []).length) : [];   // no days = left alone
+    const byDay = d => mine.filter(w => w.days.includes(d)).sort((a, b) => (a.time || '99').localeCompare(b.time || '99') || (a.order || 0) - (b.order || 0));
+    const needed = mine.some(w => w.days.length !== 1 || w.time) || [1, 2, 3, 4, 5, 6, 7].some(d => byDay(d).length > 1);
+    if (!needed) { await done(t); return false; }
+    const claimed = new Set(), map = new Map(), recs = [];
+    for (let d = 1; d <= 7; d++) {
+      const src = byDay(d); if (!src.length) continue;
+      const id = claimed.has(src[0].id) ? uid() : (claimed.add(src[0].id), src[0].id);
+      recs.push({ ...src[0], id, routineId: active.id, days: [d], time: '', order: d, exercises: src.flatMap(w => JSON.parse(JSON.stringify(w.exercises || []))) });
+      for (const w of src) map.set(w.id + '|' + d, id);
+    }
+    for (const w of mine) if (!claimed.has(w.id)) ws.delete(w.id);
+    for (const r of recs) ws.put(r);
+    const ids = new Set(mine.map(w => w.id));
+    for (const s of sessions) {
+      if (!ids.has(s.workoutId)) continue;
+      const [y, m, dd] = String(s.date).split('-').map(Number), wd = (new Date(y, m - 1, dd).getDay() + 6) % 7 + 1;
+      const to = map.get(s.workoutId + '|' + wd) || (claimed.has(s.workoutId) ? s.workoutId : [...map].find(([k]) => k.startsWith(s.workoutId + '|'))?.[1]);
+      if (to && to !== s.workoutId) ss.put({ ...s, workoutId: to });
+    }
+    await done(t); return true;
   }
 
   // ---- One-time move from the old localStorage (releases .12/.13) ----
@@ -197,9 +232,10 @@ const RisenDB = (() => {
   async function init() {
     await open();
     await migrateLocalStorage();
+    await migrateWeekdays();
     try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch (e) {}
   }
 
-  return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, saveWorkout, deleteWorkout, workoutsOf,
+  return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, saveWorkout, deleteWorkout, workoutsOf,
     saveExercise, saveMed, deleteMed, logDose, undoDose, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();

@@ -1,7 +1,22 @@
-// RISEN Gym tab: TODAY (log today's workout) and PLAN (routine builder).
-// Uses the shared helpers from index.html (S, load, renderHome, show, toast, esc, dayKey, plannedOn, ...).
+// RISEN Gym tab. Three levels: THE WEEK (7 days) -> THE DAY (its exercises) -> THE EXERCISE (targets, photo, notes),
+// plus the workout logger (START WORKOUT), which takes over the tab until you finish or discard.
+// Uses the shared helpers from index.html (S, load, renderHome, show, toast, esc, dayKey, isoDay, weekDays, plannedOn, ...).
+
+// ---- Shared (also used by Home): exercise info and the automatic title of a day ----
+function exerciseInfo(id) {
+  const base = LIBRARY.byId[id], rec = S.exercises.find(e => e.id === id);
+  if (base) return rec && rec.notes ? { ...base, notes: rec.notes } : base;       // notes on a library exercise live in a small record of their own
+  return rec || { id, name: 'Unknown exercise', muscle: '' };
+}
+function workoutTitle(w) {          // "Chest · Triceps": the muscle groups of the exercises, in order
+  const seen = [];
+  for (const it of w.exercises || []) { const m = exerciseInfo(it.exerciseId).muscle; if (m && m !== 'Custom' && !seen.includes(m)) seen.push(m); }
+  return seen.length ? seen.join(' · ') : ((w.exercises || []).length ? 'Workout' : (w.name || ''));
+}
+
 const Gym = (() => {
   const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const DAYNAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const I = {
     up: '<svg class="icon" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></svg>',
     down: '<svg class="icon" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>',
@@ -9,14 +24,17 @@ const Gym = (() => {
     chev: '<svg class="icon chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>',
     check: '<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7.5"/></svg>',
     play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>',
+    bar: '<svg class="icon" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>',
   };
-  let seg = 'today';
+  let curDay = null, curEx = null;            // which day / exercise is open (levels 2 and 3)
+  let lastDay = dayKey(new Date());
 
   const num = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isFinite(n) ? n : null; };
   const fmtN = n => (n === '' || n == null) ? '' : String(Math.round(Number(n) * 100) / 100);
-  const exInfo = id => LIBRARY.byId[id] || S.exercises.find(e => e.id === id) || { id, name: 'Unknown exercise', muscle: '' };
+  const exInfo = exerciseInfo;
   const daysText = d => (d && d.length) ? [...d].sort().map(x => DAYS[x - 1]).join(' · ') : 'No days set';
   const fmtDate = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const targetText = it => `${it.sets} × ${fmtN(it.reps)}${num(it.kg) > 0 ? ' · ' + fmtN(it.kg) + ' kg' : ''}`;
   function fmtClock(ms) { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = String(s % 60).padStart(2, '0'); return h ? `${h}:${String(m).padStart(2, '0')}:${x}` : `${m}:${x}`; }
   function fmtDur(ms) { const m = Math.max(1, Math.round(ms / 60000)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`; }
   // Runs fn after ms of quiet. flush() runs it now, but only if a change is waiting.
@@ -29,24 +47,19 @@ const Gym = (() => {
   }
 
   // ================= Navigation =================
-  function open(which) {
-    seg = which || 'today';
-    closeAll(); show('gym'); renderSeg();
-  }
-  function renderSeg() {
-    document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-selected', b.dataset.seg === seg));
-    $('gymToday').hidden = seg !== 'today'; $('gymPlan').hidden = seg !== 'plan';
-    seg === 'today' ? renderToday() : renderPlan();
+  function open() { closeAll(); show('gym'); renderGym(); }       // the Gym tab always opens on the week (or the workout in progress)
+  function renderGym() {
+    const d = draft();
+    $('gymLog').hidden = !d; $('gymWeek').hidden = !!d;
+    d ? renderLog($('gymLog'), d) : renderWeek();
     $('view-gym').scrollTop = 0;
   }
-  document.querySelector('.seg').onclick = e => { const b = e.target.closest('[data-seg]'); if (b && b.dataset.seg !== seg) { seg = b.dataset.seg; renderSeg(); } };
-
-  function openPage(id, title) {
-    if (title != null) $('gymPageTitle').textContent = title;
-    const p = $(id); p.scrollTop = 0; p.classList.add('open'); p.setAttribute('aria-hidden', 'false');
+  function openPage(id) { const p = $(id); p.scrollTop = 0; p.classList.add('open'); p.setAttribute('aria-hidden', 'false'); }
+  const onClose = {};
+  function closePage(id) {
+    const p = $(id); p.classList.remove('open'); p.setAttribute('aria-hidden', 'true');
+    const f = onClose[id]; onClose[id] = null; if (f) f();
   }
-  function closePage(id) { const p = $(id); p.classList.remove('open'); p.setAttribute('aria-hidden', 'true'); if (id === 'gymPage' && pageOnClose) { const f = pageOnClose; pageOnClose = null; f(); } }
-  let pageOnClose = null;
   document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => { document.activeElement.blur(); closePage(b.dataset.close); });
 
   function openSheet(html, { dismiss = true } = {}) {
@@ -54,38 +67,201 @@ const Gym = (() => {
   }
   function closeSheet() { document.activeElement.blur(); $('gymSheet').hidden = true; $('gymSheetBody').innerHTML = ''; }
   $('gymSheet').addEventListener('click', e => { if (e.target === $('gymSheet') && $('gymSheet').dataset.dismiss) closeSheet(); });
-  function closeAll() { closeSheet(); ['libPage', 'gymPage'].forEach(id => $(id).classList.contains('open') && closePage(id)); }
+  function closeAll() { closeSheet(); ['libPage', 'exPage', 'gymPage'].forEach(id => $(id).classList.contains('open') && closePage(id)); }
 
-  // ================= TODAY =================
+  // ================= Plan data: one record per weekday in the active program =================
+  function dayRec(d) {
+    const r = activeRoutine(); if (!r) return null;
+    return S.workouts.filter(w => w.routineId === r.id && (w.days || []).length === 1 && w.days[0] === d)
+      .sort((a, b) => (b.exercises || []).length - (a.exercises || []).length)[0] || null;
+  }
+  async function ensureDay(d) {       // the program and the day's record are created the first time they're needed
+    let r = activeRoutine();
+    if (!r) { r = await RisenDB.createRoutine('My program'); S.routines.push(r); }
+    let w = dayRec(d);
+    if (!w) { w = await RisenDB.saveWorkout({ routineId: r.id, days: [d], time: '', order: d, exercises: [], name: '' }); S.workouts.push(w); }
+    return w;
+  }
+  let savedT;
+  function flashSaved() {   // "✓ Saved" for about a second after a change has really been written
+    const m = $($('exPage').classList.contains('open') ? 'exSaved' : 'savedMark');
+    m.classList.add('show'); clearTimeout(savedT); savedT = setTimeout(() => ['exSaved', 'savedMark'].forEach(i => $(i).classList.remove('show')), 1200);
+  }
+  async function persistDay(d) {
+    const w = dayRec(d); if (!w) return;
+    w.name = workoutTitle(w);
+    try { await RisenDB.saveWorkout(w); flashSaved(); } catch (err) { toast(err.message); }
+  }
+  const saveDay = debounce(() => curDay ? persistDay(curDay) : null, 400);
+  const dirtyNotes = new Set();       // exercises whose notes changed (several can be waiting at once)
+  const saveNotes = debounce(async () => {
+    const ids = [...dirtyNotes]; dirtyNotes.clear();
+    try { for (const id of ids) { const x = S.exercises.find(z => z.id === id); if (x) await RisenDB.saveExercise(x); } if (ids.length) flashSaved(); }
+    catch (err) { toast(err.message); }
+  }, 400);
+  function setNote(id, text) {
+    let x = S.exercises.find(e => e.id === id);
+    if (!x) { x = { id, notes: '' }; S.exercises.push(x); }
+    x.notes = text; dirtyNotes.add(id); saveNotes();
+  }
+
+  // ================= LEVEL 1: THE WEEK =================
+  function renderWeek() {
+    lastDay = dayKey(new Date());
+    const el = $('gymWeek'), r = activeRoutine(), tIso = isoDay(new Date()), today = new Date(), wk = weekDays();
+    const ids = doneIds(today), sk = skippedIds(today), fm = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    let h = `<div class="gh"><h2>Week</h2><span class="meta">${fm(wk[0])} – ${fm(wk[6])}</span></div><div class="gstack">`;
+    let pending = false;
+    for (let d = 1; d <= 7; d++) {
+      const w = dayRec(d), n = w ? w.exercises.length : 0, isToday = d === tIso;
+      let stat = '';
+      if (isToday && n) { if (ids.has(w.id)) stat = '<span class="status ok">DONE ✓</span>'; else if (sk.has(w.id)) stat = '<span class="status">SKIPPED</span>'; else pending = true; }
+      h += `<button class="card dayrow${isToday ? ' today' : ''}" data-day="${d}"><div class="wrow"><span class="wdn">${DAYS[d - 1].toUpperCase()}</span>
+        <div class="wdm">${n ? `<div class="m">${esc(workoutTitle(w))}</div><div class="s">${n} exercise${n === 1 ? '' : 's'}</div>` : '<div class="s">Rest</div>'}</div>${stat}${I.chev}</div></button>`;
+    }
+    h += '</div>';
+    const extras = S.sessions.filter(x => x.date === dayKey(today) && x.extra && x.finishedAt);
+    if (extras.length) h += `<div class="gstack" style="margin-top:12px">${extras.map(x => `<div class="card"><div class="wrow"><div><div class="t">${esc(x.name || 'Extra workout')}</div><div class="s">Extra workout</div></div><span class="status ok">DONE ✓</span></div></div>`).join('')}</div>`;
+    h += `<div class="btnrow"><button class="ghost" data-act="extra">LOG EXTRA</button>${pending ? '<button class="ghost" data-act="skip">SKIP TODAY</button>' : ''}</div>`;
+    if (r) h += `<div class="proglink"><span>Program: <b>${esc(r.name)}</b></span><button class="linkbtn" data-act="rename">Rename</button><button class="linkbtn" data-act="newprogram">New program</button></div>`;
+    const archived = S.routines.filter(x => x.status === 'archived').sort((a, b) => (b.archived || '').localeCompare(a.archived || ''));
+    if (archived.length) h += `<div class="label">Archived programs</div><div class="group">${archived.map(a =>
+      `<button class="row" data-archived="${esc(a.id)}"><span>${esc(a.name)}<br><small style="color:var(--muted);font-size:13px">${fmtDate(a.created)} – ${fmtDate(a.archived)}</small></span>${I.chev}</button>`).join('')}</div>`;
+    el.innerHTML = h;
+  }
+  $('gymWeek').addEventListener('click', e => {
+    const t = e.target.closest('button'); if (!t) return;
+    if (t.dataset.day) return openDay(+t.dataset.day);
+    if (t.dataset.archived) return openArchived(t.dataset.archived);
+    switch (t.dataset.act) {
+      case 'extra': return extraSheet();
+      case 'skip': return skipSheet();
+      case 'rename': return routineSheet('rename');
+      case 'newprogram': {
+        const r = activeRoutine();
+        if (confirm(`Start a new program? “${r.name}” will be archived (read-only). Your history, including “Last time”, is kept.`)) routineSheet('new');
+        return;
+      }
+    }
+  });
+  function routineSheet(mode) {
+    const r = activeRoutine();
+    openSheet(`<h2>${mode === 'rename' ? 'Rename program' : 'New program'}</h2>
+      <p>${mode === 'rename' ? '' : r ? `“${esc(r.name)}” will be archived. You can still look at it, but not change it.` : 'Give it a name, e.g. “Autumn block”.'}</p>
+      <input class="field" id="routineName" type="text" maxlength="40" placeholder="Program name" value="${mode === 'rename' ? esc(r.name) : ''}" autocapitalize="words" enterkeyhint="done">
+      <button class="primary" data-sheet="routine" data-mode="${mode}">${mode === 'rename' ? 'SAVE' : 'CREATE'}</button><button class="textbtn" data-sheet="cancel">Cancel</button>`);
+    setTimeout(() => $('routineName').focus(), 300);
+  }
+
+  // ================= LEVEL 2: THE DAY =================
+  const thumbs = new Map();            // exerciseId -> object URL, or null when there is no photo
+  const thumbHtml = id => thumbs.get(id) ? `<img alt="" src="${thumbs.get(id)}">` : I.bar;
+  function dropThumb(id) { if (thumbs.get(id)) URL.revokeObjectURL(thumbs.get(id)); thumbs.delete(id); }
+  function clearThumbs() { for (const id of [...thumbs.keys()]) dropThumb(id); }
+  async function loadThumbs() {
+    const els = [...document.querySelectorAll('#gymPageBody [data-xph]')];
+    for (const el of els) { const id = el.dataset.xph; if (thumbs.has(id)) continue; const p = await RisenDB.getPhoto(id); thumbs.set(id, p ? URL.createObjectURL(p.blob) : null); }
+    for (const el of els) { const u = thumbs.get(el.dataset.xph); if (u && !el.querySelector('img')) el.innerHTML = `<img alt="" src="${u}">`; }
+  }
+
+  function openDay(d) {
+    curDay = d; clearThumbs(); $('gymPage').classList.add('editing'); $('gymPageTitle').textContent = DAYNAMES[d - 1];
+    renderDay(); openPage('gymPage');
+    onClose.gymPage = async () => { await flush(); curDay = null; renderWeek(); renderHome(); };
+  }
+  function renderDay() {
+    const d = curDay, w = dayRec(d), list = w ? w.exercises : [], n = list.length;
+    let h = `<button class="primary" data-act="addex" style="margin-top:6px">+ ADD EXERCISE</button>
+      <div class="gh" style="margin-top:22px"><h2>${esc(n ? workoutTitle(w) : 'Rest day')}</h2><span class="meta">${n} exercise${n === 1 ? '' : 's'}</span></div>`;
+    if (d === isoDay(new Date()) && n) {              // starting is only possible on today's day
+      const today = new Date();
+      if (doneIds(today).has(w.id)) h += `<div class="card" style="margin-bottom:14px"><div class="wrow"><div><div class="t">Workout done</div></div><span class="status ok">DONE ✓</span></div></div>`;
+      else if (skippedIds(today).has(w.id)) h += `<div class="card" style="margin-bottom:14px"><div class="wrow"><div><div class="t">Skipped today</div><div class="s">${esc(S.sessions.find(x => x.date === dayKey(today) && x.skipped && x.workoutId === w.id).reason)}</div></div><span class="status">SKIPPED</span></div></div>`;
+      else h += `<button class="primary big" data-act="startw" style="margin:0 0 14px">START WORKOUT</button>`;
+    }
+    h += `<div class="gstack">${list.map((it, i) => {
+      const x = exInfo(it.exerciseId);
+      return `<div class="card wcard"><div class="wrow xrow"><button class="wmain" data-open="${i}"><span class="exthumb" data-xph="${esc(it.exerciseId)}">${thumbHtml(it.exerciseId)}</span>
+        <div class="xt"><div class="t">${esc(x.name)}</div><div class="s">${esc(targetText(it))}</div></div></button>
+        <div class="tools"><button data-mv="${i}" data-dir="-1" aria-label="Move up" ${i === 0 ? 'disabled' : ''}>${I.up}</button>
+        <button data-mv="${i}" data-dir="1" aria-label="Move down" ${i === n - 1 ? 'disabled' : ''}>${I.down}</button>
+        <button data-del="${i}" aria-label="Delete">${I.trash}</button></div></div></div>`;
+    }).join('')}</div>`;
+    if (n) h += `<button class="ghost" data-act="copy" style="width:100%;margin-top:18px">COPY TO…</button>`;
+    $('gymPageBody').innerHTML = h;
+    loadThumbs();
+  }
+  $('gymPageBody').addEventListener('click', async e => {
+    const t = e.target.closest('button'); if (!t || curDay == null) return;
+    const w = dayRec(curDay);
+    if (t.dataset.open != null) return openExercise(+t.dataset.open);
+    if (t.dataset.mv != null) {
+      const i = +t.dataset.mv, j = i + +t.dataset.dir, a = w.exercises;
+      [a[i], a[j]] = [a[j], a[i]]; await persistDay(curDay); return renderDay();
+    }
+    if (t.dataset.del != null) {
+      const i = +t.dataset.del;
+      if (!confirm(`Delete ${exInfo(w.exercises[i].exerciseId).name} from ${DAYNAMES[curDay - 1]}? Its history is kept.`)) return;
+      w.exercises.splice(i, 1); await persistDay(curDay); return renderDay();
+    }
+    switch (t.dataset.act) {
+      case 'addex': return openLibrary(async id => {
+        const rec = await ensureDay(curDay); rec.exercises.push({ exerciseId: id, sets: 3, kg: 0, reps: 10 });
+        await persistDay(curDay); renderDay();
+      });
+      case 'startw': return start(w.id);
+      case 'copy': return copySheet();
+    }
+  });
+  function copySheet() {
+    const w = dayRec(curDay), n = w.exercises.length;
+    openSheet(`<h2>Copy to…</h2><p>Copy ${DAYNAMES[curDay - 1]} (${esc(workoutTitle(w))}, ${n} exercise${n === 1 ? '' : 's'}) to the days you pick, targets included.</p>
+      <div class="chips">${DAYS.map((nm, i) => i + 1 === curDay ? '' : `<button type="button" data-cday="${i + 1}" aria-pressed="false">${nm}</button>`).join('')}</div>
+      <button class="primary" data-sheet="docopy">COPY</button><button class="textbtn" data-sheet="cancel">Cancel</button>`);
+  }
+
+  // ================= LEVEL 3: THE EXERCISE =================
+  function openExercise(i) {
+    curEx = i; const it = dayRec(curDay).exercises[i];
+    renderExercise(); openPage('exPage');
+    onClose.exPage = async () => { await flush(); dropThumb(it.exerciseId); curEx = null; renderDay(); };
+  }
+  function renderExercise() {
+    const it = dayRec(curDay).exercises[curEx], x = exInfo(it.exerciseId);
+    $('exTitle').textContent = x.name;
+    $('exBody').innerHTML = `<div id="exPhoto"></div>
+      <div class="label">Sets · KG · Reps</div>
+      <div class="targets" style="margin-top:0">${['sets', 'kg', 'reps'].map(f => `<label>${f.toUpperCase()}<input class="num" data-t="${f}" inputmode="${f === 'kg' ? 'decimal' : 'numeric'}" value="${esc(fmtN(it[f]))}" placeholder="0"></label>`).join('')}</div>
+      <div class="last" id="exLast" style="margin-top:12px"></div>
+      <div class="label">Notes</div><textarea class="field" id="exNotes" rows="2" maxlength="300" placeholder="Seat, machine, settings…">${esc(x.notes || '')}</textarea>
+      ${x.custom ? `<div class="label">Muscle group</div><div class="chips" style="margin-top:0" id="exMuscle">${LIBRARY.groups.map(g => `<button type="button" data-xm="${g}" aria-pressed="${x.muscle === g}">${g}</button>`).join('')}</div>` : ''}`;
+    PhotoSlot.mount($('exPhoto'), it.exerciseId, { editable: true });
+    const idx = curEx;
+    RisenDB.historyOf(it.exerciseId).then(hs => {
+      const l = hs.find(h => h.sets && h.sets.length), el = $('exLast'); if (!el || curEx !== idx) return;
+      const s = l && topSet(l.sets);
+      el.innerHTML = l ? `Last time: <b>${fmtN(s.kg)} kg × ${fmtN(s.reps)}</b>` : 'No history yet';
+    });
+  }
+  $('exBody').addEventListener('input', e => {
+    const t = e.target, w = curDay != null && dayRec(curDay); if (!w || curEx == null) return;
+    const it = w.exercises[curEx];
+    if (t.dataset.t) { it[t.dataset.t] = num(t.value) ?? 0; saveDay(); }
+    else if (t.id === 'exNotes') setNote(it.exerciseId, t.value);
+  });
+  $('exBody').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); e.target.blur(); } });
+  $('exBody').addEventListener('click', async e => {
+    const t = e.target.closest('button'); if (!t || !t.dataset.xm) return;
+    const id = dayRec(curDay).exercises[curEx].exerciseId, x = S.exercises.find(z => z.id === id); if (!x) return;
+    x.muscle = t.dataset.xm; await RisenDB.saveExercise(x); flashSaved();
+    $('exMuscle').querySelectorAll('[data-xm]').forEach(b => b.setAttribute('aria-pressed', b === t));
+    await persistDay(curDay);                       // the day's title follows the muscle group
+  });
+
+  // ================= The workout in progress (logger) =================
   const draft = () => S.settings.activeSession || null;
   const saveDraft = () => RisenDB.setSetting('activeSession', S.settings.activeSession || null);
   const saveDraftSoon = debounce(saveDraft, 400);
-
-  function renderToday() {
-    const el = $('gymToday'), d = draft();
-    if (d) return renderLogger(el, d);
-    const r = activeRoutine();
-    if (!r) {
-      el.innerHTML = `<div class="card empty"><div class="wname">No plan yet</div><div class="sub">Build your routine in Plan. Your workouts then show up here on their days.</div>
-        <button class="primary" data-act="toplan">GO TO PLAN</button></div>`;
-      return;
-    }
-    const today = new Date(), list = plannedOn(today), ids = doneIds(today), sk = skippedIds(today);
-    const extras = S.sessions.filter(x => x.date === dayKey(today) && x.extra && x.finishedAt);
-    const pending = list.filter(w => !ids.has(w.id) && !sk.has(w.id));
-    let h = `<div class="gh"><h2>Today</h2><span class="meta">${today.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}</span></div><div class="gstack">`;
-    if (!list.length) h += `<div class="card"><div class="wrow"><div><div class="t">Rest day</div><div class="s">No workout planned today.</div></div></div></div>`;
-    for (const w of list) {
-      const n = (w.exercises || []).length, sub = `${n} exercise${n === 1 ? '' : 's'}${w.time ? ' · ' + esc(w.time) : ''}`;
-      if (ids.has(w.id)) h += `<div class="card"><div class="wrow"><div><div class="t">${esc(w.name)}</div><div class="s">${sub}</div></div><span class="status ok">DONE ✓</span></div></div>`;
-      else if (sk.has(w.id)) { const why = S.sessions.find(x => x.date === dayKey(today) && x.skipped && x.workoutId === w.id).reason;
-        h += `<div class="card"><div class="wrow"><div><div class="t">${esc(w.name)}</div><div class="s">Skipped · ${esc(why)}</div></div><span class="status">SKIPPED</span></div></div>`; }
-      else h += `<button class="card" data-start="${esc(w.id)}"><div class="wrow"><div><div class="t">${esc(w.name)}</div><div class="s">${sub}</div></div><span class="play sm">${I.play}</span></div></button>`;
-    }
-    for (const x of extras) h += `<div class="card"><div class="wrow"><div><div class="t">${esc(x.name || 'Extra workout')}</div><div class="s">Extra workout</div></div><span class="status ok">DONE ✓</span></div></div>`;
-    h += `</div><div class="btnrow"><button class="ghost" data-act="extra">LOG EXTRA</button>${pending.length ? '<button class="ghost" data-act="skip">SKIP DAY</button>' : ''}</div>`;
-    el.innerHTML = h;
-  }
 
   function topSet(sets) { return sets.reduce((a, b) => (num(b.kg) ?? 0) > (num(a.kg) ?? 0) || ((num(b.kg) ?? 0) === (num(a.kg) ?? 0) && (num(b.reps) ?? 0) > (num(a.reps) ?? 0)) ? b : a); }
   async function newEntry(exerciseId, target) {
@@ -100,19 +276,19 @@ const Gym = (() => {
 
   async function start(workoutId, { extra = false } = {}) {
     const d = draft();
-    if (d) { open('today'); if (d.workoutId !== workoutId) toast('Finish or discard the workout in progress first'); return; }
+    if (d) { open(); if (d.workoutId !== workoutId) toast('Finish or discard the workout in progress first'); return; }
     const w = workoutId ? S.workouts.find(x => x.id === workoutId) : null;
     const exercises = [];
     for (const t of (w ? w.exercises : [])) exercises.push(await newEntry(t.exerciseId, t));
     S.settings.activeSession = { id: RisenDB.uid(), workoutId: w ? w.id : null, routineId: w ? w.routineId : ((activeRoutine() || {}).id || null),
-      name: w ? w.name : 'Extra workout', extra, date: dayKey(new Date()), startedAt: new Date().toISOString(), exercises };
-    await saveDraft(); open('today');
+      name: w ? (workoutTitle(w) || w.name || 'Workout') : 'Extra workout', extra, date: dayKey(new Date()), startedAt: new Date().toISOString(), exercises };
+    await saveDraft(); open();
   }
 
-  function renderLogger(el, d) {
+  function renderLog(el, d) {
     let h = `<div class="gh"><h2>${esc(d.name)}</h2><span class="meta elapsed" id="elapsed">${fmtClock(Date.now() - new Date(d.startedAt))}</span></div><div class="gstack">`;
     d.exercises.forEach((e, i) => {
-      const x = exInfo(e.exerciseId);
+      const x = exerciseInfo(e.exerciseId);
       h += `<div class="card ex"><div class="exhead"><div><h3>${esc(x.name)}</h3>${x.notes ? `<div class="notes">${esc(x.notes)}</div>` : ''}</div>
         <div class="tools"><button data-rmex="${i}" aria-label="Remove from this workout">${I.trash}</button></div></div>
         <div class="last">${e.last ? `Last time: <b>${fmtN(e.last.kg)} kg × ${fmtN(e.last.reps)}</b>` : 'First time'}</div>
@@ -134,20 +310,19 @@ const Gym = (() => {
   }
   setInterval(() => { const e = $('elapsed'), d = draft(); if (e && d) e.textContent = fmtClock(Date.now() - new Date(d.startedAt)); }, 1000);
 
-  $('gymToday').addEventListener('input', e => {
+  $('gymLog').addEventListener('input', e => {
     const inp = e.target.closest('.num'); if (!inp) return;
     const row = inp.closest('.setrow'), d = draft();
     d.exercises[row.dataset.ex].sets[row.dataset.set][inp.dataset.f] = inp.value; saveDraftSoon();
   });
-  $('gymToday').addEventListener('keydown', e => {
+  $('gymLog').addEventListener('keydown', e => {
     if (e.key !== 'Enter' || !e.target.matches('.num')) return;
     e.preventDefault(); const row = e.target.closest('.setrow');
     if (e.target.dataset.f === 'kg') row.querySelector('[data-f="reps"]').focus(); else e.target.blur();
   });
-  $('gymToday').addEventListener('click', async e => {
+  $('gymLog').addEventListener('click', async e => {
     const t = e.target.closest('button'); if (!t) return;
     const d = draft();
-    if (t.dataset.start) return start(t.dataset.start);
     if (t.hasAttribute('data-tick')) {
       const row = t.closest('.setrow'), s = d.exercises[row.dataset.ex].sets[row.dataset.set];
       if (!s.done) {
@@ -159,34 +334,31 @@ const Gym = (() => {
     }
     if (t.dataset.addset != null) {
       const sets = d.exercises[t.dataset.addset].sets, p = sets[sets.length - 1] || { kg: '', reps: '' };
-      sets.push({ kg: p.kg, reps: p.reps, done: false }); saveDraft(); renderToday(); return;
+      sets.push({ kg: p.kg, reps: p.reps, done: false }); saveDraft(); renderGym(); return;
     }
     if (t.dataset.rmex != null) {
-      if (!confirm(`Remove ${exInfo(d.exercises[t.dataset.rmex].exerciseId).name} from this workout? Your plan doesn't change.`)) return;
-      d.exercises.splice(t.dataset.rmex, 1); saveDraft(); renderToday(); return;
+      if (!confirm(`Remove ${exerciseInfo(d.exercises[t.dataset.rmex].exerciseId).name} from this workout? Your plan doesn't change.`)) return;
+      d.exercises.splice(t.dataset.rmex, 1); saveDraft(); renderGym(); return;
     }
     switch (t.dataset.act) {
-      case 'toplan': seg = 'plan'; return renderSeg();
-      case 'extra': return extraSheet();
-      case 'skip': return skipSheet();
-      case 'addex': return openLibrary(async id => { draft().exercises.push(await newEntry(id, null)); await saveDraft(); renderToday(); });
+      case 'addex': return openLibrary(async id => { draft().exercises.push(await newEntry(id, null)); await saveDraft(); renderGym(); });
       case 'finish': return finish();
       case 'discard':
         if (!confirm('Discard this workout? Nothing will be saved.')) return;
-        S.settings.activeSession = null; await saveDraft(); Rest.stop(); renderToday(); renderHome(); return;
+        S.settings.activeSession = null; await saveDraft(); Rest.stop(); renderGym(); renderHome(); return;
     }
   });
 
   async function finish() {
     const d = draft();
     const all = d.exercises.flatMap(e => e.sets), doneN = all.filter(s => s.done).length;
-    if (!doneN) { if (confirm('No sets are ticked, so there is nothing to save. Discard this workout?')) { S.settings.activeSession = null; await saveDraft(); Rest.stop(); renderToday(); } return; }
+    if (!doneN) { if (confirm('No sets are ticked, so there is nothing to save. Discard this workout?')) { S.settings.activeSession = null; await saveDraft(); Rest.stop(); renderGym(); } return; }
     if (doneN < all.length && !confirm("Finish anyway? Unchecked sets won't be saved.")) return;
     const entries = d.exercises.map(e => ({ exerciseId: e.exerciseId, sets: e.sets.filter(s => s.done).map(s => ({ kg: num(s.kg) ?? 0, reps: num(s.reps) ?? 0 })) }))
       .filter(e => e.sets.length);
     const ses = await RisenDB.logSession({ date: d.date, workoutId: d.workoutId, routineId: d.routineId, name: d.name, extra: d.extra, startedAt: d.startedAt, entries });
     S.settings.activeSession = null; await saveDraft(); Rest.stop();
-    await load(); renderHome(); renderToday();
+    await load(); renderHome(); renderGym();
     openSheet(`<h2>Workout done</h2><p>${esc(d.name)}</p>
       <div class="stats"><div><b>${entries.length}</b><span>Exercises</span></div><div><b>${doneN}</b><span>Sets</span></div>
       <div><b>${fmtDur(new Date(ses.finishedAt) - new Date(d.startedAt))}</b><span>Time</span></div></div>
@@ -200,35 +372,47 @@ const Gym = (() => {
       <button class="primary" data-sheet="doskip">SKIP DAY</button><button class="textbtn" data-sheet="cancel">Cancel</button>`);
   }
   function extraSheet() {
-    const ws = S.workouts.filter(w => w.routineId === (activeRoutine() || {}).id).sort((a, b) => (a.order || 0) - (b.order || 0));
+    const r = activeRoutine(), ws = r ? S.workouts.filter(w => w.routineId === r.id && (w.days || []).length === 1 && (w.exercises || []).length).sort((a, b) => a.days[0] - b.days[0]) : [];
     openSheet(`<h2>Log extra workout</h2><p>An unplanned session. It's saved to your history.</p>
-      <div class="list">${ws.map(w => `<button data-extra="${esc(w.id)}">${esc(w.name)}</button>`).join('')}<button data-extra="">Blank workout (add exercises as you go)</button></div>
+      <div class="list">${ws.map(w => `<button data-extra="${esc(w.id)}">${DAYS[w.days[0] - 1]} · ${esc(workoutTitle(w))}</button>`).join('')}<button data-extra="">Blank workout (add exercises as you go)</button></div>
       <button class="textbtn" data-sheet="cancel">Cancel</button>`);
   }
 
   $('gymSheetBody').addEventListener('click', async e => {
     const t = e.target.closest('button'); if (!t) return;
     if (t.dataset.chip) { const on = t.getAttribute('aria-pressed') !== 'true'; $('gymSheetBody').querySelectorAll('[data-chip]').forEach(c => c.setAttribute('aria-pressed', 'false')); t.setAttribute('aria-pressed', on); return; }
+    if (t.dataset.mchip) { const on = t.getAttribute('aria-pressed') !== 'true'; $('gymSheetBody').querySelectorAll('[data-mchip]').forEach(c => c.setAttribute('aria-pressed', 'false')); t.setAttribute('aria-pressed', on); return; }
+    if (t.dataset.cday) { t.setAttribute('aria-pressed', t.getAttribute('aria-pressed') !== 'true'); return; }
     if (t.dataset.extra != null) { closeSheet(); return start(t.dataset.extra || null, { extra: true }); }
     switch (t.dataset.sheet) {
       case 'cancel': return closeSheet();
-      case 'home': closeSheet(); seg = 'today'; renderHome(); return show('home');
+      case 'home': closeSheet(); renderHome(); return show('home');
       case 'doskip': {
         const chip = $('gymSheetBody').querySelector('[data-chip][aria-pressed="true"]'), note = $('skipNote').value.trim();
         const reason = [chip && chip.dataset.chip, note].filter(Boolean).join(': ');
         if (!reason) return toast('Pick a reason or type one');
         const today = new Date(), ids = doneIds(today), sk = skippedIds(today);
         await RisenDB.skipWorkouts({ date: dayKey(today), workoutIds: plannedOn(today).filter(w => !ids.has(w.id) && !sk.has(w.id)).map(w => w.id), routineId: activeRoutine().id, reason });
-        closeSheet(); await load(); renderToday(); renderHome(); return toast('Day skipped');
+        closeSheet(); await load(); renderGym(); renderHome(); return toast('Day skipped');
       }
       case 'routine': {
         const name = $('routineName').value.trim(); if (!name) return $('routineName').focus();
         if (t.dataset.mode === 'rename') await RisenDB.renameRoutine(activeRoutine().id, name); else await RisenDB.createRoutine(name);
-        closeSheet(); await load(); renderPlan(); renderHome(); return;
+        closeSheet(); await load(); renderWeek(); renderHome(); return;
+      }
+      case 'docopy': {
+        const days = [...$('gymSheetBody').querySelectorAll('[data-cday][aria-pressed="true"]')].map(b => +b.dataset.cday);
+        if (!days.length) return toast('Pick a day');
+        const filled = days.filter(d => (dayRec(d) || { exercises: [] }).exercises.length);
+        if (filled.length && !confirm(`Replace the exercises on ${filled.map(d => DAYNAMES[d - 1]).join(', ')}?`)) return;
+        const copy = JSON.parse(JSON.stringify(dayRec(curDay).exercises));
+        for (const d of days) { const w = await ensureDay(d); w.exercises = JSON.parse(JSON.stringify(copy)); await persistDay(d); }
+        closeSheet(); renderDay(); return toast('Copied to ' + days.map(d => DAYS[d - 1]).join(', '));
       }
       case 'custom': {
         const name = $('cxName').value.trim(); if (!name) return $('cxName').focus();
-        const ex = await RisenDB.saveExercise({ name, muscle: 'Custom', notes: $('cxNotes').value.trim(), custom: true });
+        const m = $('gymSheetBody').querySelector('[data-mchip][aria-pressed="true"]');
+        const ex = await RisenDB.saveExercise({ name, muscle: m ? m.dataset.mchip : 'Custom', notes: $('cxNotes').value.trim(), custom: true });
         S.exercises.push(ex); closeSheet(); return pick(ex.id);
       }
     }
@@ -252,148 +436,17 @@ const Gym = (() => {
     return { start, stop };
   })();
 
-  // ================= PLAN =================
-  function renderPlan() {
-    const el = $('gymPlan'), r = activeRoutine();
-    const archived = S.routines.filter(x => x.status === 'archived').sort((a, b) => (b.archived || '').localeCompare(a.archived || ''));
-    let h = '';
-    if (!r) h += `<div class="card empty"><div class="wname">No routine yet</div><div class="sub">A routine holds your weekly workouts.</div>
-      <button class="primary" data-act="newroutine">CREATE ROUTINE</button></div>`;
-    else {
-      const ws = S.workouts.filter(w => w.routineId === r.id).sort((a, b) => (a.order || 0) - (b.order || 0));
-      h += `<div class="label" style="margin-top:0">Active routine</div><div class="card">
-        <div class="wrow"><div><div class="wname">${esc(r.name)}</div><div class="sub">Since ${fmtDate(r.created)}</div></div><button class="ghost sm" data-act="rename">RENAME</button></div>
-        <button class="cta" data-act="newroutine">+ NEW ROUTINE</button>
-        <p class="note">Starting a new program? The current routine is archived and your “Last time” history is kept.</p></div>
-        <div class="label">Workouts</div><div class="gstack">`;
-      for (const w of ws) { const n = w.exercises.length;
-        h += `<div class="card wcard"><div class="wrow"><button class="wmain" data-edit="${esc(w.id)}"><div><div class="t">${esc(w.name)}</div>
-          <div class="s">${daysText(w.days)}${w.time ? ' · ' + esc(w.time) : ''} · ${n} exercise${n === 1 ? '' : 's'}</div></div>${I.chev}</button>
-          <div class="tools"><button data-delw="${esc(w.id)}" aria-label="Delete workout">${I.trash}</button></div></div></div>`; }
-      h += `<button class="dashed" data-act="addworkout">+ Add workout</button></div>`;
-    }
-    if (archived.length) h += `<div class="label">Archived</div><div class="group">${archived.map(a =>
-      `<button class="row" data-archived="${esc(a.id)}"><span>${esc(a.name)}<br><small style="color:var(--muted);font-size:13px">${fmtDate(a.created)} – ${fmtDate(a.archived)}</small></span>${I.chev}</button>`).join('')}</div>`;
-    el.innerHTML = h;
-  }
-
-  function routineSheet(mode) {
-    const r = activeRoutine();
-    openSheet(`<h2>${mode === 'rename' ? 'Rename routine' : 'New routine'}</h2>
-      <p>${mode === 'rename' ? '' : r ? `“${esc(r.name)}” will be archived. You can still look at it, but not change it.` : 'Give it a name, e.g. “Autumn block”.'}</p>
-      <input class="field" id="routineName" type="text" maxlength="40" placeholder="Routine name" value="${mode === 'rename' ? esc(r.name) : ''}" autocapitalize="words" enterkeyhint="done">
-      <button class="primary" data-sheet="routine" data-mode="${mode}">${mode === 'rename' ? 'SAVE' : 'CREATE'}</button><button class="textbtn" data-sheet="cancel">Cancel</button>`);
-    setTimeout(() => $('routineName').focus(), 300);
-  }
-
-  $('gymPlan').addEventListener('click', async e => {
-    const t = e.target.closest('button'); if (!t) return;
-    if (t.dataset.edit) return openEditor(t.dataset.edit);
-    if (t.dataset.archived) return openArchived(t.dataset.archived);
-    if (t.dataset.delw) {
-      const w = S.workouts.find(x => x.id === t.dataset.delw);
-      if (!confirm(`Delete the workout “${w.name}”? Its history is kept.`)) return;
-      await RisenDB.deleteWorkout(w.id); await load(); renderPlan(); renderHome(); return;
-    }
-    switch (t.dataset.act) {
-      case 'newroutine': return routineSheet('new');
-      case 'rename': return routineSheet('rename');
-      case 'addworkout': {
-        const r = activeRoutine(), ws = S.workouts.filter(w => w.routineId === r.id);
-        const w = await RisenDB.saveWorkout({ routineId: r.id, name: 'New workout', order: ws.reduce((m, x) => Math.max(m, x.order || 0), 0) + 1 });
-        await load(); return openEditor(w.id, true);
-      }
-    }
-  });
-
-  // ---- Workout editor ----
-  let edit = null;
-  // "✓ Saved" shows for about a second after each save has really been written
-  let savedT;
-  function flashSaved() { const m = $('savedMark'); m.classList.add('show'); clearTimeout(savedT); savedT = setTimeout(() => m.classList.remove('show'), 1200); }
-  const saveEdit = debounce(async () => {
-    if (!edit) return;
-    try { await RisenDB.saveWorkout(edit); flashSaved(); } catch (err) { toast(err.message); }
-  }, 400);
-  const dirtyNotes = new Set();   // custom exercises whose notes changed (several can be waiting at once)
-  const saveNotes = debounce(async () => {
-    const ids = [...dirtyNotes]; dirtyNotes.clear();
-    try { for (const id of ids) { const x = S.exercises.find(z => z.id === id); if (x) await RisenDB.saveExercise(x); } if (ids.length) flashSaved(); }
-    catch (err) { toast(err.message); }
-  }, 400);
-
-  function openEditor(id, isNew) {
-    edit = JSON.parse(JSON.stringify(S.workouts.find(w => w.id === id)));
-    renderEditor(); $('gymPage').classList.add('editing'); openPage('gymPage', 'Workout');
-    pageOnClose = async () => { await flush(); edit = null; await load(); renderPlan(); renderHome(); };
-    if (isNew) setTimeout(() => { $('wName').focus(); $('wName').select(); }, 320);
-  }
-  function renderEditor() {
-    const w = edit;
-    let h = `<div class="label" style="margin-top:4px">Name</div><input class="field" id="wName" type="text" maxlength="40" value="${esc(w.name)}" autocapitalize="words" enterkeyhint="done">
-      <div class="label">Days</div><div class="days-pick">${DAYS.map((d, i) => `<button type="button" data-day="${i + 1}" aria-pressed="${w.days.includes(i + 1)}" aria-label="${d}">${d[0]}</button>`).join('')}</div>
-      <div class="label">Time (optional)</div><input class="field" id="wTime" type="time" value="${esc(w.time || '')}">
-      <div class="label">Exercises</div><div class="gstack">`;
-    w.exercises.forEach((it, i) => {
-      const x = exInfo(it.exerciseId);
-      h += `<div class="card"><div class="exhead"><div class="wrow"><div><div class="t">${esc(x.name)}</div><div class="s">${esc(x.muscle || '')}</div></div></div>
-        <div class="tools"><button data-mv="${i}" data-dir="-1" aria-label="Move up" ${i === 0 ? 'disabled' : ''}>${I.up}</button>
-        <button data-mv="${i}" data-dir="1" aria-label="Move down" ${i === w.exercises.length - 1 ? 'disabled' : ''}>${I.down}</button>
-        <button data-del="${i}" aria-label="Delete">${I.trash}</button></div></div>
-        ${x.custom ? `<textarea class="field" style="margin-top:12px" data-notes="${esc(x.id)}" rows="2" maxlength="300" placeholder="Notes: machine, seat setting…">${esc(x.notes || '')}</textarea>` : ''}
-        <div class="targets">${['sets', 'kg', 'reps'].map(f => `<label>${f.toUpperCase()}<input class="num" data-i="${i}" data-t="${f}" inputmode="${f === 'kg' ? 'decimal' : 'numeric'}" value="${esc(fmtN(it[f]))}" placeholder="0"></label>`).join('')}</div>
-        <div data-photo="${esc(it.exerciseId)}"></div></div>`;
-    });
-    h += `<button class="dashed" data-act="addex">+ Add exercise</button></div>
-      <button class="quiet danger" data-act="delworkout">Delete workout</button>`;
-    $('gymPageBody').innerHTML = h;
-    $('gymPageBody').querySelectorAll('[data-photo]').forEach(p => PhotoSlot.mount(p, p.dataset.photo, { editable: true }));
-  }
-  $('gymPageBody').addEventListener('input', e => {
-    if (!edit) return; const t = e.target;
-    if (t.id === 'wName') edit.name = t.value.trim() || 'Workout';
-    else if (t.id === 'wTime') edit.time = t.value;
-    else if (t.dataset.t) edit.exercises[t.dataset.i][t.dataset.t] = num(t.value) ?? 0;
-    else if (t.dataset.notes) { const x = S.exercises.find(z => z.id === t.dataset.notes); if (x) { x.notes = t.value; dirtyNotes.add(x.id); saveNotes(); } return; }
-    else return;
-    saveEdit();
-  });
-  $('gymPageBody').addEventListener('change', e => { if (edit && e.target.id === 'wTime') { edit.time = e.target.value; saveEdit(); } });
-  $('gymPageBody').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); e.target.blur(); } });
-  $('gymPageBody').addEventListener('click', async e => {
-    const t = e.target.closest('button'); if (!t || !edit) return;
-    if (t.dataset.day) {
-      const d = +t.dataset.day, on = !edit.days.includes(d);
-      edit.days = on ? [...edit.days, d].sort() : edit.days.filter(x => x !== d);
-      t.setAttribute('aria-pressed', on); saveEdit(); return;
-    }
-    if (t.dataset.mv != null) {
-      const i = +t.dataset.mv, j = i + +t.dataset.dir, a = edit.exercises;
-      [a[i], a[j]] = [a[j], a[i]]; saveEdit(); renderEditor(); return;
-    }
-    if (t.dataset.del != null) {
-      const i = +t.dataset.del;
-      if (!confirm(`Delete ${exInfo(edit.exercises[i].exerciseId).name} from this workout? Its history is kept.`)) return;
-      edit.exercises.splice(i, 1); saveEdit(); renderEditor(); return;
-    }
-    if (t.dataset.act === 'addex') return openLibrary(id => { edit.exercises.push({ exerciseId: id, sets: 3, kg: 0, reps: 10 }); saveEdit(); renderEditor(); });
-    if (t.dataset.act === 'delworkout') {
-      if (!confirm(`Delete the workout “${edit.name}”? Its history is kept.`)) return;
-      const id = edit.id; edit = null; pageOnClose = null;
-      await RisenDB.deleteWorkout(id); closePage('gymPage'); await load(); renderPlan(); renderHome(); return;
-    }
-  });
-
-  // ---- Archived routine (read-only) ----
+  // ================= Archived program (read-only) =================
   function openArchived(id) {
-    const r = S.routines.find(x => x.id === id), ws = S.workouts.filter(w => w.routineId === id).sort((a, b) => (a.order || 0) - (b.order || 0));
+    const r = S.routines.find(x => x.id === id);
+    const ws = S.workouts.filter(w => w.routineId === id && (w.exercises || []).length).sort((a, b) => ((a.days || [9])[0]) - ((b.days || [9])[0]) || (a.order || 0) - (b.order || 0));
     let h = `<p class="note" style="margin:0 2px 16px">${fmtDate(r.created)} – ${fmtDate(r.archived)} · Archived, read-only</p><div class="gstack">`;
-    for (const w of ws) h += `<div class="card ro"><div class="t" style="font-family:Oswald,sans-serif;font-weight:700;font-size:21px;text-transform:uppercase">${esc(w.name)}</div>
-      <div class="sub" style="margin-top:4px">${daysText(w.days)}${w.time ? ' · ' + esc(w.time) : ''}</div>
-      <div class="sub" style="margin-top:10px;color:var(--text);line-height:1.6">${w.exercises.map(it => `${esc(exInfo(it.exerciseId).name)} <span style="color:var(--muted)">${it.sets} × ${fmtN(it.reps)} @ ${fmtN(it.kg)} kg</span>`).join('<br>') || 'No exercises'}</div></div>`;
-    if (!ws.length) h += '<div class="card"><div class="sub">No workouts in this routine.</div></div>';
+    for (const w of ws) h += `<div class="card ro"><div class="t" style="font-family:Oswald,sans-serif;font-weight:700;font-size:21px;text-transform:uppercase">${esc(workoutTitle(w))}</div>
+      <div class="sub" style="margin-top:4px">${daysText(w.days)}</div>
+      <div class="sub" style="margin-top:10px;color:var(--text);line-height:1.6">${w.exercises.map(it => `${esc(exInfo(it.exerciseId).name)} <span style="color:var(--muted)">${it.sets} × ${fmtN(it.reps)} @ ${fmtN(it.kg)} kg</span>`).join('<br>')}</div></div>`;
+    if (!ws.length) h += '<div class="card"><div class="sub">No exercises in this program.</div></div>';
     $('gymPageBody').innerHTML = h + '</div>';
-    pageOnClose = null; $('gymPage').classList.remove('editing'); openPage('gymPage', r.name);
+    curDay = null; onClose.gymPage = null; $('gymPage').classList.remove('editing'); $('gymPageTitle').textContent = r.name; openPage('gymPage');
   }
 
   // ================= Exercise library =================
@@ -420,18 +473,24 @@ const Gym = (() => {
     if (t.dataset.act === 'custom') {
       openSheet(`<h2>Custom exercise</h2><p>For a machine or move that isn't in the list.</p>
         <input class="field" id="cxName" type="text" maxlength="40" placeholder="Name" value="${esc($('libSearch').value.trim())}" autocapitalize="sentences">
+        <div class="chips" style="margin-top:14px">${LIBRARY.groups.map(g => `<button type="button" data-mchip="${g}" aria-pressed="false">${g}</button>`).join('')}</div>
         <textarea class="field" id="cxNotes" rows="2" maxlength="300" placeholder="Notes: machine, seat setting…"></textarea>
         <button class="primary" data-sheet="custom">SAVE</button><button class="textbtn" data-sheet="cancel">Cancel</button>`);
       setTimeout(() => $('cxName').focus(), 300);
     }
   });
 
-  function reset() { Rest.stop(); closeAll(); seg = 'today'; }
+  function reset() { Rest.stop(); closeAll(); curDay = null; curEx = null; clearThumbs(); }
 
-  // Write every pending change now (workout editor, notes, workout in progress)
-  function flush() { return Promise.all([saveEdit.flush(), saveNotes.flush(), saveDraftSoon.flush()]).catch(err => toast(err.message)); }
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+  // Write every pending change now (day plan, notes, workout in progress)
+  function flush() { return Promise.all([saveDay.flush(), saveNotes.flush(), saveDraftSoon.flush()]).catch(err => toast(err.message)); }
+  function dayRolled() {      // a new day started while the app was open: today's row moves on by itself
+    if (dayKey(new Date()) === lastDay) return;
+    if (!$('view-gym').hidden && !draft() && !$('gymPage').classList.contains('open')) renderWeek(); else lastDay = dayKey(new Date());
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); else dayRolled(); });
   addEventListener('pagehide', flush);
+  setInterval(dayRolled, 60000);
 
   return { open, start, reset, flush };
 })();

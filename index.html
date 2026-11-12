@@ -140,10 +140,6 @@
   .toast.show{opacity:1;transform:translate(-50%,0)}
 
   /* ===== GYM ===== */
-  .seg{display:flex;margin:6px 0 20px;padding:4px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
-  .seg button{flex:1;height:40px;border:0;border-radius:999px;background:none;color:var(--muted);cursor:pointer;
-    font-family:Oswald,sans-serif;font-weight:500;font-size:15px;letter-spacing:.16em;transition:background .2s ease,color .2s ease}
-  .seg button[aria-selected="true"]{background:var(--volt);color:#0B0B0B}
   .gh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 14px}
   .gh h2{font-family:Oswald,sans-serif;font-weight:700;font-size:28px;line-height:1.05;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
   .gh .meta{flex:none;font-size:13px;color:var(--muted);letter-spacing:.06em}
@@ -167,6 +163,29 @@
   .empty{padding:28px 20px;text-align:center}
   .empty .wname{margin-bottom:6px}
   .empty .primary{margin-top:20px}
+
+  /* The week (level 1) and the day (level 2) */
+  .dayrow{padding:14px 16px}
+  .wdn{flex:none;width:50px;font-family:Oswald,sans-serif;font-weight:700;font-size:22px;letter-spacing:.06em}
+  .wdm{flex:1;min-width:0}
+  .wdm .m{font-size:16px;font-weight:500;line-height:1.25;overflow-wrap:anywhere}
+  .dayrow.today{background:var(--volt);border-color:var(--volt);color:#0B0B0B}
+  .dayrow.today:active{background:#B8E600}
+  .dayrow.today .s{color:rgba(0,0,0,.65)}
+  .dayrow.today .status{color:#0B0B0B}
+  .primary.big{min-height:64px;font-size:20px}
+  .exthumb{flex:none;width:56px;height:56px;border-radius:12px;overflow:hidden;background:#0F0F0F;display:grid;place-items:center;color:#5A5A5A}
+  .exthumb img{display:block;width:100%;height:100%;object-fit:cover}
+  .exthumb .icon{width:26px;height:26px}
+  .xt{flex:1;min-width:0}
+  .wrow .xt .t{font-size:18px}
+  @media (max-width:380px){.xrow{flex-wrap:wrap}.xrow .wmain{flex:1 1 100%}.wcard .xrow .tools{margin:2px -8px -6px auto}}
+  .proglink{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0 12px;margin:22px 0 0;font-size:13px;color:var(--muted)}
+  .proglink b{font-weight:500;color:var(--text)}
+  .linkbtn{min-height:44px;padding:0 6px;border:0;background:none;color:var(--text);font:500 13px Inter,sans-serif;
+    text-decoration:underline;text-decoration-color:#5A5A5A;text-underline-offset:3px;cursor:pointer}
+  #exPhoto{margin-top:4px}
+  #exPhoto .pslot-img img{max-height:340px}
 
   /* Logging sets */
   .ex h3{font-family:Oswald,sans-serif;font-weight:700;font-size:21px;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
@@ -248,7 +267,9 @@
   #libPage{z-index:13}
   #gymPage .subtop h1{flex:1;min-width:0}
   .saved,.donebtn{display:none}
-  #gymPage.editing .donebtn{display:block}
+  #exPage{z-index:13}
+  #exPage .subtop h1{flex:1;min-width:0}
+  #exPage .saved,#exPage .donebtn{display:block}
   #gymPage.editing .saved{display:block}
   .saved{flex:none;margin-right:10px;font-size:13px;font-weight:500;color:var(--volt);opacity:0;transition:opacity .25s ease}
   .saved.show{opacity:1}
@@ -399,12 +420,8 @@
 
     <!-- GYM (Today + Plan) is built next; MEALS, MEDS, CLASSES come later -->
     <div class="view" id="view-gym" hidden>
-      <div class="seg" role="tablist">
-        <button role="tab" data-seg="today" aria-selected="true">TODAY</button>
-        <button role="tab" data-seg="plan" aria-selected="false">PLAN</button>
-      </div>
-      <div id="gymToday"></div>
-      <div id="gymPlan" hidden></div>
+      <div id="gymWeek"></div>
+      <div id="gymLog" hidden></div>
     </div>
     <div class="view" id="view-meals" hidden><div class="soon"><h2>Meals</h2><p>Coming soon.</p></div></div>
     <div class="view" id="view-meds" hidden><div id="medsBody"></div></div>
@@ -422,9 +439,14 @@
     <!-- Gym sub-pages -->
     <section class="subpage" id="gymPage" aria-hidden="true">
       <div class="subtop"><button class="iconbtn" data-close="gymPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="gymPageTitle"></h1>
-        <span class="saved" id="savedMark" aria-live="polite">✓ Saved</span>
-        <button class="donebtn" data-close="gymPage">DONE</button></div>
+        <span class="saved" id="savedMark" aria-live="polite">✓ Saved</span></div>
       <div id="gymPageBody"></div>
+    </section>
+    <section class="subpage" id="exPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-close="exPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="exTitle"></h1>
+        <span class="saved" id="exSaved" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" data-close="exPage">DONE</button></div>
+      <div id="exBody"></div>
     </section>
     <section class="subpage" id="medPage" aria-hidden="true">
       <div class="subtop"><button class="iconbtn" id="medBack" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="medTitle">Med</h1>
@@ -548,9 +570,10 @@
     const k=dayKey(d);
     return S.routines.find(r=>dayKey(new Date(r.created))<=k&&(!r.archived||dayKey(new Date(r.archived))>k))||null;
   }
+  const wTitle=w=>typeof workoutTitle==='function'?workoutTitle(w):w.name;   // "Chest · Triceps" (gym.js)
   function plannedOn(d){                                    // workouts scheduled that day, earliest first
     const r=routineOn(d); if(!r) return [];
-    return S.workouts.filter(w=>w.routineId===r.id&&(w.days||[]).includes(isoDay(d)))
+    return S.workouts.filter(w=>w.routineId===r.id&&(w.days||[]).includes(isoDay(d))&&(w.exercises||[]).length)
       .sort((a,b)=>(a.time||'99').localeCompare(b.time||'99')||(a.order||0)-(b.order||0));
   }
   const doneIds=d=>new Set(S.sessions.filter(x=>x.date===dayKey(d)&&x.finishedAt&&!x.extra).map(x=>x.workoutId));
@@ -578,10 +601,10 @@
       if(!list.length) return `<div><div class="wname">Rest day</div><div class="sub">Recover. Back at it tomorrow.</div></div>`;
       const sk=skippedIds(today), w=list.find(x=>!ids.has(x.id)&&!sk.has(x.id));
       if(!w){ const doneL=list.filter(x=>ids.has(x.id));
-        return doneL.length?`<div><div class="wname">Done today</div><div class="sub">${doneL.map(x=>esc(x.name)).join(' · ')}</div></div>`
+        return doneL.length?`<div><div class="wname">Done today</div><div class="sub">${doneL.map(x=>esc(wTitle(x))).join(' · ')}</div></div>`
           :`<div><div class="wname">Skipped today</div><div class="sub">Back at it next time.</div></div>`; }
       const n=(w.exercises||[]).length;
-      return `<div><div class="wname">${esc(w.name)}</div><div class="sub">${n} exercise${n===1?'':'s'}${w.time?' · '+esc(w.time):''}</div></div>
+      return `<div><div class="wname">${esc(wTitle(w))}</div><div class="sub">${n} exercise${n===1?'':'s'}${w.time?' · '+esc(w.time):''}</div></div>
         <button class="play" aria-label="Start workout" data-workout="${esc(w.id)}">${PLAY}</button>`;
     }},
     {title:'This week', stack:true, html(){
