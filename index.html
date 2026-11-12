@@ -246,6 +246,15 @@
     transform:translateX(100%);visibility:hidden;transition:transform .3s cubic-bezier(.32,.72,0,1),visibility 0s .3s}
   .subpage.open{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.32,.72,0,1)}
   #libPage{z-index:13}
+  #gymPage .subtop h1{flex:1;min-width:0}
+  .saved,.donebtn{display:none}
+  #gymPage.editing .donebtn{display:block}
+  #gymPage.editing .saved{display:block}
+  .saved{flex:none;margin-right:10px;font-size:13px;font-weight:500;color:var(--volt);opacity:0;transition:opacity .25s ease}
+  .saved.show{opacity:1}
+  .donebtn{flex:none;min-height:38px;padding:0 18px;border:0;border-radius:999px;background:var(--volt);color:#0B0B0B;
+    font-family:Oswald,sans-serif;font-weight:700;font-size:14px;letter-spacing:.14em;cursor:pointer}
+  .donebtn:active{transform:scale(.96)}
   .subtop{display:flex;align-items:center;height:44px;margin-bottom:8px}
   .subtop .iconbtn{margin:0 0 0 -10px}
   .subtop h1{margin-left:4px;font-family:Oswald,sans-serif;font-weight:700;font-size:22px;letter-spacing:.08em;text-transform:uppercase;
@@ -356,7 +365,9 @@
 
     <!-- Gym sub-pages -->
     <section class="subpage" id="gymPage" aria-hidden="true">
-      <div class="subtop"><button class="iconbtn" data-close="gymPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="gymPageTitle"></h1></div>
+      <div class="subtop"><button class="iconbtn" data-close="gymPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="gymPageTitle"></h1>
+        <span class="saved" id="savedMark" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" data-close="gymPage">DONE</button></div>
       <div id="gymPageBody"></div>
     </section>
     <section class="subpage" id="libPage" aria-hidden="true">

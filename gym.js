@@ -19,7 +19,14 @@ const Gym = (() => {
   const fmtDate = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   function fmtClock(ms) { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = String(s % 60).padStart(2, '0'); return h ? `${h}:${String(m).padStart(2, '0')}:${x}` : `${m}:${x}`; }
   function fmtDur(ms) { const m = Math.max(1, Math.round(ms / 60000)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`; }
-  function debounce(fn, ms) { let t; const f = (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; f.flush = () => { clearTimeout(t); return fn(); }; return f; }
+  // Runs fn after ms of quiet. flush() runs it now, but only if a change is waiting.
+  function debounce(fn, ms) {
+    let t = null, args = [];
+    const run = () => { t = null; return fn(...args); };
+    const f = (...a) => { args = a; clearTimeout(t); t = setTimeout(run, ms); };
+    f.flush = () => { if (t === null) return Promise.resolve(); clearTimeout(t); return Promise.resolve(run()); };
+    return f;
+  }
 
   // ================= Navigation =================
   function open(which) {
@@ -301,13 +308,24 @@ const Gym = (() => {
 
   // ---- Workout editor ----
   let edit = null;
-  const saveEdit = debounce(() => edit && RisenDB.saveWorkout(edit).catch(err => toast(err.message)), 400);
-  const saveNotes = debounce(ex => RisenDB.saveExercise(ex), 400);
+  // "✓ Saved" shows for about a second after each save has really been written
+  let savedT;
+  function flashSaved() { const m = $('savedMark'); m.classList.add('show'); clearTimeout(savedT); savedT = setTimeout(() => m.classList.remove('show'), 1200); }
+  const saveEdit = debounce(async () => {
+    if (!edit) return;
+    try { await RisenDB.saveWorkout(edit); flashSaved(); } catch (err) { toast(err.message); }
+  }, 400);
+  const dirtyNotes = new Set();   // custom exercises whose notes changed (several can be waiting at once)
+  const saveNotes = debounce(async () => {
+    const ids = [...dirtyNotes]; dirtyNotes.clear();
+    try { for (const id of ids) { const x = S.exercises.find(z => z.id === id); if (x) await RisenDB.saveExercise(x); } if (ids.length) flashSaved(); }
+    catch (err) { toast(err.message); }
+  }, 400);
 
   function openEditor(id, isNew) {
     edit = JSON.parse(JSON.stringify(S.workouts.find(w => w.id === id)));
-    renderEditor(); openPage('gymPage', 'Workout');
-    pageOnClose = async () => { await saveEdit.flush(); edit = null; await load(); renderPlan(); renderHome(); };
+    renderEditor(); $('gymPage').classList.add('editing'); openPage('gymPage', 'Workout');
+    pageOnClose = async () => { await flush(); edit = null; await load(); renderPlan(); renderHome(); };
     if (isNew) setTimeout(() => { $('wName').focus(); $('wName').select(); }, 320);
   }
   function renderEditor() {
@@ -336,7 +354,7 @@ const Gym = (() => {
     if (t.id === 'wName') edit.name = t.value.trim() || 'Workout';
     else if (t.id === 'wTime') edit.time = t.value;
     else if (t.dataset.t) edit.exercises[t.dataset.i][t.dataset.t] = num(t.value) ?? 0;
-    else if (t.dataset.notes) { const x = S.exercises.find(z => z.id === t.dataset.notes); if (x) { x.notes = t.value; saveNotes(x); } return; }
+    else if (t.dataset.notes) { const x = S.exercises.find(z => z.id === t.dataset.notes); if (x) { x.notes = t.value; dirtyNotes.add(x.id); saveNotes(); } return; }
     else return;
     saveEdit();
   });
@@ -375,7 +393,7 @@ const Gym = (() => {
       <div class="sub" style="margin-top:10px;color:var(--text);line-height:1.6">${w.exercises.map(it => `${esc(exInfo(it.exerciseId).name)} <span style="color:var(--muted)">${it.sets} × ${fmtN(it.reps)} @ ${fmtN(it.kg)} kg</span>`).join('<br>') || 'No exercises'}</div></div>`;
     if (!ws.length) h += '<div class="card"><div class="sub">No workouts in this routine.</div></div>';
     $('gymPageBody').innerHTML = h + '</div>';
-    pageOnClose = null; openPage('gymPage', r.name);
+    pageOnClose = null; $('gymPage').classList.remove('editing'); openPage('gymPage', r.name);
   }
 
   // ================= Exercise library =================
@@ -410,5 +428,10 @@ const Gym = (() => {
 
   function reset() { Rest.stop(); closeAll(); seg = 'today'; }
 
-  return { open, start, reset };
+  // Write every pending change now (workout editor, notes, workout in progress)
+  function flush() { return Promise.all([saveEdit.flush(), saveNotes.flush(), saveDraftSoon.flush()]).catch(err => toast(err.message)); }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+  addEventListener('pagehide', flush);
+
+  return { open, start, reset, flush };
 })();
