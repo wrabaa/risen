@@ -357,6 +357,31 @@
   .dose.taken .sd.today::after{background:#0B0B0B}
   @media (max-width:350px){.dphoto{width:72px;height:72px}.dtick{width:56px;height:56px}.drow{gap:10px}}
 
+  /* ===== CLASSES ===== */
+  #clsEditPage,#instEditPage{z-index:13}
+  #clsEditPage .subtop h1,#instEditPage .subtop h1{flex:1;min-width:0}
+  #clsEditPage .saved,#clsEditPage .donebtn,#instEditPage .saved,#instEditPage .donebtn{display:block}
+  .tline{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chips.sm{gap:6px}
+  .chips.sm button{min-height:38px;padding:0 13px;font-size:14px}
+  .avatar{flex:none;width:56px;height:56px;border-radius:50%;overflow:hidden;background:#0F0F0F;border:1px solid var(--line);display:grid;place-items:center;color:var(--muted)}
+  .avatar img{display:block;width:100%;height:100%;object-fit:cover}
+  .avatar b{font-family:Oswald,sans-serif;font-weight:500;font-size:17px;letter-spacing:.06em}
+  .avatar.xl{width:168px;height:168px}.avatar.xl b{font-size:56px}
+  .cls .wmain{width:100%}
+  .cls .xt .t{font-family:Oswald,sans-serif;font-weight:700;font-size:19px;line-height:1.15;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
+  .cls .xt .s{margin-top:4px;font-size:14px;color:var(--muted)}
+  .ctag{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tag{padding:2px 10px;border-radius:999px;border:1px solid var(--line);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .attbtn{margin-top:14px;width:100%;min-height:56px;border-radius:999px;border:1.5px solid #3A3A3A;background:none;color:var(--muted);
+    font-family:Oswald,sans-serif;font-weight:700;font-size:17px;letter-spacing:.12em;cursor:pointer;transition:background .2s ease,color .2s ease}
+  .attbtn:active{background:var(--line)}
+  .attbtn.on{background:var(--volt);border-color:var(--volt);color:#0B0B0B}
+  .bigph{display:grid;place-items:center;width:100%;aspect-ratio:1/1;max-height:340px;border-radius:16px;overflow:hidden;background:#0F0F0F;border:1px solid var(--line);color:var(--muted)}
+  .bigph img{display:block;width:100%;height:100%;object-fit:cover}
+  .bigph b{font-family:Oswald,sans-serif;font-weight:700;font-size:96px;letter-spacing:.04em}
+  select.field{padding-right:44px;background:#0F0F0F url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239A9A9A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center/20px}
+
   /* EXERCISE PHOTO slot (photo.js): goes under each exercise in Plan and Today */
   .pslot{position:relative;margin-top:12px}
   .pslot-add{display:flex;align-items:center;justify-content:center;gap:10px;height:96px;border:1.5px dashed #3A3A3A;border-radius:14px;
@@ -428,7 +453,7 @@
     </div>
     <div class="view" id="view-meals" hidden><div class="soon"><h2>Meals</h2><p>Coming soon.</p></div></div>
     <div class="view" id="view-meds" hidden><div id="medsBody"></div></div>
-    <div class="view" id="view-classes" hidden><div class="soon"><h2>Classes</h2><p>Coming soon.</p></div></div>
+    <div class="view" id="view-classes" hidden><div id="clsWeek"></div></div>
 
     <!-- Rest timer: starts when a set is ticked -->
     <div class="restbar" id="restbar" aria-live="polite">
@@ -450,6 +475,26 @@
         <span class="saved" id="exSaved" aria-live="polite">✓ Saved</span>
         <button class="donebtn" data-close="exPage">DONE</button></div>
       <div id="exBody"></div>
+    </section>
+    <section class="subpage" id="clsPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-cls-close="clsPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="clsPageTitle"></h1></div>
+      <div id="clsPageBody"></div>
+    </section>
+    <section class="subpage" id="clsEditPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-cls-close="clsEditPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="clsEditTitle">Class</h1>
+        <span class="saved" id="clsSaved" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" data-cls-close="clsEditPage">DONE</button></div>
+      <div id="clsEditBody"></div>
+    </section>
+    <section class="subpage" id="instPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-cls-close="instPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1>Instructors</h1></div>
+      <div id="instBody"></div>
+    </section>
+    <section class="subpage" id="instEditPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-cls-close="instEditPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="instEditTitle">Instructor</h1>
+        <span class="saved" id="instSaved" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" data-cls-close="instEditPage">DONE</button></div>
+      <div id="instEditBody"></div>
     </section>
     <section class="subpage" id="medPage" aria-hidden="true">
       <div class="subtop"><button class="iconbtn" id="medBack" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="medTitle">Med</h1>
@@ -517,6 +562,7 @@
 
     <div class="group-label">Data</div>
     <div class="group">
+      <button class="row danger" id="clearClasses">Clear all classes</button>
       <button class="row danger" id="resetBtn">Reset all data</button>
     </div>
 
@@ -528,11 +574,21 @@
   <!-- Gym pop-ups -->
   <div class="sheet-wrap" id="gymSheet" hidden><div class="sheet" id="gymSheetBody"></div></div>
 
+  <!-- Classes: asked once, the first time the tab opens -->
+  <div class="sheet-wrap" id="clsSheet" hidden>
+    <div class="sheet">
+      <h2>Load Fitness Zone schedule?</h2>
+      <p>Fills in the weekly classes and instructors. Afterwards everything is yours to edit, delete or add to.</p>
+      <button class="primary" type="button" id="clsYes">YES</button>
+      <button class="textbtn" type="button" id="clsNo">START EMPTY</button>
+    </div>
+  </div>
+
   <!-- Reset all data (Settings) -->
   <div class="sheet-wrap" id="resetSheet" hidden>
     <div class="sheet">
       <h2>Reset all data?</h2>
-      <p>Deletes everything on this phone: routines, workouts, meds, history, photos, name and settings. Export a backup first if you might want it back.</p>
+      <p>Deletes everything on this phone: routines, workouts, meds, classes, history, photos, name and settings. Export a backup first if you might want it back.</p>
       <button class="primary" type="button" id="resetExport">EXPORT BACKUP FIRST</button>
       <button class="dangerbtn" type="button" id="resetGo">RESET EVERYTHING</button>
       <button class="textbtn" type="button" id="resetCancel">Cancel</button>
@@ -557,11 +613,12 @@
   const intro=$('intro'), app=$('app');
 
   // ---- Data: lives in IndexedDB (db.js). This is an in-memory copy for drawing the screens. ----
-  const S={settings:{name:'',nameAsked:false,restSec:90},routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[]};
+  const S={settings:{name:'',nameAsked:false,restSec:90},routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[],classes:[],instructors:[],classlogs:[]};
   async function load(){
     [S.settings,S.routines,S.workouts,S.sessions,S.exercises]=await Promise.all([RisenDB.getSettings(),RisenDB.all('routines'),
       RisenDB.all('workouts'),RisenDB.all('sessions'),RisenDB.all('exercises')]);
     [S.meds,S.medlogs]=await Promise.all([RisenDB.all('meds'),RisenDB.all('medlogs')]);
+    [S.classes,S.instructors,S.classlogs]=await Promise.all([RisenDB.all('classes'),RisenDB.all('instructors'),RisenDB.all('classlogs')]);
   }
   const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -632,6 +689,13 @@
       if(s.taken===s.total) return `<div><div class="wname">All done today ✓</div><div class="sub">${s.taken} of ${s.total} taken</div></div>`;
       return `<div><div class="wname">${s.taken} of ${s.total} taken today</div><div class="sub">Next: ${esc(s.next.m.name)} · ${esc(s.next.t)}</div></div>`;
     }},
+    {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
+      if(typeof Classes==='undefined') return '';
+      if(!S.classes.length) return `<div><div class="wname">No classes yet</div><div class="sub">Add them in Classes</div></div>`;
+      const n=Classes.next();
+      if(n.none) return `<div><div class="wname">${n.none==='today'?'No classes today':'No more classes today'}</div></div>`;
+      return `<div><div class="wname">${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${esc(n.i?n.i.name.split(' ')[0]:'TBA')}</div></div>${Classes.avatar(n.i)}`;
+    }},
   ];
   // Quiet backup reminder: shows when there's a plan and the last export is missing or older than 7 days
   function renderBackupLine(){
@@ -656,11 +720,12 @@
     if(view==='home'&&!wasHome) renderHome();
     document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
   }
-  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open('today'); else if(t.dataset.view==='meds') Meds.open(); else show(t.dataset.view)};
+  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open('today'); else if(t.dataset.view==='meds') Meds.open(); else if(t.dataset.view==='classes') Classes.open(); else show(t.dataset.view)};
   $('tiles').onclick=e=>{
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     const b=e.target.closest('[data-go]'); if(b) return Gym.open(b.dataset.go);
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();
+    if(e.target.closest('[data-tap="classes"]')) Classes.openToday();
   };
   $('tiles').onkeydown=e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-tap]')){ e.preventDefault(); e.target.click(); } };
 
@@ -703,6 +768,13 @@
   $('viewIntro').onclick=()=>{
     $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true');
     app.classList.add('hidden'); intro.classList.remove('hidden');
+  };
+
+  // ---- Clear all classes (changing gym): classes, instructors and attendance; the gym workouts stay ----
+  $('clearClasses').onclick=async()=>{
+    if(!confirm('Delete all classes, instructors and attendance? Use this when you change gym. Your workouts are not affected.')) return;
+    try{ await RisenDB.clearClasses(); }catch(e){ toast('Could not clear: '+e.message); return; }
+    await load(); Classes.reset(); renderHome(); toast('Classes cleared');
   };
 
   // ---- Reset all data: suggest export, confirm twice, back to first launch ----
@@ -759,5 +831,6 @@
 <script src="library.js"></script>
 <script src="gym.js"></script>
 <script src="meds.js"></script>
+<script src="classes.js"></script>
 </body>
 </html>

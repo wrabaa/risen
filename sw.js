@@ -1,11 +1,12 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of every file and delete the old one.
-const VERSION = '2026-11-12.24';
+const VERSION = '2026-11-12.25';
 const CACHE = 'risen-' + VERSION;
-const CORE = ['./', 'index.html', 'db.js', 'photo.js', 'library.js', 'gym.js', 'meds.js', 'manifest.json',
+const CORE = ['./', 'index.html', 'db.js', 'photo.js', 'library.js', 'gym.js', 'meds.js', 'classes.js', 'manifest.json', 'data/gym-classes.json',
   'assets/bg.jpg', 'assets/mark.png',
   'assets/icon-180.png', 'assets/icon-192.png', 'assets/icon-512.png',
-  'assets/fonts/inter.woff2', 'assets/fonts/oswald.woff2'];
+  'assets/fonts/inter.woff2', 'assets/fonts/oswald.woff2',
+  ...['bader', 'bahaa', 'dolly', 'elie', 'ghada', 'jad', 'mira', 'mjay', 'olga', 'patricia', 'robert', 'rouane', 'samir', 'yasmine'].map(n => 'assets/instructors/' + n + '.jpg')];
 
 self.addEventListener('install', e => {
   // cache:'reload' skips the browser's HTTP cache, so a new version never stores stale files

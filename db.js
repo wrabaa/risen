@@ -19,12 +19,16 @@
 //   meds       {id, name, dose, times:['08:00',..], freq:'daily'|'days'|'weekly', days:[1..7],
 //               food:'yes'|'no'|'any', notes, paused, created}
 //   medlogs    {id:'<medId>|<date>|<time>', medId, date, time, takenAt}   one row per dose taken
+//   classes    {id, name, studio, day:1..7, time:'HH:MM', duration (min), instructorId|null, notes}   weekly group classes
+//   instructors {id, name, photo|null}   photo = a file in the app (seed); a photo from the phone lives in `photos` as 'inst-<id>'
+//   classlogs  {id:'<classId>|<date>', classId, date, at}   one row per class attended
+//   settings also holds classesAsked (the one-time "load the schedule?" question has been answered)
 //
 // SCHEMA VERSION: raise DB_VERSION and add a new `if (old < N)` step in upgrade().
 // Never delete or rename a store in an upgrade, so updates never lose data.
 const RisenDB = (() => {
-  const DB_NAME = 'risen', DB_VERSION = 3;
-  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs'];
+  const DB_NAME = 'risen', DB_VERSION = 4;
+  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs'];
   let dbp;
 
   function upgrade(db, old) {
@@ -40,6 +44,11 @@ const RisenDB = (() => {
     }
     if (old < 2) {
       db.createObjectStore('photos', { keyPath: 'exerciseId' });   // v2: one photo per exercise
+    }
+    if (old < 4) {                                                  // v4: Classes
+      db.createObjectStore('classes', { keyPath: 'id' });
+      db.createObjectStore('instructors', { keyPath: 'id' });
+      db.createObjectStore('classlogs', { keyPath: 'id' });
     }
     if (old < 3) {                                                  // v3: Meds
       db.createObjectStore('meds', { keyPath: 'id' });
@@ -121,6 +130,40 @@ const RisenDB = (() => {
     await done(t);
   }
   const logDose = (medId, date, time) => put('medlogs', { id: `${medId}|${date}|${time}`, medId, date, time, takenAt: now() });
+  // ---- Classes ----
+  const saveClass = c => put('classes', c);
+  const saveInstructor = i => put('instructors', i);
+  async function deleteClass(id) {          // the class and its attendance
+    const db = await open(), t = db.transaction(['classes', 'classlogs'], 'readwrite');
+    t.objectStore('classes').delete(id);
+    t.objectStore('classlogs').delete(IDBKeyRange.bound(id + '|', id + '|\uffff'));
+    await done(t);
+  }
+  async function deleteInstructor(id) {     // their photo goes too; their classes stay, as "TBA"
+    const db = await open(), t = db.transaction(['instructors', 'classes', 'photos'], 'readwrite');
+    t.objectStore('instructors').delete(id); t.objectStore('photos').delete('inst-' + id);
+    const cs = t.objectStore('classes');
+    for (const c of await req(cs.getAll())) if (c.instructorId === id) cs.put({ ...c, instructorId: null });
+    await done(t);
+  }
+  const attendClass = (classId, date) => put('classlogs', { id: `${classId}|${date}`, classId, date, at: now() });
+  async function unattendClass(id) { const db = await open(), t = db.transaction('classlogs', 'readwrite'); t.objectStore('classlogs').delete(id); await done(t); }
+  async function seedClasses({ instructors, classes }) {        // the one-time "load the schedule" (and the answer is remembered)
+    const db = await open(), t = db.transaction(['instructors', 'classes', 'settings'], 'readwrite');
+    for (const i of instructors) t.objectStore('instructors').put(i);
+    for (const c of classes) t.objectStore('classes').put(c);
+    t.objectStore('settings').put({ key: 'classesAsked', value: true });
+    await done(t);
+  }
+  async function clearClasses() {           // for changing gym: classes, instructors (and their photos) and attendance
+    const db = await open(), t = db.transaction(['classes', 'instructors', 'classlogs', 'photos', 'settings'], 'readwrite');
+    for (const s of ['classes', 'instructors', 'classlogs']) t.objectStore(s).clear();
+    t.objectStore('photos').delete(IDBKeyRange.bound('inst-', 'inst-\uffff'));
+    t.objectStore('settings').put({ key: 'classesAsked', value: true });
+    await done(t);
+  }
+  async function photoKeys() { const db = await open(); return req(db.transaction('photos').objectStore('photos').getAllKeys()); }
+
   async function undoDose(id) { const db = await open(), t = db.transaction('medlogs', 'readwrite'); t.objectStore('medlogs').delete(id); await done(t); }
 
   // ---- Sessions + per-exercise logs, saved together ----
@@ -237,5 +280,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, saveWorkout, deleteWorkout, workoutsOf,
-    saveExercise, saveMed, deleteMed, logDose, undoDose, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
+    saveExercise, saveMed, deleteMed, logDose, undoDose, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();
