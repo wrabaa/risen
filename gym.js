@@ -48,10 +48,23 @@ const Gym = (() => {
 
   // ================= Navigation =================
   function open() { closeAll(); show('gym'); renderGym(); }       // the Gym tab always opens on the week (or the workout in progress)
+  // The workout in progress is a copy of the day's plan made at START. This keeps it honest: a plan-based session whose
+  // day has no exercises left (or that has none itself) has nothing to log or save, so it is closed and its timer stops.
+  // A blank extra workout is built by hand, so it is left alone.
+  function syncDraft() {
+    const d = draft(); if (!d || d.extra || !d.workoutId) return false;
+    const w = S.workouts.find(x => x.id === d.workoutId);
+    if (w && (w.exercises || []).length && d.exercises.length) return false;
+    S.settings.activeSession = null; saveDraft(); Rest.stop(); return true;
+  }
+  function openToday() {       // Home's Training tile: today's day (or the workout already running)
+    closeAll(); show('gym'); renderGym(); if (!draft()) openDay(isoDay(new Date()));
+  }
   function renderGym() {
+    if (syncDraft()) toast('Workout closed: no exercises left');
     const d = draft();
     $('gymLog').hidden = !d; $('gymWeek').hidden = !!d;
-    d ? renderLog($('gymLog'), d) : renderWeek();
+    if (d) renderLog($('gymLog'), d); else { $('gymLog').innerHTML = ''; renderWeek(); }
     $('view-gym').scrollTop = 0;
   }
   function openPage(id) { const p = $(id); p.scrollTop = 0; p.classList.add('open'); p.setAttribute('aria-hidden', 'false'); }
@@ -91,6 +104,7 @@ const Gym = (() => {
     const w = dayRec(d); if (!w) return;
     w.name = workoutTitle(w);
     try { await RisenDB.saveWorkout(w); flashSaved(); } catch (err) { toast(err.message); }
+    if (syncDraft()) { renderGym(); toast('Workout closed: no exercises left'); }
   }
   const saveDay = debounce(() => curDay ? persistDay(curDay) : null, 400);
   const dirtyNotes = new Set();       // exercises whose notes changed (several can be waiting at once)
@@ -278,6 +292,7 @@ const Gym = (() => {
     const d = draft();
     if (d) { open(); if (d.workoutId !== workoutId) toast('Finish or discard the workout in progress first'); return; }
     const w = workoutId ? S.workouts.find(x => x.id === workoutId) : null;
+    if (w && !(w.exercises || []).length) return toast('Nothing planned for that day');
     const exercises = [];
     for (const t of (w ? w.exercises : [])) exercises.push(await newEntry(t.exerciseId, t));
     S.settings.activeSession = { id: RisenDB.uid(), workoutId: w ? w.id : null, routineId: w ? w.routineId : ((activeRoutine() || {}).id || null),
@@ -337,7 +352,7 @@ const Gym = (() => {
       sets.push({ kg: p.kg, reps: p.reps, done: false }); saveDraft(); renderGym(); return;
     }
     if (t.dataset.rmex != null) {
-      if (!confirm(`Remove ${exerciseInfo(d.exercises[t.dataset.rmex].exerciseId).name} from this workout? Your plan doesn't change.`)) return;
+      if (!confirm(`Remove ${exerciseInfo(d.exercises[t.dataset.rmex].exerciseId).name} from this workout only? Your plan doesn't change.`)) return;
       d.exercises.splice(t.dataset.rmex, 1); saveDraft(); renderGym(); return;
     }
     switch (t.dataset.act) {
@@ -492,5 +507,8 @@ const Gym = (() => {
   addEventListener('pagehide', flush);
   setInterval(dayRolled, 60000);
 
-  return { open, start, reset, flush };
+  // A workout left over from before (e.g. emptied) is cleaned up as soon as the data is loaded
+  ready.then(() => { if (syncDraft()) renderHome(); });
+
+  return { open, openToday, start, reset, flush };
 })();

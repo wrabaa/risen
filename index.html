@@ -67,6 +67,9 @@
   .tiles{display:flex;flex-direction:column;gap:14px}
   .tile{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px 20px;
     animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+  .tile[data-tap]{cursor:pointer}
+  .tile[data-tap]:active{background:#202020}
+  .tiles.still .tile{animation:none}
   .tile:nth-child(2){animation-delay:.06s}.tile:nth-child(3){animation-delay:.12s}
   .tile-head{display:flex;align-items:baseline;gap:10px;font-family:Oswald,sans-serif;font-weight:500;font-size:14px;letter-spacing:.2em;text-transform:uppercase}
   .tile-head b{font-weight:500;color:var(--muted)}
@@ -594,18 +597,17 @@
   // ---- Tiles: add a new tile by adding an entry here ----
   const PLAY='<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>';
   const TILES=[
-    {title:'Training', html(){
-      if(!activeRoutine()) return `<div><div class="wname">No plan yet</div><div class="sub">Build your week in Gym</div></div>
-        <button class="ghost" data-go="plan">SET UP</button>`;
-      const today=new Date(), list=plannedOn(today), ids=doneIds(today);
-      if(!list.length) return `<div><div class="wname">Rest day</div><div class="sub">Recover. Back at it tomorrow.</div></div>`;
-      const sk=skippedIds(today), w=list.find(x=>!ids.has(x.id)&&!sk.has(x.id));
+    {title:'Training', tap:'today', html(){          // the whole tile opens today's day in Gym
+      const today=new Date(), day=`<div class="wname">${today.toLocaleDateString('en-GB',{weekday:'long'})}</div>`, go=`<span class="play" aria-hidden="true">${PLAY}</span>`;
+      if(S.settings.activeSession) return `<div>${day}<div class="sub">Workout in progress</div></div>${go}`;
+      if(!activeRoutine()) return `<div>${day}<div class="sub">No plan yet · tap to build it</div></div>`;
+      const list=plannedOn(today), ids=doneIds(today), sk=skippedIds(today);
+      if(!list.length) return `<div>${day}<div class="sub">Rest day</div></div>`;
+      const w=list.find(x=>!ids.has(x.id)&&!sk.has(x.id));
       if(!w){ const doneL=list.filter(x=>ids.has(x.id));
-        return doneL.length?`<div><div class="wname">Done today</div><div class="sub">${doneL.map(x=>esc(wTitle(x))).join(' · ')}</div></div>`
-          :`<div><div class="wname">Skipped today</div><div class="sub">Back at it next time.</div></div>`; }
+        return `<div>${day}<div class="sub">${doneL.length?'Done today ✓ · '+doneL.map(x=>esc(wTitle(x))).join(' · '):'Skipped today'}</div></div>`; }
       const n=(w.exercises||[]).length;
-      return `<div><div class="wname">${esc(wTitle(w))}</div><div class="sub">${n} exercise${n===1?'':'s'}${w.time?' · '+esc(w.time):''}</div></div>
-        <button class="play" aria-label="Start workout" data-workout="${esc(w.id)}">${PLAY}</button>`;
+      return `<div>${day}<div class="sub">${esc(wTitle(w))} · ${n} exercise${n===1?'':'s'}</div></div>${go}`;
     }},
     {title:'This week', stack:true, html(){
       const days=weekDays(), today=dayKey(new Date());
@@ -637,25 +639,30 @@
     el.hidden=!activeRoutine()||(days!=null&&days<7);
     el.innerHTML=(days==null?'No backup yet':`Last backup: ${days} days ago`)+' · <u>Back up</u>';
   }
+  let homeDrawn=false;
   function renderHome(){
     renderBackupLine();
     $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-    $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile"><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
+    $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
+    $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
       <div class="tile-body${t.stack?' stack':''}">${t.html()}</div></article>`).join('');
   }
 
   // ---- Tabs ----
   function show(view){
+    const wasHome=!$('view-home').hidden;
     document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+view);
+    if(view==='home'&&!wasHome) renderHome();
     document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
   }
   document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open('today'); else if(t.dataset.view==='meds') Meds.open(); else show(t.dataset.view)};
   $('tiles').onclick=e=>{
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     const b=e.target.closest('[data-go]'); if(b) return Gym.open(b.dataset.go);
-    const p=e.target.closest('[data-workout]'); if(p) Gym.start(p.dataset.workout);
+    if(e.target.closest('[data-tap="today"]')) Gym.openToday();
   };
+  $('tiles').onkeydown=e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-tap]')){ e.preventDefault(); e.target.click(); } };
 
   // ---- Name: asked once, on first ENTER. Skip = no name, greeting says just "Hello" ----
   async function closeName(name){
