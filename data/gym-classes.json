@@ -1,0 +1,385 @@
+{
+ "gym": "Fitness Zone",
+ "version": 1,
+ "note": "Seed data — loaded once on user's YES; fully editable after.",
+ "studios": [
+  "Energy",
+  "Balance",
+  "Power"
+ ],
+ "instructors": [
+  {
+   "id": "mjay",
+   "name": "Mjay",
+   "photo": "assets/instructors/mjay.jpg"
+  },
+  {
+   "id": "elie",
+   "name": "Elie Balkis",
+   "photo": "assets/instructors/elie.jpg"
+  },
+  {
+   "id": "mira",
+   "name": "Mira Ammouri",
+   "photo": "assets/instructors/mira.jpg"
+  },
+  {
+   "id": "dolly",
+   "name": "Dolly Faour",
+   "photo": "assets/instructors/dolly.jpg"
+  },
+  {
+   "id": "patricia",
+   "name": "Patricia Abi Chacra",
+   "photo": "assets/instructors/patricia.jpg"
+  },
+  {
+   "id": "jad",
+   "name": "Jad Abi Ghosn",
+   "photo": "assets/instructors/jad.jpg"
+  },
+  {
+   "id": "samir",
+   "name": "Samir Badawi",
+   "photo": "assets/instructors/samir.jpg"
+  },
+  {
+   "id": "rouane",
+   "name": "Rouane Nasreddine",
+   "photo": "assets/instructors/rouane.jpg"
+  },
+  {
+   "id": "olga",
+   "name": "Olga Zein",
+   "photo": "assets/instructors/olga.jpg"
+  },
+  {
+   "id": "bader",
+   "name": "Bader Dimashkieh",
+   "photo": "assets/instructors/bader.jpg"
+  },
+  {
+   "id": "robert",
+   "name": "Robert Walter",
+   "photo": "assets/instructors/robert.jpg"
+  },
+  {
+   "id": "yasmine",
+   "name": "Yasmine Halabi",
+   "photo": "assets/instructors/yasmine.jpg"
+  },
+  {
+   "id": "bahaa",
+   "name": "Bahaa Fayad",
+   "photo": "assets/instructors/bahaa.jpg"
+  },
+  {
+   "id": "ghada",
+   "name": "Ghada Jaber",
+   "photo": "assets/instructors/ghada.jpg"
+  },
+  {
+   "id": "cesar",
+   "name": "Cesar",
+   "photo": null
+  }
+ ],
+ "classes": [
+  {
+   "studio": "Energy",
+   "day": 1,
+   "time": "09:00",
+   "name": "Circuit Training",
+   "instructor": "bader",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 1,
+   "time": "10:00",
+   "name": "Tabata",
+   "instructor": "bader",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 1,
+   "time": "18:00",
+   "name": "Sweat",
+   "instructor": "mjay",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 1,
+   "time": "19:00",
+   "name": "Les Mills BodyCombat",
+   "instructor": "mjay",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 2,
+   "time": "09:00",
+   "name": "Sweat",
+   "instructor": "mjay",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 2,
+   "time": "10:00",
+   "name": "Iron Core",
+   "instructor": "mjay",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 2,
+   "time": "19:00",
+   "name": "Circuit Training",
+   "instructor": "mira",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 3,
+   "time": "10:00",
+   "name": "Les Mills BodyPump",
+   "instructor": "robert",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 3,
+   "time": "18:00",
+   "name": "Les Mills BodyCombat",
+   "instructor": "samir",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 3,
+   "time": "19:00",
+   "name": "Les Mills BodyPump",
+   "instructor": "yasmine",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 4,
+   "time": "09:00",
+   "name": "Cardio Sculpt",
+   "instructor": "elie",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 4,
+   "time": "18:00",
+   "name": "Les Mills BodyPump",
+   "instructor": "bader",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 5,
+   "time": "09:00",
+   "name": "Tabata",
+   "instructor": "dolly",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 5,
+   "time": "10:00",
+   "name": "Butts & Guts",
+   "instructor": "dolly",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 5,
+   "time": "17:30",
+   "name": "Pound",
+   "instructor": "jad",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 5,
+   "time": "18:00",
+   "name": "Sixpax",
+   "instructor": "jad",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 5,
+   "time": "19:00",
+   "name": "Les Mills BodyBalance",
+   "instructor": "jad",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 6,
+   "time": "09:30",
+   "name": "Sixpax",
+   "instructor": "mjay",
+   "duration": 60
+  },
+  {
+   "studio": "Energy",
+   "day": 6,
+   "time": "10:00",
+   "name": "Les Mills BodyPump",
+   "instructor": "mjay",
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 1,
+   "time": "19:00",
+   "name": "Pilates",
+   "instructor": "ghada",
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 2,
+   "time": "11:00",
+   "name": "Power Pilates",
+   "instructor": "rouane",
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 2,
+   "time": "12:00",
+   "name": "Stretch",
+   "instructor": "rouane",
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 2,
+   "time": "19:00",
+   "name": "Stretch",
+   "instructor": "patricia",
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 3,
+   "time": "11:00",
+   "name": "H-Yoga",
+   "instructor": "cesar",
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 3,
+   "time": "18:00",
+   "name": "Power Pilates",
+   "instructor": "rouane",
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 3,
+   "time": "19:00",
+   "name": "Stretch n Roll",
+   "instructor": "rouane",
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 4,
+   "time": "11:00",
+   "name": "Pilates",
+   "instructor": "ghada",
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 4,
+   "time": "12:00",
+   "name": "Stretch",
+   "instructor": "ghada",
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 4,
+   "time": "18:00",
+   "name": "Yoga",
+   "instructor": "bahaa",
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 4,
+   "time": "19:30",
+   "name": "Zumba",
+   "instructor": null,
+   "duration": 60
+  },
+  {
+   "studio": "Balance",
+   "day": 5,
+   "time": "11:00",
+   "name": "H-Yoga",
+   "instructor": "olga",
+   "duration": 60
+  },
+  {
+   "studio": "Power",
+   "day": 2,
+   "time": "18:00",
+   "name": "Spinning",
+   "instructor": "mira",
+   "duration": 60
+  },
+  {
+   "studio": "Power",
+   "day": 3,
+   "time": "09:00",
+   "name": "Les Mills RPM",
+   "instructor": "robert",
+   "duration": 60
+  },
+  {
+   "studio": "Power",
+   "day": 3,
+   "time": "19:00",
+   "name": "Spinning",
+   "instructor": "rouane",
+   "duration": 60
+  },
+  {
+   "studio": "Power",
+   "day": 4,
+   "time": "10:00",
+   "name": "Spinning",
+   "instructor": "elie",
+   "duration": 60
+  },
+  {
+   "studio": "Power",
+   "day": 4,
+   "time": "19:00",
+   "name": "Les Mills RPM",
+   "instructor": "bader",
+   "duration": 60
+  },
+  {
+   "studio": "Power",
+   "day": 6,
+   "time": "11:00",
+   "name": "Spinning",
+   "instructor": "mjay",
+   "duration": 60
+  }
+ ]
+}
