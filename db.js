@@ -22,13 +22,16 @@
 //   classes    {id, name, studio, day:1..7, time:'HH:MM', duration (min), instructorId|null, notes}   weekly group classes
 //   instructors {id, name, photo|null}   photo = a file in the app (seed); a photo from the phone lives in `photos` as 'inst-<id>'
 //   classlogs  {id:'<classId>|<date>', classId, date, at}   one row per class attended
+//   recipes    {id, category:'shakes'|'breakfast'|'lunch'|'snacks'|'dinner', name, ingredients:[{text}], method, created, updated}
+//              Each ingredient is an object (not a bare string) so grams / calories can be added to it later; a recipe's photo
+//              lives in `photos` as 'recipe-<id>'.
 //   settings also holds classesAsked (the one-time "load the schedule?" question has been answered)
 //
 // SCHEMA VERSION: raise DB_VERSION and add a new `if (old < N)` step in upgrade().
 // Never delete or rename a store in an upgrade, so updates never lose data.
 const RisenDB = (() => {
-  const DB_NAME = 'risen', DB_VERSION = 4;
-  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs'];
+  const DB_NAME = 'risen', DB_VERSION = 5;
+  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs', 'recipes'];
   let dbp;
 
   function upgrade(db, old) {
@@ -45,14 +48,17 @@ const RisenDB = (() => {
     if (old < 2) {
       db.createObjectStore('photos', { keyPath: 'exerciseId' });   // v2: one photo per exercise
     }
+    if (old < 3) {                                                  // v3: Meds
+      db.createObjectStore('meds', { keyPath: 'id' });
+      db.createObjectStore('medlogs', { keyPath: 'id' }).createIndex('date', 'date');
+    }
     if (old < 4) {                                                  // v4: Classes
       db.createObjectStore('classes', { keyPath: 'id' });
       db.createObjectStore('instructors', { keyPath: 'id' });
       db.createObjectStore('classlogs', { keyPath: 'id' });
     }
-    if (old < 3) {                                                  // v3: Meds
-      db.createObjectStore('meds', { keyPath: 'id' });
-      db.createObjectStore('medlogs', { keyPath: 'id' }).createIndex('date', 'date');
+    if (old < 5) {                                                  // v5: Meals
+      db.createObjectStore('recipes', { keyPath: 'id' });
     }
   }
 
@@ -130,6 +136,14 @@ const RisenDB = (() => {
     await done(t);
   }
   const logDose = (medId, date, time) => put('medlogs', { id: `${medId}|${date}|${time}`, medId, date, time, takenAt: now() });
+  // ---- Recipes ----
+  const saveRecipe = r => put('recipes', r);
+  async function deleteRecipe(id) {         // the recipe and its photo
+    const db = await open(), t = db.transaction(['recipes', 'photos'], 'readwrite');
+    t.objectStore('recipes').delete(id); t.objectStore('photos').delete('recipe-' + id);
+    await done(t);
+  }
+
   // ---- Classes ----
   const saveClass = c => put('classes', c);
   const saveInstructor = i => put('instructors', i);
@@ -280,5 +294,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, saveWorkout, deleteWorkout, workoutsOf,
-    saveExercise, saveMed, deleteMed, logDose, undoDose, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
+    saveExercise, saveMed, deleteMed, logDose, undoDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();

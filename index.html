@@ -366,6 +366,30 @@
   .dose.taken .sd.today::after{background:#0B0B0B}
   @media (max-width:350px){.dphoto{width:56px;height:56px}.drow{gap:10px}}
 
+  /* ===== MEALS ===== */
+  #recipePage{z-index:13}
+  #recipePage .subtop h1{flex:1;min-width:0}
+  #recipePage .saved,#recipePage .donebtn{display:block}
+  .mcat{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;width:100%;min-height:124px;padding:18px 20px;
+    border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card) center/cover no-repeat;color:var(--text);text-align:left;cursor:pointer}
+  .mcat:active{filter:brightness(1.12)}
+  .mcat.ph{border-color:transparent}
+  .mcat.ph::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,11,.1) 0%,rgba(11,11,11,.82) 100%)}
+  .mcat>*{position:relative}
+  .mcat .mt{font-family:Oswald,sans-serif;font-weight:700;font-size:28px;line-height:1.05;text-transform:uppercase;letter-spacing:.04em}
+  .mcat .mn{margin-top:4px;font-size:14px;color:var(--muted)}
+  .mcat.ph .mn{color:#D6D6D6}
+  .micon{color:var(--muted)}
+  .micon .icon{width:44px;height:44px;stroke-width:1.5}
+  .rcard{display:block;width:100%;padding:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);color:var(--text);text-align:left;cursor:pointer}
+  .rcard:active{background:#202020}
+  .rimg{position:relative;overflow:hidden;display:grid;place-items:center;width:100%;aspect-ratio:16/10;background:#0F0F0F;color:#5A5A5A}
+  .rimg img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
+  .rimg .icon{width:44px;height:44px;stroke-width:1.5}
+  .rname{padding:14px 16px;font-family:Oswald,sans-serif;font-weight:700;font-size:21px;line-height:1.15;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
+  textarea.grow{resize:none;overflow:hidden;line-height:1.45}
+  #rPhoto .pslot-img img{max-height:340px}
+
   /* ===== CLASSES ===== */
   #clsEditPage,#instEditPage{z-index:13}
   #clsEditPage .subtop h1,#instEditPage .subtop h1{flex:1;min-width:0}
@@ -460,7 +484,7 @@
       <div id="gymWeek"></div>
       <div id="gymLog" hidden></div>
     </div>
-    <div class="view" id="view-meals" hidden><div class="soon"><h2>Meals</h2><p>Coming soon.</p></div></div>
+    <div class="view" id="view-meals" hidden><div id="mealCats"></div></div>
     <div class="view" id="view-meds" hidden><div id="medsBody"></div></div>
     <div class="view" id="view-classes" hidden><div id="clsWeek"></div></div>
 
@@ -484,6 +508,16 @@
         <span class="saved" id="exSaved" aria-live="polite">✓ Saved</span>
         <button class="donebtn" data-close="exPage">DONE</button></div>
       <div id="exBody"></div>
+    </section>
+    <section class="subpage" id="mealPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-meal-close="mealPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="mealPageTitle"></h1></div>
+      <div id="mealPageBody"></div>
+    </section>
+    <section class="subpage" id="recipePage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-meal-close="recipePage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="recipeTitle">Recipe</h1>
+        <span class="saved" id="recipeSaved" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" data-meal-close="recipePage">DONE</button></div>
+      <div id="recipeBody"></div>
     </section>
     <section class="subpage" id="clsPage" aria-hidden="true">
       <div class="subtop"><button class="iconbtn" data-cls-close="clsPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="clsPageTitle"></h1></div>
@@ -583,6 +617,9 @@
   <!-- Gym pop-ups -->
   <div class="sheet-wrap" id="gymSheet" hidden><div class="sheet" id="gymSheetBody"></div></div>
 
+  <!-- Meals: move a recipe to another category -->
+  <div class="sheet-wrap" id="mealSheet" hidden><div class="sheet" id="mealSheetBody"></div></div>
+
   <!-- Classes: asked once, the first time the tab opens -->
   <div class="sheet-wrap" id="clsSheet" hidden>
     <div class="sheet">
@@ -597,7 +634,7 @@
   <div class="sheet-wrap" id="resetSheet" hidden>
     <div class="sheet">
       <h2>Reset all data?</h2>
-      <p>Deletes everything on this phone: routines, workouts, meds, classes, history, photos, name and settings. Export a backup first if you might want it back.</p>
+      <p>Deletes everything on this phone: routines, workouts, meds, classes, recipes, history, photos, name and settings. Export a backup first if you might want it back.</p>
       <button class="primary" type="button" id="resetExport">EXPORT BACKUP FIRST</button>
       <button class="dangerbtn" type="button" id="resetGo">RESET EVERYTHING</button>
       <button class="textbtn" type="button" id="resetCancel">Cancel</button>
@@ -622,12 +659,13 @@
   const intro=$('intro'), app=$('app');
 
   // ---- Data: lives in IndexedDB (db.js). This is an in-memory copy for drawing the screens. ----
-  const S={settings:{name:'',nameAsked:false,restSec:90},routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[],classes:[],instructors:[],classlogs:[]};
+  const S={settings:{name:'',nameAsked:false,restSec:90},routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[],classes:[],instructors:[],classlogs:[],recipes:[]};
   async function load(){
     [S.settings,S.routines,S.workouts,S.sessions,S.exercises]=await Promise.all([RisenDB.getSettings(),RisenDB.all('routines'),
       RisenDB.all('workouts'),RisenDB.all('sessions'),RisenDB.all('exercises')]);
     [S.meds,S.medlogs]=await Promise.all([RisenDB.all('meds'),RisenDB.all('medlogs')]);
     [S.classes,S.instructors,S.classlogs]=await Promise.all([RisenDB.all('classes'),RisenDB.all('instructors'),RisenDB.all('classlogs')]);
+    S.recipes=await RisenDB.all('recipes');
   }
   const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -729,7 +767,7 @@
     if(view==='home'&&!wasHome) renderHome();
     document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
   }
-  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open('today'); else if(t.dataset.view==='meds') Meds.open(); else if(t.dataset.view==='classes') Classes.open(); else show(t.dataset.view)};
+  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open('today'); else if(t.dataset.view==='meds') Meds.open(); else if(t.dataset.view==='classes') Classes.open(); else if(t.dataset.view==='meals') Meals.open(); else show(t.dataset.view)};
   $('tiles').onclick=e=>{
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     const b=e.target.closest('[data-go]'); if(b) return Gym.open(b.dataset.go);
@@ -841,5 +879,6 @@
 <script src="gym.js"></script>
 <script src="meds.js"></script>
 <script src="classes.js"></script>
+<script src="meals.js"></script>
 </body>
 </html>
