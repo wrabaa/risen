@@ -839,17 +839,38 @@
   // ---- Backup: export to a file, import from a file ----
   async function exported(){ S.settings.lastExport=new Date().toISOString(); await RisenDB.setSetting('lastExport',S.settings.lastExport); renderHome(); }
   $('backupLine').onclick=()=>$('exportBtn').click();
+  // The backup date is saved ONLY when the phone confirms the file went out (share sheet finished). If the share sheet
+  // can't open (it only opens right after a tap, and preparing a big backup can take too long), the prepared file is
+  // kept for two minutes so the next tap on Export opens the share sheet at once.
+  let readyBackup=null; // {file, at}
+  async function shareBackup(file){ // 'done' | 'cancel' | 'fail'
+    try{ await navigator.share({files:[file]}); return 'done'; }
+    catch(e){ return e&&e.name==='AbortError'?'cancel':'fail'; }
+  }
   $('exportBtn').onclick=async()=>{
+    if(readyBackup&&Date.now()-readyBackup.at<120000){ // second tap: the file is ready, share straight away
+      const f=readyBackup.file; readyBackup=null;
+      const r=await shareBackup(f);
+      if(r==='done') await exported(); else if(r==='fail') toast('Backup not saved. Try again.');
+      return;
+    }
+    readyBackup=null;
     const name='risen-backup-'+dayKey(new Date())+'.json';
-    const blob=new Blob([JSON.stringify(await RisenDB.exportAll(),null,2)],{type:'application/json'});
+    let blob; try{ blob=new Blob([JSON.stringify(await RisenDB.exportAll())],{type:'application/json'}); }
+    catch(e){ toast('Backup not saved: '+e.message); return; }
     const file=new File([blob],name,{type:'application/json'});
-    try{
-      if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); await exported(); return; } // iPhone: Save to Files
-    }catch(e){ if(e.name==='AbortError') return; }
+    let canShare=false; try{ canShare=!!(navigator.canShare&&navigator.canShare({files:[file]})); }catch(e){}
+    if(canShare){ // iPhone: Save to Files
+      const r=await shareBackup(file);
+      if(r==='done') await exported();
+      else if(r==='fail'){ readyBackup={file,at:Date.now()}; toast('Backup is ready. Tap Export backup again to save it.'); }
+      return;
+    }
+    // No share sheet (a computer's browser): plain download
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
     setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove()},1000); toast('Backup saved'); await exported();
   };
-  $('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
+$('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
   $('importFile').onchange=async()=>{
     const f=$('importFile').files[0]; if(!f) return;
     let b; try{ b=JSON.parse(await f.text()) }catch(e){ toast('That file is not a RISEN backup'); return; }
