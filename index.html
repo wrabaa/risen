@@ -769,6 +769,7 @@
     const wasHome=!$('view-home').hidden;
     document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+view);
     if(view==='home'&&!wasHome) renderHome();
+    if(view==='home') applyUpdate(); // a new release that arrived while you were busy loads now
     document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
   }
   document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open('today'); else if(t.dataset.view==='meds') Meds.open(); else if(t.dataset.view==='classes') Classes.open(); else if(t.dataset.view==='meals') Meals.open(); else show(t.dataset.view)};
@@ -806,7 +807,7 @@
     $('settings').classList.add('open'); $('settings').setAttribute('aria-hidden','false'); $('settings').scrollTop=0;
   }
   function closeSettings(){
-    $('setName').blur(); $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true'); renderHome();
+    $('setName').blur(); $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true'); renderHome(); applyUpdate();
   }
   $('gearBtn').onclick=openSettings;
   $('settingsBack').onclick=closeSettings;
@@ -897,12 +898,20 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
       document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update()});
     });
-    // When a new release takes over, reload once so the new files show
-    let reloading=false;
-    if(navigator.serviceWorker.controller) navigator.serviceWorker.addEventListener('controllerchange',()=>{
-      if(!reloading){reloading=true;location.reload()}
-    });
+    // When a new release takes over, reload once so the new files show, but never in the middle of something:
+    // see applyUpdate() below.
+    if(navigator.serviceWorker.controller) navigator.serviceWorker.addEventListener('controllerchange',()=>{ updateWaiting=true; applyUpdate(); });
   }
+  // A new release reloads the app only on the intro, or on Home with nothing open and no keyboard up. Anywhere else
+  // (a workout, an editor, Settings, a pop-up) it waits until you are back on Home, or until the app is next opened.
+  let updateWaiting=false, reloading=false;
+  function quietNow(){
+    if(!intro.classList.contains('hidden')) return true;
+    if($('view-home').hidden) return false;
+    if(document.querySelector('.subpage.open,#settings.open,.sheet-wrap:not([hidden]),.pviewer.open')) return false;
+    const a=document.activeElement; return !(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
+  }
+  function applyUpdate(){ if(!updateWaiting||reloading||!quietNow()) return; reloading=true; location.reload(); }
   // Show the installed version (small text on the app screen) to confirm an update arrived
   if('caches' in window) caches.keys().then(k=>{const v=k.find(n=>n.startsWith('risen-'));
     if(v) document.getElementById('version').textContent='v'+v.slice(6)});
