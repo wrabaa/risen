@@ -138,7 +138,7 @@
   .note{margin:10px 4px 0;font-size:13px;line-height:1.5;color:var(--muted)}
   .settings-version{margin-top:30px;padding:10px;text-align:center;font-size:11px;letter-spacing:.1em;color:var(--muted);opacity:.6}
   .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);z-index:30;transform:translate(-50%,20px);opacity:0;pointer-events:none;
-    padding:12px 20px;border-radius:999px;background:rgba(40,40,40,.92);color:var(--text);font-size:14px;white-space:nowrap;
+    padding:12px 20px;border-radius:22px;background:rgba(40,40,40,.92);color:var(--text);font-size:14px;line-height:1.35;text-align:center;width:max-content;max-width:calc(100% - 32px);
     -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transition:opacity .25s ease,transform .25s ease}
   .toast.show{opacity:1;transform:translate(-50%,0)}
 
@@ -855,12 +855,19 @@
     let b; try{ b=JSON.parse(await f.text()) }catch(e){ toast('That file is not a RISEN backup'); return; }
     if(!b||b.app!=='RISEN'){ toast('That file is not a RISEN backup'); return; }
     const when=b.exported?new Date(b.exported).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'an earlier date';
-    if(!confirm('Replace everything on this phone with the backup from '+when+'?')) return;
-    try{ await RisenDB.importAll(b); }catch(e){ toast(e.message==='Not a RISEN backup'?'That file is not a RISEN backup':e.message); return; }
-    await load(); openSettings(); renderHome(); toast('Backup restored');
-  };
+  // Say what is in the file before anything is replaced
+  const st=b.stores||{}, cnt=k=>Array.isArray(st[k])?st[k].length:0, plural=(n,w)=>n+' '+w+(n===1?'':w.endsWith('s')?'es':'s');
+  const old=b.format===1;
+  const inside=old?'':[[cnt('workouts'),'gym day'],[cnt('sessions'),'workout'],[cnt('meds'),'med'],[cnt('classes'),'class'],[cnt('recipes'),'recipe'],[cnt('photos'),'photo']]
+    .filter(x=>x[0]).map(x=>plural(x[0],x[1])).join(', ');
+  const msg=old?'This is an old backup from '+when+'. It only holds your name and rest timer. Restore those? Everything else on this phone stays as it is.'
+    :'Backup from '+when+(inside?'\n\nIn this file: '+inside+'.':'\n\nThis backup is empty.')+'\n\nEverything on this phone will be replaced by it. If you might want what is on the phone now, tap Cancel and export a backup first.';
+  if(!confirm(msg)) return;
+  let res; try{ res=await RisenDB.importAll(b); }catch(e){ toast(e.message==='Not a RISEN backup'?'That file is not a RISEN backup':e.message); return; }
+  await load(); openSettings(); renderHome(); toast(res&&res.settingsOnly?'Name and rest timer restored':'Backup restored');
+};
 
-  if('serviceWorker' in navigator){
+if('serviceWorker' in navigator){
     // Check for a new release on launch and each time the app comes back to the foreground
     navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
       document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update()});

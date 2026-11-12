@@ -219,19 +219,36 @@ const RisenDB = (() => {
     stores.photos = stores.photos.map(p => ({ ...p, data: toB64(p.data) }));
     return { app: 'RISEN', format: 2, schema: DB_VERSION, exported: now(), stores };
   }
+  // Import is all-or-nothing: the file is checked first, and if anything goes wrong while writing, every change is undone.
+  const KEY_OF = { settings: 'key', photos: 'exerciseId' };      // every other store is keyed by `id`
+  const DAMAGED = 'This backup file is damaged. Nothing was changed.';
   async function importAll(b) {
-    let stores;
-    if (b && b.app === 'RISEN' && b.format === 2 && b.stores) stores = b.stores;
-    else if (b && b.app === 'RISEN' && b.format === 1 && b.data) {         // backup from release .13
-      const d = b.data;
-      stores = { settings: [{ key: 'name', value: d.name || '' }, { key: 'nameAsked', value: true }, { key: 'restSec', value: d.restSec || 90 }] };
-    } else throw new Error('Not a RISEN backup');
+    if (!b || b.app !== 'RISEN') throw new Error('Not a RISEN backup');
     if (b.schema > DB_VERSION) throw new Error('Backup is from a newer RISEN. Update the app first.');
-    stores = { ...stores, photos: (stores.photos || []).map(p => ({ ...p, data: fromB64(p.data) })) };
-    const db = await open(), t = db.transaction(STORES, 'readwrite');
-    for (const s of STORES) { const st = t.objectStore(s); st.clear(); for (const row of stores[s] || []) st.put(row); }
-    await done(t);
+    if (b.format === 1 && b.data) {          // backup from release .13: it only holds the name and the rest timer,
+      const d = b.data;                      // so only those are restored and everything else on the phone is left alone
+      if (d.name) await setSetting('name', String(d.name));
+      await setSetting('nameAsked', true);
+      if (d.restSec > 0) await setSetting('restSec', Number(d.restSec));
+      return { settingsOnly: true };
+    }
+    if (b.format !== 2 || !b.stores || typeof b.stores !== 'object') throw new Error('Not a RISEN backup');
+    const stores = {};
+    for (const s of STORES) {                // check every row before touching the phone's data
+      const rows = b.stores[s] == null ? [] : b.stores[s];
+      if (!Array.isArray(rows)) throw new Error(DAMAGED);
+      const k = KEY_OF[s] || 'id';
+      for (const row of rows) if (!row || typeof row !== 'object' || (typeof row[k] !== 'string' && typeof row[k] !== 'number')) throw new Error(DAMAGED);
+      stores[s] = rows;
+    }
+    try { stores.photos = stores.photos.map(p => ({ ...p, data: fromB64(p.data) })); } catch (e) { throw new Error(DAMAGED); }
+    const db = await open(), t = db.transaction(STORES, 'readwrite'), finished = done(t);
+    try {
+      for (const s of STORES) { const st = t.objectStore(s); st.clear(); for (const row of stores[s]) st.put(row); }
+    } catch (e) { try { t.abort(); } catch (x) {} await finished.catch(() => {}); throw new Error(DAMAGED); }
+    try { await finished; } catch (e) { throw new Error('Could not restore the backup. Nothing was changed.'); }
     await migrateWeekdays();                 // a backup made before the week flow gets converted too
+    return { settingsOnly: false };
   }
 
   // ---- Week flow: one record per weekday in the active routine ----
