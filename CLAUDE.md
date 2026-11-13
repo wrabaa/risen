@@ -15,6 +15,18 @@ Rule of thumb: **one screen, one job, one big button. No manual needed.**
   Every new store goes into Export / Import / Reset.
 - Photos: `photo.js` (resize ≤1000px JPEG, stored in IndexedDB, included in backup).
 - Service worker `sw.js` — bump `VERSION` on every release (format `YYYY-MM-DD.N`).
+  App files (pages, code, `data/`) are re-downloaded on every release. Images and fonts live
+  in their own cache that survives releases, driven by the `ASSETS` list at the top of `sw.js`:
+  **add an image → new line with number 1 · replace an image (same name) → raise its number
+  by 1 · remove an image → delete its line.** Forgetting this means phones keep the old image.
+- A new release reloads the app only on the intro or on a quiet Home (nothing open, no
+  keyboard); otherwise it waits until Home is shown again or the app is next opened.
+- **Fixed IDs — never change, never reuse:** built-in exercises (`library.js`, `lib-…`) and
+  schedule classes (`data/gym-classes.json`, `fz-c01…`). History, photos and attendance hang
+  on them. Names can change freely. Rebuilding the exercise list: use `aliases` (old → new)
+  and `retired` in `library.js` (see the comment there); nothing on the phone is deleted.
+- `UPGRADES.md` = upgrade ideas after this plan, one section at a time, discussed first,
+  with a "Where we are" block that is updated after every section.
 - Status bar meta must stay `black` (opaque). `black-translucent` breaks full screen on
   current iOS (bottom 62px gap). Do not touch.
 
@@ -40,32 +52,39 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   studio chips (Energy/Balance/Power), ✓ ATTENDED, instructors list.
 - **MEALS** (`meals.js`): Shakes · Breakfast · Lunch · Snacks · Dinner → recipes →
   recipe page (photo, ingredients one per line stored as objects `{text}`, how-to, Move to…).
-- **SETTINGS**: name, rest timer, Export/Import backup, View intro, Clear all classes,
-  Reset all data.
+- **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
+  Clear all classes, Reset all data.
 
-## Status (release 2026-11-12.27)
+## Status (release 2026-11-13.35)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
 - 🔄 GYM — works; Siza is testing it in real gym sessions. Exercise library to be rebuilt.
 - 🟡 MEALS — base only.
+- ✅ Code-review fixes `.28`–`.32` (safe import, honest backup date, streak/week counting,
+  quiet updates, med tick follows a time change) — tested on iPhone.
+- ✅ Upgrade A fixed IDs (`.33`, tested on iPhone) · Upgrade B image cache (`.34`) ·
+  Reload gym schedule (`.35`). `.34` and `.35`: iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
-1. **Settings: "Reload gym schedule"** → confirm → replace seeded classes with latest
-   `data/gym-classes.json`, keep attendance history + user-added classes. Seeded
-   instructor photos must load from `assets/instructors/` so replacing a file updates
-   every phone.
-2. **Instructor photos**: new sharper photos coming → replace files, same names.
+1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
+   to the latest `data/gym-classes.json` (by fixed ID). Kept: attendance, notes on a class,
+   classes/instructors added by hand, a phone photo of an instructor. To change the schedule
+   for everyone: edit the JSON (new class = next free `fz-c..` number), release, tap Reload.
+2. **Instructor photos**: new sharper photos coming → replace files, same names, and raise
+   each file's number in the `ASSETS` list in `sw.js`.
 3. **GYM exercise library rebuild**: Siza sends photos of his gym's machines → planner
    writes the new list (machines + free weights, by muscle) → one built-in image per
-   exercise (Siza generates them, file name = exercise) → images built into the app.
-   No real history yet, so the library can be rebuilt from zero.
+   exercise (Siza generates them, file name = exercise) → images built into the app
+   (one line per image in `ASSETS` in `sw.js`). Real history now exists: rebuild through
+   `aliases` / `retired` in `library.js`, never by renaming IDs.
 4. **Exercise detail polish**: big image on top, muscles worked, 2–3 form tips, notes,
    "Last time".
 5. **GYM fine-tunes** from Siza's real use (will come as notes).
-6. **MEALS phase 2 — calories**: built-in offline food list (~300–500 foods incl. Lebanese
-   basics, kcal + protein/carbs/fat per 100 g); ingredient + grams → auto totals,
-   servings; custom foods from label. Planned in small steps first.
+6. **MEALS phase 2 — calories** (WAITING: Siza plans the screen with the planner first):
+   built-in offline food list (~300–500 foods incl. Lebanese basics, kcal + protein/carbs/fat
+   per 100 g); ingredient + grams → auto totals, servings; custom foods from label.
+   Planned in small steps first.
 7. **MEALS phase 3 — barcode scan** (needs internet; optional extra).
 8. **Design pass** over the whole app (animations, premium feel) — later.
 9. Later: iCloud sync when RISEN becomes a native app (Capacitor). For now: Export/Import.
@@ -91,6 +110,13 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   background (`visibilitychange` / `pagehide`).
 - Delete levels: 🗑 exercise (history kept) · 🗑 day/workout · "New program" (archives,
   history kept) · Settings "Reset all data" (export first, double confirm).
+- Import is all-or-nothing: the file is checked first and any failure undoes everything.
+  A release-.13 backup restores only name + rest timer. The confirm lists what is in the file.
+- The backup date is stored only when the share sheet really finishes. If it cannot open,
+  the file is kept two minutes and the next tap on Export opens it.
+- Safari tab vs home-screen app = two separate data stores on iPhone (Siza's meds once looked
+  "missing" for this reason; fixed with export/import). A warning banner is in the
+  `UPGRADES.md` parking lot.
 
 **GYM**
 - Siza thinks in DAYS, not "workouts": Week → Day → Exercise. No workout names, no days
@@ -99,6 +125,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - Old "workouts with days" data was converted once to one plan per weekday (done, .23).
 - Home TRAINING tile = shortcut: shows the DAY name; tap → today's Day page (not the logger).
   0 exercises → "Rest day", no ▶. Running workout stays in sync with the plan (.24).
+- Plan edits never rewrite the past (`.30`): a finished planned workout always counts for its
+  day; a day can only be "missed" from the date it got its exercises (`since` on the day plan).
 - THIS WEEK: a skipped workout drops out of the total (excused, like the streak).
   Extra workouts count for history / "Last time" only, not THIS WEEK or STREAK.
   STREAK: today not done yet doesn't break it; skipped-with-reason doesn't break it.
@@ -106,19 +134,22 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - Reps required to tick a set; empty kg = 0 (bodyweight). No sets ticked → offer discard.
 - Rest timer starts automatically on ✓, default from Settings (1:30), ±15 s, flashes lime at 0.
 - One photo per exercise, linked to exercise ID, shown everywhere; addable in the gym too.
-- Exercise library (66 generic) will be REPLACED by Siza's real gym list + built-in images.
+- Exercise library (66 generic, fixed IDs) will be REPLACED by Siza's real gym list + built-in
+  images, through `aliases` / `retired` so plans, history and photos follow.
 
 **MEDS**
 - A med counts from the day it's added (earlier days = "not scheduled", not "missed").
-- Known small flaw (accepted for now): changing a schedule re-judges past days.
+- Known small flaw (accepted for now): changing a schedule re-judges past days. Exception
+  (`.32`): a dose already taken TODAY follows its med to the new time (no double dose).
 - Weekly = one weekday. Groups by exact time. Undo is per dose (on purpose, safer).
-- No notifications yet (separate project for later).
+- No notifications: ON HOLD until the native Apple app (Capacitor). Do not build in the web app.
 
 **CLASSES**
 - Gym = Fitness Zone; 3 studios: Energy, Balance, Power. 37 classes, 15 instructors
   (Cesar has no photo; Zumba Thu 19:30 instructor unknown = TBA).
   Fri Pound time set to 17:30 (not labeled on the board — Siza's call).
-- Seed loads once on YES; afterwards it's normal editable data.
+- Seed loads once on YES; afterwards it's normal editable data. Schedule classes carry
+  `seed:true` and a fixed ID; "Reload gym schedule" resets only those.
 - Instructor photos are public in the repo — Siza decided this is fine (they're already
   public in the gym's own app). Current crops are low quality; better ones coming.
 - "Clear all classes" also removes instructors (they belong to the old gym).
