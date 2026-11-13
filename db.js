@@ -121,11 +121,6 @@ const RisenDB = (() => {
     await assertEditable(w.routineId);
     return put('workouts', { id: uid(), days: [], time: '', order: 0, exercises: [], ...w });
   }
-  async function deleteWorkout(id) {
-    const w = await get('workouts', id); if (!w) return;
-    await assertEditable(w.routineId);
-    const db = await open(), t = db.transaction('workouts', 'readwrite'); t.objectStore('workouts').delete(id); await done(t);
-  }
   const workoutsOf = routineId => byIndex('workouts', 'routineId', routineId);
 
   // ---- Exercise library ----
@@ -429,6 +424,6 @@ const RisenDB = (() => {
     try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch (e) {}
   }
 
-  return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, migrateLibrary, adoptSeedClasses, saveWorkout, deleteWorkout, workoutsOf,
+  return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, migrateLibrary, adoptSeedClasses, saveWorkout, workoutsOf,
     saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();

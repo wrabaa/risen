@@ -21,6 +21,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - K. One shared helper file + `index.html` split — built in `.38`, iPhone test pending.
 - H + I + J. One confirm sheet, same behaviour in every tab, named colours — built in `.39`,
   iPhone test pending.
+- L. Clean-up — built in `.40`, iPhone test pending.
 
 **Waiting / on hold**
 - C. Plan the calories screen — WAITING: Siza plans it with the planner first.
@@ -29,7 +30,6 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 **What's left** (in suggested order)
 - E. Backup that does not rely on memory
 - F. Weekly summary on Home
-- L. Clean-up
 
 ## Do early (cheap now, painful later)
 
@@ -166,6 +166,12 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - If storage cannot open, show a clear full-screen message instead of an empty app.
 - Home refreshes every time the app comes back to the front.
 - **Size:** small.
+- **Status: BUILT in release `2026-11-13.40`. Tested in the browser; iPhone test pending.**
+  - Removed: unused `assets/bg-gym.jpg` (186 KB), unused styles, a dead tap handler, an unused
+    database function and an old comment. `README.md` rewritten to match the app today.
+  - If the phone's storage cannot be opened, a full-screen message says the data has not been
+    deleted and offers TRY AGAIN; the app no longer opens looking empty.
+  - Home redraws every time the app comes back to the front (date, doses, next class).
 
 ## Done from the code review (for reference)
 - `.28` Safe import (all-or-nothing, old backups keep data, contents shown first).
@@ -185,6 +191,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - `.37` Upgrade G: gym comfort.
 - `.38` Upgrade K: shared helper file, `index.html` split into `styles.css` + `app.js`.
 - `.39` Upgrades H + I + J: one confirm sheet, same behaviour in every tab, named colours.
+- `.40` Upgrade L: clean-up, storage-failure screen, Home refresh on return.
 
 ## Done from the `CLAUDE.md` to-do list
 - `.35` To-do 1: Settings → "Reload gym schedule". Schedule classes go back to the latest

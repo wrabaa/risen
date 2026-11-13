@@ -48,7 +48,7 @@
       <button class="backup-line" id="backupLine" hidden></button>
     </div>
 
-    <!-- GYM (Today + Plan) is built next; MEALS, MEDS, CLASSES come later -->
+    <!-- GYM, MEALS, MEDS, CLASSES: each tab draws itself (gym.js, meals.js, meds.js, classes.js) -->
     <div class="view" id="view-gym" hidden>
       <div id="gymWeek"></div>
       <div id="gymLog" hidden></div>
@@ -200,6 +200,14 @@
       <button class="textbtn" type="button" id="clsNo">START EMPTY</button>
     </div>
   </div>
+
+  <!-- Shown instead of the app when the phone's storage can't be opened -->
+  <section class="storagefail" id="storageFail" role="alert" hidden>
+    <h2>RISEN can't open your data</h2>
+    <p>Your data has not been deleted. This usually clears up by itself: close RISEN completely and open it again, or tap the button.</p>
+    <button class="primary" type="button" id="storageRetry">TRY AGAIN</button>
+    <p class="why" id="storageWhy"></p>
+  </section>
 
   <!-- The app's one "are you sure?" sheet (ask() in shared.js) -->
   <div class="sheet-wrap" id="askSheet" hidden><div class="sheet" id="askBody"></div></div>

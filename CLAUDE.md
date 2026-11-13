@@ -62,7 +62,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.39)
+## Status (release 2026-11-13.40)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
@@ -72,8 +72,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   quiet updates, med tick follows a time change) — tested on iPhone.
 - ✅ Upgrade A fixed IDs (`.33`, tested on iPhone) · Upgrade B image cache (`.34`) ·
   Reload gym schedule (`.35`) · Safari banner (`.36`) · Gym comfort (`.37`) · code split,
-  no visible change (`.38`) · confirm sheet, consistency, named colours (`.39`).
-  `.34`–`.39`: iPhone test pending.
+  no visible change (`.38`) · confirm sheet, consistency, named colours (`.39`) · clean-up (`.40`).
+  `.34`–`.40`: iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -123,6 +123,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - A NEW item with something filled in but no name is saved as "Untitled …"; an untouched new
   item is discarded; an existing item whose name is cleared keeps its last saved version.
 - Add buttons: lime "+ ADD …" at the top of the list it adds to.
+- Storage cannot open → full-screen "RISEN can't open your data" + TRY AGAIN (`.40`); the app
+  never opens looking empty. Home redraws whenever the app returns to the front.
 - Delete levels: 🗑 exercise (history kept) · 🗑 day/workout · "New program" (archives,
   history kept) · Settings "Reset all data" (export first, double confirm).
 - Import is all-or-nothing: the file is checked first and any failure undoes everything.

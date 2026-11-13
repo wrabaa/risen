@@ -93,12 +93,8 @@
     font:400 13px Inter,sans-serif;cursor:pointer}
   .backup-line[hidden]{display:none}
   .backup-line u{color:var(--text);text-decoration-color:var(--dim);text-underline-offset:3px}
-  .version{margin-top:28px;text-align:center;font-size:11px;letter-spacing:.1em;color:var(--muted);opacity:.6}
 
   /* Placeholder views (Plan, Calendar, Progress come in a later step) */
-  .soon{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
-  .soon h2{font-family:Oswald,sans-serif;font-weight:700;font-size:30px;letter-spacing:.06em;text-transform:uppercase}
-  .soon p{color:var(--muted);font-size:15px}
 
   /* Bottom tab bar: frosted glass */
   .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:5;display:flex;
@@ -277,6 +273,14 @@
   .saved,.donebtn{display:none}
   #settings .saved{display:block;margin:0 0 0 auto}
   #askSheet{z-index:45}
+
+  /* Storage could not be opened: covers everything */
+  .storagefail{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;justify-content:center;gap:14px;
+    padding:calc(env(safe-area-inset-top) + 24px) 28px calc(env(safe-area-inset-bottom) + 24px);background:var(--bg)}
+  .storagefail[hidden]{display:none}
+  .storagefail h2{font-family:Oswald,sans-serif;font-weight:700;font-size:30px;line-height:1.1;text-transform:uppercase;letter-spacing:.03em}
+  .storagefail p{font-size:16px;line-height:1.5;color:var(--muted)}
+  .storagefail .why{font-size:12px;opacity:.7}
   #exPage{z-index:13}
   #exPage .subtop h1{flex:1;min-width:0}
   #exPage .saved,#exPage .donebtn{display:block}

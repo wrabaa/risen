@@ -115,10 +115,9 @@
     if(view==='home') applyUpdate(); // a new release that arrived while you were busy loads now
     document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
   }
-  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open('today'); else if(t.dataset.view==='meds') Meds.open(); else if(t.dataset.view==='classes') Classes.open(); else if(t.dataset.view==='meals') Meals.open(); else show(t.dataset.view)};
+  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open(); else if(t.dataset.view==='meds') Meds.open(); else if(t.dataset.view==='classes') Classes.open(); else if(t.dataset.view==='meals') Meals.open(); else show(t.dataset.view)};
   $('tiles').onclick=e=>{
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
-    const b=e.target.closest('[data-go]'); if(b) return Gym.open(b.dataset.go);
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();
     if(e.target.closest('[data-tap="classes"]')) Classes.openToday();
     if(e.target.closest('[data-tap="meds"]')) Meds.open();
@@ -135,7 +134,20 @@
   $('nameSkip').onclick=()=>closeName('');
 
   // ---- ENTER: intro to Home (intro shows only when the app opens) ----
-  const ready=RisenDB.init().then(load).catch(e=>{console.error(e); toast('Could not open storage: '+e.message)});
+  // If the phone's storage can't be opened, the app must not look empty (that reads as "my data is gone"): a full-screen
+  // message says the data is still there and offers to try again. Nothing else runs, so nothing can be saved over it.
+  let loaded=false;
+  const ready=RisenDB.init().then(load).then(()=>{loaded=true}).catch(e=>{
+    console.error(e);
+    $('storageWhy').textContent=(e&&e.message)||'Unknown error';
+    $('storageFail').hidden=false;
+    return new Promise(()=>{}); // never continues
+  });
+  $('storageRetry').onclick=()=>location.reload();
+  // Back to the front (from another app, or the phone was unlocked): Home shows the current day, doses and next class
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'&&loaded&&!app.classList.contains('hidden')&&!$('view-home').hidden) renderHome();
+  });
   $('login').onclick=async()=>{
     await ready; renderHome(); show('home');
     intro.classList.add('hidden'); app.classList.remove('hidden');
