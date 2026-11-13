@@ -137,7 +137,7 @@ const Meals = (() => {
       $('mealSheet').hidden = false; return;
     }
     if (t.id === 'rDelete') {
-      if (!confirm(`Delete “${rec.name.trim() || 'this recipe'}”? Its photo is deleted too.`)) return;
+      if (!(await ask({ title: 'Delete recipe?', text: `“${rec.name.trim() || 'This recipe'}” and its photo are deleted.`, ok: 'DELETE', danger: true }))) return;
       const id = rec.id, was = persisted; rec = null; onClose.recipePage = null;          // a waiting auto-save then does nothing
       if (was) { await RisenDB.deleteRecipe(id); S.recipes = S.recipes.filter(r => r.id !== id); } else await RisenDB.deletePhoto('recipe-' + id);
       hasPhoto.delete(id); dropUrl(id); closePage('recipePage'); if (curCat) renderCat(); renderCats();
@@ -153,6 +153,10 @@ const Meals = (() => {
   });
   async function finishRecipe() {                  // back arrow / DONE
     if (!rec) return;
+    // A new recipe with something filled in but no name is kept as "Untitled recipe" instead of being thrown away
+    if (!persisted && !rec.name.trim() && (rec.ingText.trim() || rec.method.trim() || hasPhoto.has(rec.id) || await RisenDB.getPhoto('recipe-' + rec.id))) {
+      rec.name = 'Untitled recipe'; saveRec(); toast('Saved as “Untitled recipe”');
+    }
     await saveRec.flush();
     const id = rec.id, was = persisted, touched = rec.name || rec.ingText || rec.method;
     if (!was) {                                     // a brand-new recipe that never got a name: nothing is kept, not even its photo

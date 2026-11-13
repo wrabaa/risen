@@ -51,7 +51,7 @@
     {title:'Training', tap:'today', html(){          // the whole tile opens today's day in Gym
       const today=new Date(), day=`<div class="wname">${today.toLocaleDateString('en-GB',{weekday:'long'})}</div>`, go=`<span class="play" aria-hidden="true">${PLAY}</span>`;
       if(S.settings.activeSession) return `<div>${day}<div class="sub">Workout in progress</div></div>${go}`;
-      if(!activeRoutine()) return `<div>${day}<div class="sub">No plan yet · tap to build it</div></div>`;
+      if(!activeRoutine()) return `<div>${day}<div class="sub">No program yet · tap to build it</div></div>`;
       const list=plannedOn(today), ids=doneIds(today), sk=skippedIds(today);
       if(!list.length) return `<div>${day}<div class="sub">Rest day</div></div>`;
       const w=list.find(x=>!ids.has(x.id)&&!sk.has(x.id));
@@ -69,13 +69,13 @@
         const cls=[all?'plan':'', all&&dn===all?'done':'', dayKey(d)===today?'today':''].join(' ');
         return `<span class="${cls}">${'MTWTFSS'[isoDay(d)-1]}</span>`;
       }).join('');
-      return `<div><div class="big">${doneN}<small>/${plannedN}</small></div><div class="sub">Sessions done</div></div><div class="days">${dots}</div>`;
+      return `<div><div class="big">${doneN}<small>/${plannedN}</small></div><div class="sub">Workouts done</div></div><div class="days">${dots}</div>`;
     }},
     {title:'Streak', html(){
       const n=streak();
-      return `<div><div class="big">${n}</div><div class="sub">Planned session${n===1?'':'s'} in a row</div></div>`;
+      return `<div><div class="big">${n}</div><div class="sub">Planned workout${n===1?'':'s'} in a row</div></div>`;
     }},
-    {title:'Meds', html(){
+    {title:'Meds', tap:'meds', html(){ // the whole tile opens Meds
       if(typeof Meds==='undefined') return '';
       const s=Meds.summary();
       if(!s.hasMeds) return `<div><div class="wname">No meds yet</div><div class="sub">Add them in Meds</div></div><button class="ghost" data-tab="meds">ADD</button>`;
@@ -121,6 +121,7 @@
     const b=e.target.closest('[data-go]'); if(b) return Gym.open(b.dataset.go);
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();
     if(e.target.closest('[data-tap="classes"]')) Classes.openToday();
+    if(e.target.closest('[data-tap="meds"]')) Meds.open();
   };
   $('tiles').onkeydown=e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-tap]')){ e.preventDefault(); e.target.click(); } };
 
@@ -154,10 +155,10 @@
   }
   $('gearBtn').onclick=openSettings;
   $('settingsBack').onclick=closeSettings;
-  $('setName').oninput=()=>{S.settings.name=$('setName').value.trim(); RisenDB.setSetting('name',S.settings.name)};
+  $('setName').oninput=()=>{S.settings.name=$('setName').value.trim(); RisenDB.setSetting('name',S.settings.name).then(()=>savedFlash('setSaved'))};
   $('setName').onkeydown=e=>{if(e.key==='Enter') $('setName').blur()};
   const stepRest=d=>{S.settings.restSec=Math.min(600,Math.max(15,S.settings.restSec+d)); $('restVal').textContent=fmtRest(S.settings.restSec);
-    RisenDB.setSetting('restSec',S.settings.restSec)};
+    RisenDB.setSetting('restSec',S.settings.restSec).then(()=>savedFlash('setSaved'))};
   $('restMinus').onclick=()=>stepRest(-15);
   $('restPlus').onclick=()=>stepRest(15);
   $('viewIntro').onclick=()=>{
@@ -168,14 +169,14 @@
   // ---- Clear all classes (changing gym): classes, instructors and attendance; the gym workouts stay ----
   // ---- Reload gym schedule: schedule classes go back to the latest file; attendance and your own classes stay ----
   $('reloadClasses').onclick=async()=>{
-    if(!confirm('Reload the gym schedule?\n\nClasses from the gym schedule go back to the latest version (name, day, time, studio, instructor). Your attendance history, your notes and the classes you added yourself are kept.')) return;
+    if(!(await ask({title:'Reload gym schedule?',text:'Classes from the gym schedule go back to the latest version (name, day, time, studio, instructor). Your attendance history, your notes and the classes you added yourself are kept.',ok:'RELOAD'}))) return;
     let r; try{ r=await Classes.reloadSchedule(); }catch(e){ toast('Could not reload: '+e.message); return; }
     renderHome();
     const extra=[r.added?r.added+' new':'', r.removed?r.removed+' removed':''].filter(Boolean).join(', ');
     toast('Schedule reloaded: '+r.total+' classes'+(extra?' ('+extra+')':''));
   };
   $('clearClasses').onclick=async()=>{
-    if(!confirm('Delete all classes, instructors and attendance? Use this when you change gym. Your workouts are not affected.')) return;
+    if(!(await ask({title:'Delete all classes?',text:'Deletes all classes, instructors and attendance. Use this when you change gym. Your workouts are not affected.',ok:'DELETE ALL CLASSES',danger:true}))) return;
     try{ await RisenDB.clearClasses(); }catch(e){ toast('Could not clear: '+e.message); return; }
     await load(); Classes.reset(); renderHome(); toast('Classes cleared');
   };
@@ -183,9 +184,9 @@
   // ---- Reset all data: suggest export, confirm twice, back to first launch ----
   $('resetBtn').onclick=()=>{$('resetSheet').hidden=false};
   $('resetCancel').onclick=()=>{$('resetSheet').hidden=true};
-  $('resetExport').onclick=()=>$('exportBtn').click();
+  $('resetExport').onclick=()=>doExport();
   $('resetGo').onclick=async()=>{
-    if(!confirm("Last check: delete everything on this phone? This can't be undone.")) return;
+    if(!(await ask({title:'Last check',text:"Delete everything on this phone? This can't be undone.",ok:'DELETE EVERYTHING',danger:true}))) return;
     try{ await RisenDB.resetAll(); }catch(e){ toast('Reset failed: '+e.message); return; }
     $('resetSheet').hidden=true; Gym.reset(); await load(); renderHome();
     $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true');
@@ -194,7 +195,7 @@
 
   // ---- Backup: export to a file, import from a file ----
   async function exported(){ S.settings.lastExport=new Date().toISOString(); await RisenDB.setSetting('lastExport',S.settings.lastExport); renderHome(); }
-  $('backupLine').onclick=()=>$('exportBtn').click();
+  $('backupLine').onclick=()=>doExport();
   // The backup date is saved ONLY when the phone confirms the file went out (share sheet finished). If the share sheet
   // can't open (it only opens right after a tap, and preparing a big backup can take too long), the prepared file is
   // kept for two minutes so the next tap on Export opens the share sheet at once.
@@ -203,7 +204,7 @@
     try{ await navigator.share({files:[file]}); return 'done'; }
     catch(e){ return e&&e.name==='AbortError'?'cancel':'fail'; }
   }
-  $('exportBtn').onclick=async()=>{
+  async function doExport(){
     if(readyBackup&&Date.now()-readyBackup.at<120000){ // second tap: the file is ready, share straight away
       const f=readyBackup.file; readyBackup=null;
       const r=await shareBackup(f);
@@ -225,7 +226,8 @@
     // No share sheet (a computer's browser): plain download
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
     setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove()},1000); toast('Backup saved'); await exported();
-  };
+  }
+  $('exportBtn').onclick=doExport;
 $('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
   $('importFile').onchange=async()=>{
     const f=$('importFile').files[0]; if(!f) return;
@@ -237,9 +239,17 @@ $('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
   const old=b.format===1;
   const inside=old?'':[[cnt('workouts'),'gym day'],[cnt('sessions'),'workout'],[cnt('meds'),'med'],[cnt('classes'),'class'],[cnt('recipes'),'recipe'],[cnt('photos'),'photo']]
     .filter(x=>x[0]).map(x=>plural(x[0],x[1])).join(', ');
-  const msg=old?'This is an old backup from '+when+'. It only holds your name and rest timer. Restore those? Everything else on this phone stays as it is.'
-    :'Backup from '+when+(inside?'\n\nIn this file: '+inside+'.':'\n\nThis backup is empty.')+'\n\nEverything on this phone will be replaced by it. If you might want what is on the phone now, tap Cancel and export a backup first.';
-  if(!confirm(msg)) return;
+  // One RISEN sheet: what is in the file, and a way to save what is on the phone first
+  if(old){
+    if(!(await ask({title:'Old backup',text:'This backup from '+when+' only holds your name and rest timer. Restore those? Everything else on this phone stays as it is.',ok:'RESTORE'}))) return;
+  }else{
+    const text='Backup from '+when+'.\n'+(inside?'In this file: '+inside+'.':'This backup is empty.')+'\n\nEverything on this phone will be replaced by it.';
+    for(;;){
+      const r=await ask({title:'Replace everything?',text,extra:'EXPORT FIRST',ok:'REPLACE EVERYTHING',danger:true});
+      if(r==='extra'){ await doExport(); continue; }   // saves what is on the phone now, then asks again
+      if(!r) return; break;
+    }
+  }
   let res; try{ res=await RisenDB.importAll(b); }catch(e){ toast(e.message==='Not a RISEN backup'?'That file is not a RISEN backup':e.message); return; }
   await load(); await Gym.followLibrary(); await Classes.matchSeed(); // an older backup follows the current exercise list and class ids
     openSettings(); renderHome(); toast(res&&res.settingsOnly?'Name and rest timer restored':'Backup restored');

@@ -145,7 +145,7 @@ const Gym = (() => {
       case 'rename': return routineSheet('rename');
       case 'newprogram': {
         const r = activeRoutine();
-        if (confirm(`Start a new program? “${r.name}” will be archived (read-only). Your history, including “Last time”, is kept.`)) routineSheet('new');
+        ask({ title: 'Start a new program?', text: `“${r.name}” will be archived (read-only). Your history, including “Last time”, is kept.`, ok: 'CONTINUE' }).then(y => { if (y) routineSheet('new'); });
         return;
       }
     }
@@ -207,7 +207,7 @@ const Gym = (() => {
     }
     if (t.dataset.del != null) {
       const i = +t.dataset.del;
-      if (!confirm(`Delete ${exInfo(w.exercises[i].exerciseId).name} from ${DAYNAMES[curDay - 1]}? Its history is kept.`)) return;
+      if (!(await ask({ title: 'Delete exercise?', text: `${exInfo(w.exercises[i].exerciseId).name} is deleted from ${DAYNAMES[curDay - 1]}. Its history is kept.`, ok: 'DELETE', danger: true }))) return;
       w.exercises.splice(i, 1); await persistDay(curDay); return renderDay();
     }
     switch (t.dataset.act) {
@@ -305,7 +305,7 @@ const Gym = (() => {
     d.exercises.forEach((e, i) => {
       const x = exerciseInfo(e.exerciseId);
       h += `<div class="card ex"><div class="exhead"><div><h3>${esc(x.name)}</h3>${x.notes ? `<div class="notes">${esc(x.notes)}</div>` : ''}</div>
-        <div class="tools"><button data-rmex="${i}" aria-label="Remove from this workout">${I.trash}</button></div></div>
+        <div class="tools"><button data-rmex="${i}" aria-label="Delete from this workout">${I.trash}</button></div></div>
         <div class="last">${e.last ? `Last time: <b>${fmtN(e.last.kg)} kg × ${fmtN(e.last.reps)}</b>` : 'First time'}</div>
         <div data-photo="${esc(e.exerciseId)}"></div>
         <div class="sets"><div class="setrow sethead"><span>SET</span><span>KG</span><span>REPS</span><span></span></div>`;
@@ -352,14 +352,14 @@ const Gym = (() => {
       sets.push({ kg: p.kg, reps: p.reps, done: false }); saveDraft(); renderGym(); return;
     }
     if (t.dataset.rmex != null) {
-      if (!confirm(`Remove ${exerciseInfo(d.exercises[t.dataset.rmex].exerciseId).name} from this workout only? Your plan doesn't change.`)) return;
+      if (!(await ask({ title: 'Delete from this workout?', text: `${exerciseInfo(d.exercises[t.dataset.rmex].exerciseId).name} is taken out of this workout only. Your program doesn't change.`, ok: 'DELETE', danger: true }))) return;
       d.exercises.splice(t.dataset.rmex, 1); saveDraft(); renderGym(); return;
     }
     switch (t.dataset.act) {
       case 'addex': return openLibrary(async id => { draft().exercises.push(await newEntry(id, null)); await saveDraft(); renderGym(); });
       case 'finish': return finish();
       case 'discard':
-        if (!confirm('Discard this workout? Nothing will be saved.')) return;
+        if (!(await ask({ title: 'Discard this workout?', text: 'Nothing will be saved.', ok: 'DISCARD', danger: true }))) return;
         S.settings.activeSession = null; await saveDraft(); Rest.stop(); renderGym(); renderHome(); return;
     }
   });
@@ -367,8 +367,8 @@ const Gym = (() => {
   async function finish() {
     const d = draft();
     const all = d.exercises.flatMap(e => e.sets), doneN = all.filter(s => s.done).length;
-    if (!doneN) { if (confirm('No sets are ticked, so there is nothing to save. Discard this workout?')) { S.settings.activeSession = null; await saveDraft(); Rest.stop(); renderGym(); } return; }
-    if (doneN < all.length && !confirm("Finish anyway? Unchecked sets won't be saved.")) return;
+    if (!doneN) { if (await ask({ title: 'Nothing to save', text: 'No sets are ticked. Discard this workout?', ok: 'DISCARD', danger: true, cancel: 'Keep going' })) { S.settings.activeSession = null; await saveDraft(); Rest.stop(); renderGym(); } return; }
+    if (doneN < all.length && !(await ask({ title: 'Finish anyway?', text: "Unchecked sets won't be saved.", ok: 'FINISH' }))) return;
     const entries = d.exercises.map(e => ({ exerciseId: e.exerciseId, sets: e.sets.filter(s => s.done).map(s => ({ kg: num(s.kg) ?? 0, reps: num(s.reps) ?? 0 })) }))
       .filter(e => e.sets.length);
     let ses;
@@ -390,7 +390,7 @@ const Gym = (() => {
   }
   function extraSheet() {
     const r = activeRoutine(), ws = r ? S.workouts.filter(w => w.routineId === r.id && (w.days || []).length === 1 && (w.exercises || []).length).sort((a, b) => a.days[0] - b.days[0]) : [];
-    openSheet(`<h2>Log extra workout</h2><p>An unplanned session. It's saved to your history.</p>
+    openSheet(`<h2>Log extra workout</h2><p>An unplanned workout. It's saved to your history.</p>
       <div class="list">${ws.map(w => `<button data-extra="${esc(w.id)}">${DAYS[w.days[0] - 1]} · ${esc(workoutTitle(w))}</button>`).join('')}<button data-extra="">Blank workout (add exercises as you go)</button></div>
       <button class="textbtn" data-sheet="cancel">Cancel</button>`);
   }
@@ -421,7 +421,7 @@ const Gym = (() => {
         const days = [...$('gymSheetBody').querySelectorAll('[data-cday][aria-pressed="true"]')].map(b => +b.dataset.cday);
         if (!days.length) return toast('Pick a day');
         const filled = days.filter(d => (dayRec(d) || { exercises: [] }).exercises.length);
-        if (filled.length && !confirm(`Replace the exercises on ${filled.map(d => DAYNAMES[d - 1]).join(', ')}?`)) return;
+        if (filled.length && !(await ask({ title: 'Replace exercises?', text: `The exercises on ${filled.map(d => DAYNAMES[d - 1]).join(', ')} will be replaced.`, ok: 'REPLACE', danger: true }))) return;
         const copy = JSON.parse(JSON.stringify(dayRec(curDay).exercises));
         for (const d of days) { const w = await ensureDay(d); w.exercises = JSON.parse(JSON.stringify(copy)); await persistDay(d); }
         closeSheet(); renderDay(); return toast('Copied to ' + days.map(d => DAYS[d - 1]).join(', '));

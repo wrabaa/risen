@@ -37,6 +37,10 @@ Rule of thumb: **one screen, one job, one big button. No manual needed.**
 Background #0B0B0B · cards #1A1A1A · borders #262626 · text #F2F2F2 · muted #9A9A9A ·
 ONE accent volt #CCFF00 (buttons, active, highlights, done). Oswald (headlines, uppercase,
 big numbers) + Inter (body). 16px rounded cards, pill buttons, simple line icons.
+Supporting colours (named on `:root` in `styles.css`, use the names, never raw codes):
+`--danger` #FF6B6B (delete/reset ONLY — the one exception to "one accent") · `--field` #0F0F0F
+(inputs) · `--press` #202020 · `--dash` #3A3A3A · `--mid` #4A4A4A · `--dim` #5A5A5A ·
+`--faint` #6A6A6A · `--off` #2A2A2A · `--soft` #C9C9C9 · `--soft2` #D6D6D6 · `--volt-press` #B8E600.
 No dot-matrix font. Intro = Siza's black & white photo + logo + "STRONGER EVERY DAY" + ENTER
 (all text/buttons in code, never baked into images).
 
@@ -58,7 +62,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.38)
+## Status (release 2026-11-13.39)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
@@ -68,7 +72,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   quiet updates, med tick follows a time change) — tested on iPhone.
 - ✅ Upgrade A fixed IDs (`.33`, tested on iPhone) · Upgrade B image cache (`.34`) ·
   Reload gym schedule (`.35`) · Safari banner (`.36`) · Gym comfort (`.37`) · code split,
-  no visible change (`.38`). `.34`–`.38`: iPhone test pending.
+  no visible change (`.38`) · confirm sheet, consistency, named colours (`.39`).
+  `.34`–`.39`: iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -111,7 +116,13 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   exercise IS the progress tracking).
 - Name: asked once on first ENTER; Skip → greeting just "HELLO" (friends use the app too).
 - Every editor: auto-save (0.4 s) + visible "✓ Saved" + DONE button + flush on
-  background (`visibilitychange` / `pagehide`).
+  background (`visibilitychange` / `pagehide`). Settings shows "✓ Saved" too (`.39`).
+- Every "are you sure?" is the RISEN sheet `ask()` in `shared.js` — never the system
+  `confirm()`. Red outline button = deletes something; lime = everything else.
+- Words: "program" (not plan/routine) · "workout" (not session) · "delete" (not remove).
+- A NEW item with something filled in but no name is saved as "Untitled …"; an untouched new
+  item is discarded; an existing item whose name is cleared keeps its last saved version.
+- Add buttons: lime "+ ADD …" at the top of the list it adds to.
 - Delete levels: 🗑 exercise (history kept) · 🗑 day/workout · "New program" (archives,
   history kept) · Settings "Reset all data" (export first, double confirm).
 - Import is all-or-nothing: the file is checked first and any failure undoes everything.

@@ -139,7 +139,7 @@ const Classes = (() => {
     if (t.dataset.att) {
       const id = attId(t.dataset.att, dayKey(new Date()));
       if (attMap().has(id)) {
-        if (!confirm('Mark this class as not attended?')) return;
+        if (!(await ask({ title: 'Mark as not attended?', ok: 'YES, UNDO' }))) return;
         await RisenDB.unattendClass(id); S.classlogs = S.classlogs.filter(l => l.id !== id);
       } else S.classlogs.push(await RisenDB.attendClass(t.dataset.att, dayKey(new Date())));
       renderDay(); renderHome();
@@ -163,11 +163,12 @@ const Classes = (() => {
     } catch (err) { toast(err.message); }
   }, 400);
   function clsHint() { const p = cls && clsProblem(), h = $('cHint'); if (h) { h.textContent = p || ''; h.hidden = !p; } }
-  const clsTouch = () => { clsHint(); saveCls(); };
+  let clsDirty = false;                 // something was changed in the class editor since it opened
+  const clsTouch = () => { clsDirty = true; clsHint(); saveCls(); };
 
   function openClass(id) {
     const ex = id ? S.classes.find(c => c.id === id) : null;
-    clsSaved = !!ex;
+    clsSaved = !!ex; clsDirty = false;
     cls = ex ? JSON.parse(JSON.stringify(ex)) : { id: RisenDB.uid(), name: '', studio: filter !== 'ALL' ? filter : (studios()[0] || ''), day: curDay, time: '18:00', duration: 60, instructorId: null, notes: '' };
     cls.notes = cls.notes || ''; cls.studio = cls.studio || '';
     $('clsEditTitle').textContent = ex ? 'Class' : 'New class';
@@ -216,7 +217,7 @@ const Classes = (() => {
     if (t.dataset.cst) { cls.studio = t.dataset.cst; $('cStudio').value = t.dataset.cst; $('cStudios').querySelectorAll('[data-cst]').forEach(b => b.setAttribute('aria-pressed', b === t)); return clsTouch(); }
     if (t.dataset.cday) { cls.day = +t.dataset.cday; $('cDays').querySelectorAll('[data-cday]').forEach(b => b.setAttribute('aria-pressed', b === t)); return clsTouch(); }
     if (t.dataset.act === 'del') {
-      if (!confirm(`Delete “${cls.name.trim() || 'this class'}”? Its attendance history is deleted too.`)) return;
+      if (!(await ask({ title: 'Delete class?', text: `“${cls.name.trim() || 'This class'}” and its attendance history are deleted.`, ok: 'DELETE', danger: true }))) return;
       const id = cls.id, was = clsSaved; cls = null; onClose.clsEditPage = null;       // a waiting auto-save then does nothing
       if (was) { await RisenDB.deleteClass(id); S.classes = S.classes.filter(c => c.id !== id); S.classlogs = S.classlogs.filter(l => l.classId !== id); }
       closePage('clsEditPage'); renderDay(); renderHome();
@@ -224,6 +225,8 @@ const Classes = (() => {
   });
   async function finishClass() {             // back arrow / DONE
     if (!cls) return;
+    // A new class with something filled in but no name is kept as "Untitled class" instead of being thrown away
+    if (!clsSaved && !cls.name.trim() && clsDirty) { cls.name = 'Untitled class'; saveCls(); toast('Saved as “Untitled class”'); }
     await saveCls.flush();
     const p = clsProblem(), was = clsSaved, touched = cls.name || cls.notes;
     if (p && (was || touched)) toast('Not saved: ' + p.replace(' to save this class.', '.').toLowerCase() + (was ? ' Last saved version kept.' : ''));
@@ -268,7 +271,7 @@ const Classes = (() => {
     const hasCustom = custom.has(ins.id), hasAny = hasCustom || !!ins.photo;
     $('instEditBody').innerHTML = `<div style="display:grid;place-items:center;margin-top:8px">${avatar(ins, 'xl')}</div>
       <label class="ghost" style="display:flex;align-items:center;justify-content:center;margin:16px auto 0;max-width:260px;cursor:pointer">${hasAny ? 'REPLACE PHOTO' : '+ ADD PHOTO'}<input type="file" id="iFile" accept="image/*" hidden></label>
-      ${hasCustom ? `<button class="quiet" id="iRemove" type="button" style="margin-top:6px">${ins.photo ? 'Use the original photo' : 'Remove photo'}</button>` : ''}
+      ${hasCustom ? `<button class="quiet" id="iRemove" type="button" style="margin-top:6px">${ins.photo ? 'Use the original photo' : 'Delete photo'}</button>` : ''}
       <p class="note hint" id="iHint" hidden style="margin-top:14px"></p>
       <div class="label">Name</div><input class="field" id="iName" type="text" maxlength="40" autocapitalize="words" autocomplete="off" enterkeyhint="done" placeholder="e.g. Mira Ammouri" value="${esc(ins.name)}">
       <button class="quiet danger" data-act="delinst" type="button">Delete instructor</button>`;
@@ -285,12 +288,12 @@ const Classes = (() => {
   $('instEditBody').addEventListener('click', async e => {
     const t = e.target.closest('button'); if (!t || !ins) return;
     if (t.id === 'iRemove') {
-      if (!confirm(ins.photo ? 'Use the original photo again?' : 'Remove this photo?')) return;
+      if (!(await ask(ins.photo ? { title: 'Use the original photo?', ok: 'USE ORIGINAL' } : { title: 'Delete photo?', ok: 'DELETE', danger: true }))) return;
       await removeInstPhoto(ins.id); renderInstructorEditor(); return;
     }
     if (t.dataset.act === 'delinst') {
       const n = S.classes.filter(c => c.instructorId === ins.id).length;
-      if (!confirm(`Delete ${ins.name.trim() || 'this instructor'}?${n ? ` Their ${n} class${n === 1 ? '' : 'es'} will show TBA.` : ''}`)) return;
+      if (!(await ask({ title: 'Delete instructor?', text: `${ins.name.trim() || 'This instructor'} is deleted.${n ? ` Their ${n} class${n === 1 ? '' : 'es'} will show TBA.` : ''}`, ok: 'DELETE', danger: true }))) return;
       const id = ins.id, was = insSaved; ins = null; onClose.instEditPage = null;
       if (was) { await RisenDB.deleteInstructor(id); S.instructors = S.instructors.filter(i => i.id !== id); S.classes = S.classes.map(c => c.instructorId === id ? { ...c, instructorId: null } : c); }
       else await RisenDB.deletePhoto('inst-' + id);
@@ -300,6 +303,7 @@ const Classes = (() => {
   async function removeInstPhotoLocal(id) { if (urls.get(id)) URL.revokeObjectURL(urls.get(id)); custom.delete(id); urls.delete(id); }
   async function finishInstructor() {
     if (!ins) return;
+    if (!insSaved && !ins.name.trim() && custom.has(ins.id)) { ins.name = 'Untitled instructor'; saveIns(); toast('Saved as “Untitled instructor”'); }   // a photo was added but no name
     await saveIns.flush();
     const p = insProblem(), was = insSaved, id = ins.id, touched = ins.name || custom.has(id);
     if (!was) { if (custom.has(id)) { await RisenDB.deletePhoto('inst-' + id); await removeInstPhotoLocal(id); } if (p && touched) toast('Not saved: ' + p.replace(' to save this instructor.', '.').toLowerCase()); }

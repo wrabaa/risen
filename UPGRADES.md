@@ -19,6 +19,8 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - Safari warning banner (from the Parking lot) — built in `.36`, iPhone test pending.
 - G. Gym comfort — built in `.37`, iPhone test pending.
 - K. One shared helper file + `index.html` split — built in `.38`, iPhone test pending.
+- H + I + J. One confirm sheet, same behaviour in every tab, named colours — built in `.39`,
+  iPhone test pending.
 
 **Waiting / on hold**
 - C. Plan the calories screen — WAITING: Siza plans it with the planner first.
@@ -27,9 +29,6 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 **What's left** (in suggested order)
 - E. Backup that does not rely on memory
 - F. Weekly summary on Home
-- H. One confirm sheet for the whole app
-- I. Same behaviour in every tab
-- J. Brand colours written down
 - L. Clean-up
 
 ## Do early (cheap now, painful later)
@@ -117,6 +116,10 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - **Why:** most deletes use the grey iOS box; Reset and Skip use RISEN sheets.
 - **What:** one shared RISEN sheet for every "are you sure?", with an "Export first" button on Import.
 - **Size:** medium.
+- **Status: BUILT in release `2026-11-13.39`. Tested in the browser; iPhone test pending.**
+  All 19 system confirm boxes are replaced by one RISEN sheet (`ask()` in `shared.js`):
+  red outline button for anything that deletes, lime for the rest. Import shows EXPORT FIRST,
+  REPLACE EVERYTHING and Cancel; EXPORT FIRST saves the phone's data and asks again.
 
 ### I. Same behaviour in every tab
 - Settings name shows "✓ Saved".
@@ -125,11 +128,23 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - One word for each thing: program / plan, workout / session, delete / remove.
 - Unnamed recipe, med or class: save as "Untitled" or ask, instead of discarding.
 - **Size:** small each.
+- **Status: BUILT in release `2026-11-13.39`. Tested in the browser; iPhone test pending.**
+  - Settings shows "✓ Saved" (top right) for the name and the rest timer.
+  - The Meds tile on Home opens Meds.
+  - Meds: "+ ADD MED" is a lime button at the top of "My meds" (it used to be a dashed button
+    at the bottom). The ring and today's doses stay first on the screen.
+  - Words: "program" (not plan/routine), "workout" (not session), "delete" (not remove).
+  - A new recipe, med, class or instructor with something filled in but no name is saved as
+    "Untitled …". One left completely untouched is still discarded. An existing item whose
+    name is cleared keeps its last saved version, as before.
 
 ### J. Brand colours written down
 - **What:** name the danger red and the extra greys once at the top of the styles and add them
   to the Brand section of `CLAUDE.md`.
 - **Size:** small.
+- **Status: BUILT in release `2026-11-13.39`. No visible change.** Eleven supporting colours
+  are named on `:root` in `styles.css` and listed in `CLAUDE.md`; no raw colour codes are left
+  in the styles except pure black/white in the photo viewer.
 
 ## Under the hood (no visible change)
 
@@ -169,6 +184,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   because they had been entered in Safari, not the app.
 - `.37` Upgrade G: gym comfort.
 - `.38` Upgrade K: shared helper file, `index.html` split into `styles.css` + `app.js`.
+- `.39` Upgrades H + I + J: one confirm sheet, same behaviour in every tab, named colours.
 
 ## Done from the `CLAUDE.md` to-do list
 - `.35` To-do 1: Settings → "Reload gym schedule". Schedule classes go back to the latest

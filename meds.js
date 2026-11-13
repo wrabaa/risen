@@ -101,7 +101,7 @@ const Meds = (() => {
         ${groups.map(g => groupHtml(g, lm)).join('')}</div>`;
       const list = [...S.meds].sort((a, b) => (a.paused ? 1 : 0) - (b.paused ? 1 : 0)           // active first (by time), paused last
         || ((a.times || [])[0] || '').localeCompare((b.times || [])[0] || '') || a.name.localeCompare(b.name));
-      h += `<div class="label">My meds</div><div class="gstack">${list.map(listCard).join('')}<button class="dashed" data-act="add">+ Add med</button></div>`;
+      h += `<div class="label">My meds</div><button class="primary" data-act="add" style="margin-top:0">+ ADD MED</button><div class="gstack" style="margin-top:14px">${list.map(listCard).join('')}</div>`;
     }
     el.innerHTML = h;
     if (ring && ring.from !== ring.frac) requestAnimationFrame(() => requestAnimationFrame(() => { const c = $('rfill'); if (c) c.style.strokeDashoffset = ring.C * (1 - ring.frac); }));
@@ -115,7 +115,7 @@ const Meds = (() => {
     if (t.dataset.dose) {
       const id = t.dataset.dose;
       if (logMap().has(id)) {
-        if (!confirm('Mark this dose as not taken?')) return;
+        if (!(await ask({ title: 'Mark as not taken?', ok: 'YES, UNDO' }))) return;
         await RisenDB.undoDose(id); S.medlogs = S.medlogs.filter(l => l.id !== id);
       } else {
         const [medId, date, time] = id.split('|'); S.medlogs.push(await RisenDB.logDose(medId, date, time));
@@ -170,7 +170,8 @@ const Meds = (() => {
       flashSaved();
     } catch (err) { toast(err.message); }
   }, 400);
-  const touch = () => { updateHint(); saveMed(); };
+  let dirty = false;                   // something was changed in the editor since it opened
+  const touch = () => { dirty = true; updateHint(); saveMed(); };
   const flush = () => saveMed.flush().catch(err => toast(err.message));
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') flush();
@@ -182,7 +183,7 @@ const Meds = (() => {
 
   function openEditor(id) {
     const ex = id ? S.meds.find(m => m.id === id) : null;
-    persisted = !!ex;
+    persisted = !!ex; dirty = false;
     med = ex ? JSON.parse(JSON.stringify(ex)) : { id: RisenDB.uid(), name: '', dose: '', times: ['08:00'], freq: 'daily', days: [], food: 'any', notes: '', paused: false, created: new Date().toISOString() };
     med.times = med.times || []; med.days = med.days || []; tickAt = ex ? [...med.times] : [];
     $('medTitle').textContent = ex ? 'Edit med' : 'New med';
@@ -207,7 +208,7 @@ const Meds = (() => {
   }
   function renderTimes() {
     $('mTimes').innerHTML = med.times.map((t, i) => `<div class="timerow"><input class="field" type="time" data-ti="${i}" value="${esc(t)}" aria-label="Time ${i + 1}">${
-      med.times.length > 1 ? `<button class="timex" type="button" data-tdel="${i}" aria-label="Remove time">${I.x}</button>` : ''}</div>`).join('')
+      med.times.length > 1 ? `<button class="timex" type="button" data-tdel="${i}" aria-label="Delete time">${I.x}</button>` : ''}</div>`).join('')
       + '<button class="dashed" type="button" data-act="addtime">+ Add time</button>';
   }
   function renderFreq() {
@@ -251,7 +252,7 @@ const Meds = (() => {
     }
     if (t.id === 'mPause') { med.paused = !med.paused; renderPauseBtn(); return touch(); }
     if (t.dataset.act === 'del') {
-      if (!confirm(`Delete “${med.name.trim() || 'this med'}”? Its photo and history are deleted too.`)) return;
+      if (!(await ask({ title: 'Delete med?', text: `“${med.name.trim() || 'This med'}”, its photo and its history are deleted.`, ok: 'DELETE', danger: true }))) return;
       const id = med.id, wasSaved = persisted; med = null;       // a waiting auto-save then does nothing
       if (wasSaved) await removeMed(id); else { await RisenDB.deletePhoto('med-' + id); dropThumb(id); }
       closePage(); render(); renderHome();
@@ -261,9 +262,11 @@ const Meds = (() => {
   async function closeEditor() {
     if (!med) return closePage();
     document.activeElement && document.activeElement.blur();
+    // A new med with something filled in but no name is kept as "Untitled med" instead of being thrown away
+    if (!persisted && !med.name.trim() && (dirty || await RisenDB.getPhoto('med-' + med.id))) { med.name = 'Untitled med'; saveMed(); toast('Saved as “Untitled med”'); }
     await flush();
     const id = med.id, wasSaved = persisted, p = problem(), touched = med.name || med.dose || med.notes;
-    if (!wasSaved) {             // a brand-new med that never got a name: nothing is kept, not even its photo
+    if (!wasSaved) {             // a brand-new med that was left untouched (or still has no time): nothing is kept, not even its photo
       const photo = await RisenDB.getPhoto('med-' + id); if (photo) await RisenDB.deletePhoto('med-' + id);
       if (p && (touched || photo)) toast('Not saved: ' + p.replace(' to save this med.', '.').toLowerCase());
     } else if (p) toast('Not saved: ' + p.replace(' to save this med.', '.').toLowerCase() + ' Last saved version kept.');

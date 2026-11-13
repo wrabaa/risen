@@ -34,6 +34,27 @@ const Pages = (() => {
   return { open, close, onClose };
 })();
 
+// The one "are you sure?" of the app: a RISEN sheet instead of the grey system box.
+//   if (!(await ask({ title, text, ok: 'DELETE', danger: true }))) return;
+// Resolves true (ok), false (cancel or a tap outside) or 'extra' (the optional extra button, shown first).
+function ask({ title, text = '', ok = 'OK', danger = false, cancel = 'Cancel', extra = '' }) {
+  return new Promise(res => {
+    const w = $('askSheet'), b = $('askBody');
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    b.innerHTML = `<h2>${esc(title)}</h2>${text ? `<p>${esc(text).replace(/\n/g, '<br>')}</p>` : ''}`
+      + (extra ? `<button class="primary" type="button" data-ask="extra">${esc(extra)}</button>` : '')
+      + `<button class="${danger ? 'dangerbtn' : 'primary'}" type="button" data-ask="ok">${esc(ok)}</button>`
+      + `<button class="textbtn" type="button" data-ask="cancel">${esc(cancel)}</button>`;
+    const done = v => { w.hidden = true; b.innerHTML = ''; w.onclick = null; res(v); };
+    w.onclick = e => {
+      const t = e.target.closest('[data-ask]');
+      if (t) done(t.dataset.ask === 'ok' ? true : t.dataset.ask === 'extra' ? 'extra' : false);
+      else if (e.target === w) done(false);
+    };
+    w.hidden = false;
+  });
+}
+
 // "✓ Saved" for about a second after a change has really been written
 const savedTimers = {};
 function savedFlash(id) {

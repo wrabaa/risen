@@ -52,7 +52,7 @@ const PhotoSlot = (() => {
         (editable ? `<button class="pslot-del" aria-label="Delete photo">${TRASH}</button>` : '');
       el.querySelector('.pslot-img').onclick = () => openViewer(urls.get(exerciseId));
       if (editable) el.querySelector('.pslot-del').onclick = async () => {
-        if (!confirm('Delete this photo?')) return;
+        if (!(await ask({ title: 'Delete this photo?', ok: 'DELETE', danger: true }))) return;
         await RisenDB.deletePhoto(exerciseId); mount(el, exerciseId, { editable });
       };
     } else if (editable) {
