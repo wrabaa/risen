@@ -90,6 +90,13 @@
       if(n.none) return `<div><div class="wname">${n.none==='today'?'No classes today':'No more classes today'}</div></div>`;
       return `<div><div class="wname">${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${esc(n.i?n.i.name.split(' ')[0]:'TBA')}</div></div>${Classes.avatar(n.i)}`;
     }},
+    {title:'Week summary', stack:true, html(){ // this week (Mon–Sun) at a glance: all three sections in one line
+      const wk=weekDays(), a=dayKey(wk[0]), b=dayKey(wk[6]), inWeek=k=>k>=a&&k<=b;
+      const workouts=S.sessions.filter(x=>x.finishedAt&&inWeek(x.date)).length;       // every finished workout, extra ones too
+      const m=typeof Meds==='undefined'?{taken:0,total:0}:Meds.week();                // doses due up to today
+      const classes=S.classlogs.filter(l=>inWeek(l.date)).length;
+      return `<div class="stats"><div><b>${workouts}</b><span>Workouts</span></div><div><b>${m.taken}<small>/${m.total}</small></b><span>Meds</span></div><div><b>${classes}</b><span>Classes</span></div></div>`;
+    }},
   ];
   // Quiet backup reminder: shows when there's a plan and the last export is missing or older than 7 days
   function renderBackupLine(){
@@ -152,6 +159,7 @@
     await ready; renderHome(); show('home');
     intro.classList.add('hidden'); app.classList.remove('hidden');
     if(!S.settings.nameAsked){ $('nameSheet').hidden=false; setTimeout(()=>$('nameInput').focus(),350); }
+    else backupPrompt();
   };
 
   // ---- Settings ----
@@ -216,6 +224,24 @@
     try{ await navigator.share({files:[file]}); return 'done'; }
     catch(e){ return e&&e.name==='AbortError'?'cancel':'fail'; }
   }
+  async function buildBackup(){ // the file is put together piece by piece (db.js), so many photos don't overload the phone
+    const blob=await RisenDB.exportBlob();
+    return {blob, file:new File([blob],'risen-backup-'+dayKey(new Date())+'.json',{type:'application/json'})};
+  }
+  const canShareFile=f=>{ try{ return !!(navigator.canShare&&navigator.canShare({files:[f]})); }catch(e){ return false; } };
+  // Weekly "Back up now?" when the app is opened: only if there is something to lose, the last backup is a week old (or
+  // missing) and the question was not asked in the last 7 days. The file is prepared while the question is on screen,
+  // so one tap on BACK UP NOW opens the share sheet.
+  async function backupPrompt(){
+    const has=S.workouts.length||S.sessions.length||S.meds.length||S.recipes.length||S.classlogs.length;
+    if(!has||S.settings.activeSession) return;
+    const age=iso=>iso?Math.floor((Date.now()-new Date(iso))/864e5):null, last=age(S.settings.lastExport), asked=age(S.settings.backupAsked);
+    if((last!=null&&last<7)||(asked!=null&&asked<7)) return;
+    S.settings.backupAsked=new Date().toISOString(); RisenDB.setSetting('backupAsked',S.settings.backupAsked);
+    buildBackup().then(({file})=>{ if(canShareFile(file)) readyBackup={file,at:Date.now()}; }).catch(()=>{});
+    const yes=await ask({title:'Back up now?',text:(last==null?'You have no backup yet.':'Your last backup was '+last+' days ago.')+' Everything is stored only on this phone.',ok:'BACK UP NOW',cancel:'Later'});
+    if(yes) doExport();
+  }
   async function doExport(){
     if(readyBackup&&Date.now()-readyBackup.at<120000){ // second tap: the file is ready, share straight away
       const f=readyBackup.file; readyBackup=null;
@@ -224,12 +250,10 @@
       return;
     }
     readyBackup=null;
-    const name='risen-backup-'+dayKey(new Date())+'.json';
-    let blob; try{ blob=new Blob([JSON.stringify(await RisenDB.exportAll())],{type:'application/json'}); }
+    let blob, file; try{ ({blob,file}=await buildBackup()); }
     catch(e){ toast('Backup not saved: '+e.message); return; }
-    const file=new File([blob],name,{type:'application/json'});
-    let canShare=false; try{ canShare=!!(navigator.canShare&&navigator.canShare({files:[file]})); }catch(e){}
-    if(canShare){ // iPhone: Save to Files
+    const name=file.name;
+    if(canShareFile(file)){ // iPhone: Save to Files
       const r=await shareBackup(file);
       if(r==='done') await exported();
       else if(r==='fail'){ readyBackup={file,at:Date.now()}; toast('Backup is ready. Tap Export backup again to save it.'); }

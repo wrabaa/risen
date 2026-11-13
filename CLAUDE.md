@@ -47,7 +47,8 @@ No dot-matrix font. Intro = Siza's black & white photo + logo + "STRONGER EVERY 
 ## Structure
 Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙️ (top right) = Settings.
 - **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
-  02 THIS WEEK, 03 STREAK, 04 MEDS, 05 CLASSES, backup reminder line.
+  02 THIS WEEK, 03 STREAK, 04 MEDS, 05 CLASSES, 06 WEEK SUMMARY (workouts · meds taken/due ·
+  classes attended), backup reminder line.
 - **GYM** (`gym.js`, `library.js`): Week (Mon–Sun, today lime) → Day (+ ADD EXERCISE,
   list, Copy to…, START WORKOUT on today) → Exercise (photo, sets/kg/reps, notes,
   "Last time"). Logging: pre-filled sets, ✓, auto rest timer, finish. History per exercise ID.
@@ -62,7 +63,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.40)
+## Status (release 2026-11-13.41)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
@@ -72,8 +73,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   quiet updates, med tick follows a time change) — tested on iPhone.
 - ✅ Upgrade A fixed IDs (`.33`, tested on iPhone) · Upgrade B image cache (`.34`) ·
   Reload gym schedule (`.35`) · Safari banner (`.36`) · Gym comfort (`.37`) · code split,
-  no visible change (`.38`) · confirm sheet, consistency, named colours (`.39`) · clean-up (`.40`).
-  `.34`–`.40`: iPhone test pending.
+  no visible change (`.38`) · confirm sheet, consistency, named colours (`.39`) · clean-up (`.40`) · weekly backup
+  prompt, piece-by-piece backups, week summary tile (`.41`). `.34`–`.41`: iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -129,6 +130,9 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   history kept) · Settings "Reset all data" (export first, double confirm).
 - Import is all-or-nothing: the file is checked first and any failure undoes everything.
   A release-.13 backup restores only name + rest timer. The confirm lists what is in the file.
+- Weekly "Back up now?" sheet on opening (`.41`): only with data, last backup 7+ days old or
+  missing, not asked in the last 7 days, never during a workout. The file is prepared while
+  the sheet shows, so one tap opens the share sheet. Backup files are built piece by piece.
 - The backup date is stored only when the share sheet really finishes. If it cannot open,
   the file is kept two minutes and the next tap on Export opens it.
 - Safari tab vs home-screen app = two separate data stores on iPhone (Siza's meds once looked

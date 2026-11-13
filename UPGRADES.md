@@ -22,14 +22,15 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - H + I + J. One confirm sheet, same behaviour in every tab, named colours — built in `.39`,
   iPhone test pending.
 - L. Clean-up — built in `.40`, iPhone test pending.
+- E + F. Weekly backup prompt, piece-by-piece backups, week summary tile — built in `.41`,
+  iPhone test pending.
 
 **Waiting / on hold**
 - C. Plan the calories screen — WAITING: Siza plans it with the planner first.
 - D. Med reminders — ON HOLD until the native Apple app (Capacitor). Not to be built in the web app.
 
-**What's left** (in suggested order)
-- E. Backup that does not rely on memory
-- F. Weekly summary on Home
+**What's left**
+- Nothing open in this file. C waits for planning and D is on hold (see above).
 
 ## Do early (cheap now, painful later)
 
@@ -94,11 +95,24 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   show what is in a backup before importing (done in .28); build big backups piece by piece
   so many photos cannot crash the export.
 - **Size:** small (prompt) + medium (big backups).
+- **Status: BUILT in release `2026-11-13.41`. Tested in the browser; iPhone test pending.**
+  - Weekly prompt: on opening the app (after ENTER), if there is data, the last backup is 7+
+    days old or missing, and the question was not shown in the last 7 days, a sheet asks
+    "Back up now?" with BACK UP NOW and Later. Not shown during a workout or on first launch.
+  - One tap: the file is prepared while the question is on screen, so BACK UP NOW opens the
+    share sheet directly.
+  - Big backups: the file is built piece by piece (one store, one photo at a time) instead of
+    as one giant text. Same content and format; old and new backups both import.
+  - Not done: IMPORT still reads the whole file at once. Fine for normal sizes; revisit if a
+    backup ever grows past a few hundred MB.
 
 ### F. Weekly summary on Home
 - **Why:** a sense of progress without bringing back a Progress tab.
 - **What:** one tile: workouts done, meds taken, classes attended this week.
 - **Size:** small.
+- **Status: BUILT in release `2026-11-13.41`. Tested in the browser; iPhone test pending.**
+  Home tile 06 WEEK SUMMARY (Mon–Sun): Workouts = every finished workout this week, extra ones
+  included · Meds = doses taken / doses due from Monday up to today · Classes = classes attended.
 
 ### G. Gym comfort
 - Keep the screen awake during a workout.
@@ -192,6 +206,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - `.38` Upgrade K: shared helper file, `index.html` split into `styles.css` + `app.js`.
 - `.39` Upgrades H + I + J: one confirm sheet, same behaviour in every tab, named colours.
 - `.40` Upgrade L: clean-up, storage-failure screen, Home refresh on return.
+- `.41` Upgrades E + F: weekly backup prompt, piece-by-piece backups, week summary tile.
 
 ## Done from the `CLAUDE.md` to-do list
 - `.35` To-do 1: Settings → "Reload gym schedule". Schedule classes go back to the latest

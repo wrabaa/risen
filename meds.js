@@ -26,6 +26,11 @@ const Meds = (() => {
     const lm = logMap(), doses = dosesOn(new Date());
     return { hasMeds: S.meds.length > 0, total: doses.length, taken: doses.filter(x => lm.has(x.id)).length, next: doses.find(x => !lm.has(x.id)) };
   }
+  function week() {       // for Home's week summary: doses due from Monday up to today, and how many were taken
+    const lm = logMap(), today = dayKey(new Date()); let total = 0, taken = 0;
+    for (const d of weekDays()) { if (dayKey(d) > today) break; for (const x of dosesOn(d)) { total++; if (lm.has(x.id)) taken++; } }
+    return { total, taken };
+  }
   const foodText = m => m.food === 'yes' ? 'With food' : m.food === 'no' ? 'Without food' : '';
   function freqText(m) {
     if (m.freq === 'weekly') return 'Weekly · ' + (DAYS[(m.days || [])[0] - 1] || '?');
@@ -275,5 +280,5 @@ const Meds = (() => {
   $('medBack').onclick = closeEditor;
   $('medDone').onclick = closeEditor;
 
-  return { open, render, summary, flush };
+  return { open, render, summary, week, flush };
 })();

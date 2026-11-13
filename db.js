@@ -14,7 +14,8 @@
 //              extra:true = unplanned session.  Skipped:  {..., skipped:true, reason, finishedAt:null}
 //   logs       {id, exerciseId, sessionId, date, at, sets:[{kg, reps}]}
 //              History is stored per EXERCISE ID, so changing routines never loses progress.
-//   settings   {key, value}   name, nameAsked, restSec, activeSession (workout in progress), lastExport
+//   settings   {key, value}   name, nameAsked, restSec, activeSession (workout in progress), lastExport,
+//              backupAsked (when the weekly "Back up now?" was last shown)
 //   photos     {exerciseId, type, data:ArrayBuffer, width, height, updated}
 //              ONE photo per exercise, keyed by exercise ID. Resized to max 1000px JPEG before saving.
 //              A med's box photo lives here too, under the key 'med-<medId>'.
@@ -248,6 +249,25 @@ const RisenDB = (() => {
     stores.photos = stores.photos.map(p => ({ ...p, data: toB64(p.data) }));
     return { app: 'RISEN', format: 2, schema: DB_VERSION, exported: now(), stores };
   }
+  // The backup FILE, built piece by piece (one store, one photo at a time) so a phone with many photos never has to hold
+  // the whole backup as one giant piece of text. Same content and format as exportAll().
+  async function exportBlob() {
+    const parts = ['{"app":"RISEN","format":2,"schema":' + DB_VERSION + ',"exported":' + JSON.stringify(now()) + ',"stores":{'];
+    for (let i = 0; i < STORES.length; i++) {
+      const s = STORES[i];
+      parts.push((i ? ',' : '') + JSON.stringify(s) + ':[');
+      if (s === 'photos') {
+        let n = 0;
+        for (const key of await photoKeys()) {
+          const p = await get('photos', key); if (!p) continue;
+          parts.push(new Blob([(n++ ? ',' : '') + JSON.stringify({ ...p, data: toB64(p.data) })]));   // each photo becomes its own piece
+        }
+      } else parts.push((await all(s)).map(r => JSON.stringify(r)).join(','));
+      parts.push(']');
+    }
+    parts.push('}}');
+    return new Blob(parts, { type: 'application/json' });
+  }
   // Import is all-or-nothing: the file is checked first, and if anything goes wrong while writing, every change is undone.
   const KEY_OF = { settings: 'key', photos: 'exerciseId' };      // every other store is keyed by `id`
   const DAMAGED = 'This backup file is damaged. Nothing was changed.';
@@ -425,5 +445,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, migrateLibrary, adoptSeedClasses, saveWorkout, workoutsOf,
-    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
+    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, exportBlob, importAll };
 })();
