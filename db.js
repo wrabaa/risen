@@ -23,6 +23,7 @@
 //               food:'yes'|'no'|'any', notes, paused, created}
 //   medlogs    {id:'<medId>|<date>|<time>', medId, date, time, takenAt}   one row per dose taken
 //   classes    {id, name, studio, day:1..7, time:'HH:MM', duration (min), instructorId|null, notes, seed}   weekly group classes
+//              star:true = one of "my classes" (the star on a class in Classes; kept when the schedule is reloaded)
 //              seed:true = it came from data/gym-classes.json and its id is the fixed id written there (fz-c01 ...); a class
 //              added by hand has a random id and no `seed`
 //   instructors {id, name, photo|null}   photo = a file in the app (seed); a photo from the phone lives in `photos` as 'inst-<id>'
@@ -178,7 +179,7 @@ const RisenDB = (() => {
     await done(t);
   }
   // Settings "Reload gym schedule": the classes that came from the schedule go back to the latest file, by their fixed ids.
-  //   - a schedule class: name, studio, day, time, duration and instructor are replaced; its own notes and attendance stay
+  //   - a schedule class: name, studio, day, time, duration and instructor are replaced; its own notes, star and attendance stay
   //   - a class new in the file is added; a schedule class no longer in the file is removed (its attendance rows are kept)
   //   - classes added by hand are not touched
   //   - schedule instructors get the file's name and photo path again (a photo chosen on the phone still wins)
@@ -191,7 +192,7 @@ const RisenDB = (() => {
       if (!s.id) continue; ids.add(s.id);
       const old = byId.get(s.id); old ? out.updated++ : out.added++;
       cs.put({ id: s.id, seed: true, name: s.name, studio: s.studio || '', day: s.day, time: s.time, duration: s.duration || 60,
-        instructorId: s.instructor || null, notes: (old && old.notes) || '' });
+        instructorId: s.instructor || null, notes: (old && old.notes) || '', ...(old && old.star ? { star: true } : {}) });
     }
     for (const c of classes) if (c.seed && !ids.has(c.id)) { cs.delete(c.id); out.removed++; }
     for (const i of seed.instructors || []) is.put({ id: i.id, name: i.name, photo: i.photo || null });

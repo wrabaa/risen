@@ -1,12 +1,13 @@
-// RISEN Classes tab. THE WEEK (7 days, studio filter) -> THE DAY (its classes, ✓ ATTENDED on today) -> THE CLASS (edit),
-// plus the instructors list. The first time the tab opens it offers to load the gym's schedule from data/gym-classes.json.
+// RISEN Classes tab. The main screen is TODAY'S TIMELINE (swipe or tap a weekday for another day, WEEK for the 7-day list)
+// with live timing, ⭐ my classes, an instructor page (tap a photo) and my stats. Tap a class to edit it. The tab also has the
+// instructors list. Until it is answered, opening the tab asks to load the gym's schedule from data/gym-classes.json.
 // Uses the shared helpers from index.html (S, load, renderHome, show, toast, esc, dayKey, isoDay, weekDays).
 const Classes = (() => {
   const STUDIO_ORDER = ['Energy', 'Balance', 'Power'];
   const CHEV = ICONS.chev, TRASH = ICONS.trash;
 
-  let filter = 'ALL';                 // studio shown, or ALL (not saved: starts on ALL)
-  let curDay = null, lastDay = dayKey(new Date());
+  let filter = 'ALL';                 // 'ALL', 'MINE' (starred classes) or one studio (not saved: starts on ALL)
+  let lastDay = dayKey(new Date());
 
   // ================= Small helpers =================
   const pad = n => String(n).padStart(2, '0');
@@ -25,16 +26,18 @@ const Classes = (() => {
     return u.sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
   }
   const byTime = (a, b) => a.time.localeCompare(b.time) || a.name.localeCompare(b.name);
-  const classesOn = d => S.classes.filter(c => c.day === d && (filter === 'ALL' || c.studio === filter)).sort(byTime);
+  const classesOn = d => S.classes.filter(c => c.day === d && (filter === 'ALL' || (filter === 'MINE' ? c.star : c.studio === filter))).sort(byTime);
   function lastAttended(classId) { const ds = S.classlogs.filter(l => l.classId === classId).map(l => l.date).sort(); return ds.length ? ds[ds.length - 1] : null; }
 
-  // For the Home tile: the next class today that is not attended yet (one that has started but not ended counts as "now")
+  // For the Home tile: the next STARRED class today that is not attended yet; with none left, the next class of any kind.
+  // (One that has started but not ended counts as "now".)
   function next() {
     const now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes(), k = dayKey(now), att = attMap();
     const today = S.classes.filter(c => c.day === isoDay(now)).sort(byTime);
     if (!today.length) return { none: 'today' };
-    const c = today.find(x => !att.has(attId(x.id, k)) && toMin(x.time) + (x.duration || 60) > nowMin);
-    return c ? { c, i: inst(c.instructorId), now: toMin(c.time) <= nowMin } : { none: 'more' };
+    const left = today.filter(x => !att.has(attId(x.id, k)) && toMin(x.time) + (x.duration || 60) > nowMin);
+    const c = left.find(x => x.star) || left[0];
+    return c ? { c, i: inst(c.instructorId), now: toMin(c.time) <= nowMin, star: !!c.star } : { none: 'more' };
   }
 
   // ================= Instructor photos =================
@@ -66,7 +69,7 @@ const Classes = (() => {
   // ================= Pages =================
   const openPage = Pages.open, closePage = Pages.close, onClose = Pages.onClose;
   document.querySelectorAll('[data-cls-close]').forEach(b => b.onclick = () => { document.activeElement.blur(); closePage(b.dataset.clsClose); });
-  const PAGES = ['clsEditPage', 'instEditPage', 'instPage', 'clsPage'];
+  const PAGES = ['clsEditPage', 'instEditPage', 'instPage', 'instViewPage'];
   const closeAll = () => PAGES.forEach(id => $(id).classList.contains('open') && closePage(id));
   const flashSaved = savedFlash;
 
@@ -76,7 +79,7 @@ const Classes = (() => {
   $('clsLater').onclick = notNow; $('clsX').onclick = notNow;
   $('clsSheet').addEventListener('click', e => { if (e.target === $('clsSheet')) notNow(); });
   $('clsNo').onclick = async () => {
-    await RisenDB.setSetting('classesAsked', true); S.settings.classesAsked = true; $('clsSheet').hidden = true; renderWeek();
+    await RisenDB.setSetting('classesAsked', true); S.settings.classesAsked = true; $('clsSheet').hidden = true; render();
   };
   $('clsYes').onclick = async () => {
     const yes = $('clsYes'), no = $('clsNo'); yes.disabled = no.disabled = true; yes.textContent = 'LOADING…';
@@ -87,66 +90,177 @@ const Classes = (() => {
         instructors: d.instructors.map(i => ({ id: i.id, name: i.name, photo: i.photo || null })),
         classes: d.classes.map(c => ({ id: c.id || RisenDB.uid(), seed: true, name: c.name, studio: c.studio || '', day: c.day, time: c.time, duration: c.duration || 60, instructorId: c.instructor || null, notes: '' })),
       });
-      await load(); S.settings.classesAsked = true; S.settings.classIdsMatched = true; $('clsSheet').hidden = true; renderWeek(); renderHome();
+      await load(); S.settings.classesAsked = true; S.settings.classIdsMatched = true; $('clsSheet').hidden = true; render(); renderHome();
       toast(`Loaded ${d.classes.length} classes`);
     } catch (e) { toast('Could not load the schedule. Check your connection and try again.'); }
     yes.disabled = no.disabled = false; yes.textContent = 'YES';
   };
 
-  // ================= LEVEL 1: THE WEEK =================
-  function renderWeek() {
-    lastDay = dayKey(new Date());
-    const el = $('clsWeek'), tIso = isoDay(new Date()), wk = weekDays(), st = studios();
-    if (filter !== 'ALL' && !st.includes(filter)) filter = 'ALL';
+  // ================= THE MAIN SCREEN: today's timeline, or the week =================
+  let mode = 'day';                   // 'day' = one day's timeline (the default), 'week' = the 7-day list
+  let viewDay = isoDay(new Date());   // the day shown in 'day' mode (1 = Monday ... 7 = Sunday)
+  let lastMin = -1, slide = '';       // minute last drawn (live timing) and direction of the last day change (animation)
+  const nowMinutes = () => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
+  const inText = m => m < 60 ? `${m} min` : (m % 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${Math.floor(m / 60)} h`);
+  const studioClass = s => s ? 'st-' + String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-') : '';   // st-energy, st-balance, st-power ...
+  const tagHtml = s => s ? `<span class="tag ${studioClass(s)}">${esc(s)}</span>` : '';
+  const STAR = ICONS.star;
+
+  function chipsHtml() {
+    if (!S.classes.length) return '';
+    const chips = [['ALL', 'ALL'], ['MINE', `${STAR} MINE`], ...studios().map(x => [x, esc(x.toUpperCase())])];
+    return `<div class="chips sm" style="margin:0 0 16px">${chips.map(([v, l]) => `<button type="button" data-filter="${esc(v)}" aria-pressed="${filter === v}">${l}</button>`).join('')}</div>`;
+  }
+
+  function render() {
+    lastDay = dayKey(new Date()); lastMin = nowMinutes();
+    if (filter !== 'ALL' && filter !== 'MINE' && !studios().includes(filter)) filter = 'ALL';
+    $('clsWeek').innerHTML = mode === 'week' ? weekHtml() : dayHtml();
+  }
+
+  // ---- a day: header, filter, weekday strip, timeline ----
+  function dayHtml() {
+    const d = viewDay, tIso = isoDay(new Date()), isToday = d === tIso, date = weekDays()[d - 1];
+    const meta = date.toLocaleDateString('en-GB', isToday ? { weekday: 'long', day: 'numeric', month: 'short' } : { day: 'numeric', month: 'short' });
+    let h = `<div class="gh"><h2>${isToday ? 'Today' : DAYNAMES[d - 1]}</h2><span class="gh-r"><span class="meta">${meta}</span><button type="button" class="ghost sm" data-act="week">WEEK</button></span></div>`;
+    h += chipsHtml();
+    h += `<div class="dstrip">${[1, 2, 3, 4, 5, 6, 7].map(n => `<button type="button" class="dsd${n === d ? ' sel' : ''}${n === tIso ? ' tod' : ''}" data-goday="${n}" aria-label="${DAYNAMES[n - 1]}"${n === d ? ' aria-current="true"' : ''}>${'MTWTFSS'[n - 1]}</button>`).join('')}</div>`;
+    const list = classesOn(d), att = attMap(), k = dayKey(new Date()), nowM = nowMinutes();
+    let body;
+    if (!S.classes.length) body = `<div class="card empty"><div class="wname">No classes yet</div><div class="sub">Add your own with the button below.</div></div>`;
+    else if (!list.length) body = `<div class="card empty"><div class="wname">${filter === 'MINE' ? 'No starred classes' : 'No classes'}</div><div class="sub">${filter === 'MINE'
+      ? (S.classes.some(c => c.star) ? 'None of your starred classes is on this day.' : 'Tap the star on a class to add it to MINE.') : 'Nothing is scheduled on this day.'}</div></div>`;
+    else {
+      const parts = []; let nowDone = !isToday;                   // the NOW line sits between the classes that have started and the ones still to come
+      for (const c of list) {
+        if (!nowDone && toMin(c.time) > nowM) { parts.push(nowLine(nowM)); nowDone = true; }
+        parts.push(classCard(c, isToday, att, k, nowM));
+      }
+      if (!nowDone) parts.push(nowLine(nowM));
+      body = `<div class="gstack">${parts.join('')}</div>`;
+    }
+    return h + `<div class="dlist${slide ? ' ' + slide : ''}">${body}</div><button class="primary" type="button" data-act="add" style="margin-top:18px">+ ADD CLASS</button>`;
+  }
+  const nowLine = m => `<div class="nowline"><span>NOW · ${pad(Math.floor(m / 60))}:${pad(m % 60)}</span></div>`;
+  function classCard(c, today, att, k, nowM) {
+    const i = inst(c.instructorId), done = today && att.has(attId(c.id, k)), s = toMin(c.time), e = s + (c.duration || 60);
+    const st = !today ? '' : nowM >= e ? 'past' : nowM >= s ? 'live' : 'soon';       // live timing: only for today
+    const status = st === 'live' ? '<div class="stat"><span class="livepill">LIVE NOW</span></div>' : st === 'soon' ? `<div class="stat starts">Starts in ${inText(s - nowM)}</div>` : '';
+    const av = i ? `<button class="avbtn" type="button" data-instview="${esc(i.id)}" aria-label="${esc(i.name)}: classes this week">${avatar(i)}</button>` : avatar(i);
+    return `<div class="card cls${st ? ' ' + st : ''}${c.star ? ' mine' : ''}"><div class="clsrow">${av}
+      <button class="wmain" data-open="${esc(c.id)}"><div class="xt"><div class="t">${esc(c.name)}</div><div class="s">${range(c)}</div>${status}
+        <div class="s ctag">${tagHtml(c.studio)}${i ? esc(i.name) : 'TBA'}</div></div>${CHEV}</button>
+      <button class="starbtn${c.star ? ' on' : ''}" type="button" data-star="${esc(c.id)}" aria-pressed="${!!c.star}" aria-label="${c.star ? 'Remove from my classes' : 'Add to my classes'}">${STAR}</button></div>
+      ${today ? `<button class="attbtn${done ? ' on' : ''}" data-att="${esc(c.id)}">✓ ATTENDED</button>` : ''}</div>`;
+  }
+
+  // ---- the week: 7 day rows, instructors link, my stats ----
+  function weekHtml() {
+    const tIso = isoDay(new Date()), wk = weekDays();
     const fm = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-    let h = `<div class="gh"><h2>Classes</h2><span class="meta">${fm(wk[0])} – ${fm(wk[6])}</span></div>`;
-    if (st.length > 1) h += `<div class="chips sm" style="margin:0 0 16px">${['ALL', ...st].map(s => `<button type="button" data-filter="${esc(s)}" aria-pressed="${filter === s}">${esc(s.toUpperCase())}</button>`).join('')}</div>`;
-    h += '<div class="gstack">';
+    let h = `<div class="gh"><h2>Classes</h2><span class="gh-r"><span class="meta">${fm(wk[0])} – ${fm(wk[6])}</span><button type="button" class="ghost sm" data-act="today">TODAY</button></span></div>` + chipsHtml() + '<div class="gstack">';
     for (let d = 1; d <= 7; d++) {
       const list = classesOn(d), n = list.length;
       h += `<button class="card dayrow${d === tIso ? ' today' : ''}" data-day="${d}"><div class="wrow"><span class="wdn">${DAYS[d - 1].toUpperCase()}</span>
-        <div class="wdm">${n ? `<div class="m">${n} class${n === 1 ? '' : 'es'}</div><div class="s tline">${list.map(c => hm(c.time)).join(' · ')}</div>` : '<div class="s">No classes</div>'}</div>${CHEV}</div></button>`;
+        <div class="wdm">${n ? `<div class="m">${n} class${n === 1 ? '' : 'es'}</div><div class="s tline">${list.map(c => c.star ? `<b class="stt">${hm(c.time)}</b>` : hm(c.time)).join(' · ')}</div>` : '<div class="s">No classes</div>'}</div>${CHEV}</div></button>`;
     }
-    h += `</div><div class="proglink"><span>Instructors: <b>${S.instructors.length}</b></span><button class="linkbtn" data-act="instructors">Manage instructors</button></div>`;
-    el.innerHTML = h;
+    return h + `</div><div class="proglink"><span>Instructors: <b>${S.instructors.length}</b></span><button class="linkbtn" data-act="instructors">Manage instructors</button></div>` + statsHtml();
   }
-  $('clsWeek').addEventListener('click', e => {
-    const t = e.target.closest('button'); if (!t) return;
-    if (t.dataset.filter) { filter = t.dataset.filter; return renderWeek(); }
-    if (t.dataset.day) return openDay(+t.dataset.day);
-    if (t.dataset.act === 'instructors') return openInstructors();
-  });
+  // "8 classes this month · favourite: BodyPump · most with: Mjay" (this calendar month, from the attendance log)
+  function statsHtml() {
+    const ym = dayKey(new Date()).slice(0, 7), logs = S.classlogs.filter(l => String(l.date).startsWith(ym));
+    if (!S.classes.length && !logs.length) return '';
+    const byName = new Map(), byInst = new Map();
+    for (const l of logs) {
+      const c = S.classes.find(x => x.id === l.classId); if (!c) continue;       // a class that is gone still counts in the total, but not below
+      const nk = String(c.name).trim().toLowerCase(), e = byName.get(nk) || { name: String(c.name).trim(), n: 0 }; e.n++; byName.set(nk, e);
+      const i = c.instructorId && inst(c.instructorId); if (i) { const e2 = byInst.get(i.id) || { name: i.name.split(' ')[0], n: 0 }; e2.n++; byInst.set(i.id, e2); }
+    }
+    const top = m => [...m.values()].sort((a, b) => b.n - a.n || a.name.localeCompare(b.name))[0];
+    const n = logs.length, fav = top(byName), who = top(byInst);
+    const line = n ? [`<b>${n}</b> class${n === 1 ? '' : 'es'} this month`, fav ? `favourite: <b>${esc(fav.name)}</b>` : '', who ? `most with: <b>${esc(who.name)}</b>` : ''].filter(Boolean).join(' · ') : 'No classes attended this month yet';
+    return `<div class="card statscard"><div class="statlabel">My stats</div><div class="stline">${line}</div></div>`;
+  }
 
-  // ================= LEVEL 2: THE DAY =================
-  function openDay(d) {
-    curDay = d; $('clsPageTitle').textContent = DAYNAMES[d - 1]; renderDay(); openPage('clsPage');
-    onClose.clsPage = () => { curDay = null; renderWeek(); renderHome(); };
+  // ---- moving between days ----
+  // Today's timeline opens scrolled to what is happening now: the live class, or the next one (the finished ones sit above, dimmed).
+  function scrollToNow() {
+    const v = $('view-classes'); v.scrollTop = 0;
+    if (mode !== 'day' || viewDay !== isoDay(new Date())) return;
+    if (!$('clsWeek').querySelector('.card.cls.past')) return;                 // nothing has finished yet: stay at the top, header and all
+    const c = $('clsWeek').querySelector('.card.cls:not(.past)') || $('clsWeek').querySelector('.nowline'); if (!c) return;
+    v.scrollTop = Math.max(0, c.getBoundingClientRect().top - v.getBoundingClientRect().top + v.scrollTop - 14);
   }
-  function renderDay() {
-    const d = curDay, list = classesOn(d), n = list.length, today = d === isoDay(new Date()), k = dayKey(new Date()), att = attMap();
-    let h = `<button class="primary" data-act="add" style="margin-top:6px">+ ADD CLASS</button>
-      <div class="gh" style="margin-top:22px"><h2>${n ? `${n} class${n === 1 ? '' : 'es'}` : 'No classes'}</h2><span class="meta">${filter === 'ALL' ? '' : esc(filter)}</span></div><div class="gstack">`;
-    for (const c of list) {
-      const i = inst(c.instructorId), done = today && att.has(attId(c.id, k));
-      h += `<div class="card cls"><button class="wmain" data-open="${esc(c.id)}">${avatar(i)}
-        <div class="xt"><div class="t">${esc(c.name)}</div><div class="s">${range(c)}</div>
-        <div class="s ctag">${c.studio ? `<span class="tag">${esc(c.studio)}</span>` : ''}${i ? esc(i.name) : 'TBA'}</div></div>${CHEV}</button>
-        ${today ? `<button class="attbtn${done ? ' on' : ''}" data-att="${esc(c.id)}">✓ ATTENDED</button>` : ''}</div>`;
-    }
-    $('clsPageBody').innerHTML = h + '</div>';
+  function goDay(n, dir) {
+    if (n === viewDay) return;
+    slide = dir || (n > viewDay ? 'next' : 'prev'); viewDay = n; render(); slide = ''; scrollToNow();
   }
-  $('clsPageBody').addEventListener('click', async e => {
-    const t = e.target.closest('button'); if (!t || curDay == null) return;
-    if (t.dataset.open) return openClass(t.dataset.open);
-    if (t.dataset.act === 'add') return openClass(null);
-    if (t.dataset.att) {
-      const id = attId(t.dataset.att, dayKey(new Date()));
+  const step = dir => goDay(((viewDay - 1 + dir + 7) % 7) + 1, dir > 0 ? 'next' : 'prev');   // Sunday -> Monday and back
+  { // swipe left = next day, swipe right = previous day (day timeline only; not from the screen edges, which belong to the phone)
+    const vc = $('view-classes'); let tx = 0, ty = 0, tt = 0, on = false;
+    vc.addEventListener('touchstart', e => { const t = e.touches[0]; on = e.touches.length === 1 && mode === 'day' && t.clientX > 24 && t.clientX < innerWidth - 24; tx = t.clientX; ty = t.clientY; tt = Date.now(); }, { passive: true });
+    vc.addEventListener('touchcancel', () => { on = false; }, { passive: true });
+    vc.addEventListener('touchend', e => {
+      if (!on) return; on = false;
+      const t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.6 && Date.now() - tt < 800) step(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  }
+
+  async function toggleStar(id) {
+    const c = S.classes.find(x => x.id === id); if (!c) return;
+    const rec = { ...c }; if (rec.star) delete rec.star; else rec.star = true;
+    try { await RisenDB.saveClass(rec); } catch (err) { toast(err.message); return; }
+    S.classes = S.classes.map(x => x.id === id ? rec : x);
+    render(); renderHome();
+  }
+
+  $('clsWeek').addEventListener('click', async e => {
+    const t = e.target.closest('button'); if (!t) return;
+    const d = t.dataset;
+    if (d.filter) { filter = d.filter; return render(); }
+    if (d.goday) return goDay(+d.goday);
+    if (d.day) { mode = 'day'; viewDay = +d.day; slide = ''; render(); scrollToNow(); return; }     // a row of the week
+    if (d.act === 'week') { mode = 'week'; slide = ''; render(); $('view-classes').scrollTop = 0; return; }
+    if (d.act === 'today') { mode = 'day'; viewDay = isoDay(new Date()); slide = ''; render(); scrollToNow(); return; }
+    if (d.act === 'instructors') return openInstructors();
+    if (d.act === 'add') return openClass(null);
+    if (d.open) return openClass(d.open);
+    if (d.instview) return openInstView(d.instview);
+    if (d.star) return toggleStar(d.star);
+    if (d.att) {
+      const id = attId(d.att, dayKey(new Date()));
       if (attMap().has(id)) {
         if (!(await ask({ title: 'Mark as not attended?', ok: 'YES, UNDO' }))) return;
         await RisenDB.unattendClass(id); S.classlogs = S.classlogs.filter(l => l.id !== id);
-      } else S.classlogs.push(await RisenDB.attendClass(t.dataset.att, dayKey(new Date())));
-      renderDay(); renderHome();
+      } else S.classlogs.push(await RisenDB.attendClass(d.att, dayKey(new Date())));
+      render(); renderHome();
     }
+  });
+
+  // ================= The instructor page (tap an instructor's photo): big photo, name, all their classes this week =================
+  let viewInst = null;
+  function openInstView(id) {
+    if (!inst(id)) return;
+    viewInst = id; renderInstView(); openPage('instViewPage');
+    onClose.instViewPage = () => { viewInst = null; render(); renderHome(); };
+  }
+  function renderInstView() {
+    const i = inst(viewInst); if (!i) return;
+    const src = photoSrc(i), tIso = isoDay(new Date()), list = S.classes.filter(c => c.instructorId === i.id).sort((a, b) => a.day - b.day || byTime(a, b));
+    let h = `<div class="bigph">${src ? `<img alt="" src="${esc(src)}">` : `<b>${esc(initials(i.name))}</b>`}</div>
+      <div class="gh" style="margin-top:18px"><h2>${esc(i.name)}</h2><span class="meta">${list.length} class${list.length === 1 ? '' : 'es'} this week</span></div>`;
+    if (!list.length) h += '<div class="card empty"><div class="sub">No classes this week.</div></div>';
+    for (let d = 1; d <= 7; d++) {
+      const ds = list.filter(c => c.day === d); if (!ds.length) continue;
+      h += `<div class="label">${d === tIso ? 'Today' : DAYNAMES[d - 1]}</div><div class="gstack">${ds.map(c => `<button type="button" class="card ivrow${c.star ? ' mine' : ''}" data-gotoday="${d}"><div class="wrow"><div class="xt"><div class="t">${esc(c.name)}</div>
+        <div class="s ctag"><span>${range(c)}</span>${tagHtml(c.studio)}</div></div>${c.star ? `<span class="starmark" aria-label="My class">${STAR}</span>` : ''}${CHEV}</div></button>`).join('')}</div>`;
+    }
+    $('instViewBody').innerHTML = h;
+  }
+  $('instViewBody').addEventListener('click', e => {
+    const t = e.target.closest('[data-gotoday]'); if (!t) return;
+    mode = 'day'; viewDay = +t.dataset.gotoday; slide = ''; closePage('instViewPage'); scrollToNow();     // its onClose redraws the timeline
   });
 
   // ================= LEVEL 3: THE CLASS =================
@@ -155,7 +269,7 @@ const Classes = (() => {
   function clsNormal() {
     const c = cls, dur = parseInt(c.duration, 10);
     return { id: c.id, name: c.name.trim(), studio: c.studio.trim(), day: c.day, time: c.time, duration: dur > 0 ? dur : 60, instructorId: c.instructorId || null, notes: c.notes.trim(),
-      ...(c.seed ? { seed: true } : {}) };          // a class from the gym schedule stays marked as one when it is edited
+      ...(c.seed ? { seed: true } : {}), ...(c.star ? { star: true } : {}) };          // a class from the gym schedule stays marked as one when it is edited
   }
   const saveCls = debounce(async () => {
     if (!cls || clsProblem()) return;
@@ -172,7 +286,7 @@ const Classes = (() => {
   function openClass(id) {
     const ex = id ? S.classes.find(c => c.id === id) : null;
     clsSaved = !!ex; clsDirty = false;
-    cls = ex ? JSON.parse(JSON.stringify(ex)) : { id: RisenDB.uid(), name: '', studio: filter !== 'ALL' ? filter : (studios()[0] || ''), day: curDay, time: '18:00', duration: 60, instructorId: null, notes: '' };
+    cls = ex ? JSON.parse(JSON.stringify(ex)) : { id: RisenDB.uid(), name: '', studio: filter !== 'ALL' ? filter : (studios()[0] || ''), day: viewDay, time: '18:00', duration: 60, instructorId: null, notes: '' };
     cls.notes = cls.notes || ''; cls.studio = cls.studio || '';
     $('clsEditTitle').textContent = ex ? 'Class' : 'New class';
     renderClassEditor(); openPage('clsEditPage');
@@ -223,7 +337,7 @@ const Classes = (() => {
       if (!(await ask({ title: 'Delete class?', text: `“${cls.name.trim() || 'This class'}” and its attendance history are deleted.`, ok: 'DELETE', danger: true }))) return;
       const id = cls.id, was = clsSaved; cls = null; onClose.clsEditPage = null;       // a waiting auto-save then does nothing
       if (was) { await RisenDB.deleteClass(id); S.classes = S.classes.filter(c => c.id !== id); S.classlogs = S.classlogs.filter(l => l.classId !== id); }
-      closePage('clsEditPage'); renderDay(); renderHome();
+      closePage('clsEditPage'); render(); renderHome();
     }
   });
   async function finishClass() {             // back arrow / DONE
@@ -233,11 +347,11 @@ const Classes = (() => {
     await saveCls.flush();
     const p = clsProblem(), was = clsSaved, touched = cls.name || cls.notes;
     if (p && (was || touched)) toast('Not saved: ' + p.replace(' to save this class.', '.').toLowerCase() + (was ? ' Last saved version kept.' : ''));
-    cls = null; renderDay(); renderHome();
+    cls = null; render(); renderHome();
   }
 
   // ================= Instructors =================
-  function openInstructors() { renderInstructors(); openPage('instPage'); onClose.instPage = () => { renderWeek(); if (curDay != null) renderDay(); }; }
+  function openInstructors() { renderInstructors(); openPage('instPage'); onClose.instPage = () => render(); }
   function renderInstructors() {
     const list = [...S.instructors].sort((a, b) => a.name.localeCompare(b.name));
     $('instBody').innerHTML = `<button class="primary" data-act="addinst" style="margin-top:6px">+ ADD INSTRUCTOR</button><div class="gstack" style="margin-top:18px">${list.map(i => {
@@ -316,24 +430,23 @@ const Classes = (() => {
 
   // ================= Opening the tab =================
   function open() {
-    closeAll(); show('classes'); renderWeek();
+    closeAll(); show('classes'); mode = 'day'; viewDay = isoDay(new Date()); slide = ''; render();      // opening the tab always shows today
     for (const id of [...urls.keys()]) { URL.revokeObjectURL(urls.get(id)); urls.delete(id); }
-    warm().then(() => { if (!$('view-classes').hidden) { renderWeek(); if (curDay != null) renderDay(); } renderHome(); });
+    warm().then(() => { if (!$('view-classes').hidden) { render(); scrollToNow(); } renderHome(); });
     if (!S.settings.classesAsked) askSeed();
-    $('view-classes').scrollTop = 0;
+    scrollToNow();
   }
-  function openToday() {      // Home's Classes tile: today's classes
-    open(); if (S.settings.classesAsked && S.classes.length) openDay(isoDay(new Date()));
-  }
-  function reset() { closeAll(); filter = 'ALL'; curDay = null; cls = null; ins = null; for (const id of [...urls.keys()]) { URL.revokeObjectURL(urls.get(id)); } urls.clear(); custom.clear(); $('clsSheet').hidden = true; }
+  function openToday() { open(); }      // Home's Classes tile: the tab opens on today's timeline
+  function reset() { closeAll(); filter = 'ALL'; mode = 'day'; viewDay = isoDay(new Date()); viewInst = null; slide = ''; cls = null; ins = null; for (const id of [...urls.keys()]) { URL.revokeObjectURL(urls.get(id)); } urls.clear(); custom.clear(); $('clsSheet').hidden = true; }
 
   const flush = () => Promise.all([saveCls.flush(), saveIns.flush()]).catch(err => toast(err.message));
   let lastSig = '';
   const sig = () => { const n = next(); return n.none || (n.c.id + (n.now ? 'n' : '')); };
   function tick() {           // a new day, or the "next class" moved on: bring the screens up to date
-    if (dayKey(new Date()) !== lastDay) {
-      if (!$('view-classes').hidden && !PAGES.some(id => $(id).classList.contains('open'))) renderWeek(); else lastDay = dayKey(new Date());
-    }
+    const quiet = !$('view-classes').hidden && !PAGES.some(id => $(id).classList.contains('open'));
+    if (dayKey(new Date()) !== lastDay) {                       // a new day began while the app was open: today moves on by itself
+      if (quiet) { if (mode === 'day') viewDay = isoDay(new Date()); render(); } else lastDay = dayKey(new Date());
+    } else if (quiet && mode === 'day' && viewDay === isoDay(new Date()) && nowMinutes() !== lastMin) render();      // live timing: every minute
     const s = sig(); if (s !== lastSig) { lastSig = s; if (!$('view-home').hidden) renderHome(); }
   }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); else tick(); });
@@ -352,7 +465,7 @@ const Classes = (() => {
       n = await RisenDB.adoptSeedClasses(seed);
     } catch (e) { return 0; }
     S.settings.classIdsMatched = true;
-    if (n) { await load(); lastSig = sig(); if (!$('view-classes').hidden) { renderWeek(); if (curDay != null && !cls) renderDay(); } renderHome(); }
+    if (n) { await load(); lastSig = sig(); if (!$('view-classes').hidden) render(); renderHome(); }
     return n;
   }
   ready.then(matchSeed);

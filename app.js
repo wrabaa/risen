@@ -88,7 +88,7 @@
       if(!S.classes.length) return `<div><div class="wname">No classes yet</div><div class="sub">Add them in Classes</div></div>`;
       const n=Classes.next();
       if(n.none) return `<div><div class="wname">${n.none==='today'?'No classes today':'No more classes today'}</div></div>`;
-      return `<div><div class="wname">${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${esc(n.i?n.i.name.split(' ')[0]:'TBA')}</div></div>${Classes.avatar(n.i)}`;
+      return `<div><div class="wname">${n.star?`<span class="tstar" aria-label="My class">${ICONS.star}</span>`:''}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${esc(n.i?n.i.name.split(' ')[0]:'TBA')}</div></div>${Classes.avatar(n.i)}`;
     }},
     {title:'Week summary', stack:true, html(){ // this week (Mon–Sun) at a glance: all three sections in one line
       const wk=weekDays(), a=dayKey(wk[0]), b=dayKey(wk[6]), inWeek=k=>k>=a&&k<=b;

@@ -27,6 +27,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - **Queue 3 (Classes and install)** — see the section at the bottom of this file:
   1. Classes first-open question: × / NOT NOW, tab bar visible — built in `.42`, iPhone test pending.
   2. Install pop-up (replaces the Safari banner) — built in `.43`, iPhone test pending.
+  3. Classes made alive (a–f) — built in `.44`, iPhone test pending.
 
 **Waiting / on hold**
 - C. Plan the calories screen — WAITING: Siza plans it with the planner first.
@@ -236,6 +237,31 @@ Siza's order. Each item: built? tested on iPhone? release number.
    - Any other browser or computer with no way to install: nothing is shown.
    - × always closes it for this visit (so does tapping outside it); it closes itself once
      RISEN is installed. iPhone test pending.
+3. **Classes — make it alive** — `.44` (changes only Classes and its Home tile; no new database
+   store, nothing in a backup changes shape). iPhone test pending.
+   - **a) Today first.** Opening Classes shows today's timeline: header TODAY + date, filter chips,
+     a row of 7 weekday buttons, then the classes by time. Swipe left = next day, right = previous
+     day (Sunday wraps to Monday); tap a weekday to jump. A small WEEK button opens the old week
+     list (tap a row = that day); TODAY in the week view comes back. Opening the tab always lands
+     on today, scrolled so the live or next class is at the top (finished ones sit above, dimmed).
+     The old separate day page is gone: the timeline is the day.
+   - **b) Live timing** (today only): "Starts in 25 min" (or "7 h 5 min"), a lime LIVE NOW pill and
+     lime border while a class runs, finished classes dimmed, and a lime NOW line between them.
+     Redraws every minute by itself.
+   - **c) ⭐ My classes.** A star on every class card (stored as `star:true` on the class; kept
+     when the gym schedule is reloaded, edited or backed up). Starred cards get a lime edge; in the
+     week list their times are lime/underlined. New chip ★ MINE next to ALL/ENERGY/BALANCE/POWER.
+     Home tile: shows the next STARRED class today first (with a small star); when no starred
+     class is left today it falls back to the next class of any kind.
+   - **d) Instructor page.** Tap an instructor's photo on a class card: big photo, name, and all
+     their classes this week by day (starred ones marked). Tap a row = jump to that day.
+   - **e) Studio colours.** Subtle tag colours: Energy amber `--studio-energy`, Balance sage
+     `--studio-balance`, Power violet `--studio-power` (named on `:root`). Lime stays the only accent.
+   - **f) My stats** at the bottom of the week view: "8 classes this month · favourite: BodyPump ·
+     most with: Mjay" (this calendar month, from the attendance log; instructor by first name;
+     "No classes attended this month yet" when empty).
+   - Choices: + ADD CLASS now sits at the bottom of the day timeline (the timeline is the hero);
+     a starred class later today wins the Home tile even while an unstarred one is live.
 
 ## Parking lot
 - (new ideas go here)

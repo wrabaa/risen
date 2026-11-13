@@ -40,7 +40,9 @@ big numbers) + Inter (body). 16px rounded cards, pill buttons, simple line icons
 Supporting colours (named on `:root` in `styles.css`, use the names, never raw codes):
 `--danger` #FF6B6B (delete/reset ONLY — the one exception to "one accent") · `--field` #0F0F0F
 (inputs) · `--press` #202020 · `--dash` #3A3A3A · `--mid` #4A4A4A · `--dim` #5A5A5A ·
-`--faint` #6A6A6A · `--off` #2A2A2A · `--soft` #C9C9C9 · `--soft2` #D6D6D6 · `--volt-press` #B8E600.
+`--faint` #6A6A6A · `--off` #2A2A2A · `--soft` #C9C9C9 · `--soft2` #D6D6D6 · `--volt-press` #B8E600 ·
+studio tags (Classes only, subtle): `--studio-energy` #D9A25E · `--studio-balance` #7CB9AE ·
+`--studio-power` #A592D6.
 No dot-matrix font. Intro = Siza's black & white photo + logo + "STRONGER EVERY DAY" + ENTER
 (all text/buttons in code, never baked into images).
 
@@ -57,14 +59,16 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   cards with box photo, 7-day dots; My meds list (tap row → edit, pause/delete inside).
 - **CLASSES** (`classes.js`, `data/gym-classes.json`, `assets/instructors/`):
   opening the tab asks "Load Fitness Zone schedule?" until answered: YES / START EMPTY, or
-  × / NOT NOW = ask again next time (the sheet stops above the tab bar). Week → Day → Class,
-  studio chips (Energy/Balance/Power), ✓ ATTENDED, instructors list.
+  × / NOT NOW = ask again next time (the sheet stops above the tab bar). The tab opens on
+  TODAY'S TIMELINE (live timing, NOW line, ✓ ATTENDED, ⭐ star per class); swipe or tap a
+  weekday for another day; WEEK button = 7-day list + my stats + instructors list. Chips: ALL ·
+  ★ MINE · Energy/Balance/Power. Tap a class = edit; tap an instructor photo = instructor page.
 - **MEALS** (`meals.js`): Shakes · Breakfast · Lunch · Snacks · Dinner → recipes →
   recipe page (photo, ingredients one per line stored as objects `{text}`, how-to, Move to…).
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.43)
+## Status (release 2026-11-13.44)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
@@ -78,7 +82,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   prompt, piece-by-piece backups, week summary tile (`.41`). `.34`–`.41` tested on iPhone, OK.
 - Queue 3 (Classes alive + install pop-up), one release per item, details in `UPGRADES.md`:
   `.42` Classes first-open question has × / NOT NOW and keeps the tab bar · `.43` install pop-up
-  replaces the Safari banner. `.42`–`.43`: iPhone test pending.
+  replaces the Safari banner · `.44` Classes made alive (today's timeline, swipe days, live
+  timing, ⭐ my classes, instructor page, studio colours, my stats). `.42`–`.44`: iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -127,7 +132,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - Words: "program" (not plan/routine) · "workout" (not session) · "delete" (not remove).
 - A NEW item with something filled in but no name is saved as "Untitled …"; an untouched new
   item is discarded; an existing item whose name is cleared keeps its last saved version.
-- Add buttons: lime "+ ADD …" at the top of the list it adds to.
+- Add buttons: lime "+ ADD …" at the top of the list it adds to (exception: Classes' day
+  timeline has it at the bottom, so the timeline comes first).
 - Storage cannot open → full-screen "RISEN can't open your data" + TRY AGAIN (`.40`); the app
   never opens looking empty. Home redraws whenever the app returns to the front.
 - Delete levels: 🗑 exercise (history kept) · 🗑 day/workout · "New program" (archives,
@@ -181,6 +187,9 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - Instructor photos are public in the repo — Siza decided this is fine (they're already
   public in the gym's own app). Current crops are low quality; better ones coming.
 - "Clear all classes" also removes instructors (they belong to the old gym).
+- ⭐ = `star:true` on the class record (no new store); kept by "Reload gym schedule". Home tile =
+  next starred class today, else next class of any kind. Live timing only exists for TODAY.
+  My stats = this calendar month. The tab always opens on today, scrolled to the live/next class.
 
 **MEALS**
 - 5 fixed categories. Ingredients stored as objects `{text}` so grams/kcal can be added
