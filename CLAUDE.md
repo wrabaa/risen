@@ -90,7 +90,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
    to the latest `data/gym-classes.json` (by fixed ID). Kept: attendance, notes on a class,
    classes/instructors added by hand, a phone photo of an instructor. To change the schedule
    for everyone: edit the JSON (new class = next free `fz-c..` number), release, tap Reload.
-2. **Instructor photos**: new sharper photos coming → replace files, same names, and raise
+2. ✅ DONE (`.45`) **Instructor photos**: 14 new AI-cleaned studio portraits (640×800, Cesar still none) → replace files, same names, and raise
    each file's number in the `ASSETS` list in `sw.js`.
 3. **GYM exercise library rebuild**: Siza sends photos of his gym's machines → planner
    writes the new list (machines + free weights, by muscle) → one built-in image per

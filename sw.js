@@ -1,6 +1,6 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of the APP files (pages, code, data) and delete the old one.
-const VERSION = '2026-11-13.44';
+const VERSION = '2026-11-13.45';
 const CACHE = 'risen-' + VERSION;
 
 // APP FILES: small, change often. All of them are downloaded again on every release, all or nothing.
@@ -22,20 +22,20 @@ const ASSETS = {
   'assets/icon-512.png': 1,
   'assets/fonts/inter.woff2': 1,
   'assets/fonts/oswald.woff2': 1,
-  'assets/instructors/bader.jpg': 1,
-  'assets/instructors/bahaa.jpg': 1,
-  'assets/instructors/dolly.jpg': 1,
-  'assets/instructors/elie.jpg': 1,
-  'assets/instructors/ghada.jpg': 1,
-  'assets/instructors/jad.jpg': 1,
-  'assets/instructors/mira.jpg': 1,
-  'assets/instructors/mjay.jpg': 1,
-  'assets/instructors/olga.jpg': 1,
-  'assets/instructors/patricia.jpg': 1,
-  'assets/instructors/robert.jpg': 1,
-  'assets/instructors/rouane.jpg': 1,
-  'assets/instructors/samir.jpg': 1,
-  'assets/instructors/yasmine.jpg': 1,
+  'assets/instructors/bader.jpg': 2,
+  'assets/instructors/bahaa.jpg': 2,
+  'assets/instructors/dolly.jpg': 2,
+  'assets/instructors/elie.jpg': 2,
+  'assets/instructors/ghada.jpg': 2,
+  'assets/instructors/jad.jpg': 2,
+  'assets/instructors/mira.jpg': 2,
+  'assets/instructors/mjay.jpg': 2,
+  'assets/instructors/olga.jpg': 2,
+  'assets/instructors/patricia.jpg': 2,
+  'assets/instructors/robert.jpg': 2,
+  'assets/instructors/rouane.jpg': 2,
+  'assets/instructors/samir.jpg': 2,
+  'assets/instructors/yasmine.jpg': 2,
 };
 // Not named "risen-…" on purpose: every cache with that prefix is an app version and gets deleted on update.
 const ASSET_CACHE = 'risen.assets';
