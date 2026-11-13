@@ -13,7 +13,7 @@ to-do list). `UPGRADES.md` lists the upgrade ideas and where each one stands.
 2. Tap **Share → Add to Home Screen**
 3. Open RISEN from the home screen icon — it works offline
 
-Always use the home-screen icon. A Safari tab keeps its own, separate data (the app shows a banner there).
+Always use the home-screen icon. A Safari tab keeps its own, separate data, so in a browser the app shows a pop-up with the install steps.
 
 ## Files
 | File | What it holds |

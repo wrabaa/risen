@@ -16,7 +16,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - A. Fixed IDs for gym classes and library exercises — `.33`, tested on iPhone, OK.
 - B. Images cached separately from the app — built in `.34`, iPhone test pending.
 - `CLAUDE.md` to-do 1, Settings "Reload gym schedule" — built in `.35`, iPhone test pending.
-- Safari warning banner (from the Parking lot) — built in `.36`, iPhone test pending.
+- Safari warning banner (from the Parking lot) — `.36`; REPLACED by the install pop-up in `.43`.
 - G. Gym comfort — built in `.37`, iPhone test pending.
 - K. One shared helper file + `index.html` split — built in `.38`, iPhone test pending.
 - H + I + J. One confirm sheet, same behaviour in every tab, named colours — built in `.39`,
@@ -26,6 +26,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   iPhone, all OK.
 - **Queue 3 (Classes and install)** — see the section at the bottom of this file:
   1. Classes first-open question: × / NOT NOW, tab bar visible — built in `.42`, iPhone test pending.
+  2. Install pop-up (replaces the Safari banner) — built in `.43`, iPhone test pending.
 
 **Waiting / on hold**
 - C. Plan the calories screen — WAITING: Siza plans it with the planner first.
@@ -203,7 +204,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   banner at the top says: "You're in Safari — your data here is separate from the home-screen
   app. Open RISEN from your home screen icon." × hides it for this visit. Never shown in the
   home-screen app, and not on a computer or Android. Why: Siza's meds once looked "missing"
-  because they had been entered in Safari, not the app.
+  because they had been entered in Safari, not the app. (Replaced by the install pop-up in `.43`.)
 - `.37` Upgrade G: gym comfort.
 - `.38` Upgrade K: shared helper file, `index.html` split into `styles.css` + `app.js`.
 - `.39` Upgrades H + I + J: one confirm sheet, same behaviour in every tab, named colours.
@@ -226,6 +227,15 @@ Siza's order. Each item: built? tested on iPhone? release number.
    is the same, it stops above the tab bar so the tabs stay usable, and it closes by itself if
    you switch tab. YES and START EMPTY work as before (START EMPTY is remembered).
    iPhone test pending.
+2. **Install pop-up** — `.43`. Replaces the Safari banner (banner removed). Shown only when RISEN
+   is opened in a browser, never in the home-screen app:
+   - iPhone / iPad: "Add RISEN to your home screen" with 3 illustrated steps (Share → Add to
+     Home Screen → open the icon) and a reminder that the data lives in the app, not in Safari.
+   - Android, and Chrome/Edge on a computer: one INSTALL RISEN button that opens the browser's
+     own install prompt (only when the browser offers it).
+   - Any other browser or computer with no way to install: nothing is shown.
+   - × always closes it for this visit (so does tapping outside it); it closes itself once
+     RISEN is installed. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

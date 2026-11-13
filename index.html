@@ -17,10 +17,6 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="safaribar" id="safariBar" role="status" hidden>
-    <p><b>You're in Safari</b> — your data here is separate from the home-screen app. Open RISEN from your home screen icon.</p>
-    <button type="button" id="safariX" aria-label="Hide this message"><svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-  </div>
   <section id="intro" class="screen">
     <img class="photo" src="assets/bg.jpg" alt="">
     <div class="brand"><img src="assets/mark.png" alt=""><span>RISEN</span></div>
@@ -203,6 +199,9 @@
       <button class="textbtn" type="button" id="clsLater">NOT NOW</button>
     </div>
   </div>
+
+  <!-- Install pop-up: only in a browser, never in the home-screen app (see "Install pop-up" in app.js) -->
+  <div class="sheet-wrap" id="installSheet" hidden><div class="sheet install" id="installBody"></div></div>
 
   <!-- Shown instead of the app when the phone's storage can't be opened -->
   <section class="storagefail" id="storageFail" role="alert" hidden>

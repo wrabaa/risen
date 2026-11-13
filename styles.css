@@ -17,7 +17,7 @@
     --volt-press:#B8E600  /* volt while pressed */}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
-  .screen{position:fixed;top:var(--bannerh,0px);left:0;right:0;height:calc(100% - var(--bannerh,0px));transition:opacity .5s ease,transform .5s ease}
+  .screen{position:fixed;top:0;left:0;right:0;height:100%;transition:opacity .5s ease,transform .5s ease}
   .hidden{opacity:0;pointer-events:none;transform:scale(1.04)}
 
   /* INTRO: plain photo + real logo, text and button in code (stays right on every screen size) */
@@ -134,14 +134,6 @@
     -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transition:opacity .25s ease,transform .25s ease}
   .toast.show{opacity:1;transform:translate(-50%,0)}
 
-  /* Safari banner: only in a Safari tab on iPhone/iPad, never in the home-screen app. The screens start below it. */
-  .safaribar{position:fixed;top:0;left:0;right:0;z-index:9;display:flex;align-items:center;gap:6px;
-    padding:calc(env(safe-area-inset-top) + 8px) 6px 8px 16px;background:var(--card);border-bottom:1px solid var(--line)}
-  .safaribar[hidden]{display:none}
-  .safaribar p{flex:1;min-width:0;font-size:13px;line-height:1.4;color:var(--text)}
-  .safaribar b{font-weight:600;color:var(--volt)}
-  .safaribar button{flex:none;width:44px;height:44px;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
-  #settings{top:var(--bannerh,0px)}
 
   /* ===== GYM ===== */
   .gh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 14px}
@@ -273,6 +265,27 @@
   .saved,.donebtn{display:none}
   #settings .saved{display:block;margin:0 0 0 auto}
   #askSheet{z-index:45}
+
+  /* Install pop-up (browser only) */
+  #installSheet{padding-top:calc(env(safe-area-inset-top) + 6vh);padding-bottom:14px;overflow-y:auto;z-index:50}
+  .install h2{padding-right:34px}
+  .isteps{list-style:none;margin:16px 0 4px;display:flex;flex-direction:column;gap:12px}
+  .istep{display:grid;grid-template-columns:112px 1fr;gap:14px;align-items:center}
+  .ill{height:72px;border-radius:14px;background:var(--bg);border:1px solid var(--line);display:grid;place-items:center;padding:0 8px;overflow:hidden}
+  .ill svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .ill-bar{width:100%;display:flex;align-items:center;justify-content:space-between}
+  .ill-bar i{width:10px;height:10px;border-radius:3px;border:1.5px solid var(--dim)}
+  .ill-hot{width:34px;height:34px;border-radius:50%;border:2px solid var(--volt);color:var(--volt);display:grid;place-items:center}
+  .ill-row{width:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 10px;border-radius:10px;
+    background:var(--card);border:1.5px solid var(--volt);font-size:11px;font-weight:600;line-height:1.2;color:var(--text)}
+  .ill-row svg{flex:none;color:var(--volt)}
+  .ill-icon{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--text)}
+  .ill-icon img{width:42px;height:42px;border-radius:10px;box-shadow:0 0 0 2px var(--volt)}
+  .itxt{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .itxt strong{font-size:14px;font-weight:600;line-height:1.25}
+  .itxt span{font-size:12px;line-height:1.35;color:var(--muted)}
+  .inum{display:inline-grid;place-items:center;width:22px;height:22px;margin-bottom:3px;border-radius:50%;background:var(--volt);color:var(--bg);
+    font:700 12px Oswald,sans-serif}
 
   /* Storage could not be opened: covers everything */
   .storagefail{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;justify-content:center;gap:14px;

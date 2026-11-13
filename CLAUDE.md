@@ -64,7 +64,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.42)
+## Status (release 2026-11-13.43)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
@@ -77,7 +77,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   no visible change (`.38`) · confirm sheet, consistency, named colours (`.39`) · clean-up (`.40`) · weekly backup
   prompt, piece-by-piece backups, week summary tile (`.41`). `.34`–`.41` tested on iPhone, OK.
 - Queue 3 (Classes alive + install pop-up), one release per item, details in `UPGRADES.md`:
-  `.42` Classes first-open question has × / NOT NOW and keeps the tab bar (iPhone test pending).
+  `.42` Classes first-open question has × / NOT NOW and keeps the tab bar · `.43` install pop-up
+  replaces the Safari banner. `.42`–`.43`: iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -139,8 +140,9 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - The backup date is stored only when the share sheet really finishes. If it cannot open,
   the file is kept two minutes and the next tap on Export opens it.
 - Safari tab vs home-screen app = two separate data stores on iPhone (Siza's meds once looked
-  "missing" for this reason; fixed with export/import). Since `.36` a small banner at the top
-  says so in a Safari tab on iPhone/iPad (× hides it for the visit); never in the home-screen app.
+  "missing" for this reason; fixed with export/import). Since `.43` opening RISEN in a browser
+  (not the icon) shows an install pop-up: iPhone/iPad = 3 illustrated steps, Android/Chrome =
+  one INSTALL RISEN button, otherwise nothing; × closes it for the visit; never in the app.
 
 **GYM**
 - Siza thinks in DAYS, not "workouts": Week → Day → Exercise. No workout names, no days

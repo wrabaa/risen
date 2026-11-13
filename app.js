@@ -311,19 +311,48 @@ if('serviceWorker' in navigator){
     const a=document.activeElement; return !(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
   }
   function applyUpdate(){ if(!updateWaiting||reloading||!quietNow()) return; reloading=true; location.reload(); }
-  // ---- Safari banner ----
-  // On iPhone/iPad a Safari tab and the home-screen app keep SEPARATE data, so data entered in the wrong one looks "missing"
-  // in the other. In a Safari tab a small banner says so; × hides it for this visit. Never shown in the home-screen app.
-  function inSafariTab(nav=navigator){
-    const ios=/iPhone|iPad|iPod/.test(nav.userAgent)||(/Macintosh/.test(nav.userAgent)&&nav.maxTouchPoints>1); // iPad says "Macintosh"
-    const app=nav.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
-    return ios&&!app;
+  // ---- Install pop-up ----
+  // Opened in a browser instead of from the home-screen icon? On iPhone/iPad a Safari tab and the home-screen app keep SEPARATE
+  // data, so anything entered in the wrong one looks "missing" in the other. A pop-up shows how to install RISEN:
+  //   iPhone/iPad -> 3 illustrated steps (Share -> Add to Home Screen -> open the icon)
+  //   Android, and Chrome/Edge on a computer -> one INSTALL RISEN button (the browser's own install prompt)
+  //   anything else (no way to install) -> nothing
+  // x closes it for this visit. Never shown in the home-screen app.
+  const installEnv=(nav=navigator)=>({
+    ios:/iPhone|iPad|iPod/.test(nav.userAgent)||(/Macintosh/.test(nav.userAgent)&&nav.maxTouchPoints>1), // an iPad says "Macintosh"
+    app:nav.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)
+  });
+  let installEvent=null;
+  const installClosed=()=>{ try{ return sessionStorage.getItem('risenInstallHide')==='1'; }catch(e){ return false; } };
+  const SHARE_ICON='<svg class="icon" viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4M7 10H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1"/></svg>';
+  const PLUS_ICON='<svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>';
+  function installHtml(kind){
+    const x='<button class="sheet-x" type="button" data-install="x" aria-label="Close"><svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>';
+    if(kind==='prompt') return x+'<h2>Install RISEN</h2><p>Put RISEN on your home screen. It opens like an app and works without internet.</p>'
+      +'<button class="primary" type="button" data-install="go">INSTALL RISEN</button>';
+    const step=(n,ill,title,sub)=>`<li class="istep"><div class="ill">${ill}</div><div class="itxt"><b class="inum">${n}</b><strong>${title}</strong><span>${sub}</span></div></li>`;
+    return x+'<h2>Add RISEN to your home screen</h2><p>Do this once. Then RISEN opens like an app and works without internet.</p><ol class="isteps">'
+      +step(1,`<div class="ill-bar"><i></i><i></i><span class="ill-hot">${SHARE_ICON}</span><i></i><i></i></div>`,'Tap the Share button','The square with an arrow, in the bar at the bottom or top of the page.')
+      +step(2,`<div class="ill-row"><span>Add to Home Screen</span>${PLUS_ICON}</div>`,'Tap Add to Home Screen','Scroll down the list if you do not see it. Then tap Add.')
+      +step(3,'<div class="ill-icon"><img src="assets/icon-180.png" alt=""><span>RISEN</span></div>','Open RISEN from its icon','Always use the icon, not Safari. Your data lives in the app.')
+      +'</ol>';
   }
-  function fitBanner(){ const b=$('safariBar'); document.documentElement.style.setProperty('--bannerh',(b.hidden?0:b.offsetHeight)+'px'); }
-  function showSafariBanner(on){ $('safariBar').hidden=!on; fitBanner(); }
-  $('safariX').onclick=()=>{ try{ sessionStorage.setItem('risenSafariHide','1'); }catch(e){} showSafariBanner(false); };
-  addEventListener('resize',fitBanner);
-  { let hidden=false; try{ hidden=sessionStorage.getItem('risenSafariHide')==='1'; }catch(e){} if(inSafariTab()&&!hidden) showSafariBanner(true); }
+  function showInstall(kind){ $('installBody').innerHTML=installHtml(kind); $('installBody').dataset.kind=kind; $('installSheet').hidden=false; }
+  function hideInstall(){ $('installSheet').hidden=true; $('installBody').innerHTML=''; }
+  function closeInstall(){ try{ sessionStorage.setItem('risenInstallHide','1'); }catch(e){} hideInstall(); }
+  function installKind(env=installEnv()){ if(env.app) return null; if(env.ios) return 'ios'; return installEvent?'prompt':null; }
+  $('installSheet').addEventListener('click',async e=>{
+    const t=e.target.closest('[data-install]');
+    if(t&&t.dataset.install==='go'){
+      const ev=installEvent; installEvent=null; if(!ev) return closeInstall();
+      try{ await ev.prompt(); await ev.userChoice; }catch(err){}
+      return hideInstall();                                   // installed or declined: the browser has had its say
+    }
+    if(t||e.target===$('installSheet')) closeInstall();       // x, or a tap outside the pop-up
+  });
+  addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); installEvent=e; if(!installClosed()&&installKind()==='prompt') showInstall('prompt'); });
+  addEventListener('appinstalled',()=>{ installEvent=null; hideInstall(); });
+  { const k=installKind(); if(k==='ios'&&!installClosed()) setTimeout(()=>{ if(!installClosed()) showInstall('ios'); },700); }
 
   // Show the installed version (small text on the app screen) to confirm an update arrived
   if('caches' in window) caches.keys().then(k=>{const v=k.find(n=>n.startsWith('risen-'));
