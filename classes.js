@@ -2,11 +2,8 @@
 // plus the instructors list. The first time the tab opens it offers to load the gym's schedule from data/gym-classes.json.
 // Uses the shared helpers from index.html (S, load, renderHome, show, toast, esc, dayKey, isoDay, weekDays).
 const Classes = (() => {
-  const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const DAYNAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const STUDIO_ORDER = ['Energy', 'Balance', 'Power'];
-  const CHEV = '<svg class="icon chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>';
-  const TRASH = '<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+  const CHEV = ICONS.chev, TRASH = ICONS.trash;
 
   let filter = 'ALL';                 // studio shown, or ALL (not saved: starts on ALL)
   let curDay = null, lastDay = dayKey(new Date());
@@ -18,13 +15,6 @@ const Classes = (() => {
   const addMin = (t, m) => { const x = ((toMin(t) + m) % 1440 + 1440) % 1440; return pad(Math.floor(x / 60)) + ':' + pad(x % 60); };
   const range = c => `${c.time}–${addMin(c.time, c.duration || 60)}`;
   const fmtDay = iso => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); };
-  function debounce(fn, ms) {
-    let t = null;
-    const run = () => { t = null; return fn(); };
-    const f = () => { clearTimeout(t); t = setTimeout(run, ms); };
-    f.flush = () => { if (t === null) return Promise.resolve(); clearTimeout(t); return Promise.resolve(run()); };
-    return f;
-  }
 
   // ================= Data selectors =================
   const inst = id => S.instructors.find(i => i.id === id) || null;
@@ -74,17 +64,11 @@ const Classes = (() => {
   }
 
   // ================= Pages =================
-  const onClose = {};
-  function openPage(id) { const p = $(id); p.scrollTop = 0; p.classList.add('open'); p.setAttribute('aria-hidden', 'false'); }
-  function closePage(id) {
-    const p = $(id); p.classList.remove('open'); p.setAttribute('aria-hidden', 'true');
-    const f = onClose[id]; onClose[id] = null; if (f) f();
-  }
+  const openPage = Pages.open, closePage = Pages.close, onClose = Pages.onClose;
   document.querySelectorAll('[data-cls-close]').forEach(b => b.onclick = () => { document.activeElement.blur(); closePage(b.dataset.clsClose); });
   const PAGES = ['clsEditPage', 'instEditPage', 'instPage', 'clsPage'];
   const closeAll = () => PAGES.forEach(id => $(id).classList.contains('open') && closePage(id));
-  let savedT;
-  function flashSaved(id) { const m = $(id); m.classList.add('show'); clearTimeout(savedT); savedT = setTimeout(() => ['clsSaved', 'instSaved'].forEach(i => $(i).classList.remove('show')), 1200); }
+  const flashSaved = savedFlash;
 
   // ================= First open: load the schedule? =================
   function askSeed() { $('clsSheet').hidden = false; }

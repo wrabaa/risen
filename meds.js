@@ -1,11 +1,9 @@
 // RISEN Meds tab: TODAY (progress ring + today's doses) and MY MEDS (add, edit, pause, delete).
 // Uses the shared helpers from index.html (S, load, renderHome, show, toast, esc, dayKey, isoDay, weekDays).
 const Meds = (() => {
-  const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const I = {
-    check: '<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7.5"/></svg>',
+    check: ICONS.check, x: ICONS.x,
     pill: '<svg class="icon" viewBox="0 0 24 24"><rect x="2.8" y="8.2" width="18.4" height="7.6" rx="3.8" transform="rotate(-45 12 12)"/><path d="m8.6 8.6 6.8 6.8"/></svg>',
-    x: '<svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   };
 
   // ================= Schedule helpers =================
@@ -13,13 +11,6 @@ const Meds = (() => {
   const hhmm = iso => { const d = new Date(iso); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
   const logId = (medId, date, time) => `${medId}|${date}|${time}`;
   const logMap = () => new Map(S.medlogs.map(l => [l.id, l]));
-  function debounce(fn, ms) {
-    let t = null;
-    const run = () => { t = null; return fn(); };
-    const f = () => { clearTimeout(t); t = setTimeout(run, ms); };
-    f.flush = () => { if (t === null) return Promise.resolve(); clearTimeout(t); return Promise.resolve(run()); };
-    return f;
-  }
 
   // Is this med due on that day? (paused meds never are; nothing before the day it was added)
   function dueOn(m, d) {
@@ -162,8 +153,7 @@ const Meds = (() => {
       if (moved) S.medlogs = S.medlogs.filter(l => l.id !== from).concat(moved);
     }
   }
-  let savedT;
-  function flashSaved() { const m = $('medSaved'); m.classList.add('show'); clearTimeout(savedT); savedT = setTimeout(() => m.classList.remove('show'), 1200); }
+  const flashSaved = () => savedFlash('medSaved');
   const problem = () => !med.name.trim() ? 'Add a name to save this med.' : !med.times.some(Boolean) ? 'Add at least one time to save this med.'
     : (med.freq !== 'daily' && !med.days.length) ? 'Pick at least one day to save this med.' : '';
   function updateHint() { const p = problem(), h = $('mHint'); if (!h) return; h.textContent = p; h.hidden = !p; }
@@ -188,8 +178,7 @@ const Meds = (() => {
   });
   addEventListener('pagehide', flush);
 
-  const openPage = () => { const p = $('medPage'); p.scrollTop = 0; p.classList.add('open'); p.setAttribute('aria-hidden', 'false'); };
-  const closePage = () => { const p = $('medPage'); p.classList.remove('open'); p.setAttribute('aria-hidden', 'true'); };
+  const openPage = () => Pages.open('medPage'), closePage = () => Pages.close('medPage');
 
   function openEditor(id) {
     const ex = id ? S.meds.find(m => m.id === id) : null;

@@ -24,13 +24,6 @@ const Meals = (() => {
       return { text: line };
     });
   }
-  function debounce(fn, ms) {
-    let t = null;
-    const run = () => { t = null; return fn(); };
-    const f = () => { clearTimeout(t); t = setTimeout(run, ms); };
-    f.flush = () => { if (t === null) return Promise.resolve(); clearTimeout(t); return Promise.resolve(run()); };
-    return f;
-  }
 
   // ================= Photos =================
   // Which recipes have a photo is known from the photo keys; the pictures themselves are only read when a screen needs them.
@@ -54,15 +47,12 @@ const Meals = (() => {
   }
 
   // ================= Pages and the move sheet =================
-  const onClose = {};
-  function openPage(id) { const p = $(id); p.scrollTop = 0; p.classList.add('open'); p.setAttribute('aria-hidden', 'false'); }
-  function closePage(id) { const p = $(id); p.classList.remove('open'); p.setAttribute('aria-hidden', 'true'); const f = onClose[id]; onClose[id] = null; if (f) f(); }
+  const openPage = Pages.open, closePage = Pages.close, onClose = Pages.onClose;
   document.querySelectorAll('[data-meal-close]').forEach(b => b.onclick = () => { document.activeElement.blur(); closePage(b.dataset.mealClose); });
   const closeAll = () => ['recipePage', 'mealPage'].forEach(id => $(id).classList.contains('open') && closePage(id));
   const closeSheet = () => { document.activeElement.blur(); $('mealSheet').hidden = true; $('mealSheetBody').innerHTML = ''; };
   $('mealSheet').addEventListener('click', e => { if (e.target === $('mealSheet')) closeSheet(); });
-  let savedT;
-  function flashSaved() { const m = $('recipeSaved'); m.classList.add('show'); clearTimeout(savedT); savedT = setTimeout(() => m.classList.remove('show'), 1200); }
+  const flashSaved = () => savedFlash('recipeSaved');
 
   // ================= LEVEL 1: MEALS =================
   function renderCats() {

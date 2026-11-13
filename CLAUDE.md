@@ -7,6 +7,9 @@ It is NOT an international product: simple, useful, fast to understand beats fea
 Rule of thumb: **one screen, one job, one big button. No manual needed.**
 
 ## How it runs
+- Files: `index.html` (markup only) · `styles.css` · `shared.js` (helpers every tab uses) ·
+  `app.js` (Home, tabs, Settings, backup, updates) · one file per tab. A new file must be
+  added to `CORE` in `sw.js` or it will not work offline.
 - Plain HTML/CSS/JS PWA, no build step, no framework. Hosted on GitHub Pages:
   https://wrabaa.github.io/risen/ (repo `wrabaa/risen`, branch `main`).
 - Installed on iPhone via Safari → Share → Add to Home Screen.
@@ -39,7 +42,7 @@ No dot-matrix font. Intro = Siza's black & white photo + logo + "STRONGER EVERY 
 
 ## Structure
 Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙️ (top right) = Settings.
-- **HOME** (`index.html`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
+- **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
   02 THIS WEEK, 03 STREAK, 04 MEDS, 05 CLASSES, backup reminder line.
 - **GYM** (`gym.js`, `library.js`): Week (Mon–Sun, today lime) → Day (+ ADD EXERCISE,
   list, Copy to…, START WORKOUT on today) → Exercise (photo, sets/kg/reps, notes,
@@ -55,7 +58,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.37)
+## Status (release 2026-11-13.38)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
@@ -64,8 +67,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - ✅ Code-review fixes `.28`–`.32` (safe import, honest backup date, streak/week counting,
   quiet updates, med tick follows a time change) — tested on iPhone.
 - ✅ Upgrade A fixed IDs (`.33`, tested on iPhone) · Upgrade B image cache (`.34`) ·
-  Reload gym schedule (`.35`) · Safari banner (`.36`) · Gym comfort (`.37`).
-  `.34`–`.37`: iPhone test pending.
+  Reload gym schedule (`.35`) · Safari banner (`.36`) · Gym comfort (`.37`) · code split,
+  no visible change (`.38`). `.34`–`.38`: iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

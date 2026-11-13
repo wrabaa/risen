@@ -18,6 +18,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - `CLAUDE.md` to-do 1, Settings "Reload gym schedule" — built in `.35`, iPhone test pending.
 - Safari warning banner (from the Parking lot) — built in `.36`, iPhone test pending.
 - G. Gym comfort — built in `.37`, iPhone test pending.
+- K. One shared helper file + `index.html` split — built in `.38`, iPhone test pending.
 
 **Waiting / on hold**
 - C. Plan the calories screen — WAITING: Siza plans it with the planner first.
@@ -29,7 +30,6 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - H. One confirm sheet for the whole app
 - I. Same behaviour in every tab
 - J. Brand colours written down
-- K. One shared helper file
 - L. Clean-up
 
 ## Do early (cheap now, painful later)
@@ -138,6 +138,13 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   copied in four or five files.
 - **What:** one small shared file; split `index.html` into styles and app code.
 - **Size:** medium. Makes every later change quicker and safer.
+- **Status: BUILT in release `2026-11-13.38`. No visible change. All-tabs test passed in the
+  browser; iPhone test pending.**
+  - `index.html` is now only the page markup; styles are in `styles.css`, the app shell
+    (Home, tabs, Settings, backup, updates) in `app.js`.
+  - `shared.js` holds what every tab uses: `$`, `esc`, day names, shared icons, the auto-save
+    helper (`debounce`), sub-page open/close (`Pages`) and the "✓ Saved" flash (`savedFlash`).
+  - Not unified yet: each tab still has its own small photo-thumbnail cache.
 
 ### L. Clean-up
 - Remove unused `assets/bg-gym.jpg`, old comments and unused code; bring `README.md` up to date.
@@ -161,6 +168,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   home-screen app, and not on a computer or Android. Why: Siza's meds once looked "missing"
   because they had been entered in Safari, not the app.
 - `.37` Upgrade G: gym comfort.
+- `.38` Upgrade K: shared helper file, `index.html` split into `styles.css` + `app.js`.
 
 ## Done from the `CLAUDE.md` to-do list
 - `.35` To-do 1: Settings → "Reload gym schedule". Schedule classes go back to the latest

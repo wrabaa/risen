@@ -41,7 +41,7 @@ const PhotoSlot = (() => {
     requestAnimationFrame(() => viewer.classList.add('open'));
   }
 
-  const TRASH = '<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+  const TRASH = ICONS.trash;
   const CAMERA = '<svg class="icon" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
 
   async function mount(el, exerciseId, { editable = false } = {}) {

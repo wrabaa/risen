@@ -15,15 +15,9 @@ function workoutTitle(w) {          // "Chest · Triceps": the muscle groups of 
 }
 
 const Gym = (() => {
-  const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const DAYNAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  const I = {
+  const I = { ...ICONS,
     up: '<svg class="icon" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></svg>',
     down: '<svg class="icon" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>',
-    trash: '<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',
-    chev: '<svg class="icon chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>',
-    check: '<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7.5"/></svg>',
-    play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>',
     bar: '<svg class="icon" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>',
   };
   let curDay = null, curEx = null;            // which day / exercise is open (levels 2 and 3)
@@ -37,14 +31,6 @@ const Gym = (() => {
   const targetText = it => `${it.sets} × ${fmtN(it.reps)}${num(it.kg) > 0 ? ' · ' + fmtN(it.kg) + ' kg' : ''}`;
   function fmtClock(ms) { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = String(s % 60).padStart(2, '0'); return h ? `${h}:${String(m).padStart(2, '0')}:${x}` : `${m}:${x}`; }
   function fmtDur(ms) { const m = Math.max(1, Math.round(ms / 60000)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`; }
-  // Runs fn after ms of quiet. flush() runs it now, but only if a change is waiting.
-  function debounce(fn, ms) {
-    let t = null, args = [];
-    const run = () => { t = null; return fn(...args); };
-    const f = (...a) => { args = a; clearTimeout(t); t = setTimeout(run, ms); };
-    f.flush = () => { if (t === null) return Promise.resolve(); clearTimeout(t); return Promise.resolve(run()); };
-    return f;
-  }
 
   // ================= Navigation =================
   function open() { closeAll(); show('gym'); renderGym(); }       // the Gym tab always opens on the week (or the workout in progress)
@@ -81,12 +67,7 @@ const Gym = (() => {
     } catch (e) { wake = null; }
     waking = false;
   }
-  function openPage(id) { const p = $(id); p.scrollTop = 0; p.classList.add('open'); p.setAttribute('aria-hidden', 'false'); }
-  const onClose = {};
-  function closePage(id) {
-    const p = $(id); p.classList.remove('open'); p.setAttribute('aria-hidden', 'true');
-    const f = onClose[id]; onClose[id] = null; if (f) f();
-  }
+  const openPage = Pages.open, closePage = Pages.close, onClose = Pages.onClose;
   document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => { document.activeElement.blur(); closePage(b.dataset.close); });
 
   function openSheet(html, { dismiss = true } = {}) {
@@ -109,11 +90,7 @@ const Gym = (() => {
     if (!w) { w = await RisenDB.saveWorkout({ routineId: r.id, days: [d], time: '', order: d, exercises: [], name: '' }); S.workouts.push(w); }
     return w;
   }
-  let savedT;
-  function flashSaved() {   // "✓ Saved" for about a second after a change has really been written
-    const m = $($('exPage').classList.contains('open') ? 'exSaved' : 'savedMark');
-    m.classList.add('show'); clearTimeout(savedT); savedT = setTimeout(() => ['exSaved', 'savedMark'].forEach(i => $(i).classList.remove('show')), 1200);
-  }
+  const flashSaved = () => savedFlash($('exPage').classList.contains('open') ? 'exSaved' : 'savedMark');
   async function persistDay(d) {
     const w = dayRec(d); if (!w) return;
     w.name = workoutTitle(w);

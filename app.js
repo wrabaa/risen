@@ -1,0 +1,283 @@
+// RISEN app shell: data in memory, Home, tabs, Settings, backup, updates. The tabs live in gym.js, meds.js, classes.js, meals.js;
+// helpers every file uses are in shared.js.
+  const intro=$('intro'), app=$('app');
+
+  // ---- Data: lives in IndexedDB (db.js). This is an in-memory copy for drawing the screens. ----
+  const S={settings:{name:'',nameAsked:false,restSec:90},routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[],classes:[],instructors:[],classlogs:[],recipes:[]};
+  async function load(){
+    [S.settings,S.routines,S.workouts,S.sessions,S.exercises]=await Promise.all([RisenDB.getSettings(),RisenDB.all('routines'),
+      RisenDB.all('workouts'),RisenDB.all('sessions'),RisenDB.all('exercises')]);
+    [S.meds,S.medlogs]=await Promise.all([RisenDB.all('meds'),RisenDB.all('medlogs')]);
+    [S.classes,S.instructors,S.classlogs]=await Promise.all([RisenDB.all('classes'),RisenDB.all('instructors'),RisenDB.all('classlogs')]);
+    S.recipes=await RisenDB.all('recipes');
+  }
+
+  // ---- Schedule helpers ----
+  const dayKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const isoDay=d=>(d.getDay()+6)%7+1;                       // 1=Mon … 7=Sun
+  const activeRoutine=()=>S.routines.find(r=>r.status==='active')||null;
+  function routineOn(d){                                    // the routine that was active on that date
+    const k=dayKey(d);
+    return S.routines.find(r=>dayKey(new Date(r.created))<=k&&(!r.archived||dayKey(new Date(r.archived))>k))||null;
+  }
+  const wTitle=w=>typeof workoutTitle==='function'?workoutTitle(w):w.name;   // "Chest · Triceps" (gym.js)
+  function plannedOn(d){ // workouts scheduled that day, earliest first (a day's plan only counts from the date it got exercises)
+    const r=routineOn(d), k=dayKey(d); if(!r) return [];
+    return S.workouts.filter(w=>w.routineId===r.id&&(w.days||[]).includes(isoDay(d))&&(w.exercises||[]).length&&(!w.since||w.since<=k))
+      .sort((a,b)=>(a.time||'99').localeCompare(b.time||'99')||(a.order||0)-(b.order||0));
+  }
+  const doneIds=d=>new Set(S.sessions.filter(x=>x.date===dayKey(d)&&x.finishedAt&&!x.extra).map(x=>x.workoutId));
+  const skippedIds=d=>new Set(S.sessions.filter(x=>x.date===dayKey(d)&&x.skipped).map(x=>x.workoutId));
+  // Planned workouts finished that day whose day plan has changed since (emptied, refilled, other program): a workout that
+  // was done stays done, whatever happens to the plan afterwards.
+  const keptDone=(list,ids)=>{const p=new Set(list.map(w=>w.id)); return [...ids].filter(id=>!p.has(id)).length};
+  function weekDays(){ // Monday to Sunday of this week
+    const t=new Date(); t.setHours(0,0,0,0); const mon=new Date(t); mon.setDate(t.getDate()-isoDay(t)+1);
+    return [...Array(7)].map((_,i)=>{const d=new Date(mon); d.setDate(mon.getDate()+i); return d});
+  }
+  function streak(){ // planned sessions done in a row, counting back from today (today doesn't break it if not done yet)
+    let n=0; const d=new Date(); d.setHours(0,0,0,0);   // a skipped session (with a reason) neither counts nor breaks it
+    for(let i=0;i<730;i++,d.setDate(d.getDate()-1)){
+      const ids=doneIds(d), sk=skippedIds(d);
+      const list=plannedOn(d); n+=keptDone(list,ids);
+      for(const w of list.reverse()){ if(ids.has(w.id)) n++; else if(sk.has(w.id)) continue; else if(i>0) return n; }
+    }
+    return n;
+  }
+
+  // ---- Tiles: add a new tile by adding an entry here ----
+  const PLAY=ICONS.play;
+  const TILES=[
+    {title:'Training', tap:'today', html(){          // the whole tile opens today's day in Gym
+      const today=new Date(), day=`<div class="wname">${today.toLocaleDateString('en-GB',{weekday:'long'})}</div>`, go=`<span class="play" aria-hidden="true">${PLAY}</span>`;
+      if(S.settings.activeSession) return `<div>${day}<div class="sub">Workout in progress</div></div>${go}`;
+      if(!activeRoutine()) return `<div>${day}<div class="sub">No plan yet · tap to build it</div></div>`;
+      const list=plannedOn(today), ids=doneIds(today), sk=skippedIds(today);
+      if(!list.length) return `<div>${day}<div class="sub">Rest day</div></div>`;
+      const w=list.find(x=>!ids.has(x.id)&&!sk.has(x.id));
+      if(!w){ const doneL=list.filter(x=>ids.has(x.id));
+        return `<div>${day}<div class="sub">${doneL.length?'Done today ✓ · '+doneL.map(x=>esc(wTitle(x))).join(' · '):'Skipped today'}</div></div>`; }
+      const n=(w.exercises||[]).length;
+      return `<div>${day}<div class="sub">${esc(wTitle(w))} · ${n} exercise${n===1?'':'s'}</div></div>${go}`;
+    }},
+    {title:'This week', stack:true, html(){
+      const days=weekDays(), today=dayKey(new Date());
+      let plannedN=0, doneN=0;
+      const dots=days.map(d=>{
+        const sk=skippedIds(d), list=plannedOn(d).filter(w=>!sk.has(w.id)), ids=doneIds(d), kept=keptDone(list,ids), dn=list.filter(w=>ids.has(w.id)).length+kept, all=list.length+kept;
+        plannedN+=all; doneN+=dn;
+        const cls=[all?'plan':'', all&&dn===all?'done':'', dayKey(d)===today?'today':''].join(' ');
+        return `<span class="${cls}">${'MTWTFSS'[isoDay(d)-1]}</span>`;
+      }).join('');
+      return `<div><div class="big">${doneN}<small>/${plannedN}</small></div><div class="sub">Sessions done</div></div><div class="days">${dots}</div>`;
+    }},
+    {title:'Streak', html(){
+      const n=streak();
+      return `<div><div class="big">${n}</div><div class="sub">Planned session${n===1?'':'s'} in a row</div></div>`;
+    }},
+    {title:'Meds', html(){
+      if(typeof Meds==='undefined') return '';
+      const s=Meds.summary();
+      if(!s.hasMeds) return `<div><div class="wname">No meds yet</div><div class="sub">Add them in Meds</div></div><button class="ghost" data-tab="meds">ADD</button>`;
+      if(!s.total) return `<div><div class="wname">No doses today</div><div class="sub">Nothing scheduled</div></div>`;
+      if(s.taken===s.total) return `<div><div class="wname">All done today ✓</div><div class="sub">${s.taken} of ${s.total} taken</div></div>`;
+      return `<div><div class="wname">${s.taken} of ${s.total} taken today</div><div class="sub">Next: ${esc(s.next.m.name)} · ${esc(s.next.t)}</div></div>`;
+    }},
+    {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
+      if(typeof Classes==='undefined') return '';
+      if(!S.classes.length) return `<div><div class="wname">No classes yet</div><div class="sub">Add them in Classes</div></div>`;
+      const n=Classes.next();
+      if(n.none) return `<div><div class="wname">${n.none==='today'?'No classes today':'No more classes today'}</div></div>`;
+      return `<div><div class="wname">${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${esc(n.i?n.i.name.split(' ')[0]:'TBA')}</div></div>${Classes.avatar(n.i)}`;
+    }},
+  ];
+  // Quiet backup reminder: shows when there's a plan and the last export is missing or older than 7 days
+  function renderBackupLine(){
+    const last=S.settings.lastExport, days=last?Math.floor((Date.now()-new Date(last))/864e5):null, el=$('backupLine');
+    el.hidden=!activeRoutine()||(days!=null&&days<7);
+    el.innerHTML=(days==null?'No backup yet':`Last backup: ${days} days ago`)+' · <u>Back up</u>';
+  }
+  let homeDrawn=false;
+  function renderHome(){
+    renderBackupLine();
+    $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
+    $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
+    $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
+      <div class="tile-body${t.stack?' stack':''}">${t.html()}</div></article>`).join('');
+  }
+
+  // ---- Tabs ----
+  function show(view){
+    const wasHome=!$('view-home').hidden;
+    document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+view);
+    if(view==='home'&&!wasHome) renderHome();
+    if(view==='home') applyUpdate(); // a new release that arrived while you were busy loads now
+    document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
+  }
+  document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open('today'); else if(t.dataset.view==='meds') Meds.open(); else if(t.dataset.view==='classes') Classes.open(); else if(t.dataset.view==='meals') Meals.open(); else show(t.dataset.view)};
+  $('tiles').onclick=e=>{
+    const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
+    const b=e.target.closest('[data-go]'); if(b) return Gym.open(b.dataset.go);
+    if(e.target.closest('[data-tap="today"]')) Gym.openToday();
+    if(e.target.closest('[data-tap="classes"]')) Classes.openToday();
+  };
+  $('tiles').onkeydown=e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-tap]')){ e.preventDefault(); e.target.click(); } };
+
+  // ---- Name: asked once, on first ENTER. Skip = no name, greeting says just "Hello" ----
+  async function closeName(name){
+    S.settings.name=(name||'').trim(); S.settings.nameAsked=true;
+    $('nameInput').blur(); $('nameSheet').hidden=true; renderHome();
+    await RisenDB.setSetting('name',S.settings.name); await RisenDB.setSetting('nameAsked',true);
+  }
+  $('nameForm').onsubmit=e=>{e.preventDefault(); closeName($('nameInput').value)};
+  $('nameSkip').onclick=()=>closeName('');
+
+  // ---- ENTER: intro to Home (intro shows only when the app opens) ----
+  const ready=RisenDB.init().then(load).catch(e=>{console.error(e); toast('Could not open storage: '+e.message)});
+  $('login').onclick=async()=>{
+    await ready; renderHome(); show('home');
+    intro.classList.add('hidden'); app.classList.remove('hidden');
+    if(!S.settings.nameAsked){ $('nameSheet').hidden=false; setTimeout(()=>$('nameInput').focus(),350); }
+  };
+
+  // ---- Settings ----
+  const fmtRest=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+  function toast(msg){const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),2600)}
+  function openSettings(){
+    $('setName').value=S.settings.name;
+    $('restVal').textContent=fmtRest(S.settings.restSec);
+    $('settings').classList.add('open'); $('settings').setAttribute('aria-hidden','false'); $('settings').scrollTop=0;
+  }
+  function closeSettings(){
+    $('setName').blur(); $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true'); renderHome(); applyUpdate();
+  }
+  $('gearBtn').onclick=openSettings;
+  $('settingsBack').onclick=closeSettings;
+  $('setName').oninput=()=>{S.settings.name=$('setName').value.trim(); RisenDB.setSetting('name',S.settings.name)};
+  $('setName').onkeydown=e=>{if(e.key==='Enter') $('setName').blur()};
+  const stepRest=d=>{S.settings.restSec=Math.min(600,Math.max(15,S.settings.restSec+d)); $('restVal').textContent=fmtRest(S.settings.restSec);
+    RisenDB.setSetting('restSec',S.settings.restSec)};
+  $('restMinus').onclick=()=>stepRest(-15);
+  $('restPlus').onclick=()=>stepRest(15);
+  $('viewIntro').onclick=()=>{
+    $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true');
+    app.classList.add('hidden'); intro.classList.remove('hidden');
+  };
+
+  // ---- Clear all classes (changing gym): classes, instructors and attendance; the gym workouts stay ----
+  // ---- Reload gym schedule: schedule classes go back to the latest file; attendance and your own classes stay ----
+  $('reloadClasses').onclick=async()=>{
+    if(!confirm('Reload the gym schedule?\n\nClasses from the gym schedule go back to the latest version (name, day, time, studio, instructor). Your attendance history, your notes and the classes you added yourself are kept.')) return;
+    let r; try{ r=await Classes.reloadSchedule(); }catch(e){ toast('Could not reload: '+e.message); return; }
+    renderHome();
+    const extra=[r.added?r.added+' new':'', r.removed?r.removed+' removed':''].filter(Boolean).join(', ');
+    toast('Schedule reloaded: '+r.total+' classes'+(extra?' ('+extra+')':''));
+  };
+  $('clearClasses').onclick=async()=>{
+    if(!confirm('Delete all classes, instructors and attendance? Use this when you change gym. Your workouts are not affected.')) return;
+    try{ await RisenDB.clearClasses(); }catch(e){ toast('Could not clear: '+e.message); return; }
+    await load(); Classes.reset(); renderHome(); toast('Classes cleared');
+  };
+
+  // ---- Reset all data: suggest export, confirm twice, back to first launch ----
+  $('resetBtn').onclick=()=>{$('resetSheet').hidden=false};
+  $('resetCancel').onclick=()=>{$('resetSheet').hidden=true};
+  $('resetExport').onclick=()=>$('exportBtn').click();
+  $('resetGo').onclick=async()=>{
+    if(!confirm("Last check: delete everything on this phone? This can't be undone.")) return;
+    try{ await RisenDB.resetAll(); }catch(e){ toast('Reset failed: '+e.message); return; }
+    $('resetSheet').hidden=true; Gym.reset(); await load(); renderHome();
+    $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true');
+    app.classList.add('hidden'); intro.classList.remove('hidden'); toast('All data deleted');
+  };
+
+  // ---- Backup: export to a file, import from a file ----
+  async function exported(){ S.settings.lastExport=new Date().toISOString(); await RisenDB.setSetting('lastExport',S.settings.lastExport); renderHome(); }
+  $('backupLine').onclick=()=>$('exportBtn').click();
+  // The backup date is saved ONLY when the phone confirms the file went out (share sheet finished). If the share sheet
+  // can't open (it only opens right after a tap, and preparing a big backup can take too long), the prepared file is
+  // kept for two minutes so the next tap on Export opens the share sheet at once.
+  let readyBackup=null; // {file, at}
+  async function shareBackup(file){ // 'done' | 'cancel' | 'fail'
+    try{ await navigator.share({files:[file]}); return 'done'; }
+    catch(e){ return e&&e.name==='AbortError'?'cancel':'fail'; }
+  }
+  $('exportBtn').onclick=async()=>{
+    if(readyBackup&&Date.now()-readyBackup.at<120000){ // second tap: the file is ready, share straight away
+      const f=readyBackup.file; readyBackup=null;
+      const r=await shareBackup(f);
+      if(r==='done') await exported(); else if(r==='fail') toast('Backup not saved. Try again.');
+      return;
+    }
+    readyBackup=null;
+    const name='risen-backup-'+dayKey(new Date())+'.json';
+    let blob; try{ blob=new Blob([JSON.stringify(await RisenDB.exportAll())],{type:'application/json'}); }
+    catch(e){ toast('Backup not saved: '+e.message); return; }
+    const file=new File([blob],name,{type:'application/json'});
+    let canShare=false; try{ canShare=!!(navigator.canShare&&navigator.canShare({files:[file]})); }catch(e){}
+    if(canShare){ // iPhone: Save to Files
+      const r=await shareBackup(file);
+      if(r==='done') await exported();
+      else if(r==='fail'){ readyBackup={file,at:Date.now()}; toast('Backup is ready. Tap Export backup again to save it.'); }
+      return;
+    }
+    // No share sheet (a computer's browser): plain download
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove()},1000); toast('Backup saved'); await exported();
+  };
+$('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
+  $('importFile').onchange=async()=>{
+    const f=$('importFile').files[0]; if(!f) return;
+    let b; try{ b=JSON.parse(await f.text()) }catch(e){ toast('That file is not a RISEN backup'); return; }
+    if(!b||b.app!=='RISEN'){ toast('That file is not a RISEN backup'); return; }
+    const when=b.exported?new Date(b.exported).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'an earlier date';
+  // Say what is in the file before anything is replaced
+  const st=b.stores||{}, cnt=k=>Array.isArray(st[k])?st[k].length:0, plural=(n,w)=>n+' '+w+(n===1?'':w.endsWith('s')?'es':'s');
+  const old=b.format===1;
+  const inside=old?'':[[cnt('workouts'),'gym day'],[cnt('sessions'),'workout'],[cnt('meds'),'med'],[cnt('classes'),'class'],[cnt('recipes'),'recipe'],[cnt('photos'),'photo']]
+    .filter(x=>x[0]).map(x=>plural(x[0],x[1])).join(', ');
+  const msg=old?'This is an old backup from '+when+'. It only holds your name and rest timer. Restore those? Everything else on this phone stays as it is.'
+    :'Backup from '+when+(inside?'\n\nIn this file: '+inside+'.':'\n\nThis backup is empty.')+'\n\nEverything on this phone will be replaced by it. If you might want what is on the phone now, tap Cancel and export a backup first.';
+  if(!confirm(msg)) return;
+  let res; try{ res=await RisenDB.importAll(b); }catch(e){ toast(e.message==='Not a RISEN backup'?'That file is not a RISEN backup':e.message); return; }
+  await load(); await Gym.followLibrary(); await Classes.matchSeed(); // an older backup follows the current exercise list and class ids
+    openSettings(); renderHome(); toast(res&&res.settingsOnly?'Name and rest timer restored':'Backup restored');
+};
+
+if('serviceWorker' in navigator){
+    // Check for a new release on launch and each time the app comes back to the foreground
+    navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+      document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update()});
+    });
+    // When a new release takes over, reload once so the new files show, but never in the middle of something:
+    // see applyUpdate() below.
+    if(navigator.serviceWorker.controller) navigator.serviceWorker.addEventListener('controllerchange',()=>{ updateWaiting=true; applyUpdate(); });
+  }
+  // A new release reloads the app only on the intro, or on Home with nothing open and no keyboard up. Anywhere else
+  // (a workout, an editor, Settings, a pop-up) it waits until you are back on Home, or until the app is next opened.
+  let updateWaiting=false, reloading=false;
+  function quietNow(){
+    if(!intro.classList.contains('hidden')) return true;
+    if($('view-home').hidden) return false;
+    if(document.querySelector('.subpage.open,#settings.open,.sheet-wrap:not([hidden]),.pviewer.open')) return false;
+    const a=document.activeElement; return !(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
+  }
+  function applyUpdate(){ if(!updateWaiting||reloading||!quietNow()) return; reloading=true; location.reload(); }
+  // ---- Safari banner ----
+  // On iPhone/iPad a Safari tab and the home-screen app keep SEPARATE data, so data entered in the wrong one looks "missing"
+  // in the other. In a Safari tab a small banner says so; × hides it for this visit. Never shown in the home-screen app.
+  function inSafariTab(nav=navigator){
+    const ios=/iPhone|iPad|iPod/.test(nav.userAgent)||(/Macintosh/.test(nav.userAgent)&&nav.maxTouchPoints>1); // iPad says "Macintosh"
+    const app=nav.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+    return ios&&!app;
+  }
+  function fitBanner(){ const b=$('safariBar'); document.documentElement.style.setProperty('--bannerh',(b.hidden?0:b.offsetHeight)+'px'); }
+  function showSafariBanner(on){ $('safariBar').hidden=!on; fitBanner(); }
+  $('safariX').onclick=()=>{ try{ sessionStorage.setItem('risenSafariHide','1'); }catch(e){} showSafariBanner(false); };
+  addEventListener('resize',fitBanner);
+  { let hidden=false; try{ hidden=sessionStorage.getItem('risenSafariHide')==='1'; }catch(e){} if(inSafariTab()&&!hidden) showSafariBanner(true); }
+
+  // Show the installed version (small text on the app screen) to confirm an update arrived
+  if('caches' in window) caches.keys().then(k=>{const v=k.find(n=>n.startsWith('risen-'));
+    if(v) document.getElementById('version').textContent='v'+v.slice(6)});
