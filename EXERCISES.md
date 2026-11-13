@@ -1,6 +1,6 @@
 # RISEN — New exercise list (Fitness Zone, Siza's real gym)
 
-Status: DRAFT for approval. Source: `RISEN_Master_Gym_Equipment_Inventory.pdf` (45 items) + Siza's
+Status: BUILT in release `.47` (`library.js`: 62 exercises, ids `lib-fz-<file>`; images still to come). Source: `RISEN_Master_Gym_Equipment_Inventory.pdf` (45 items) + Siza's
 photos of the Technogym machine plates (13 Nov 2026) + standard barbell/dumbbell exercises.
 
 Rules for the build (see CLAUDE.md, to-do 3):
@@ -117,3 +117,59 @@ Total: 62 exercises.
   and one leg-type (#34). "Upper-Body" and "Seated" plate-loaded machines are left out until
   confirmed.
 - Pulldown vs Lat Machine vs Vertical Traction: three separate machines? (Kept as three.)
+
+## How the old 66 generic exercises were handled in `.47`
+Rule used: **same exercise (same movement and implement) → alias; anything else → retired.** Nothing on a phone is
+deleted: plans, history ("Last time"), notes and photos follow an alias; a retired exercise that someone uses stays
+theirs under "My exercises" with its history and photo; unused ones simply disappear.
+
+**Aliased to the new exercise (42):**
+- Bench press → Bench Press
+- Incline dumbbell press → Incline Dumbbell Press
+- Dumbbell fly → Dumbbell Fly
+- Cable crossover → Cable Crossover
+- Chest press machine → Chest Press
+- Pec deck → Pectoral (Pec Fly)
+- Deadlift → Deadlift
+- Barbell row → Barbell Row
+- Dumbbell row → One-Arm Dumbbell Row
+- Back extension → Lower Back
+- Shrug → Shrugs
+- Lat pulldown → Lat Machine
+- Seated cable row → Pulley (Seated Cable Row)
+- Dumbbell shoulder press → Dumbbell Shoulder Press
+- Lateral raise → Lateral Raise
+- Rear delt fly → Rear Delt Fly
+- Face pull → Cable Face Pull
+- Shoulder press machine → Shoulder Press
+- Back squat → Squat (rack)
+- Romanian deadlift → Romanian Deadlift
+- Walking lunge → Lunges
+- Goblet squat → Goblet Squat
+- Seated calf raise → Rotary Calf
+- Leg press → Leg Press
+- Leg extension → Leg Extension
+- Lying leg curl → Leg Curl
+- Seated leg curl → Leg Curl
+- Hip abductor → Abductor (outer thigh)
+- Hip adductor → Adductor (inner thigh)
+- Barbell curl → Barbell Curl
+- Dumbbell curl → Dumbbell Curl
+- Hammer curl → Hammer Curl
+- Triceps pushdown → Cable Triceps Pushdown
+- Overhead triceps extension → Overhead Dumbbell Extension
+- Skull crusher → Skull Crusher
+- Plank → Plank
+- Crunch → Crunch (floor)
+- Treadmill → Treadmill
+- Elliptical → Elliptical
+- Stair climber → Stair Climber
+- Exercise bike → Indoor Cycling Bike
+- Rowing machine → Rowing
+
+**Retired (24):** Incline bench press, Dumbbell bench press, Push-up, Dips (chest), Pull-up, Chin-up, T-bar row, Overhead press, Arnold press, Front raise, Front squat, Bulgarian split squat, Hip thrust, Step-up, Standing calf raise, Glute bridge, Preacher curl, Close-grip bench press, Side plank, Hanging leg raise, Russian twist, Ab wheel rollout, Cable crunch, Jump rope.
+
+Judgement calls (easy to change later in `library.js`): Lat pulldown → Lat Machine (not Pulldown); Lying and Seated
+leg curl both → Leg Curl; Seated calf raise → Rotary Calf; Back extension → Lower Back; Walking lunge → Lunges;
+Dumbbell row → One-Arm Dumbbell Row. Barbell incline, dumbbell bench, pull-up/chin-up and dips were NOT merged into
+the machine versions (different load), so they were retired.
