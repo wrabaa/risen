@@ -21,7 +21,7 @@
   :root{--bg:#0B0B0B;--card:#1A1A1A;--line:#262626;--text:#F2F2F2;--muted:#9A9A9A;--volt:#CCFF00;--tabh:64px}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
-  .screen{position:fixed;top:0;left:0;right:0;height:100%;transition:opacity .5s ease,transform .5s ease}
+  .screen{position:fixed;top:var(--bannerh,0px);left:0;right:0;height:calc(100% - var(--bannerh,0px));transition:opacity .5s ease,transform .5s ease}
   .hidden{opacity:0;pointer-events:none;transform:scale(1.04)}
 
   /* INTRO: plain photo + real logo, text and button in code (stays right on every screen size) */
@@ -141,6 +141,15 @@
     padding:12px 20px;border-radius:22px;background:rgba(40,40,40,.92);color:var(--text);font-size:14px;line-height:1.35;text-align:center;width:max-content;max-width:calc(100% - 32px);
     -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transition:opacity .25s ease,transform .25s ease}
   .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* Safari banner: only in a Safari tab on iPhone/iPad, never in the home-screen app. The screens start below it. */
+  .safaribar{position:fixed;top:0;left:0;right:0;z-index:9;display:flex;align-items:center;gap:6px;
+    padding:calc(env(safe-area-inset-top) + 8px) 6px 8px 16px;background:var(--card);border-bottom:1px solid var(--line)}
+  .safaribar[hidden]{display:none}
+  .safaribar p{flex:1;min-width:0;font-size:13px;line-height:1.4;color:var(--text)}
+  .safaribar b{font-weight:600;color:var(--volt)}
+  .safaribar button{flex:none;width:44px;height:44px;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+  #settings{top:var(--bannerh,0px)}
 
   /* ===== GYM ===== */
   .gh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 14px}
@@ -452,6 +461,10 @@
 </style>
 </head>
 <body>
+  <div class="safaribar" id="safariBar" role="status" hidden>
+    <p><b>You're in Safari</b> — your data here is separate from the home-screen app. Open RISEN from your home screen icon.</p>
+    <button type="button" id="safariX" aria-label="Hide this message"><svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
   <section id="intro" class="screen">
     <img class="photo" src="assets/bg.jpg" alt="">
     <div class="brand"><img src="assets/mark.png" alt=""><span>RISEN</span></div>
@@ -922,6 +935,20 @@ if('serviceWorker' in navigator){
     const a=document.activeElement; return !(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
   }
   function applyUpdate(){ if(!updateWaiting||reloading||!quietNow()) return; reloading=true; location.reload(); }
+  // ---- Safari banner ----
+  // On iPhone/iPad a Safari tab and the home-screen app keep SEPARATE data, so data entered in the wrong one looks "missing"
+  // in the other. In a Safari tab a small banner says so; × hides it for this visit. Never shown in the home-screen app.
+  function inSafariTab(nav=navigator){
+    const ios=/iPhone|iPad|iPod/.test(nav.userAgent)||(/Macintosh/.test(nav.userAgent)&&nav.maxTouchPoints>1); // iPad says "Macintosh"
+    const app=nav.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+    return ios&&!app;
+  }
+  function fitBanner(){ const b=$('safariBar'); document.documentElement.style.setProperty('--bannerh',(b.hidden?0:b.offsetHeight)+'px'); }
+  function showSafariBanner(on){ $('safariBar').hidden=!on; fitBanner(); }
+  $('safariX').onclick=()=>{ try{ sessionStorage.setItem('risenSafariHide','1'); }catch(e){} showSafariBanner(false); };
+  addEventListener('resize',fitBanner);
+  { let hidden=false; try{ hidden=sessionStorage.getItem('risenSafariHide')==='1'; }catch(e){} if(inSafariTab()&&!hidden) showSafariBanner(true); }
+
   // Show the installed version (small text on the app screen) to confirm an update arrived
   if('caches' in window) caches.keys().then(k=>{const v=k.find(n=>n.startsWith('risen-'));
     if(v) document.getElementById('version').textContent='v'+v.slice(6)});

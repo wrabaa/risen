@@ -16,6 +16,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - A. Fixed IDs for gym classes and library exercises — `.33`, tested on iPhone, OK.
 - B. Images cached separately from the app — built in `.34`, iPhone test pending.
 - `CLAUDE.md` to-do 1, Settings "Reload gym schedule" — built in `.35`, iPhone test pending.
+- Safari warning banner (from the Parking lot) — built in `.36`, iPhone test pending.
 
 **Waiting / on hold**
 - C. Plan the calories screen — WAITING: Siza plans it with the planner first.
@@ -150,6 +151,11 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 ## Done from this file
 - `.33` Upgrade A: fixed IDs for gym classes and library exercises.
 - `.34` Upgrade B: images and fonts cached separately from the app.
+- `.36` Safari warning banner (was in the Parking lot). In a Safari tab on iPhone/iPad a small
+  banner at the top says: "You're in Safari — your data here is separate from the home-screen
+  app. Open RISEN from your home screen icon." × hides it for this visit. Never shown in the
+  home-screen app, and not on a computer or Android. Why: Siza's meds once looked "missing"
+  because they had been entered in Safari, not the app.
 
 ## Done from the `CLAUDE.md` to-do list
 - `.35` To-do 1: Settings → "Reload gym schedule". Schedule classes go back to the latest
@@ -160,8 +166,4 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   phone taps Reload.
 
 ## Parking lot
-- **Safari warning banner.** When RISEN runs in a Safari tab (not from the home-screen icon),
-  show a small banner: "You're in Safari — data here is separate from the home-screen app.
-  Use the RISEN icon." Why: Siza's meds once looked "missing" because they had been entered in
-  Safari, not the app (fixed with export/import). Size: small.
 - (new ideas go here)

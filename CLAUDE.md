@@ -55,7 +55,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.35)
+## Status (release 2026-11-13.36)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
@@ -64,7 +64,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - ✅ Code-review fixes `.28`–`.32` (safe import, honest backup date, streak/week counting,
   quiet updates, med tick follows a time change) — tested on iPhone.
 - ✅ Upgrade A fixed IDs (`.33`, tested on iPhone) · Upgrade B image cache (`.34`) ·
-  Reload gym schedule (`.35`). `.34` and `.35`: iPhone test pending.
+  Reload gym schedule (`.35`) · Safari banner (`.36`). `.34`–`.36`: iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -115,8 +115,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - The backup date is stored only when the share sheet really finishes. If it cannot open,
   the file is kept two minutes and the next tap on Export opens it.
 - Safari tab vs home-screen app = two separate data stores on iPhone (Siza's meds once looked
-  "missing" for this reason; fixed with export/import). A warning banner is in the
-  `UPGRADES.md` parking lot.
+  "missing" for this reason; fixed with export/import). Since `.36` a small banner at the top
+  says so in a Safari tab on iPhone/iPad (× hides it for the visit); never in the home-screen app.
 
 **GYM**
 - Siza thinks in DAYS, not "workouts": Week → Day → Exercise. No workout names, no days
