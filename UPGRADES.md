@@ -12,10 +12,11 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 
 ## Where we are
 **Done**
-- A. Fixed IDs for gym classes and library exercises — built in `.33`, not yet tested on iPhone.
+- Review fixes `.28`–`.32` — tested on iPhone, all OK.
+- A. Fixed IDs for gym classes and library exercises — `.33`, tested on iPhone, OK.
+- B. Images cached separately from the app — built in `.34`, iPhone test pending.
 
 **What's left** (in suggested order)
-- B. Images cached separately from the app
 - C. Plan the calories screen
 - D. Med reminders
 - E. Backup that does not rely on memory
@@ -38,7 +39,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   photos. An old exercise with a match in the new list is linked to it once; one with no match
   stays as it is under "My exercises".
 - **Size:** medium. Do before to-do 1 and to-do 3.
-- **Status: BUILT in release `2026-11-13.33`. Tested in the browser; iPhone test pending.**
+- **Status: DONE in release `2026-11-13.33`. Tested in the browser and on iPhone, OK.**
   - Library: every exercise has a fixed ID written in `library.js` (same IDs as before, so
     nothing changes today). Names can now be changed freely.
   - Library rebuild mechanism is ready: `aliases` (old → new) and `retired` in `library.js`.
@@ -55,6 +56,17 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   ~80 exercise images that becomes several MB per release.
 - **What:** keep images in their own long-lived cache; only fetch new or changed ones.
 - **Size:** medium. Do before to-do 3.
+- **Status: BUILT in release `2026-11-13.34`. Tested in the browser; iPhone test pending.**
+  - App files (pages, code, schedule data) are still downloaded fresh on every release.
+  - Images and fonts live in their own cache that survives releases. The list is `ASSETS`
+    at the top of `sw.js`, one line per file with a number.
+  - **Add an image:** new line, number 1. **Replace an image (same name):** raise its number
+    by 1. **Remove an image:** delete its line.
+  - Safety net: a replaced file whose number was forgotten is still noticed by its size.
+  - One image that fails to download no longer blocks an update.
+  - First update to `.34` copies the images already on the phone; nothing is downloaded twice.
+  - **For to-do 2 (new instructor photos):** replace the files and raise their numbers.
+  - **For to-do 3 (exercise images):** add one line per image to `ASSETS`.
 
 ### C. Plan the calories screen
 - **Why:** ingredients are one free-text box; grams and calories cannot live there.
@@ -131,6 +143,11 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 
 ## Done from this file
 - `.33` Upgrade A: fixed IDs for gym classes and library exercises.
+- `.34` Upgrade B: images and fonts cached separately from the app.
 
 ## Parking lot
+- **Safari warning banner.** When RISEN runs in a Safari tab (not from the home-screen icon),
+  show a small banner: "You're in Safari — data here is separate from the home-screen app.
+  Use the RISEN icon." Why: Siza's meds once looked "missing" because they had been entered in
+  Safari, not the app (fixed with export/import). Size: small.
 - (new ideas go here)
