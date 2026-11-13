@@ -1,6 +1,6 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of the APP files (pages, code, data) and delete the old one.
-const VERSION = '2026-11-13.48';
+const VERSION = '2026-11-13.49';
 const CACHE = 'risen-' + VERSION;
 
 // APP FILES: small, change often. All of them are downloaded again on every release, all or nothing.
@@ -80,6 +80,13 @@ self.addEventListener('install', e => {
     caches.open(CACHE).then(c => c.addAll(CORE.map(u => new Request(u, { cache: 'reload' })))),
     syncAssets().catch(() => {}),              // images never block an update
   ]).then(() => self.skipWaiting()));
+});
+
+// The page asks "which version are you?" (Settings shows the answer). Answers on the message port, or straight back to the sender.
+self.addEventListener('message', e => {
+  if (e.data !== 'version') return;
+  if (e.ports && e.ports[0]) e.ports[0].postMessage({ version: VERSION });
+  else if (e.source) e.source.postMessage({ version: VERSION });
 });
 
 self.addEventListener('activate', e => {

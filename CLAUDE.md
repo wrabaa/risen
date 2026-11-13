@@ -70,7 +70,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.48)
+## Status (release 2026-11-13.49)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
@@ -89,6 +89,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - `.46` offline safety net · `.47` new exercise library (62, from `EXERCISES.md`); old plans/history/photos
   follow by alias · `.48` library = 82 (+20 new) with an `equipment` tag on each; 9 old retired exercises now
   alias to their new match, also for phones where they already sat under "My exercises" (iPhone test pending).
+- `.49` Settings version line made reliable: the running service worker answers a `'version'` message (`sw.js`),
+  Settings shows that, with the cache name as fallback (it was empty in the home-screen app once).
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

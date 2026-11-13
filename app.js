@@ -170,6 +170,7 @@
     $('setName').value=S.settings.name;
     $('restVal').textContent=fmtRest(S.settings.restSec);
     $('settings').classList.add('open'); $('settings').setAttribute('aria-hidden','false'); $('settings').scrollTop=0;
+    showVersion();                                  // look again each time Settings opens
   }
   function closeSettings(){
     $('setName').blur(); $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true'); renderHome(); applyUpdate();
@@ -354,6 +355,16 @@ if('serviceWorker' in navigator){
   addEventListener('appinstalled',()=>{ installEvent=null; hideInstall(); });
   { const k=installKind(); if(k==='ios'&&!installClosed()) setTimeout(()=>{ if(!installClosed()) showInstall('ios'); },700); }
 
-  // Show the installed version (small text on the app screen) to confirm an update arrived
-  if('caches' in window) caches.keys().then(k=>{const v=k.find(n=>n.startsWith('risen-'));
-    if(v) document.getElementById('version').textContent='v'+v.slice(6)});
+  // The installed version (small text at the bottom of Settings), to confirm an update arrived. It was sometimes empty in the
+  // home-screen app, so it no longer depends on one thing: the cache name is shown at once (fallback), and the running service
+  // worker is asked "which version are you?" and its answer, when it comes, replaces it.
+  async function showVersion(){
+    const el=$('version'), set=v=>{ if(v) el.textContent='v'+v; };
+    try{ const k=(await caches.keys()).find(n=>n.startsWith('risen-')); if(k) set(k.slice(6)); }catch(e){}   // fallback: the cache name
+    try{
+      if(!('serviceWorker' in navigator)) return;
+      const sw=navigator.serviceWorker.controller||(await navigator.serviceWorker.ready).active; if(!sw) return;
+      set(await new Promise(res=>{ const ch=new MessageChannel(); ch.port1.onmessage=e=>res(e.data&&e.data.version); sw.postMessage('version',[ch.port2]); setTimeout(()=>res(null),3000); }));
+    }catch(e){}
+  }
+  showVersion();
