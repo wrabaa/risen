@@ -1,6 +1,6 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of every file and delete the old one.
-const VERSION = '2026-11-13.32';
+const VERSION = '2026-11-13.33';
 const CACHE = 'risen-' + VERSION;
 const CORE = ['./', 'index.html', 'db.js', 'photo.js', 'library.js', 'gym.js', 'meds.js', 'classes.js', 'meals.js', 'manifest.json', 'data/gym-classes.json',
   'assets/bg.jpg', 'assets/mark.png',

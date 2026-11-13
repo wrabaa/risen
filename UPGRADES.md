@@ -8,6 +8,24 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - We discuss the section first. Nothing is built until Siza says go.
 - Each section ends with: built? tested on iPhone? release number.
 - New ideas go at the bottom under "Parking lot".
+- After every section this file is updated: the section gets a status line, and the list below moves on.
+
+## Where we are
+**Done**
+- A. Fixed IDs for gym classes and library exercises — built in `.33`, not yet tested on iPhone.
+
+**What's left** (in suggested order)
+- B. Images cached separately from the app
+- C. Plan the calories screen
+- D. Med reminders
+- E. Backup that does not rely on memory
+- F. Weekly summary on Home
+- G. Gym comfort
+- H. One confirm sheet for the whole app
+- I. Same behaviour in every tab
+- J. Brand colours written down
+- K. One shared helper file
+- L. Clean-up
 
 ## Do early (cheap now, painful later)
 
@@ -16,8 +34,21 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   schedule" cannot keep attendance, and renaming an exercise would detach its history and photo.
 - **What:** fixed IDs written in `data/gym-classes.json` and in the exercise list; a "from the gym
   schedule" mark on seeded classes; one-time match of existing classes by name, day and time.
-- **Discuss first:** what happens to exercises already in the plan when the library is rebuilt.
+- **Discussed and agreed:** a rebuild never deletes or changes anything in the plan, history or
+  photos. An old exercise with a match in the new list is linked to it once; one with no match
+  stays as it is under "My exercises".
 - **Size:** medium. Do before to-do 1 and to-do 3.
+- **Status: BUILT in release `2026-11-13.33`. Tested in the browser; iPhone test pending.**
+  - Library: every exercise has a fixed ID written in `library.js` (same IDs as before, so
+    nothing changes today). Names can now be changed freely.
+  - Library rebuild mechanism is ready: `aliases` (old → new) and `retired` in `library.js`.
+    Plan entries, history, notes, photo and a running workout follow automatically.
+  - Classes: fixed IDs `fz-c01` … `fz-c37` in `data/gym-classes.json`, and a "from the gym
+    schedule" mark on seeded classes that survives editing.
+  - One-time match on phones that loaded the schedule earlier: same name + day + time gets the
+    fixed ID and keeps its attendance. Renamed, re-timed or hand-added classes are left alone.
+  - **Still to do with the real gym list (to-do 3):** fill in `aliases` / `retired`.
+  - **Now possible:** to-do 1 "Reload gym schedule" (not built yet).
 
 ### B. Images cached separately from the app
 - **Why:** every release re-downloads every file, and one failed file blocks the update. With
@@ -97,6 +128,9 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - `.30` Plan edits no longer rewrite the streak and THIS WEEK.
 - `.31` Updates wait for a quiet moment instead of reloading mid-use.
 - `.32` A dose taken today follows its med when the time is edited.
+
+## Done from this file
+- `.33` Upgrade A: fixed IDs for gym classes and library exercises.
 
 ## Parking lot
 - (new ideas go here)

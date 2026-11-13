@@ -1,7 +1,7 @@
 {
  "gym": "Fitness Zone",
- "version": 1,
- "note": "Seed data — loaded once on user's YES; fully editable after.",
+ "version": 2,
+ "note": "Seed data. Every class has a fixed id: it never changes and is never reused (attendance is linked to it). A new class gets the next free number. Loaded on the user's YES; editable after.",
  "studios": [
   "Energy",
   "Balance",
@@ -86,6 +86,7 @@
  ],
  "classes": [
   {
+   "id": "fz-c01",
    "studio": "Energy",
    "day": 1,
    "time": "09:00",
@@ -94,6 +95,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c02",
    "studio": "Energy",
    "day": 1,
    "time": "10:00",
@@ -102,6 +104,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c03",
    "studio": "Energy",
    "day": 1,
    "time": "18:00",
@@ -110,6 +113,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c04",
    "studio": "Energy",
    "day": 1,
    "time": "19:00",
@@ -118,6 +122,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c05",
    "studio": "Energy",
    "day": 2,
    "time": "09:00",
@@ -126,6 +131,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c06",
    "studio": "Energy",
    "day": 2,
    "time": "10:00",
@@ -134,6 +140,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c07",
    "studio": "Energy",
    "day": 2,
    "time": "19:00",
@@ -142,6 +149,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c08",
    "studio": "Energy",
    "day": 3,
    "time": "10:00",
@@ -150,6 +158,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c09",
    "studio": "Energy",
    "day": 3,
    "time": "18:00",
@@ -158,6 +167,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c10",
    "studio": "Energy",
    "day": 3,
    "time": "19:00",
@@ -166,6 +176,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c11",
    "studio": "Energy",
    "day": 4,
    "time": "09:00",
@@ -174,6 +185,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c12",
    "studio": "Energy",
    "day": 4,
    "time": "18:00",
@@ -182,6 +194,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c13",
    "studio": "Energy",
    "day": 5,
    "time": "09:00",
@@ -190,6 +203,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c14",
    "studio": "Energy",
    "day": 5,
    "time": "10:00",
@@ -198,6 +212,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c15",
    "studio": "Energy",
    "day": 5,
    "time": "17:30",
@@ -206,6 +221,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c16",
    "studio": "Energy",
    "day": 5,
    "time": "18:00",
@@ -214,6 +230,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c17",
    "studio": "Energy",
    "day": 5,
    "time": "19:00",
@@ -222,6 +239,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c18",
    "studio": "Energy",
    "day": 6,
    "time": "09:30",
@@ -230,6 +248,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c19",
    "studio": "Energy",
    "day": 6,
    "time": "10:00",
@@ -238,6 +257,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c20",
    "studio": "Balance",
    "day": 1,
    "time": "19:00",
@@ -246,6 +266,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c21",
    "studio": "Balance",
    "day": 2,
    "time": "11:00",
@@ -254,6 +275,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c22",
    "studio": "Balance",
    "day": 2,
    "time": "12:00",
@@ -262,6 +284,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c23",
    "studio": "Balance",
    "day": 2,
    "time": "19:00",
@@ -270,6 +293,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c24",
    "studio": "Balance",
    "day": 3,
    "time": "11:00",
@@ -278,6 +302,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c25",
    "studio": "Balance",
    "day": 3,
    "time": "18:00",
@@ -286,6 +311,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c26",
    "studio": "Balance",
    "day": 3,
    "time": "19:00",
@@ -294,6 +320,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c27",
    "studio": "Balance",
    "day": 4,
    "time": "11:00",
@@ -302,6 +329,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c28",
    "studio": "Balance",
    "day": 4,
    "time": "12:00",
@@ -310,6 +338,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c29",
    "studio": "Balance",
    "day": 4,
    "time": "18:00",
@@ -318,6 +347,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c30",
    "studio": "Balance",
    "day": 4,
    "time": "19:30",
@@ -326,6 +356,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c31",
    "studio": "Balance",
    "day": 5,
    "time": "11:00",
@@ -334,6 +365,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c32",
    "studio": "Power",
    "day": 2,
    "time": "18:00",
@@ -342,6 +374,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c33",
    "studio": "Power",
    "day": 3,
    "time": "09:00",
@@ -350,6 +383,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c34",
    "studio": "Power",
    "day": 3,
    "time": "19:00",
@@ -358,6 +392,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c35",
    "studio": "Power",
    "day": 4,
    "time": "10:00",
@@ -366,6 +401,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c36",
    "studio": "Power",
    "day": 4,
    "time": "19:00",
@@ -374,6 +410,7 @@
    "duration": 60
   },
   {
+   "id": "fz-c37",
    "studio": "Power",
    "day": 6,
    "time": "11:00",

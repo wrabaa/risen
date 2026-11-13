@@ -890,7 +890,8 @@ $('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
     :'Backup from '+when+(inside?'\n\nIn this file: '+inside+'.':'\n\nThis backup is empty.')+'\n\nEverything on this phone will be replaced by it. If you might want what is on the phone now, tap Cancel and export a backup first.';
   if(!confirm(msg)) return;
   let res; try{ res=await RisenDB.importAll(b); }catch(e){ toast(e.message==='Not a RISEN backup'?'That file is not a RISEN backup':e.message); return; }
-  await load(); openSettings(); renderHome(); toast(res&&res.settingsOnly?'Name and rest timer restored':'Backup restored');
+  await load(); await Gym.followLibrary(); await Classes.matchSeed(); // an older backup follows the current exercise list and class ids
+    openSettings(); renderHome(); toast(res&&res.settingsOnly?'Name and rest timer restored':'Backup restored');
 };
 
 if('serviceWorker' in navigator){

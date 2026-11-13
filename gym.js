@@ -6,7 +6,7 @@
 function exerciseInfo(id) {
   const base = LIBRARY.byId[id], rec = S.exercises.find(e => e.id === id);
   if (base) return rec && rec.notes ? { ...base, notes: rec.notes } : base;       // notes on a library exercise live in a small record of their own
-  return rec || { id, name: 'Unknown exercise', muscle: '' };
+  return rec && rec.name ? rec : { ...(rec || {}), id, name: 'Unknown exercise', muscle: '' };   // a record with only notes has no name of its own
 }
 function workoutTitle(w) {          // "Chest · Triceps": the muscle groups of the exercises, in order
   const seen = [];
@@ -511,5 +511,14 @@ const Gym = (() => {
   // A workout left over from before (e.g. emptied) is cleaned up as soon as the data is loaded
   ready.then(() => { if (syncDraft()) renderHome(); });
 
-  return { open, openToday, start, reset, flush };
+  // The built-in list changed (library.js: aliases / retired)? Bring this phone's plan, history and photos along. Does nothing otherwise.
+  async function followLibrary() {
+    try { if (!(await RisenDB.migrateLibrary(LIBRARY))) return false; } catch (err) { console.error(err); return false; }
+    await load(); clearThumbs();
+    if (!$('view-gym').hidden && !$('gymPage').classList.contains('open')) renderGym();
+    renderHome(); return true;
+  }
+  ready.then(followLibrary);
+
+  return { open, openToday, start, reset, flush, followLibrary };
 })();

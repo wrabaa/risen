@@ -21,13 +21,16 @@
 //   meds       {id, name, dose, times:['08:00',..], freq:'daily'|'days'|'weekly', days:[1..7],
 //               food:'yes'|'no'|'any', notes, paused, created}
 //   medlogs    {id:'<medId>|<date>|<time>', medId, date, time, takenAt}   one row per dose taken
-//   classes    {id, name, studio, day:1..7, time:'HH:MM', duration (min), instructorId|null, notes}   weekly group classes
+//   classes    {id, name, studio, day:1..7, time:'HH:MM', duration (min), instructorId|null, notes, seed}   weekly group classes
+//              seed:true = it came from data/gym-classes.json and its id is the fixed id written there (fz-c01 ...); a class
+//              added by hand has a random id and no `seed`
 //   instructors {id, name, photo|null}   photo = a file in the app (seed); a photo from the phone lives in `photos` as 'inst-<id>'
 //   classlogs  {id:'<classId>|<date>', classId, date, at}   one row per class attended
 //   recipes    {id, category:'shakes'|'breakfast'|'lunch'|'snacks'|'dinner', name, ingredients:[{text}], method, created, updated}
 //              Each ingredient is an object (not a bare string) so grams / calories can be added to it later; a recipe's photo
 //              lives in `photos` as 'recipe-<id>'.
-//   settings also holds classesAsked (the one-time "load the schedule?" question has been answered)
+//   settings also holds classesAsked (the one-time "load the schedule?" question has been answered) and classIdsMatched
+//              (classes seeded before release .33 have been given their fixed ids, see adoptSeedClasses)
 //
 // SCHEMA VERSION: raise DB_VERSION and add a new `if (old < N)` step in upgrade().
 // Never delete or rename a store in an upgrade, so updates never lose data.
@@ -175,6 +178,7 @@ const RisenDB = (() => {
     for (const i of instructors) t.objectStore('instructors').put(i);
     for (const c of classes) t.objectStore('classes').put(c);
     t.objectStore('settings').put({ key: 'classesAsked', value: true });
+    t.objectStore('settings').put({ key: 'classIdsMatched', value: true });       // a fresh seed already has the fixed ids
     await done(t);
   }
   async function clearClasses() {           // for changing gym: classes, instructors (and their photos) and attendance
@@ -307,6 +311,74 @@ const RisenDB = (() => {
     await done(t);
   }
 
+  // ---- Library rebuild: follow `aliases` (old id -> new id) and keep `retired` exercises that are in use ----
+  // Safe to run any time and never deletes history: plan entries, logs, notes, the photo and a workout in progress move from
+  // an old id to its new one; a retired exercise somebody uses becomes one of their own ("My exercises"), name and all.
+  // Returns true when something was changed.
+  async function migrateLibrary({ aliases = {}, retired = [] } = {}) {
+    const olds = Object.keys(aliases); if (!olds.length && !retired.length) return false;
+    const db = await open(), t = db.transaction(['workouts', 'logs', 'photos', 'exercises', 'settings'], 'readwrite');
+    const ws = t.objectStore('workouts'), ls = t.objectStore('logs'), ps = t.objectStore('photos'), xs = t.objectStore('exercises'), st = t.objectStore('settings');
+    const [workouts, logs, photoKeysNow, exs, act] = await Promise.all([req(ws.getAll()), req(ls.getAll()), req(ps.getAllKeys()), req(xs.getAll()), req(st.get('activeSession'))]);
+    const to = id => Object.prototype.hasOwnProperty.call(aliases, id) ? aliases[id] : id;
+    let changed = false; const used = new Set();
+    for (const w of workouts) {
+      let hit = false;
+      const list = (w.exercises || []).map(it => { const n = to(it.exerciseId); used.add(n); if (n === it.exerciseId) return it; hit = true; return { ...it, exerciseId: n }; });
+      if (hit) { ws.put({ ...w, exercises: list }); changed = true; }
+    }
+    for (const l of logs) { const n = to(l.exerciseId); used.add(n); if (n !== l.exerciseId) { ls.put({ ...l, exerciseId: n }); changed = true; } }
+    const draft = act && act.value;
+    if (draft && Array.isArray(draft.exercises)) {
+      let hit = false;
+      const list = draft.exercises.map(e => { const n = to(e.exerciseId); used.add(n); if (n === e.exerciseId) return e; hit = true; return { ...e, exerciseId: n }; });
+      if (hit) { st.put({ key: 'activeSession', value: { ...draft, exercises: list } }); changed = true; }
+    }
+    const pk = new Set(photoKeysNow.map(String)), xById = new Map(exs.map(x => [x.id, x]));
+    for (const o of olds) {
+      const n = aliases[o];
+      if (pk.has(o) && !pk.has(n)) {                      // the photo follows (an existing photo on the new one wins; nothing is deleted then)
+        const p = await req(ps.get(o)); if (p) { ps.put({ ...p, exerciseId: n }); ps.delete(o); pk.add(n); pk.delete(o); changed = true; }
+      }
+      const xo = xById.get(o);                            // the small notes record of a library exercise
+      if (xo && !xo.custom) {
+        const xn = xById.get(n);
+        if (!xn) { const rec = { ...xo, id: n }; xs.put(rec); xById.set(n, rec); xs.delete(o); xById.delete(o); changed = true; }
+        else if (!xn.notes && xo.notes) { const rec = { ...xn, notes: xo.notes }; xs.put(rec); xById.set(n, rec); xs.delete(o); xById.delete(o); changed = true; }
+      }
+    }
+    for (const k of pk) used.add(k);
+    for (const r of retired) {                            // in use (plan, history, photo or notes) -> it becomes the user's own exercise
+      const x = xById.get(r.id);
+      if (!(used.has(r.id) || x) || (x && x.name)) continue;
+      xs.put({ ...(x || {}), id: r.id, name: r.name, muscle: r.muscle || 'Custom', custom: true }); changed = true;
+    }
+    await done(t); return changed;
+  }
+
+  // ---- Classes: seeded classes get the fixed ids of data/gym-classes.json (one time, for phones seeded before release .33) ----
+  // A class loaded from the schedule earlier has a random id. If it still has the same name + day + time as a class in the
+  // file, it takes that class's fixed id and its attendance moves with it. Classes that were changed or added by hand are
+  // left exactly as they are. The answer is remembered (classIdsMatched), so this runs once.
+  async function adoptSeedClasses(seed) {
+    const db = await open(), t = db.transaction(['classes', 'classlogs', 'settings'], 'readwrite');
+    const cs = t.objectStore('classes'), ls = t.objectStore('classlogs');
+    const [classes, logs] = await Promise.all([req(cs.getAll()), req(ls.getAll())]);
+    const key = c => String(c.name || '').trim().toLowerCase() + '|' + c.day + '|' + c.time;
+    const have = new Set(classes.map(c => c.id)); let n = 0;
+    for (const s of (seed && seed.classes) || []) {
+      if (!s.id || have.has(s.id)) continue;
+      const same = classes.filter(c => !c.seed && !c._adopted && key(c) === key(s));
+      const c = same.find(x => (x.studio || '') === (s.studio || '')) || same[0]; if (!c) continue;
+      c._adopted = true; have.add(s.id); n++;
+      const { _adopted, ...rest } = c;
+      cs.delete(c.id); cs.put({ ...rest, id: s.id, seed: true });
+      for (const l of logs) if (l.classId === c.id) { ls.delete(l.id); ls.put({ ...l, id: `${s.id}|${l.date}`, classId: s.id }); }
+    }
+    t.objectStore('settings').put({ key: 'classIdsMatched', value: true });
+    await done(t); return n;
+  }
+
   // ---- One-time move from the old localStorage (releases .12/.13) ----
   async function migrateLocalStorage() {
     let old; try { old = JSON.parse(localStorage.getItem('risen')); } catch (e) { return; }
@@ -335,6 +407,6 @@ const RisenDB = (() => {
     try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch (e) {}
   }
 
-  return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, saveWorkout, deleteWorkout, workoutsOf,
+  return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, migrateLibrary, adoptSeedClasses, saveWorkout, deleteWorkout, workoutsOf,
     saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();

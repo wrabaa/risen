@@ -98,9 +98,9 @@ const Classes = (() => {
       const d = await r.json();
       await RisenDB.seedClasses({
         instructors: d.instructors.map(i => ({ id: i.id, name: i.name, photo: i.photo || null })),
-        classes: d.classes.map(c => ({ id: RisenDB.uid(), name: c.name, studio: c.studio || '', day: c.day, time: c.time, duration: c.duration || 60, instructorId: c.instructor || null, notes: '' })),
+        classes: d.classes.map(c => ({ id: c.id || RisenDB.uid(), seed: true, name: c.name, studio: c.studio || '', day: c.day, time: c.time, duration: c.duration || 60, instructorId: c.instructor || null, notes: '' })),
       });
-      await load(); S.settings.classesAsked = true; $('clsSheet').hidden = true; renderWeek(); renderHome();
+      await load(); S.settings.classesAsked = true; S.settings.classIdsMatched = true; $('clsSheet').hidden = true; renderWeek(); renderHome();
       toast(`Loaded ${d.classes.length} classes`);
     } catch (e) { toast('Could not load the schedule. Check your connection and try again.'); }
     yes.disabled = no.disabled = false; yes.textContent = 'YES';
@@ -167,7 +167,8 @@ const Classes = (() => {
   const clsProblem = () => !cls.name.trim() ? 'Add a name to save this class.' : !cls.time ? 'Add a time to save this class.' : '';
   function clsNormal() {
     const c = cls, dur = parseInt(c.duration, 10);
-    return { id: c.id, name: c.name.trim(), studio: c.studio.trim(), day: c.day, time: c.time, duration: dur > 0 ? dur : 60, instructorId: c.instructorId || null, notes: c.notes.trim() };
+    return { id: c.id, name: c.name.trim(), studio: c.studio.trim(), day: c.day, time: c.time, duration: dur > 0 ? dur : 60, instructorId: c.instructorId || null, notes: c.notes.trim(),
+      ...(c.seed ? { seed: true } : {}) };          // a class from the gym schedule stays marked as one when it is edited
   }
   const saveCls = debounce(async () => {
     if (!cls || clsProblem()) return;
@@ -349,5 +350,21 @@ const Classes = (() => {
   setInterval(tick, 30000);
   ready.then(() => { lastSig = sig(); return warm(); }).then(() => { if (!$('view-home').hidden) renderHome(); });
 
-  return { open, openToday, next, avatar, reset, flush };
+  // One time, for a phone that loaded the schedule before release .33: give those classes the fixed ids of the schedule
+  // file (same name + day + time), attendance included. If the file can't be read now, it is tried again next time.
+  async function matchSeed() {
+    if (S.settings.classIdsMatched) return 0;
+    let n = 0;
+    try {
+      let seed = { classes: [] };
+      if (S.classes.some(c => !c.seed)) { const r = await fetch('data/gym-classes.json'); if (!r.ok) throw new Error('not found'); seed = await r.json(); }
+      n = await RisenDB.adoptSeedClasses(seed);
+    } catch (e) { return 0; }
+    S.settings.classIdsMatched = true;
+    if (n) { await load(); lastSig = sig(); if (!$('view-classes').hidden) { renderWeek(); if (curDay != null && !cls) renderDay(); } renderHome(); }
+    return n;
+  }
+  ready.then(matchSeed);
+
+  return { open, openToday, next, avatar, reset, flush, matchSeed };
 })();
