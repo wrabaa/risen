@@ -22,8 +22,10 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - H + I + J. One confirm sheet, same behaviour in every tab, named colours — built in `.39`,
   iPhone test pending.
 - L. Clean-up — built in `.40`, iPhone test pending.
-- E + F. Weekly backup prompt, piece-by-piece backups, week summary tile — built in `.41`,
-  iPhone test pending.
+- E + F. Weekly backup prompt, piece-by-piece backups, week summary tile — `.41`, tested on
+  iPhone, all OK.
+- **Queue 3 (Classes and install)** — see the section at the bottom of this file:
+  1. Classes first-open question: × / NOT NOW, tab bar visible — built in `.42`, iPhone test pending.
 
 **Waiting / on hold**
 - C. Plan the calories screen — WAITING: Siza plans it with the planner first.
@@ -215,6 +217,15 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   Instructor photos load from `assets/instructors/`. To change the schedule for everyone:
   edit `data/gym-classes.json` (new class = next free `fz-c..` number), release, then each
   phone taps Reload.
+
+## Queue 3 — Classes and install (from 13 Nov 2026, one release per item)
+Siza's order. Each item: built? tested on iPhone? release number.
+1. **Classes first-open question** — `.42`. The "Load Fitness Zone schedule?" sheet used to cover
+   the whole screen, tab bar included, so you could not leave Classes without answering. Now it
+   has × and NOT NOW (both = ask again the next time the Classes tab opens), tapping outside it
+   is the same, it stops above the tab bar so the tabs stay usable, and it closes by itself if
+   you switch tab. YES and START EMPTY work as before (START EMPTY is remembered).
+   iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

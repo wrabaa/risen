@@ -191,13 +191,16 @@
   <!-- Meals: move a recipe to another category -->
   <div class="sheet-wrap" id="mealSheet" hidden><div class="sheet" id="mealSheetBody"></div></div>
 
-  <!-- Classes: asked once, the first time the tab opens -->
+  <!-- Classes: asked when the tab opens, until it is answered YES or START EMPTY. x / NOT NOW = ask again next time.
+       It stops above the tab bar so the tabs stay usable. -->
   <div class="sheet-wrap" id="clsSheet" hidden>
     <div class="sheet">
+      <button class="sheet-x" type="button" id="clsX" aria-label="Not now"><svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       <h2>Load Fitness Zone schedule?</h2>
       <p>Fills in the weekly classes and instructors. Afterwards everything is yours to edit, delete or add to.</p>
       <button class="primary" type="button" id="clsYes">YES</button>
       <button class="textbtn" type="button" id="clsNo">START EMPTY</button>
+      <button class="textbtn" type="button" id="clsLater">NOT NOW</button>
     </div>
   </div>
 

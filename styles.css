@@ -453,7 +453,12 @@
   .sheet-wrap[hidden]{display:none}
   .sheet{width:100%;max-width:420px;background:rgba(26,26,26,.86);border:1px solid var(--line);border-radius:22px;padding:26px 22px 18px;
     animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+  .sheet{position:relative}
+  .sheet-x{position:absolute;top:6px;right:6px;width:44px;height:44px;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
   .sheet h2{font-family:Oswald,sans-serif;font-weight:700;font-size:26px;text-transform:uppercase;letter-spacing:.03em}
+  /* the Classes question stops above the tab bar, so the tabs stay visible and usable */
+  #clsSheet{bottom:calc(var(--tabh) + env(safe-area-inset-bottom));padding-top:calc(env(safe-area-inset-top) + 8vh);padding-bottom:12px;overflow-y:auto}
+  #clsSheet .sheet h2{padding-right:34px}
   .sheet p{margin-top:6px;color:var(--muted);font-size:14px}
   .sheet input{margin-top:20px;width:100%;height:54px;padding:0 18px;border-radius:14px;border:1px solid var(--line);background:var(--field);
     color:var(--text);font:500 17px Inter,sans-serif;outline:none;-webkit-user-select:text;user-select:text}

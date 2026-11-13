@@ -72,6 +72,9 @@ const Classes = (() => {
 
   // ================= First open: load the schedule? =================
   function askSeed() { $('clsSheet').hidden = false; }
+  const notNow = () => { $('clsSheet').hidden = true; };          // not answered: it is asked again the next time the tab opens
+  $('clsLater').onclick = notNow; $('clsX').onclick = notNow;
+  $('clsSheet').addEventListener('click', e => { if (e.target === $('clsSheet')) notNow(); });
   $('clsNo').onclick = async () => {
     await RisenDB.setSetting('classesAsked', true); S.settings.classesAsked = true; $('clsSheet').hidden = true; renderWeek();
   };

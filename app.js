@@ -118,6 +118,7 @@
   function show(view){
     const wasHome=!$('view-home').hidden;
     document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+view);
+    if(view!=='classes') $('clsSheet').hidden=true; // the Classes question belongs to the Classes tab only
     if(view==='home'&&!wasHome) renderHome();
     if(view==='home') applyUpdate(); // a new release that arrived while you were busy loads now
     document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));

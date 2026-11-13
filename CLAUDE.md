@@ -56,14 +56,15 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **MEDS** (`meds.js`): progress ring, doses grouped by time with ✓ TAKE ALL, compact
   cards with box photo, 7-day dots; My meds list (tap row → edit, pause/delete inside).
 - **CLASSES** (`classes.js`, `data/gym-classes.json`, `assets/instructors/`):
-  first open asks "Load Fitness Zone schedule?" YES / START EMPTY. Week → Day → Class,
+  opening the tab asks "Load Fitness Zone schedule?" until answered: YES / START EMPTY, or
+  × / NOT NOW = ask again next time (the sheet stops above the tab bar). Week → Day → Class,
   studio chips (Energy/Balance/Power), ✓ ATTENDED, instructors list.
 - **MEALS** (`meals.js`): Shakes · Breakfast · Lunch · Snacks · Dinner → recipes →
   recipe page (photo, ingredients one per line stored as objects `{text}`, how-to, Move to…).
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.41)
+## Status (release 2026-11-13.42)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
@@ -74,7 +75,9 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - ✅ Upgrade A fixed IDs (`.33`, tested on iPhone) · Upgrade B image cache (`.34`) ·
   Reload gym schedule (`.35`) · Safari banner (`.36`) · Gym comfort (`.37`) · code split,
   no visible change (`.38`) · confirm sheet, consistency, named colours (`.39`) · clean-up (`.40`) · weekly backup
-  prompt, piece-by-piece backups, week summary tile (`.41`). `.34`–`.41`: iPhone test pending.
+  prompt, piece-by-piece backups, week summary tile (`.41`). `.34`–`.41` tested on iPhone, OK.
+- Queue 3 (Classes alive + install pop-up), one release per item, details in `UPGRADES.md`:
+  `.42` Classes first-open question has × / NOT NOW and keeps the tab bar (iPhone test pending).
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
