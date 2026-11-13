@@ -55,7 +55,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.36)
+## Status (release 2026-11-13.37)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
@@ -64,7 +64,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - ✅ Code-review fixes `.28`–`.32` (safe import, honest backup date, streak/week counting,
   quiet updates, med tick follows a time change) — tested on iPhone.
 - ✅ Upgrade A fixed IDs (`.33`, tested on iPhone) · Upgrade B image cache (`.34`) ·
-  Reload gym schedule (`.35`) · Safari banner (`.36`). `.34`–`.36`: iPhone test pending.
+  Reload gym schedule (`.35`) · Safari banner (`.36`) · Gym comfort (`.37`).
+  `.34`–`.37`: iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -131,6 +132,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   Extra workouts count for history / "Last time" only, not THIS WEEK or STREAK.
   STREAK: today not done yet doesn't break it; skipped-with-reason doesn't break it.
 - 🗑 inside a running workout removes the exercise only for that day.
+- Gym comfort (`.37`): screen stays awake during a workout; a workout in progress skips the
+  intro and opens directly; sets are whole numbers 1–20; a failed FINISH keeps the workout open.
 - Reps required to tick a set; empty kg = 0 (bodyweight). No sets ticked → offer discard.
 - Rest timer starts automatically on ✓, default from Settings (1:30), ±15 s, flashes lime at 0.
 - One photo per exercise, linked to exercise ID, shown everywhere; addable in the gym too.

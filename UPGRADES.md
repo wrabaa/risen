@@ -17,6 +17,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - B. Images cached separately from the app — built in `.34`, iPhone test pending.
 - `CLAUDE.md` to-do 1, Settings "Reload gym schedule" — built in `.35`, iPhone test pending.
 - Safari warning banner (from the Parking lot) — built in `.36`, iPhone test pending.
+- G. Gym comfort — built in `.37`, iPhone test pending.
 
 **Waiting / on hold**
 - C. Plan the calories screen — WAITING: Siza plans it with the planner first.
@@ -25,7 +26,6 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 **What's left** (in suggested order)
 - E. Backup that does not rely on memory
 - F. Weekly summary on Home
-- G. Gym comfort
 - H. One confirm sheet for the whole app
 - I. Same behaviour in every tab
 - J. Brand colours written down
@@ -106,6 +106,10 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - Skip the intro and open the workout when one is in progress.
 - Sets field: whole numbers 1–20 only; clear message if FINISH cannot save.
 - **Size:** small each.
+- **Status: BUILT in release `2026-11-13.37`. Tested in the browser; iPhone test pending.**
+  The screen stays awake while a workout runs (given back when the app is in the background).
+  A workout in progress skips the intro and opens directly. Sets are whole numbers 1–20
+  (25 → 20, 0 → 1, 2.5 → 3). If FINISH cannot save, a message says so and the workout stays open.
 
 ## Look and consistency
 
@@ -156,6 +160,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   app. Open RISEN from your home screen icon." × hides it for this visit. Never shown in the
   home-screen app, and not on a computer or Android. Why: Siza's meds once looked "missing"
   because they had been entered in Safari, not the app.
+- `.37` Upgrade G: gym comfort.
 
 ## Done from the `CLAUDE.md` to-do list
 - `.35` To-do 1: Settings → "Reload gym schedule". Schedule classes go back to the latest

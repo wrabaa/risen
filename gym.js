@@ -66,6 +66,20 @@ const Gym = (() => {
     $('gymLog').hidden = !d; $('gymWeek').hidden = !!d;
     if (d) renderLog($('gymLog'), d); else { $('gymLog').innerHTML = ''; renderWeek(); }
     $('view-gym').scrollTop = 0;
+    keepAwake();
+  }
+  // Keep the screen awake while a workout is running (the phone gives the lock back when the app goes to the background,
+  // so it is asked for again each time the app returns). Phones that can't do this simply behave as before.
+  let wake = null, waking = false;
+  async function keepAwake() {
+    const want = !!draft() && document.visibilityState === 'visible';
+    if (waking) return;
+    waking = true;
+    try {
+      if (want && !wake && navigator.wakeLock) { wake = await navigator.wakeLock.request('screen'); wake.addEventListener('release', () => { wake = null; }); }
+      else if (!want && wake) { const w = wake; wake = null; await w.release(); }
+    } catch (e) { wake = null; }
+    waking = false;
   }
   function openPage(id) { const p = $(id); p.scrollTop = 0; p.classList.add('open'); p.setAttribute('aria-hidden', 'false'); }
   const onClose = {};
@@ -261,8 +275,16 @@ const Gym = (() => {
   $('exBody').addEventListener('input', e => {
     const t = e.target, w = curDay != null && dayRec(curDay); if (!w || curEx == null) return;
     const it = w.exercises[curEx];
-    if (t.dataset.t) { it[t.dataset.t] = num(t.value) ?? 0; saveDay(); }
+    if (t.dataset.t) {
+      let v = num(t.value) ?? 0;
+      if (t.dataset.t === 'sets') v = Math.min(20, Math.max(1, Math.round(v) || 1));     // sets: a whole number from 1 to 20
+      it[t.dataset.t] = v; saveDay();
+    }
     else if (t.id === 'exNotes') setNote(it.exerciseId, t.value);
+  });
+  $('exBody').addEventListener('change', e => {      // leaving the sets field: show the number that was kept (e.g. 25 -> 20)
+    const t = e.target, w = curDay != null && dayRec(curDay); if (!w || curEx == null || t.dataset.t !== 'sets') return;
+    t.value = fmtN(w.exercises[curEx].sets);
   });
   $('exBody').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); e.target.blur(); } });
   $('exBody').addEventListener('click', async e => {
@@ -281,7 +303,7 @@ const Gym = (() => {
   function topSet(sets) { return sets.reduce((a, b) => (num(b.kg) ?? 0) > (num(a.kg) ?? 0) || ((num(b.kg) ?? 0) === (num(a.kg) ?? 0) && (num(b.reps) ?? 0) > (num(a.reps) ?? 0)) ? b : a); }
   async function newEntry(exerciseId, target) {
     const last = (await RisenDB.historyOf(exerciseId)).find(h => h.sets && h.sets.length);
-    const n = Math.max(1, target && target.sets ? target.sets : (last ? last.sets.length : 3));
+    const n = Math.min(20, Math.max(1, Math.round(target && target.sets ? target.sets : (last ? last.sets.length : 3)) || 1));
     const sets = [...Array(n)].map((_, i) => {
       const src = last ? (last.sets[i] || last.sets[last.sets.length - 1]) : (target ? { kg: target.kg, reps: target.reps } : {});
       return { kg: fmtN(src.kg), reps: fmtN(src.reps), done: false };
@@ -372,7 +394,9 @@ const Gym = (() => {
     if (doneN < all.length && !confirm("Finish anyway? Unchecked sets won't be saved.")) return;
     const entries = d.exercises.map(e => ({ exerciseId: e.exerciseId, sets: e.sets.filter(s => s.done).map(s => ({ kg: num(s.kg) ?? 0, reps: num(s.reps) ?? 0 })) }))
       .filter(e => e.sets.length);
-    const ses = await RisenDB.logSession({ date: d.date, workoutId: d.workoutId, routineId: d.routineId, name: d.name, extra: d.extra, startedAt: d.startedAt, entries });
+    let ses;
+    try { ses = await RisenDB.logSession({ date: d.date, workoutId: d.workoutId, routineId: d.routineId, name: d.name, extra: d.extra, startedAt: d.startedAt, entries }); }
+    catch (err) { toast('Could not save the workout. Nothing is lost: tap FINISH WORKOUT again.'); return; }
     S.settings.activeSession = null; await saveDraft(); Rest.stop();
     await load(); renderHome(); renderGym();
     openSheet(`<h2>Workout done</h2><p>${esc(d.name)}</p>
@@ -504,12 +528,16 @@ const Gym = (() => {
     if (dayKey(new Date()) === lastDay) return;
     if (!$('view-gym').hidden && !draft() && !$('gymPage').classList.contains('open')) renderWeek(); else lastDay = dayKey(new Date());
   }
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); else dayRolled(); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); else dayRolled(); keepAwake(); });
   addEventListener('pagehide', flush);
   setInterval(dayRolled, 60000);
 
   // A workout left over from before (e.g. emptied) is cleaned up as soon as the data is loaded
-  ready.then(() => { if (syncDraft()) renderHome(); });
+  ready.then(() => {
+    if (syncDraft()) renderHome();
+    // A workout is in progress (the phone restarted the app, or it was closed): skip the intro and open it
+    if (draft() && !intro.classList.contains('hidden')) { renderHome(); intro.classList.add('hidden'); app.classList.remove('hidden'); open(); }
+  });
 
   // The built-in list changed (library.js: aliases / retired)? Bring this phone's plan, history and photos along. Does nothing otherwise.
   async function followLibrary() {
