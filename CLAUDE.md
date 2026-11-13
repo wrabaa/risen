@@ -22,6 +22,8 @@ Rule of thumb: **one screen, one job, one big button. No manual needed.**
   in their own cache that survives releases, driven by the `ASSETS` list at the top of `sw.js`:
   **add an image → new line with number 1 · replace an image (same name) → raise its number
   by 1 · remove an image → delete its line.** Forgetting this means phones keep the old image.
+- Offline safety net (`.46`): a page request with no cached copy and no network serves the cached
+  `index.html` instead of the browser's error (`sw.js`); non-page files are unchanged.
 - A new release reloads the app only on the intro or on a quiet Home (nothing open, no
   keyboard); otherwise it waits until Home is shown again or the app is next opened.
 - **Fixed IDs — never change, never reuse:** built-in exercises (`library.js`, `lib-…`) and
@@ -68,7 +70,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.44)
+## Status (release 2026-11-13.46)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).

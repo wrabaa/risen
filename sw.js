@@ -1,6 +1,6 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of the APP files (pages, code, data) and delete the old one.
-const VERSION = '2026-11-13.45';
+const VERSION = '2026-11-13.46';
 const CACHE = 'risen-' + VERSION;
 
 // APP FILES: small, change often. All of them are downloaded again on every release, all or nothing.
@@ -103,5 +103,7 @@ self.addEventListener('fetch', e => {
   e.respondWith(caches.match(req, { cacheName: CACHE, ignoreSearch: req.mode === 'navigate' }).then(hit => hit || fetch(req).then(res => {
     if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
     return res;
-  })));
+  })).catch(() => req.mode === 'navigate'
+    ? caches.match(abs('index.html'), { cacheName: CACHE })     // safety net: a page with no copy and no network opens the app, not the browser's error
+    : Response.error()));
 });

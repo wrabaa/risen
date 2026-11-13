@@ -200,6 +200,8 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 
 ## Done from this file
 - `.33` Upgrade A: fixed IDs for gym classes and library exercises.
+- `.46` Offline safety net: `sw.js` serves the cached `index.html` when a page request has no cached copy and
+  the network fails. Tested offline: `/`, `/index.html?x=1`, `/#gym` and an uncached path all open the app.
 - `.34` Upgrade B: images and fonts cached separately from the app.
 - `.36` Safari warning banner (was in the Parking lot). In a Safari tab on iPhone/iPad a small
   banner at the top says: "You're in Safari — your data here is separate from the home-screen
