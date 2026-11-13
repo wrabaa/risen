@@ -366,5 +366,16 @@ const Classes = (() => {
   }
   ready.then(matchSeed);
 
-  return { open, openToday, next, avatar, reset, flush, matchSeed };
+  // Settings "Reload gym schedule". Classes loaded before the fixed ids existed are matched first, so their attendance
+  // is carried over instead of being left behind on a duplicate.
+  async function reloadSchedule() {
+    const r = await fetch('data/gym-classes.json'); if (!r.ok) throw new Error('Could not read the schedule');
+    const seed = await r.json();
+    if (!S.settings.classIdsMatched && S.classes.some(c => !c.seed)) await RisenDB.adoptSeedClasses(seed);
+    const res = await RisenDB.reloadSeedClasses(seed);
+    await load(); reset(); lastSig = sig(); await warm();
+    return { ...res, total: (seed.classes || []).length, gym: seed.gym || 'gym' };
+  }
+
+  return { open, openToday, next, avatar, reset, flush, matchSeed, reloadSchedule };
 })();

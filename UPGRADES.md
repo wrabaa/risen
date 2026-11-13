@@ -15,10 +15,13 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 - Review fixes `.28`–`.32` — tested on iPhone, all OK.
 - A. Fixed IDs for gym classes and library exercises — `.33`, tested on iPhone, OK.
 - B. Images cached separately from the app — built in `.34`, iPhone test pending.
+- `CLAUDE.md` to-do 1, Settings "Reload gym schedule" — built in `.35`, iPhone test pending.
+
+**Waiting / on hold**
+- C. Plan the calories screen — WAITING: Siza plans it with the planner first.
+- D. Med reminders — ON HOLD until the native Apple app (Capacitor). Not to be built in the web app.
 
 **What's left** (in suggested order)
-- C. Plan the calories screen
-- D. Med reminders
 - E. Backup that does not rely on memory
 - F. Weekly summary on Home
 - G. Gym comfort
@@ -49,7 +52,7 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   - One-time match on phones that loaded the schedule earlier: same name + day + time gets the
     fixed ID and keeps its attendance. Renamed, re-timed or hand-added classes are left alone.
   - **Still to do with the real gym list (to-do 3):** fill in `aliases` / `retired`.
-  - **Now possible:** to-do 1 "Reload gym schedule" (not built yet).
+  - **Built on top of this:** to-do 1 "Reload gym schedule" (release `.35`).
 
 ### B. Images cached separately from the app
 - **Why:** every release re-downloads every file, and one failed file blocks the update. With
@@ -68,7 +71,8 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   - **For to-do 2 (new instructor photos):** replace the files and raise their numbers.
   - **For to-do 3 (exercise images):** add one line per image to `ASSETS`.
 
-### C. Plan the calories screen
+### C. Plan the calories screen — WAITING
+- **Status:** waiting. Siza plans it with the planner first; nothing to build yet.
 - **Why:** ingredients are one free-text box; grams and calories cannot live there.
 - **What:** one row per ingredient (food + grams), food list as its own data file.
 - **Discuss first:** the screen layout, on paper, before any code.
@@ -76,7 +80,9 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 
 ## Daily-use upgrades
 
-### D. Med reminders
+### D. Med reminders — ON HOLD
+- **Decision (13 Nov 2026):** on hold until RISEN is a native Apple app (Capacitor).
+  Do NOT build it in the web app.
 - **Why:** a meds tracker that cannot remind is the biggest gap in daily use.
 - **What:** notifications at dose times.
 - **Discuss first:** needs either a small server or the native app (Capacitor). Which route?
@@ -144,6 +150,14 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
 ## Done from this file
 - `.33` Upgrade A: fixed IDs for gym classes and library exercises.
 - `.34` Upgrade B: images and fonts cached separately from the app.
+
+## Done from the `CLAUDE.md` to-do list
+- `.35` To-do 1: Settings → "Reload gym schedule". Schedule classes go back to the latest
+  `data/gym-classes.json` by their fixed IDs. Kept: attendance history, your notes on a class,
+  classes and instructors you added yourself, and a photo you chose for an instructor.
+  Instructor photos load from `assets/instructors/`. To change the schedule for everyone:
+  edit `data/gym-classes.json` (new class = next free `fz-c..` number), release, then each
+  phone taps Reload.
 
 ## Parking lot
 - **Safari warning banner.** When RISEN runs in a Safari tab (not from the home-screen icon),

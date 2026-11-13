@@ -181,6 +181,28 @@ const RisenDB = (() => {
     t.objectStore('settings').put({ key: 'classIdsMatched', value: true });       // a fresh seed already has the fixed ids
     await done(t);
   }
+  // Settings "Reload gym schedule": the classes that came from the schedule go back to the latest file, by their fixed ids.
+  //   - a schedule class: name, studio, day, time, duration and instructor are replaced; its own notes and attendance stay
+  //   - a class new in the file is added; a schedule class no longer in the file is removed (its attendance rows are kept)
+  //   - classes added by hand are not touched
+  //   - schedule instructors get the file's name and photo path again (a photo chosen on the phone still wins)
+  async function reloadSeedClasses(seed) {
+    const db = await open(), t = db.transaction(['classes', 'instructors', 'settings'], 'readwrite');
+    const cs = t.objectStore('classes'), is = t.objectStore('instructors');
+    const classes = await req(cs.getAll()), byId = new Map(classes.map(c => [c.id, c]));
+    const ids = new Set(), out = { updated: 0, added: 0, removed: 0 };
+    for (const s of seed.classes || []) {
+      if (!s.id) continue; ids.add(s.id);
+      const old = byId.get(s.id); old ? out.updated++ : out.added++;
+      cs.put({ id: s.id, seed: true, name: s.name, studio: s.studio || '', day: s.day, time: s.time, duration: s.duration || 60,
+        instructorId: s.instructor || null, notes: (old && old.notes) || '' });
+    }
+    for (const c of classes) if (c.seed && !ids.has(c.id)) { cs.delete(c.id); out.removed++; }
+    for (const i of seed.instructors || []) is.put({ id: i.id, name: i.name, photo: i.photo || null });
+    t.objectStore('settings').put({ key: 'classesAsked', value: true });
+    t.objectStore('settings').put({ key: 'classIdsMatched', value: true });
+    await done(t); return out;
+  }
   async function clearClasses() {           // for changing gym: classes, instructors (and their photos) and attendance
     const db = await open(), t = db.transaction(['classes', 'instructors', 'classlogs', 'photos', 'settings'], 'readwrite');
     for (const s of ['classes', 'instructors', 'classlogs']) t.objectStore(s).clear();
@@ -408,5 +430,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, migrateLibrary, adoptSeedClasses, saveWorkout, deleteWorkout, workoutsOf,
-    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
+    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, importAll };
 })();

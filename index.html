@@ -605,6 +605,7 @@
 
     <div class="group-label">Data</div>
     <div class="group">
+      <button class="row" id="reloadClasses">Reload gym schedule</button>
       <button class="row danger" id="clearClasses">Clear all classes</button>
       <button class="row danger" id="resetBtn">Reset all data</button>
     </div>
@@ -823,6 +824,14 @@
   };
 
   // ---- Clear all classes (changing gym): classes, instructors and attendance; the gym workouts stay ----
+  // ---- Reload gym schedule: schedule classes go back to the latest file; attendance and your own classes stay ----
+  $('reloadClasses').onclick=async()=>{
+    if(!confirm('Reload the gym schedule?\n\nClasses from the gym schedule go back to the latest version (name, day, time, studio, instructor). Your attendance history, your notes and the classes you added yourself are kept.')) return;
+    let r; try{ r=await Classes.reloadSchedule(); }catch(e){ toast('Could not reload: '+e.message); return; }
+    renderHome();
+    const extra=[r.added?r.added+' new':'', r.removed?r.removed+' removed':''].filter(Boolean).join(', ');
+    toast('Schedule reloaded: '+r.total+' classes'+(extra?' ('+extra+')':''));
+  };
   $('clearClasses').onclick=async()=>{
     if(!confirm('Delete all classes, instructors and attendance? Use this when you change gym. Your workouts are not affected.')) return;
     try{ await RisenDB.clearClasses(); }catch(e){ toast('Could not clear: '+e.message); return; }
