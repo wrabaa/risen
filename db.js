@@ -378,11 +378,11 @@ const RisenDB = (() => {
       if (pk.has(o) && !pk.has(n)) {                      // the photo follows (an existing photo on the new one wins; nothing is deleted then)
         const p = await req(ps.get(o)); if (p) { ps.put({ ...p, exerciseId: n }); ps.delete(o); pk.add(n); pk.delete(o); changed = true; }
       }
-      const xo = xById.get(o);                            // the small notes record of a library exercise
-      if (xo && !xo.custom) {
-        const xn = xById.get(n);
-        if (!xn) { const rec = { ...xo, id: n }; xs.put(rec); xById.set(n, rec); xs.delete(o); xById.delete(o); changed = true; }
-        else if (!xn.notes && xo.notes) { const rec = { ...xn, notes: xo.notes }; xs.put(rec); xById.set(n, rec); xs.delete(o); xById.delete(o); changed = true; }
+      const xo = xById.get(o);   // the small record of the old exercise: its notes, and (if it had become one of "My exercises") its name
+      if (xo) {                  // its notes join the new exercise's record (nothing lost); the old record goes, so no stale "My exercises" entry stays
+        const xn = xById.get(n), notes = [xn && xn.notes, xo.notes].filter(Boolean).filter((t, i, a) => a.indexOf(t) === i).join('\n');
+        if (notes && (!xn || notes !== xn.notes)) { const rec = { ...(xn || {}), id: n, notes }; xs.put(rec); xById.set(n, rec); }
+        xs.delete(o); xById.delete(o); changed = true;
       }
     }
     for (const k of pk) used.add(k);

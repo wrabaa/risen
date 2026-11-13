@@ -1,7 +1,7 @@
 # RISEN — New exercise list (Fitness Zone, Siza's real gym)
 
-Status: `.47` built the first 62 (ids `lib-fz-<file>`). This version = **82** (+20 new, marked NEW) and an
-`equipment` tag on every exercise → to be built in `.48`. "Check at the gym" items are NOT built yet.
+Status: `.47` built the first 62 (ids `lib-fz-<file>`). `.48` BUILT: **82** (+20 new, marked NEW) and an
+`equipment` tag on every exercise (stored in `library.js`, no filter screen yet). "Check at the gym" items are NOT built yet.
 Source: `RISEN_Master_Gym_Equipment_Inventory.pdf` + Siza's photos of the Technogym machine plates
 + standard barbell / dumbbell / cable / bodyweight exercises.
 
@@ -206,7 +206,7 @@ leg curl both → Leg Curl; Seated calf raise → Rotary Calf; Back extension �
 Dumbbell row → One-Arm Dumbbell Row. Barbell incline, dumbbell bench, pull-up/chin-up and dips were NOT merged into
 the machine versions (different load), so they were retired.
 
-## For `.48`: retired old exercises that now have a NEW match
+## `.48`: retired old exercises that got a NEW match (now aliases; done)
 Incline bench press → Barbell Incline Bench Press · Dumbbell bench press → Dumbbell Bench Press · Front raise →
 Dumbbell Front Raise · Bulgarian split squat → Bulgarian Split Squat · Hip thrust → Barbell Hip Thrust · Step-up →
 Dumbbell Step-Up · Standing calf raise → Standing Calf Raise · Glute bridge → Glute Bridge · Close-grip bench press →

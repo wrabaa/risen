@@ -70,7 +70,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.47)
+## Status (release 2026-11-13.48)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
 - ✅ CLASSES — done (polish pending: better instructor photos).
@@ -87,7 +87,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   replaces the Safari banner · `.44` Classes made alive (today's timeline, swipe days, live
   timing, ⭐ my classes, instructor page, studio colours, my stats). `.42`–`.44`: iPhone test pending.
 - `.46` offline safety net · `.47` new exercise library (62, from `EXERCISES.md`); old plans/history/photos
-  follow by alias (iPhone test pending).
+  follow by alias · `.48` library = 82 (+20 new) with an `equipment` tag on each; 9 old retired exercises now
+  alias to their new match, also for phones where they already sat under "My exercises" (iPhone test pending).
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -96,8 +97,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
    for everyone: edit the JSON (new class = next free `fz-c..` number), release, tap Reload.
 2. ✅ DONE (`.45`) **Instructor photos**: 14 new AI-cleaned studio portraits (640×800, Cesar still none) → replace files, same names, and raise
    each file's number in the `ASSETS` list in `sw.js`.
-3. 🔄 **GYM exercise library rebuild** — list DONE (`.47`: 62 real exercises, fixed ids `lib-fz-…`, old ones
-   aliased/retired, see `EXERCISES.md`); images still to come. Original plan: Siza sends photos of his gym's machines → planner
+3. 🔄 **GYM exercise library rebuild** — list DONE (`.47`: 62, `.48`: 82 real exercises with `equipment`, fixed ids
+   `lib-fz-…`, old ones aliased/retired, see `EXERCISES.md`); images still to come. Original plan: Siza sends photos of his gym's machines → planner
    writes the new list (machines + free weights, by muscle) → one built-in image per
    exercise (Siza generates them, file name = exercise) → images built into the app
    (one line per image in `ASSETS` in `sw.js`). Real history now exists: rebuild through
@@ -173,8 +174,12 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - Reps required to tick a set; empty kg = 0 (bodyweight). No sets ticked → offer discard.
 - Rest timer starts automatically on ✓, default from Settings (1:30), ±15 s, flashes lime at 0.
 - One photo per exercise, linked to exercise ID, shown everywhere; addable in the gym too.
-- Exercise library = Siza's real gym (62, `EXERCISES.md`), replaced the 66 generic ones in `.47` through
-  `aliases` / `retired` so plans, history and photos followed. Images (`assets/exercises/<file>`) come later.
+- Exercise library = Siza's real gym (62 in `.47`, 82 in `.48`, `EXERCISES.md`), replaced the 66 generic ones through
+  `aliases` / `retired` so plans, history and photos followed. Every exercise has `muscle` (library group, day title)
+  and `equipment` (Machine/Cable/Dumbbell/Barbell/Bodyweight/Cardio; stored only, filter chips later). Images
+  (`assets/exercises/<file>`) come later. T-bar row and Preacher curl stay retired until confirmed at the gym.
+  A retired exercise that later gets a match moves to `aliases`; a phone where it was already in "My exercises"
+  moves it (plan, history, notes, photo) and drops the stale entry.
 
 **MEDS**
 - A med counts from the day it's added (earlier days = "not scheduled", not "missed").
