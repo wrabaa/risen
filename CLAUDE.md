@@ -144,7 +144,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   → 62 pt dead strip at the bottom. `100lvh` made it worse (content cut). Fix = opaque
   `black` status bar. Debug panel was removed after the fix.
 - Intro: text and buttons baked into a picture broke on every screen size → rule: photos are
-  backgrounds only; all text/buttons are real HTML. Intro photo = Siza's real B&W photo.
+  backgrounds only; all text/buttons are real HTML. Intro photo = Siza's real B&W photo (taken by Siza); since `.55` = the RISEN character (Siza, AI) doing battle ropes, B&W with the lime chest logo.
 - Navigation: ☰ menu was removed; bottom tab bar is the only navigation (gear = Settings).
   Calendar and Progress tabs were removed on purpose (not needed; "Last time" on each
   exercise IS the progress tracking).
