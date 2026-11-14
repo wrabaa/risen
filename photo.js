@@ -44,7 +44,7 @@ const PhotoSlot = (() => {
   const TRASH = ICONS.trash;
   const CAMERA = '<svg class="icon" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
 
-  async function mount(el, exerciseId, { editable = false } = {}) {
+  async function mount(el, exerciseId, { editable = false, onChange } = {}) {
     const p = await RisenDB.getPhoto(exerciseId);
     el.classList.add('pslot');
     if (p) {
@@ -53,7 +53,7 @@ const PhotoSlot = (() => {
       el.querySelector('.pslot-img').onclick = () => openViewer(urls.get(exerciseId));
       if (editable) el.querySelector('.pslot-del').onclick = async () => {
         if (!(await ask({ title: 'Delete this photo?', ok: 'DELETE', danger: true }))) return;
-        await RisenDB.deletePhoto(exerciseId); mount(el, exerciseId, { editable });
+        await RisenDB.deletePhoto(exerciseId); await mount(el, exerciseId, { editable, onChange }); if (onChange) onChange();
       };
     } else if (editable) {
       el.innerHTML = `<label class="pslot-add">${CAMERA}<span>+ Add photo</span><input type="file" accept="image/*" hidden></label>`;
@@ -62,7 +62,7 @@ const PhotoSlot = (() => {
         el.querySelector('span').textContent = 'Saving…';
         try { const r = await resize(f); await RisenDB.setPhoto(exerciseId, r.blob, r.width, r.height); }
         catch (err) { alert(err.message); }
-        mount(el, exerciseId, { editable });
+        await mount(el, exerciseId, { editable, onChange }); if (onChange) onChange();
       };
     } else {
       el.innerHTML = ''; el.classList.remove('pslot');

@@ -2,7 +2,7 @@
 
 Planning notes only. Each idea is discussed with the planner first, then built as its own small release.
 
-## 1. Profile button replaces the gear ⚙️
+## 1. Profile button replaces the gear ⚙️ — BUILT in `.61`
 - Top right of EVERY tab page (Home, Gym, Meals, Supps, Classes): a round **profile photo** (Siza's face; a
   neutral avatar / initial until a photo is added). The gear goes away.
 - Tap → one page with **two tabs: SETTINGS · PERSONAL INFO**.
@@ -15,7 +15,7 @@ Planning notes only. Each idea is discussed with the planner first, then built a
 - New data store → must go into Export / Import / Reset (CLAUDE.md rule).
 - Swipe back works on this page like on every sub-page.
 
-## 2. No name pop-up at first ENTER
+## 2. No name pop-up at first ENTER — BUILT in `.61`
 - Remove the "What's your name?" question on first launch. The name is set in PERSONAL INFO.
 - Until a name is set, Home says just "HELLO" (as today when skipped).
 
@@ -37,7 +37,7 @@ Planning notes only. Each idea is discussed with the planner first, then built a
   c) day swipe stays, and at the first/last day of the week it moves to the next tab.
   → **DECIDED: test b first** (swipe always = tab; days by tapping the weekday circles). If Siza doesn't like it → c.
 
-## 5. Supps page title in full
+## 5. Supps page title in full — BUILT in `.61`
 - The title on the Supps tab page is written out in full: **SUPPLEMENTS** (there is room; the short "SUPPS" is only
   for the tab bar / Home tile, and the tab bar has no words anyway).
 

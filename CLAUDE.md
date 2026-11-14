@@ -8,7 +8,7 @@ Rule of thumb: **one screen, one job, one big button. No manual needed.**
 
 ## How it runs
 - Files: `index.html` (markup only) · `styles.css` · `shared.js` (helpers every tab uses) ·
-  `app.js` (Home, tabs, Settings, backup, updates) · one file per tab. A new file must be
+  `app.js` (Home, tabs, Settings, backup, updates) · `profile.js` (profile button, Personal info) · one file per tab. A new file must be
   added to `CORE` in `sw.js` or it will not work offline.
 - Plain HTML/CSS/JS PWA, no build step, no framework. Hosted on GitHub Pages:
   https://wrabaa.github.io/risen/ (repo `wrabaa/risen`, branch `main`).
@@ -54,7 +54,7 @@ No dot-matrix font. Intro = Siza's black & white photo + logo + "STRONGER EVERY 
 (all text/buttons in code, never baked into images).
 
 ## Structure
-Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. Gear ⚙️ (top right) = Settings.
+Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. A round profile button (top right of every tab page) opens the profile page: SETTINGS · PERSONAL INFO.
 - **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
   02 THIS WEEK, 03 STREAK, 04 SUPPS, 05 CLASSES, 06 WEEK SUMMARY (three small rings: workouts · supps taken/due ·
   classes attended), backup reminder line.
@@ -63,7 +63,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   "Last time"). Logging: pre-filled sets, ✓, auto rest timer, finish. History per exercise ID.
   Program in background (rename / New program link at bottom).
 - **SUPPS** (`meds.js`; the tab used to be called MEDS, code and data keep the name "meds"; title inside the tab:
-  "Supplements & Meds"): progress ring, doses grouped by time with ✓ TAKE ALL, compact
+  "Supplements"): progress ring, doses grouped by time with ✓ TAKE ALL, compact
   cards with box photo, 7-day dots; My meds list (tap row → edit, pause/delete inside).
 - **CLASSES** (`classes.js`, `data/gym-classes.json`, `assets/instructors/`):
   opening the tab asks "Load Fitness Zone schedule?" until answered: YES / START EMPTY, or
@@ -73,10 +73,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   ★ (my classes) · Energy/Balance/Power. Tap a class = edit; tap an instructor photo = instructor page.
 - **MEALS** (`meals.js`): Shakes · Breakfast · Lunch · Snacks · Dinner → recipes →
   recipe page (photo, ingredients one per line stored as objects `{text}`, how-to, Move to…).
-- **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
-  Clear all classes, Reset all data.
+- **PROFILE PAGE** (`#settings` in `index.html`, `profile.js`; two segments):
+  **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
+  **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.60)
+## Status (release 2026-11-14.61)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -119,6 +120,12 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   narrow the row scrolls sideways (never wraps), and a touch on the row never swipes the day (`.cfilter` in `styles.css` / `classes.js`). iPhone test pending.
 - `.60` review 2 fixes (`REVIEW.md`): the tab bar and swipe back always return as soon as no text field is focused (`body.typing` is re-checked
   on every focus change, tap and redraw, `app.js`); Supps empty state says "Nothing added yet". iPhone test pending.
+- `.61` Profile page (`IDEAS.md` 1, 2, 5): the gear is gone; a round profile button (photo, else the name's first letter, else a person icon) sits top right of
+  every tab page (Home's top bar, and a slim top row on Gym / Meals / Supps / Classes). Tap = one page with two segments, SETTINGS · PERSONAL INFO (swipe back works).
+  SETTINGS = the old Settings as is, minus the Name row. PERSONAL INFO (`profile.js`): name, profile photo (same photo tools), height, weight, 12 body
+  measurements in cm + "+ ADD MEASUREMENT"; each value is saved with its date, the latest is shown with a small "prev" value, tap a name for its history.
+  New store `body` (DB 6) is in Export / Import / Reset. No name pop-up on first ENTER (Home says HELLO until a name is set). Supps page title: SUPPLEMENTS.
+  iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -157,10 +164,10 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   `black` status bar. Debug panel was removed after the fix.
 - Intro: text and buttons baked into a picture broke on every screen size → rule: photos are
   backgrounds only; all text/buttons are real HTML. Intro photo = Siza's real B&W photo (taken by Siza); since `.55` = the RISEN character (Siza, AI) doing battle ropes, B&W with the lime chest logo.
-- Navigation: ☰ menu was removed; bottom tab bar is the only navigation (gear = Settings).
+- Navigation: ☰ menu was removed; bottom tab bar is the only navigation (the round profile button = Settings + Personal info).
   Calendar and Progress tabs were removed on purpose (not needed; "Last time" on each
   exercise IS the progress tracking).
-- Name: asked once on first ENTER; Skip → greeting just "HELLO" (friends use the app too).
+- Name: set in Profile > Personal info (no pop-up on first ENTER since `.61`); until it is set the greeting is just "HELLO" (friends use the app too).
 - Every editor: auto-save (0.4 s) + visible "✓ Saved" + DONE button + flush on
   background (`visibilitychange` / `pagehide`). Settings shows "✓ Saved" too (`.39`).
 - Every "are you sure?" is the RISEN sheet `ask()` in `shared.js` — never the system

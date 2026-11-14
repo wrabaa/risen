@@ -17,6 +17,7 @@
 //   settings   {key, value}   name, nameAsked, restSec, activeSession (workout in progress), lastExport,
 //              backupAsked (when the weekly "Back up now?" was last shown), libraryFollowed (fingerprint of the library's
 //              aliases/retired that this phone has already been brought in line with; see Gym.followLibrary)
+//   body       {id, kind, label?, value, date, at}   dated body values (height, weight, measurements); the profile photo lives in `photos` under the key 'profile'
 //   photos     {exerciseId, type, data:ArrayBuffer, width, height, updated}
 //              ONE photo per exercise, keyed by exercise ID. Resized to max 1000px JPEG before saving.
 //              A med's box photo lives here too, under the key 'med-<medId>'.
@@ -38,8 +39,8 @@
 // SCHEMA VERSION: raise DB_VERSION and add a new `if (old < N)` step in upgrade().
 // Never delete or rename a store in an upgrade, so updates never lose data.
 const RisenDB = (() => {
-  const DB_NAME = 'risen', DB_VERSION = 5;
-  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs', 'recipes'];
+  const DB_NAME = 'risen', DB_VERSION = 6;
+  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs', 'recipes', 'body'];
   let dbp;
 
   function upgrade(db, old) {
@@ -67,6 +68,9 @@ const RisenDB = (() => {
     }
     if (old < 5) {                                                  // v5: Meals
       db.createObjectStore('recipes', { keyPath: 'id' });
+    }
+    if (old < 6) {                                                  // v6: Profile (body measurements)
+      db.createObjectStore('body', { keyPath: 'id' });
     }
   }
 
@@ -131,6 +135,15 @@ const RisenDB = (() => {
 
   // ---- Meds ----
   const saveMed = m => put('meds', m);
+  // ---- Body (Profile > Personal info): every entry is one dated value ----
+  //   body  {id, kind, label?, value, date:'YYYY-MM-DD', at}   kind = 'height' | 'weight' | 'neck' | ... | 'c-<id>' (a custom one; its name is `label`)
+  async function saveBody(row) { return put('body', row); }
+  async function deleteBody(ids) {
+    const db = await open(), t = db.transaction('body', 'readwrite');
+    for (const id of [].concat(ids)) t.objectStore('body').delete(id);
+    await done(t);
+  }
+
   async function deleteMed(id) {            // the med, its box photo and every dose logged for it
     const db = await open(), t = db.transaction(['meds', 'medlogs', 'photos'], 'readwrite');
     t.objectStore('meds').delete(id);
@@ -467,5 +480,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, migrateLibrary, adoptSeedClasses, saveWorkout, workoutsOf,
-    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, exportAll, exportBlob, importAll };
+    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, saveBody, deleteBody, exportAll, exportBlob, importAll };
 })();

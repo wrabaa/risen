@@ -591,11 +591,11 @@
   .view.enter{animation:viewin .25s var(--ease) both}
   @keyframes viewin{from{opacity:0;transform:translate3d(0,10px,0)}to{opacity:1;transform:none}}
   /* press feel: scale .97 and a little darker, then a spring back */
-  .primary,.ghost,.play,.takeall,.attbtn,.dashed,.chips button,.starbtn,.donebtn,.dsd,.tick,.dtick,.stepper button,.avbtn,.textbtn,
+  .primary,.ghost,.play,.takeall,.attbtn,.dashed,.chips button,.starbtn,.donebtn,.dsd,.tick,.dtick,.stepper button,.avbtn,.profbtn,.textbtn,
   button.card,.tile[data-tap],.mcat,.rcard,.dayrow{
     transition:transform .45s var(--spring),background-color .2s ease,border-color .2s ease,color .2s ease,filter .2s ease,opacity .2s ease}
   .primary:active,.ghost:active,.play:active,.takeall:active,.attbtn:active,.dashed:active,.chips button:active,.starbtn:active,.donebtn:active,.dsd:active,
-  .tick:active,.dtick:active,.stepper button:active,.avbtn:active,button.card:active,.tile[data-tap]:active,.mcat:active,.rcard:active,.dayrow:active{
+  .tick:active,.dtick:active,.stepper button:active,.avbtn:active,.profbtn:active,button.card:active,.tile[data-tap]:active,.mcat:active,.rcard:active,.dayrow:active{
     transform:scale(.97);transition-duration:.08s}
   .primary:active,.ghost:active,.play:active,.takeall:active,.attbtn:active,.chips button:active,.donebtn:active,.stepper button:active{filter:brightness(.9)}
   .iconbtn{transition:transform .45s var(--spring),background-color .2s ease}
@@ -618,7 +618,7 @@
     .sheet{animation:fade .2s ease both}
     .tick.pop,.dtick.pop,.attbtn.pop{animation:none}
     .primary:active,.ghost:active,.play:active,.takeall:active,.attbtn:active,.dashed:active,.chips button:active,.starbtn:active,.donebtn:active,.dsd:active,
-    .tick:active,.dtick:active,.stepper button:active,.avbtn:active,button.card:active,.tile[data-tap]:active,.mcat:active,.rcard:active,.dayrow:active,
+    .tick:active,.dtick:active,.stepper button:active,.avbtn:active,.profbtn:active,button.card:active,.tile[data-tap]:active,.mcat:active,.rcard:active,.dayrow:active,
     .iconbtn:active,.tab:active .icon{transform:none}
     .rfill{transition:none}
     .tabpill{transition:none}
@@ -631,3 +631,34 @@
     .tabbar,.sheet,.restbar{background:var(--glass-solid)}
     .search{background:var(--bg)}
   }
+
+  /* PROFILE (.61): the round profile button (top right of every tab page) and the profile page (SETTINGS · PERSONAL INFO) */
+  .profbtn{position:relative;flex:none;width:38px;height:38px;padding:0;border:1px solid var(--hairline);border-radius:50%;overflow:hidden;display:grid;place-items:center;
+    background:var(--card);box-shadow:var(--card-depth);color:var(--muted);cursor:pointer}
+  .profbtn .icon{width:20px;height:20px}
+  .profbtn img{display:block;width:100%;height:100%;object-fit:cover}
+  .profbtn .pfl{font:700 17px Oswald,sans-serif;color:var(--text);letter-spacing:.02em;line-height:1}
+  .topbar .profbtn{margin-right:-1px}
+  .tabtop{justify-content:flex-end}
+  .segs{flex:1;min-width:0;display:flex;margin:0 8px 0 4px;padding:3px;border-radius:999px;background:var(--card);border:1px solid var(--hairline)}
+  .segs button{flex:1;min-width:0;min-height:34px;padding:0 6px;border:0;border-radius:999px;background:none;color:var(--muted);
+    font:600 12px Oswald,sans-serif;letter-spacing:.1em;white-space:nowrap;cursor:pointer}
+  .segs button[aria-selected="true"]{background:var(--volt);color:var(--bg)}
+  #settings .settings-top .saved{margin:0;min-width:0;font-size:12px}
+  .row.meas{gap:8px}
+  .row.meas .mlabel{flex:1;min-width:0;display:flex;align-items:center;gap:6px;min-height:56px;padding:0;border:0;background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+  .row.meas .mlabel .chev{width:14px;height:14px;opacity:.6}
+  .row.meas .mprev{flex:none;font-size:12px;color:var(--muted);letter-spacing:.04em;white-space:nowrap}
+  .row.meas input{flex:none;width:64px;font-family:Oswald,sans-serif;font-weight:500;font-size:20px}
+  .row.meas .unit{flex:none;width:22px;font-size:12px;color:var(--muted)}
+  #profPhoto .pslot{margin-top:0}
+  #profPhoto .pslot-img img{max-height:260px}
+  .hlist{margin-top:12px;max-height:46vh;overflow-y:auto;border-top:1px solid var(--hairline)}
+  .hrow{display:flex;align-items:center;gap:10px;min-height:50px;border-bottom:1px solid var(--hairline);font-size:15px}
+  .hrow span{flex:1;color:var(--muted)}
+  .hrow b{font:600 20px Oswald,sans-serif}
+  .hrow b small{font-size:12px;color:var(--muted);font-weight:500}
+  .hdel{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+  .hdel .icon{width:18px;height:18px}
+  #histSheet .primary{margin-top:16px}
+  #histSheet,#addMeasSheet{z-index:30}

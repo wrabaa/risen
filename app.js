@@ -3,13 +3,13 @@
   const intro=$('intro'), app=$('app');
 
   // ---- Data: lives in IndexedDB (db.js). This is an in-memory copy for drawing the screens. ----
-  const S={settings:{name:'',nameAsked:false,restSec:90},routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[],classes:[],instructors:[],classlogs:[],recipes:[]};
+  const S={settings:{name:'',restSec:90},body:[],routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[],classes:[],instructors:[],classlogs:[],recipes:[]};
   async function load(){
     [S.settings,S.routines,S.workouts,S.sessions,S.exercises]=await Promise.all([RisenDB.getSettings(),RisenDB.all('routines'),
       RisenDB.all('workouts'),RisenDB.all('sessions'),RisenDB.all('exercises')]);
     [S.meds,S.medlogs]=await Promise.all([RisenDB.all('meds'),RisenDB.all('medlogs')]);
     [S.classes,S.instructors,S.classlogs]=await Promise.all([RisenDB.all('classes'),RisenDB.all('instructors'),RisenDB.all('classlogs')]);
-    S.recipes=await RisenDB.all('recipes');
+    S.recipes=await RisenDB.all('recipes'); S.body=await RisenDB.all('body');
   }
 
   // ---- Schedule helpers ----
@@ -114,6 +114,7 @@
   function renderHome(){
     renderBackupLine();
     $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
+    if(typeof Profile!=='undefined') Profile.avatars();
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
     $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile${t.title==='Training'?' train':''}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
@@ -151,14 +152,7 @@
   };
   $('tiles').onkeydown=e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-tap]')){ e.preventDefault(); e.target.click(); } };
 
-  // ---- Name: asked once, on first ENTER. Skip = no name, greeting says just "Hello" ----
-  async function closeName(name){
-    S.settings.name=(name||'').trim(); S.settings.nameAsked=true;
-    $('nameInput').blur(); $('nameSheet').hidden=true; renderHome();
-    await RisenDB.setSetting('name',S.settings.name); await RisenDB.setSetting('nameAsked',true);
-  }
-  $('nameForm').onsubmit=e=>{e.preventDefault(); closeName($('nameInput').value)};
-  $('nameSkip').onclick=()=>closeName('');
+  // ---- Name: set in Profile > Personal info (profile.js). Until it is set, Home says just "Hello" ----
 
   // ---- ENTER: intro to Home (intro shows only when the app opens) ----
   // If the phone's storage can't be opened, the app must not look empty (that reads as "my data is gone"): a full-screen
@@ -178,26 +172,23 @@
   $('login').onclick=async()=>{
     await ready; renderHome(); show('home');
     intro.classList.add('hidden'); app.classList.remove('hidden'); Motion.count($('tiles'));
-    if(!S.settings.nameAsked){ $('nameSheet').hidden=false; setTimeout(()=>$('nameInput').focus(),350); }
-    else backupPrompt();
+    backupPrompt();
   };
 
   // ---- Settings ----
   const fmtRest=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
   function toast(msg){const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),2600)}
-  function openSettings(){
-    $('setName').value=S.settings.name;
+  function openSettings(seg){
+    Profile.showPane(seg==='info'?'info':'settings');            // the profile page opens on SETTINGS
     $('restVal').textContent=fmtRest(S.settings.restSec);
     $('settings').classList.add('open'); $('settings').setAttribute('aria-hidden','false'); $('settings').scrollTop=0;
     showVersion();                                  // look again each time Settings opens
   }
   function closeSettings(){
-    $('setName').blur(); $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true'); renderHome(); applyUpdate();
+    if(document.activeElement&&document.activeElement.blur) document.activeElement.blur();
+    Profile.flush(); $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true'); renderHome(); applyUpdate();
   }
-  $('gearBtn').onclick=openSettings;
   $('settingsBack').onclick=closeSettings;
-  $('setName').oninput=()=>{S.settings.name=$('setName').value.trim(); RisenDB.setSetting('name',S.settings.name).then(()=>savedFlash('setSaved'))};
-  $('setName').onkeydown=e=>{if(e.key==='Enter') $('setName').blur()};
   const stepRest=d=>{S.settings.restSec=Math.min(600,Math.max(15,S.settings.restSec+d)); $('restVal').textContent=fmtRest(S.settings.restSec);
     RisenDB.setSetting('restSec',S.settings.restSec).then(()=>savedFlash('setSaved'))};
   $('restMinus').onclick=()=>stepRest(-15);
@@ -294,7 +285,7 @@ $('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
   // Say what is in the file before anything is replaced
   const st=b.stores||{}, cnt=k=>Array.isArray(st[k])?st[k].length:0, plural=(n,w)=>n+' '+w+(n===1?'':w.endsWith('s')?'es':'s');
   const old=b.format===1;
-  const inside=old?'':[[cnt('workouts'),'gym day'],[cnt('sessions'),'workout'],[cnt('meds'),'med'],[cnt('classes'),'class'],[cnt('recipes'),'recipe'],[cnt('photos'),'photo']]
+  const inside=old?'':[[cnt('workouts'),'gym day'],[cnt('sessions'),'workout'],[cnt('meds'),'med'],[cnt('classes'),'class'],[cnt('recipes'),'recipe'],[cnt('body'),'body value'],[cnt('photos'),'photo']]
     .filter(x=>x[0]).map(x=>plural(x[0],x[1])).join(', ');
   // One RISEN sheet: what is in the file, and a way to save what is on the phone first
   if(old){

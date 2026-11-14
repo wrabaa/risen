@@ -32,9 +32,7 @@
     <div class="view" id="view-home">
       <div class="topbar">
         <img class="mark" src="assets/mark.png" alt="RISEN">
-        <button class="iconbtn" id="gearBtn" aria-label="Settings">
-          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
+        <button class="profbtn" type="button" aria-label="Profile"></button>
       </div>
       <div class="greet">
         <div class="date" id="today"></div>
@@ -45,13 +43,13 @@
     </div>
 
     <!-- GYM, MEALS, SUPPS (meds.js), CLASSES: each tab draws itself (gym.js, meals.js, meds.js, classes.js) -->
-    <div class="view" id="view-gym" hidden>
+    <div class="view" id="view-gym" hidden><div class="topbar tabtop"><button class="profbtn" type="button" aria-label="Profile"></button></div>
       <div id="gymWeek"></div>
       <div id="gymLog" hidden></div>
     </div>
-    <div class="view" id="view-meals" hidden><div id="mealCats"></div></div>
-    <div class="view" id="view-meds" hidden><div id="medsBody"></div></div>
-    <div class="view" id="view-classes" hidden><div id="clsWeek"></div></div>
+    <div class="view" id="view-meals" hidden><div class="topbar tabtop"><button class="profbtn" type="button" aria-label="Profile"></button></div><div id="mealCats"></div></div>
+    <div class="view" id="view-meds" hidden><div class="topbar tabtop"><button class="profbtn" type="button" aria-label="Profile"></button></div><div id="medsBody"></div></div>
+    <div class="view" id="view-classes" hidden><div class="topbar tabtop"><button class="profbtn" type="button" aria-label="Profile"></button></div><div id="clsWeek"></div></div>
 
     <!-- Rest timer: starts when a set is ticked -->
     <div class="restbar" id="restbar" aria-live="polite">
@@ -138,16 +136,15 @@
       <button class="iconbtn" id="settingsBack" aria-label="Back">
         <svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
       </button>
-      <h1>Settings</h1>
+      <div class="segs" role="tablist" aria-label="Profile">
+        <button type="button" role="tab" data-seg="settings" aria-selected="true">SETTINGS</button>
+        <button type="button" role="tab" data-seg="info" aria-selected="false">PERSONAL INFO</button>
+      </div>
       <span class="saved" id="setSaved" aria-live="polite">✓ Saved</span>
     </div>
 
-    <div class="group-label">Profile</div>
-    <div class="group">
-      <label class="row">Name <input id="setName" type="text" maxlength="20" placeholder="Siza" autocapitalize="words" enterkeyhint="done"></label>
-    </div>
-
-    <div class="group-label">Workout</div>
+    <div id="setPane">
+    <div class="group-label" style="margin-top:20px">Workout</div>
     <div class="group">
       <div class="row">Default rest timer
         <div class="stepper">
@@ -179,6 +176,8 @@
     </div>
 
     <div class="settings-version" id="version"></div>
+    </div>
+    <div id="infoPane" hidden><div id="infoBody"></div></div>
   </section>
 
   <div class="toast" id="toast"></div>
@@ -220,21 +219,29 @@
   <div class="sheet-wrap" id="resetSheet" hidden>
     <div class="sheet">
       <h2>Reset all data?</h2>
-      <p>Deletes everything on this phone: programs, workouts, meds, classes, recipes, history, photos, name and settings. Export a backup first if you might want it back.</p>
+      <p>Deletes everything on this phone: programs, workouts, meds, classes, recipes, history, photos, body measurements, name and settings. Export a backup first if you might want it back.</p>
       <button class="primary" type="button" id="resetExport">EXPORT BACKUP FIRST</button>
       <button class="dangerbtn" type="button" id="resetGo">RESET EVERYTHING</button>
       <button class="textbtn" type="button" id="resetCancel">Cancel</button>
     </div>
   </div>
 
-  <!-- First launch: ask the name once -->
-  <div class="sheet-wrap" id="nameSheet" hidden>
-    <form class="sheet" id="nameForm" autocomplete="off">
-      <h2>What's your name?</h2>
-      <p>So RISEN can greet you. You can change it later in Settings.</p>
-      <input id="nameInput" type="text" maxlength="20" placeholder="Your name" autocapitalize="words" enterkeyhint="done">
-      <button class="primary" type="submit">CONTINUE</button>
-      <button class="textbtn" type="button" id="nameSkip">Skip</button>
+  <!-- Profile > Personal info: history of one value, and a new custom measurement -->
+  <div class="sheet-wrap" id="histSheet" hidden>
+    <div class="sheet">
+      <h2 id="histTitle"></h2>
+      <div class="hlist" id="histList"></div>
+      <button class="primary nogl" type="button" id="histDone">DONE</button>
+      <button class="textbtn danger" type="button" id="histDelAll" hidden>Delete this measurement</button>
+    </div>
+  </div>
+  <div class="sheet-wrap" id="addMeasSheet" hidden>
+    <form class="sheet" id="addMeasForm" autocomplete="off">
+      <h2>New measurement</h2>
+      <input class="field" id="addName" type="text" maxlength="24" placeholder="Name (e.g. Shoulders)" autocapitalize="sentences" enterkeyhint="next">
+      <input class="field" id="addVal" type="text" inputmode="decimal" placeholder="Value (cm)" style="margin-top:10px" enterkeyhint="done">
+      <button class="primary" type="submit">ADD</button>
+      <button class="textbtn" type="button" id="addCancel">Cancel</button>
     </form>
   </div>
 
@@ -247,5 +254,6 @@
 <script src="meds.js"></script>
 <script src="classes.js"></script>
 <script src="meals.js"></script>
+<script src="profile.js"></script>
 </body>
 </html>
