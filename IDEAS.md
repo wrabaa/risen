@@ -33,7 +33,11 @@ Planning notes only. Each idea is discussed with the planner first, then built a
   a) on Classes, swiping the day list changes the day; swiping the header/title area changes the tab;
   b) Classes days change only by tapping the weekday circles (day swipe removed);
   c) day swipe stays, and at the first/last day of the week it moves to the next tab.
-  → Siza + planner decide before building.
+  → **DECIDED: test b first** (swipe always = tab; days by tapping the weekday circles). If Siza doesn't like it → c.
+
+## 5. Supps page title in full
+- The title on the Supps tab page is written out in full: **SUPPLEMENTS** (there is room; the short "SUPPS" is only
+  for the tab bar / Home tile, and the tab bar has no words anyway).
 
 ## Order (suggestion)
 1 + 2 together (profile page) → 4 (tab swipe, after the Classes decision) → 3 (intro, after the look is agreed).
