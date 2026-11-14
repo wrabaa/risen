@@ -311,6 +311,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
   Supps title SUPPLEMENTS. iPhone test pending.
 - `.62` Profile button on the title line (extra row removed); swipe between tabs (HOME ⇄ GYM ⇄ MEALS ⇄ SUPPS ⇄ CLASSES, pages slide); Classes day swipe removed
   (days by tapping the weekday circles; option c if disliked). Sub-pages keep swipe-right = back. iPhone test pending.
+- `.63` Intro: ENTER button replaced by a glass "ENTER" pill above his head, tap anywhere enters; tab swipe is off while the workout logger is open. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

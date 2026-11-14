@@ -162,6 +162,7 @@
       st=null; if(Date.now()<busyUntil||e.touches.length!==1||app.classList.contains('hidden')) return;
       const view=e.currentTarget, t=e.touches[0], from=current();
       if(!from||view.id!=='view-'+from||e.target.closest(BLOCK)||typing()||overlay()||hscroll(e.target,view)) return;
+      if(from==='gym'&&!$('gymLog').hidden) return;                                         // a workout is running: an accidental swipe must never leave it (the tab bar still works)
       if(t.clientX<EDGE||t.clientX>innerWidth-EDGE) return;
       st={x0:t.clientX,y0:t.clientY,locked:false,dx:0,from,samples:[{t:e.timeStamp,x:t.clientX}]};
     }
@@ -223,10 +224,14 @@
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible'&&loaded&&!app.classList.contains('hidden')&&!$('view-home').hidden) renderHome();
   });
-  $('login').onclick=async()=>{
-    await ready; renderHome(); show('home');
+  // Tap ANYWHERE on the intro enters (the glass ENTER pill is only the hint; it is a real button too, so it works with a keyboard / VoiceOver)
+  let entering=false;
+  intro.onclick=async()=>{
+    if(entering) return; entering=true;
+    try{ await ready; renderHome(); show('home');
     intro.classList.add('hidden'); app.classList.remove('hidden'); Motion.count($('tiles'));
     backupPrompt();
+    }finally{ entering=false; }
   };
 
   // ---- Settings ----

@@ -50,7 +50,7 @@ depth (`.54`): `--bg-top` #141414 + `--glow` (≤4% lime) = the background gradi
 browser cannot blur) · `--volt-glow` (under the main button and active tab icon) · `--r-card` 20px · `--card-depth` ·
 studio tags (Classes only, subtle): `--studio-energy` #D9A25E · `--studio-balance` #7CB9AE ·
 `--studio-power` #A592D6.
-No dot-matrix font. Intro = Siza's black & white photo + logo + "STRONGER EVERY DAY" + ENTER
+No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + a glass ENTER pill above his head (tap anywhere enters, `.63`)
 (all text/buttons in code, never baked into images).
 
 ## Structure
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.62)
+## Status (release 2026-11-14.63)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -131,6 +131,10 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   the right, right = the one on the left, no wrap), running the tab's own opener, the two pages slide (transform only). Never on inputs, while typing, under a sheet /
   sub-page / photo viewer, on anything that scrolls sideways itself (Classes chips), or within 20 px of the screen edges. Classes day swipe is REMOVED: days change
   only by tapping the weekday circles (if Siza dislikes it: option c in `IDEAS.md`). iPhone test pending.
+- `.63` (`IDEAS.md` 3) intro: no ENTER button any more; TAP ANYWHERE enters. One medium glass pill "ENTER" (same glass as the tab bar, slow gentle pulse, transform +
+  opacity only) sits above his head: its top is a % of the screen height (the photo fills the height, so the head starts at 22.6% on every phone), so it never covers him
+  on iPhone 13 or SE. Logo, STRONGER EVERY DAY and the tagline are unchanged (same place). The pill is still a real button (keyboard / VoiceOver). Tab swipe is OFF while the
+  workout logger is open (Gym tab with a running workout); the tab bar still works. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

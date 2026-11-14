@@ -55,15 +55,22 @@
     animation:fade 1s ease .3s both}
   .brand img{height:30px;width:auto}
   .brand span{font-family:Oswald,sans-serif;font-weight:500;font-size:22px;letter-spacing:.32em;color:var(--text)}
-  .hero{position:absolute;z-index:2;left:28px;right:28px;bottom:calc(env(safe-area-inset-bottom) * .65 + 14px);
+  .hero{position:absolute;z-index:2;left:28px;right:28px;bottom:calc(env(safe-area-inset-bottom) * .65 + 92px);       /* (the button used to sit under the text: the text stays where it was) */
     animation:rise 1s cubic-bezier(.2,.8,.2,1) .2s both}
   .hero h1{font-family:Oswald,sans-serif;font-weight:700;font-size:clamp(44px,13vw,60px);line-height:.98;text-transform:uppercase;letter-spacing:.01em}
   .hero h1 em{display:block;font-style:normal;color:var(--volt)}
   .hero p{margin-top:14px;font-size:13px;letter-spacing:.24em;line-height:1.7;color:var(--soft);text-transform:uppercase}
-  #login{margin-top:22px;width:100%;min-height:56px;border-radius:999px;border:1.5px solid var(--text);background:rgba(11,11,11,.55);
-    color:var(--text);font-family:Oswald,sans-serif;font-weight:700;font-size:18px;letter-spacing:.1em;cursor:pointer;
-    animation:glow 2.4s ease-in-out 1.4s infinite;transition:transform .12s ease,background .12s ease}
-  #login:active{transform:scale(.97);background:rgba(204,255,0,.15)}
+  /* ENTER (.63): one glass pill in the dark space above his head (the head starts at 22.6% of the photo's height on every phone: the photo
+     fills the height), same glass as the tab bar, slow gentle pulse. The whole intro is the tap target. */
+  .enterwrap{position:absolute;z-index:2;left:0;right:0;top:calc(22.6% - 60px);height:48px;display:flex;justify-content:center;pointer-events:none;
+    animation:fade 1s ease .6s both}
+  #login{pointer-events:none;min-width:168px;height:48px;padding:0 34px;border-radius:999px;border:1px solid var(--hairline);background:var(--glass);color:var(--text);
+    -webkit-backdrop-filter:blur(28px) saturate(120%);backdrop-filter:blur(28px) saturate(120%);
+    box-shadow:inset 0 1px 0 var(--hilite),0 12px 32px var(--shadow),0 2px 8px rgba(0,0,0,.35);
+    font-family:Oswald,sans-serif;font-weight:600;font-size:17px;letter-spacing:.28em;text-indent:.28em;
+    animation:enterpulse 3.4s ease-in-out 1.6s infinite}
+  @keyframes enterpulse{0%,100%{transform:scale(1);opacity:.82}50%{transform:scale(1.05);opacity:1}}
+  #intro{cursor:pointer;-webkit-tap-highlight-color:transparent}
   @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(204,255,0,0)}50%{box-shadow:0 0 22px 2px rgba(204,255,0,.5)}}
   @keyframes rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
   @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -628,7 +635,7 @@
 
   /* No backdrop-filter (old browser): glass becomes (almost) solid so text stays readable */
   @supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
-    .tabbar,.sheet,.restbar{background:var(--glass-solid)}
+    .tabbar,.sheet,.restbar,#login{background:var(--glass-solid)}
     .search{background:var(--bg)}
   }
 

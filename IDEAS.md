@@ -19,7 +19,7 @@ Planning notes only. Each idea is discussed with the planner first, then built a
 - Remove the "What's your name?" question on first launch. The name is set in PERSONAL INFO.
 - Until a name is set, Home says just "HELLO" (as today when skipped).
 
-## 3. Intro without the ENTER button (to discuss more)
+## 3. Intro without the ENTER button — BUILT in `.63`
 - Tap **anywhere** on the intro to enter.
 - Instead of the button: one small **glass** element, iOS-lock-screen style (e.g. a glassy "tap to enter" or a
   big lock-screen-like clock/date at the top or middle). Exact look to be decided together first.
