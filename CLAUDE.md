@@ -76,7 +76,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-14.58)
+## Status (release 2026-11-14.59)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -115,6 +115,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   WEEK SUMMARY as three small rings; the lime glow only on the ONE main button per screen (iPhone test pending).
 - `.58` tab bar glass darker (84%, less colour boost) so a lime button scrolling under it is only a faint hint; schedule: Sixpax (Fri 18:00,
   Sat 09:30) and Fri Pound are 30 min (phones take it with Settings → Reload gym schedule).
+- `.59` Classes filter chips always on ONE line: "★ MINE" is just ★ (aria-label "My classes"), chips a bit smaller; if a screen is still too
+  narrow the row scrolls sideways (never wraps), and a touch on the row never swipes the day (`.cfilter` in `styles.css` / `classes.js`). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

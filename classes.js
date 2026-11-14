@@ -108,8 +108,8 @@ const Classes = (() => {
 
   function chipsHtml() {
     if (!S.classes.length) return '';
-    const chips = [['ALL', 'ALL'], ['MINE', `${STAR} MINE`], ...studios().map(x => [x, esc(x.toUpperCase())])];
-    return `<div class="chips sm" style="margin:0 0 16px">${chips.map(([v, l]) => `<button type="button" data-filter="${esc(v)}" aria-pressed="${filter === v}">${l}</button>`).join('')}</div>`;
+    const chips = [['ALL', 'ALL'], ['MINE', STAR, 'My classes'], ...studios().map(x => [x, esc(x.toUpperCase())])];      // MINE is just the star (the name is in aria-label)
+    return `<div class="chips sm cfilter" style="margin:0 0 16px">${chips.map(([v, l, name]) => `<button type="button" data-filter="${esc(v)}"${name ? ` aria-label="${name}"` : ''} aria-pressed="${filter === v}">${l}</button>`).join('')}</div>`;
   }
 
   function render() {
@@ -198,7 +198,8 @@ const Classes = (() => {
   const step = dir => goDay(((viewDay - 1 + dir + 7) % 7) + 1, dir > 0 ? 'next' : 'prev');   // Sunday -> Monday and back
   { // swipe left = next day, swipe right = previous day (day timeline only; not from the screen edges, which belong to the phone)
     const vc = $('view-classes'); let tx = 0, ty = 0, tt = 0, on = false;
-    vc.addEventListener('touchstart', e => { const t = e.touches[0]; on = e.touches.length === 1 && mode === 'day' && t.clientX > 24 && t.clientX < innerWidth - 24; tx = t.clientX; ty = t.clientY; tt = Date.now(); }, { passive: true });
+    // (the Classes filter chip row scrolls sideways itself, so a touch on it never starts a day swipe)
+    vc.addEventListener('touchstart', e => { const t = e.touches[0]; on = e.touches.length === 1 && mode === 'day' && t.clientX > 24 && t.clientX < innerWidth - 24 && !e.target.closest('.cfilter'); tx = t.clientX; ty = t.clientY; tt = Date.now(); }, { passive: true });
     vc.addEventListener('touchcancel', () => { on = false; }, { passive: true });
     vc.addEventListener('touchend', e => {
       if (!on) return; on = false;

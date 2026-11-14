@@ -463,6 +463,11 @@
   .tline{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .chips.sm{gap:6px}
   .chips.sm button{min-height:38px;padding:0 13px;font-size:14px}
+  /* Classes filter row: always ONE line. Slightly smaller chips; if a screen is still too narrow the row scrolls sideways, it never wraps. */
+  .chips.cfilter{flex-wrap:nowrap;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-left:-2px;margin-right:-2px;padding:0 2px}
+  .chips.cfilter::-webkit-scrollbar{display:none}
+  .chips.cfilter button{flex:none;min-height:36px;padding:0 10px;font-size:13px;white-space:nowrap}
+  .chips.cfilter button svg{width:16px;height:16px;margin:-2px 0 0}
   .avatar{flex:none;width:56px;height:56px;border-radius:50%;overflow:hidden;background:var(--field);border:1px solid var(--line);display:grid;place-items:center;color:var(--muted)}
   .avatar img{display:block;width:100%;height:100%;object-fit:cover}
   .avatar b{font-family:Oswald,sans-serif;font-weight:500;font-size:17px;letter-spacing:.06em}
