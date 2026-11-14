@@ -285,8 +285,10 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.51` Floating glass tab bar (iOS 26 style pill, icons only, sliding active pill, content scrolls under it, bar steps aside
   while typing); MEDS tab renamed SUPPS (tab, Home tile, week summary; title inside "Supplements & Meds"; data and code
   names unchanged); star label "Unstar". iPhone test pending.
-- `.52` Swipe back on every sub-page and Settings (page follows the finger like iOS; short/slow snaps back; never on tab
+- `.52` Swipe back on every sub-page and Settings (page follows the finger like iOS; never on tab
   pages, while typing, on inputs; vertical scroll untouched). iPhone test pending.
+- `.53` Swipe-back tuning: back past 50% of the width at any speed, or a fast flick past 25% (like iOS); anything less
+  snaps back. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)
