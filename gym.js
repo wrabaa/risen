@@ -517,13 +517,22 @@ const Gym = (() => {
   });
 
   // The built-in list changed (library.js: aliases / retired)? Bring this phone's plan, history and photos along. Does nothing otherwise.
-  async function followLibrary() {
-    try { if (!(await RisenDB.migrateLibrary(LIBRARY))) return false; } catch (err) { console.error(err); return false; }
+  // Done once per library change: the fingerprint of aliases + retired is remembered in settings (libraryFollowed), so an ordinary
+  // start does not read every workout and every log. A new alias changes the fingerprint and it runs again by itself. An import
+  // (old backups may hold old ids) passes force.
+  const libSig = () => { const s = JSON.stringify([LIBRARY.aliases, LIBRARY.retired]); let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return String(h); };
+  async function followLibrary({ force = false } = {}) {
+    const sig = libSig();
+    if (!force && S.settings.libraryFollowed === sig) return false;
+    let changed;
+    try { changed = await RisenDB.migrateLibrary(LIBRARY); } catch (err) { console.error(err); return false; }       // not marked done: tried again next time
+    try { await RisenDB.setSetting('libraryFollowed', sig); S.settings.libraryFollowed = sig; } catch (err) { console.error(err); }
+    if (!changed) return false;
     await load(); clearThumbs();
     if (!$('view-gym').hidden && !$('gymPage').classList.contains('open')) renderGym();
     renderHome(); return true;
   }
-  ready.then(followLibrary);
+  ready.then(() => followLibrary());
 
   return { open, openToday, start, reset, flush, followLibrary };
 })();

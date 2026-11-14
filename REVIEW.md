@@ -5,6 +5,10 @@ Review-only passes over the commits. No code is changed by a review; findings ar
 
 **Last reviewed: `1e03b39` — release 2026-11-13.49**
 
+## Status of review 1
+Fixed in `.50`: 🟡1 (merge duplicates, incl. repairing a day already doubled), 🟡2 (old photo kept in the backup, new one
+shown), 🟡3 (check runs once), 🟡4 (running version), 🟡5 (notes), 🟡6 (star label).
+
 ## Review 1 — 13 Nov 2026 — commits `.42` → `.49` (`abb272d` … `1e03b39`)
 Method: read every diff since `.41` (`ba88bf9`); nothing was run on an iPhone.
 

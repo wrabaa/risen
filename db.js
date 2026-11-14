@@ -15,7 +15,8 @@
 //   logs       {id, exerciseId, sessionId, date, at, sets:[{kg, reps}]}
 //              History is stored per EXERCISE ID, so changing routines never loses progress.
 //   settings   {key, value}   name, nameAsked, restSec, activeSession (workout in progress), lastExport,
-//              backupAsked (when the weekly "Back up now?" was last shown)
+//              backupAsked (when the weekly "Back up now?" was last shown), libraryFollowed (fingerprint of the library's
+//              aliases/retired that this phone has already been brought in line with; see Gym.followLibrary)
 //   photos     {exerciseId, type, data:ArrayBuffer, width, height, updated}
 //              ONE photo per exercise, keyed by exercise ID. Resized to max 1000px JPEG before saving.
 //              A med's box photo lives here too, under the key 'med-<medId>'.
@@ -360,9 +361,27 @@ const RisenDB = (() => {
     const [workouts, logs, photoKeysNow, exs, act] = await Promise.all([req(ws.getAll()), req(ls.getAll()), req(ps.getAllKeys()), req(xs.getAll()), req(st.get('activeSession'))]);
     const to = id => Object.prototype.hasOwnProperty.call(aliases, id) ? aliases[id] : id;
     let changed = false; const used = new Set();
+    // Targets that two or more old exercises map to (e.g. Lying + Seated leg curl -> Leg Curl): a day holding both would list it twice.
+    const perTarget = {}; for (const o of olds) perTarget[aliases[o]] = (perTarget[aliases[o]] || 0) + 1;
+    const merged = new Set(Object.keys(perTarget).filter(k => perTarget[k] > 1));
     for (const w of workouts) {
       let hit = false;
-      const list = (w.exercises || []).map(it => { const n = to(it.exerciseId); used.add(n); if (n === it.exerciseId) return it; hit = true; return { ...it, exerciseId: n }; });
+      // Same exercise twice because of a merge (or an alias onto one the day already has): keep ONE entry, the first. The history
+      // is by exercise id and has already moved, so only the second copy's sets/kg/reps target goes. Two entries the user made
+      // themselves on purpose are left alone.
+      const untouched = new Set((w.exercises || []).filter(it => to(it.exerciseId) === it.exerciseId && !merged.has(it.exerciseId)).map(it => it.exerciseId));
+      const taken = new Map(), list = [];                 // new id -> the old id its first entry came from
+      for (const it of w.exercises || []) {
+        const n = to(it.exerciseId); used.add(n); const remapped = n !== it.exerciseId;
+        if (remapped) {                                   // a second entry for the same new id that came from a DIFFERENT old exercise is a merge duplicate
+          if (untouched.has(n) || (taken.has(n) && taken.get(n) !== it.exerciseId)) { hit = true; continue; }
+          if (!taken.has(n)) taken.set(n, it.exerciseId);
+        } else if (merged.has(n)) {                       // already merged earlier (e.g. Leg Curl twice): keep the first
+          if (taken.has(n)) { hit = true; continue; }
+          taken.set(n, n);
+        }
+        if (remapped) { hit = true; list.push({ ...it, exerciseId: n }); } else list.push(it);
+      }
       if (hit) { ws.put({ ...w, exercises: list }); changed = true; }
     }
     for (const l of logs) { const n = to(l.exerciseId); used.add(n); if (n !== l.exerciseId) { ls.put({ ...l, exerciseId: n }); changed = true; } }
@@ -375,7 +394,9 @@ const RisenDB = (() => {
     const pk = new Set(photoKeysNow.map(String)), xById = new Map(exs.map(x => [x.id, x]));
     for (const o of olds) {
       const n = aliases[o];
-      if (pk.has(o) && !pk.has(n)) {                      // the photo follows (an existing photo on the new one wins; nothing is deleted then)
+      // The photo follows. If BOTH the old and the new exercise have one, the new one stays the one that is shown and the old one is
+      // left where it is (stored under its old id, so it is still in every backup); nothing is ever deleted here.
+      if (pk.has(o) && !pk.has(n)) {
         const p = await req(ps.get(o)); if (p) { ps.put({ ...p, exerciseId: n }); ps.delete(o); pk.add(n); pk.delete(o); changed = true; }
       }
       const xo = xById.get(o);   // the small record of the old exercise: its notes, and (if it had become one of "My exercises") its name

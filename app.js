@@ -289,7 +289,7 @@ $('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
     }
   }
   let res; try{ res=await RisenDB.importAll(b); }catch(e){ toast(e.message==='Not a RISEN backup'?'That file is not a RISEN backup':e.message); return; }
-  await load(); await Gym.followLibrary(); await Classes.matchSeed(); // an older backup follows the current exercise list and class ids
+  await load(); await Gym.followLibrary({force:true}); await Classes.matchSeed(); // an older backup follows the current exercise list and class ids
     openSettings(); renderHome(); toast(res&&res.settingsOnly?'Name and rest timer restored':'Backup restored');
 };
 
@@ -358,13 +358,23 @@ if('serviceWorker' in navigator){
   // The installed version (small text at the bottom of Settings), to confirm an update arrived. It was sometimes empty in the
   // home-screen app, so it no longer depends on one thing: the cache name is shown at once (fallback), and the running service
   // worker is asked "which version are you?" and its answer, when it comes, replaces it.
+  // It shows the version that is RUNNING (the code this page was loaded with), not the newest one that has been downloaded: it is
+  // read once, at start, before any update can arrive, and kept. (While an update waits for a quiet moment the worker is already
+  // the new one, so asking it later would run ahead of the screens.)
+  let runningVersion=null;
   async function showVersion(){
     const el=$('version'), set=v=>{ if(v) el.textContent='v'+v; };
-    try{ const k=(await caches.keys()).find(n=>n.startsWith('risen-')); if(k) set(k.slice(6)); }catch(e){}   // fallback: the cache name
+    if(runningVersion) return set(runningVersion);
+    let cacheV=null;
+    try{ const k=(await caches.keys()).find(n=>n.startsWith('risen-')); if(k){ cacheV=k.slice(6); set(cacheV); } }catch(e){}   // fallback: the cache name
+    let said=null;
     try{
-      if(!('serviceWorker' in navigator)) return;
-      const sw=navigator.serviceWorker.controller||(await navigator.serviceWorker.ready).active; if(!sw) return;
-      set(await new Promise(res=>{ const ch=new MessageChannel(); ch.port1.onmessage=e=>res(e.data&&e.data.version); sw.postMessage('version',[ch.port2]); setTimeout(()=>res(null),3000); }));
+      if('serviceWorker' in navigator){
+        const sw=navigator.serviceWorker.controller||(await navigator.serviceWorker.ready).active;
+        if(sw) said=await new Promise(res=>{ const ch=new MessageChannel(); ch.port1.onmessage=e=>res(e.data&&e.data.version); sw.postMessage('version',[ch.port2]); setTimeout(()=>res(null),3000); });
+      }
     }catch(e){}
+    set(said);
+    runningVersion=said||cacheV;     // fixed from now on (nothing found: stays empty and is tried again)
   }
   showVersion();

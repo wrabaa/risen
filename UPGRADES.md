@@ -28,6 +28,9 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   1. Classes first-open question: × / NOT NOW, tab bar visible — built in `.42`, iPhone test pending.
   2. Install pop-up (replaces the Safari banner) — built in `.43`, iPhone test pending.
   3. Classes made alive (a–f) — built in `.44`, iPhone test pending.
+- **After queue 3:** `.45` new instructor portraits · `.46` offline safety net (`sw.js`) · `.47` new exercise library (62) ·
+  `.48` library 82 + equipment tags, 9 retired exercises now alias to their new match · `.49` Settings version line
+  made reliable · `.50` fixes from the first code review (below). `.42`–`.50`: iPhone test pending.
 
 **Waiting / on hold**
 - C. Plan the calories screen — WAITING: Siza plans it with the planner first.
@@ -264,6 +267,21 @@ Siza's order. Each item: built? tested on iPhone? release number.
      "No classes attended this month yet" when empty).
    - Choices: + ADD CLASS now sits at the bottom of the day timeline (the timeline is the hero);
      a starred class later today wins the Home tile even while an unstarred one is live.
+
+## After queue 3 (14 Nov 2026)
+- `.45` Instructor photos: 14 new studio portraits (Siza); every file's number in `ASSETS` raised.
+- `.46` Offline safety net: a page with no cached copy and no network opens the cached `index.html`.
+- `.47` / `.48` Exercise library = Siza's real gym (`EXERCISES.md`): 62, then 82 with an `equipment` tag; old exercises
+  aliased or retired, nothing lost on a phone.
+- `.49` Settings version line asks the running service worker (cache name as fallback).
+- `.50` Review fixes (REVIEW.md, review 1):
+  1. A day that ends up with the same exercise twice after a merge keeps ONE (the first); history is untouched. Two
+     copies the user made on purpose are left alone; a day already doubled by `.47` (Leg Curl) is repaired.
+  2. Old and new exercise both had a photo: the new one is shown, the old stays stored under its old id (still in every backup).
+  3. The old-ID check at start-up runs once and remembers it (`libraryFollowed` in settings); a changed alias list or an
+     import runs it again.
+  4. Settings shows the version that is RUNNING (read once at start), not the newest one downloaded.
+  5. These notes. 6. Star label "Remove" → "Delete" (screen-reader text).
 
 ## Parking lot
 - (new ideas go here)

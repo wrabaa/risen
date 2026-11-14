@@ -70,11 +70,11 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-13.49)
+## Status (release 2026-11-14.50)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ MEDS — done.
-- ✅ CLASSES — done (polish pending: better instructor photos).
-- 🔄 GYM — works; Siza is testing it in real gym sessions. Exercise library to be rebuilt.
+- ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
+- 🔄 GYM — works; Siza is testing it in real gym sessions. Exercise library rebuilt (82, `.48`); images to come.
 - 🟡 MEALS — base only.
 - ✅ Code-review fixes `.28`–`.32` (safe import, honest backup date, streak/week counting,
   quiet updates, med tick follows a time change) — tested on iPhone.
@@ -91,6 +91,9 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   alias to their new match, also for phones where they already sat under "My exercises" (iPhone test pending).
 - `.49` Settings version line made reliable: the running service worker answers a `'version'` message (`sw.js`),
   Settings shows that, with the cache name as fallback (it was empty in the home-screen app once).
+- `.50` fixes from review 1 (`REVIEW.md`): a merge never leaves the same exercise twice in a day; the old photo stays in the
+  backup when both had one; the old-ID check runs once (`libraryFollowed`, import forces it); Settings shows the RUNNING
+  version (read at start); star label "Delete". `.42`–`.50`: iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -181,7 +184,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   and `equipment` (Machine/Cable/Dumbbell/Barbell/Bodyweight/Cardio; stored only, filter chips later). Images
   (`assets/exercises/<file>`) come later. T-bar row and Preacher curl stay retired until confirmed at the gym.
   A retired exercise that later gets a match moves to `aliases`; a phone where it was already in "My exercises"
-  moves it (plan, history, notes, photo) and drops the stale entry.
+  moves it (plan, history, notes, photo) and drops the stale entry. After a merge a day keeps ONE copy of the same exercise
+  (the first); the old check at start-up runs once per library change (fingerprint in settings `libraryFollowed`).
 
 **MEDS**
 - A med counts from the day it's added (earlier days = "not scheduled", not "missed").
@@ -197,7 +201,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - Seed loads once on YES; afterwards it's normal editable data. Schedule classes carry
   `seed:true` and a fixed ID; "Reload gym schedule" resets only those.
 - Instructor photos are public in the repo — Siza decided this is fine (they're already
-  public in the gym's own app). Current crops are low quality; better ones coming.
+  public in the gym's own app). New studio portraits since `.45`.
 - "Clear all classes" also removes instructors (they belong to the old gym).
 - ⭐ = `star:true` on the class record (no new store); kept by "Reload gym schedule". Home tile =
   next starred class today, else next class of any kind. Live timing only exists for TODAY.

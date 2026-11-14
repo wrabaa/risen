@@ -150,7 +150,7 @@ const Classes = (() => {
     return `<div class="card cls${st ? ' ' + st : ''}${c.star ? ' mine' : ''}"><div class="clsrow">${av}
       <button class="wmain" data-open="${esc(c.id)}"><div class="xt"><div class="t">${esc(c.name)}</div><div class="s">${range(c)}</div>${status}
         <div class="s ctag">${tagHtml(c.studio)}${i ? esc(i.name) : 'TBA'}</div></div>${CHEV}</button>
-      <button class="starbtn${c.star ? ' on' : ''}" type="button" data-star="${esc(c.id)}" aria-pressed="${!!c.star}" aria-label="${c.star ? 'Remove from my classes' : 'Add to my classes'}">${STAR}</button></div>
+      <button class="starbtn${c.star ? ' on' : ''}" type="button" data-star="${esc(c.id)}" aria-pressed="${!!c.star}" aria-label="${c.star ? 'Delete from my classes' : 'Add to my classes'}">${STAR}</button></div>
       ${today ? `<button class="attbtn${done ? ' on' : ''}" data-att="${esc(c.id)}">✓ ATTENDED</button>` : ''}</div>`;
   }
 
