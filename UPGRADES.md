@@ -323,6 +323,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.72` Supps: doses are shown again for a supplement added after their time (the not-overdue rule is only on the NOW card); editor starts with the box photo; the word is "supplement" in this section. iPhone test pending.
 - `.73` Supps redesign: NEXT UP card (box photo inside the day's ring, big lime ✓ TAKE), TIME TO TAKE highlight on due doses (one due rule with the NOW card, redraws every minute), box photos in MY SUPPS. iPhone test pending.
 - `.74` Water on Home: tile 06 (tap = a glass of 250 ml, − takes one back, gear = daily goal sheet), new store `waterlogs` in backup, 4th WATER ring in the week summary. iPhone test pending.
+- `.75` Supps NEXT UP: full-width 4:3 box photo on top, no ring, no TAKE button (information only). iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

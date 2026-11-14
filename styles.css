@@ -374,9 +374,6 @@
   .timex{flex:none;width:52px;height:52px;border-radius:14px;border:1px solid var(--line);background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
   .timex:active{background:var(--line)}
   .card.paused{opacity:.55}
-  .ringcard{display:flex;flex-direction:column;align-items:center;padding:22px 16px 20px}
-  .ringwrap{position:relative;width:168px;height:168px}
-  .ringwrap svg{display:block;width:100%;height:100%}
   .rtrack{fill:none;stroke:var(--line);stroke-width:10}
   .rfill{fill:none;stroke:var(--volt);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.32,.72,0,1)}
   .rnum{position:absolute;inset:0;display:grid;place-items:center;font-family:Oswald,sans-serif;font-weight:700;font-size:54px;line-height:1}
@@ -715,23 +712,23 @@
   .nowcard.alldone .wname{color:var(--volt)}
   .tile .play{box-shadow:none}
 
-  /* SUPPS (.73): NEXT UP card (photo inside the day's ring), TIME TO TAKE highlight (like LIVE NOW in classes), photos in MY SUPPS */
-  .nextup{position:relative}
-  .nu-top{align-self:stretch;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-  .nu-label{font-family:Oswald,sans-serif;font-weight:500;font-size:12px;letter-spacing:.24em;color:var(--muted)}
-  .nu-count{font-family:Oswald,sans-serif;font-weight:700;font-size:16px;color:var(--muted)}
+  /* SUPPS NEXT UP card (.75): information only; a full-width 4:3 box photo on top (corners rounded by the card), name + "dose · time" under it */
+  .card.nextup{position:relative;padding:0;overflow:hidden}
+  .nu-media{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--card);display:grid;place-items:center;color:var(--dim)}
+  .nu-media img{display:block;width:100%;height:100%;object-fit:cover}
+  .nu-media .icon{width:56px;height:56px}
+  .nu-media.ok{color:var(--volt)}
+  .nu-media.ok .icon,.nu-media.ok svg{width:72px;height:72px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .nu-top{position:absolute;top:10px;left:12px;right:12px;display:flex;align-items:center;justify-content:space-between;pointer-events:none}
+  .nu-label,.nu-count{padding:3px 10px;border-radius:999px;background:rgba(11,11,11,.55);font-family:Oswald,sans-serif}
+  .nu-label{font-weight:500;font-size:12px;letter-spacing:.24em;color:var(--soft)}
+  .nu-count{font-weight:700;font-size:16px;color:var(--muted)}
   .nu-count>span{color:var(--text)}
-  .rphoto{position:absolute;inset:24px;border-radius:50%;overflow:hidden;background:var(--field);display:grid;place-items:center;color:var(--dim)}
-  .rphoto img{display:block;width:100%;height:100%;object-fit:cover}
-  .rphoto .icon{width:48px;height:48px}
-  .rphoto.ok{background:none;color:var(--volt)}
-  .rphoto.ok .icon,.rphoto.ok svg{width:64px;height:64px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-  .nextup .livepill{margin-top:14px}
-  .nu-name{margin-top:12px;font-family:Oswald,sans-serif;font-weight:700;font-size:26px;line-height:1.1;text-transform:uppercase;text-align:center;overflow-wrap:anywhere}
-  .nextup .livepill+.nu-name{margin-top:8px}
+  .nu-info{padding:14px 16px 18px;text-align:center}
+  .nu-info .livepill{margin-bottom:8px}
+  .nu-name{font-family:Oswald,sans-serif;font-weight:700;font-size:26px;line-height:1.1;text-transform:uppercase;overflow-wrap:anywhere}
   .nu-name.ok{color:var(--volt)}
-  .nu-sub{margin-top:4px;font-size:15px;color:var(--muted);text-align:center}
-  .nu-btn{margin-top:16px;width:100%}
+  .nu-sub{margin-top:4px;font-size:15px;color:var(--muted)}
   .nextup.due{border-color:var(--volt)}
   .dose.due{border-color:var(--volt)}
   .dmain .livepill{margin-bottom:5px}

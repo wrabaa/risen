@@ -69,7 +69,7 @@ const Meds = (() => {
   }
 
   // ================= TODAY + MY MEDS =================
-  let lastFrac = null, lastDay = dayKey(new Date()), lastMin = -1;      // lastMin: the minute last drawn (a dose lights up at its time by itself)
+  let lastDay = dayKey(new Date()), lastMin = -1;      // lastMin: the minute last drawn (a dose lights up at its time by itself)
 
   function stripHtml(m, lm) {   // last 7 days (Mon-Sun): lime = all taken, half = some, grey = missed, tiny = not scheduled
     const todayK = dayKey(new Date());
@@ -103,25 +103,23 @@ const Meds = (() => {
       <div class="ltxt"><div class="t">${esc(m.name)}</div><div class="s">${sub}</div></div></div></button>`;
   }
 
-  // NEXT UP: ONE card with the next supplement: its photo big in the middle of the day's progress ring, name, dose and time, and a lime button that ticks it.
+  // NEXT UP: ONE information-only card (no button: ticking happens on the dose cards below). The box photo runs edge to edge at the top (4:3, cropped to fill; the pill icon on a plain
+  // block of the same height when there is no photo), the name and "dose · time" sit under it, the taken/total count stays in the top corner.
   // Which one: the earliest untaken dose that is due (a missed one keeps showing), else the next one later today ("At 14:00"), else all done.
-  function nextUpHtml(doses, lm, now, C, from, taken, total) {
+  function nextUpHtml(doses, lm, now, taken, total) {
     const open = doses.filter(d => !lm.has(d.id)), hm = hmOf(now);
     const due = open.find(d => isDue(d, now)), later = open.find(d => d.t > hm), earlier = open[0];
     const pick = due || later || earlier, complete = total > 0 && !open.length;
-    let center, title, sub = '', btn = '', pill = '';
-    if (complete) { center = `<div class="rphoto ok">${I.check}</div>`; title = 'All done today ✓'; }
-    else if (!pick) { center = `<div class="rphoto">${I.pill}</div>`; title = 'No doses today'; sub = 'Nothing scheduled'; }
+    let media, title, sub = '', pill = '';
+    if (complete) { media = `<div class="nu-media ok">${I.check}</div>`; title = 'All done today ✓'; }
+    else if (!pick) { media = `<div class="nu-media">${I.pill}</div>`; title = 'No doses today'; sub = 'Nothing scheduled'; }
     else {
-      const m = pick.m; center = `<div class="rphoto" data-mphoto="${esc(m.id)}">${thumbHtml(m.id)}</div>`; title = esc(m.name);
+      const m = pick.m; media = `<div class="nu-media" data-mphoto="${esc(m.id)}">${thumbHtml(m.id)}</div>`; title = esc(m.name);
       sub = [m.dose ? esc(m.dose) : '', due ? esc(pick.t) : later ? 'At ' + esc(pick.t) : 'Earlier today · ' + esc(pick.t)].filter(Boolean).join(' · ');
       if (due) pill = '<span class="livepill">TIME TO TAKE</span>';
-      btn = `<button class="primary nu-btn" type="button" data-dose="${esc(pick.id)}">✓ TAKE</button>`;
     }
-    return `<div class="card ringcard nextup${due ? ' due' : ''}"><div class="nu-top"><span class="nu-label">NEXT UP</span><span class="nu-count"><span data-count="${taken}">${taken}</span>/${total}</span></div>
-      <div class="ringwrap"><svg viewBox="0 0 120 120"><circle class="rtrack" cx="60" cy="60" r="52"/>
-        <circle class="rfill" id="rfill" cx="60" cy="60" r="52" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - from)}" transform="rotate(-90 60 60)"/></svg>${center}</div>
-      ${pill}<div class="nu-name${complete ? ' ok' : ''}">${title}</div>${sub ? `<div class="nu-sub">${sub}</div>` : ''}${btn}</div>`;
+    return `<div class="card nextup${due ? ' due' : ''}">${media}<div class="nu-top"><span class="nu-label">NEXT UP</span><span class="nu-count"><span data-count="${taken}">${taken}</span>/${total}</span></div>
+      <div class="nu-info">${pill}<div class="nu-name${complete ? ' ok' : ''}">${title}</div>${sub ? `<div class="nu-sub">${sub}</div>` : ''}</div></div>`;
   }
 
   function render() {
@@ -129,25 +127,21 @@ const Meds = (() => {
     const now = new Date(), lm = logMap(), doses = dosesOn(now), total = doses.length, taken = doses.filter(d => lm.has(d.id)).length;
     let h = `<div class="subline"><span class="meta">${now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}</span></div>`;
     const groups = []; for (const d of doses) { const g = groups[groups.length - 1]; if (g && g.t === d.t) g.ds.push(d); else groups.push({ t: d.t, ds: [d] }); }
-    let ring = null;
     if (!S.meds.length) {
       h += `<div class="card empty"><div class="wname">Nothing added yet</div><div class="sub">Add your medication and supplements to tick off what you take each day.</div>
         <button class="primary" data-act="add">+ ADD</button></div>`;
     } else {
-      const C = 2 * Math.PI * 52, frac = total ? taken / total : 0, from = lastFrac == null ? frac : lastFrac; lastFrac = frac;
-      ring = { C, frac, from };
-      h += `<div class="gstack">${nextUpHtml(doses, lm, now, C, from, taken, total)}
+      h += `<div class="gstack">${nextUpHtml(doses, lm, now, taken, total)}
         ${groups.map(g => groupHtml(g, lm, now)).join('')}</div>`;
       const list = [...S.meds].sort((a, b) => (a.paused ? 1 : 0) - (b.paused ? 1 : 0)           // active first (by time), paused last
         || ((a.times || [])[0] || '').localeCompare((b.times || [])[0] || '') || a.name.localeCompare(b.name));
-      h += `<div class="label">My supps</div><button class="primary nogl" data-act="add" style="margin-top:0">+ ADD</button><div class="gstack" style="margin-top:14px">${list.map(listCard).join('')}</div>`;
+      h += `<div class="label">My supps</div><button class="primary" data-act="add" style="margin-top:0">+ ADD</button><div class="gstack" style="margin-top:14px">${list.map(listCard).join('')}</div>`;
     }
     el.innerHTML = h;
-    if (ring && ring.from !== ring.frac) requestAnimationFrame(() => requestAnimationFrame(() => { const c = $('rfill'); if (c) c.style.strokeDashoffset = ring.C * (1 - ring.frac); }));
     loadThumbs();
   }
 
-  function open() { clearThumbs(); show('meds'); lastFrac = 0; render(); $('view-meds').scrollTop = 0; Motion.count($('medsBody')); }     // the ring and its number start from 0 each time the tab opens
+  function open() { clearThumbs(); show('meds'); render(); $('view-meds').scrollTop = 0; Motion.count($('medsBody')); }     // the ring and its number start from 0 each time the tab opens
 
   $('medsBody').addEventListener('click', async e => {
     const t = e.target.closest('button'); if (!t) return;

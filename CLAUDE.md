@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.74)
+## Status (release 2026-11-14.75)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -175,6 +175,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   Home tile 06 WATER (week summary is now 07): big litres, "N of G glasses"; a tap ANYWHERE on the tile adds a glass (count-up via `Motion.count`, which now also counts decimals with `data-dec`), the round − takes the last one back (never below 0),
   the small gear opens the goal sheet (glasses with − / +, the litres it adds up to, DONE); − and gear never add a glass. It resets by itself at midnight (Home redraws when the day changes: minute timer). The week summary has a 4th ring, WATER:
   glasses from Monday up to today against the goal × those days (rings are smaller: 64 px, labels 9 px). iPhone test pending.
+- `.75` SUPPS NEXT UP card is information only: no ring, no TAKE button (ticking is on the dose cards below). The box photo runs edge to edge at the top of the card (4:3, cropped to fill, the card's rounded top corners clip it);
+  without a photo the pill icon sits centred on a plain card-coloured block of the same height. Name, "dose · time" (and TIME TO TAKE when due) sit under it; the taken/total count and the NEXT UP label are small chips in the top corners
+  of the photo. The `+ ADD` in MY SUPPS is the Supps screen's glowing main button again. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
