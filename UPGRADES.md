@@ -315,6 +315,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.64` Intro like the iOS lock screen: huge glass ENTER letters behind his head (cut-out `assets/bg-fg.png` layered on top, letters fitted by `fitEnter()`), STRONGER EVERY DAY moved to the bottom. iPhone test pending.
 - `.65` ENTER letters smaller (~45% width), Oswald, embossed transparent glass (light top-left edge, soft dark bottom-right inner shadow, frost inside); head still overlaps their bottom edge. iPhone test pending.
 - `.66` One shared top bar on every tab (R mark · title · profile button, identical on all five); the old per-tab headers (date, WEEK...) are the small line below it. iPhone test pending.
+- `.67` Intro: the glass ENTER letters and the head cut-out layer are removed (tap anywhere still enters, hidden ENTER button for VoiceOver, logo and bottom text kept); the ENTER look is to be redesigned later. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

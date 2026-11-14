@@ -20,6 +20,7 @@ Planning notes only. Each idea is discussed with the planner first, then built a
 - Until a name is set, Home says just "HELLO" (as today when skipped).
 
 ## 3. Intro without the ENTER button — BUILT in `.63`
+- **`.67`: the glass ENTER letters + head cut-out (tried in `.64`/`.65`) were REMOVED. The intro is now just the photo, logo and bottom text; tap anywhere enters. The ENTER look is to be redesigned later (to discuss).**
 - Tap **anywhere** on the intro to enter.
 - Instead of the button: one small **glass** element, iOS-lock-screen style (e.g. a glassy "tap to enter" or a
   big lock-screen-like clock/date at the top or middle). Exact look to be decided together first.

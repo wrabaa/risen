@@ -20,38 +20,6 @@
   <section id="intro" class="screen">
     <img class="photo" src="assets/bg.jpg" alt="">
     <div class="brand"><img src="assets/mark.png" alt=""><span>RISEN</span></div>
-    <!-- ENTER as huge glass letters behind his head (the cut-out photo is layered on top, aligned exactly like the photo); the letters are drawn and fitted by fitEnter() in app.js -->
-    <svg class="enterglass" id="enterSvg" aria-hidden="true" focusable="false">
-      <defs>
-        <linearGradient id="egFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#FFFFFF" stop-opacity=".13"/><stop offset=".55" stop-color="#E4E8EE" stop-opacity=".03"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".08"/>
-        </linearGradient>
-        <!-- pressed-out glass: light edge on the top-left, soft dark inner shadow on the bottom-right -->
-        <filter id="egEmboss" x="-6%" y="-12%" width="112%" height="124%" color-interpolation-filters="sRGB">
-          <feOffset in="SourceAlpha" dx="1.6" dy="1.6" result="o1"/>
-          <feComposite in="SourceAlpha" in2="o1" operator="out" result="hiBand"/>
-          <feFlood flood-color="#FFFFFF" flood-opacity=".95"/><feComposite in2="hiBand" operator="in" result="hi"/>
-          <feOffset in="SourceAlpha" dx="-1.9" dy="-1.9" result="o2"/>
-          <feComposite in="SourceAlpha" in2="o2" operator="out" result="loBand"/>
-          <feGaussianBlur in="loBand" stdDeviation="1" result="loBlur"/>
-          <feFlood flood-color="#000000" flood-opacity=".42"/><feComposite in2="loBlur" operator="in" result="lo"/>
-          <feComposite in="lo" in2="SourceAlpha" operator="in" result="loIn"/>
-          <feMerge><feMergeNode in="loIn"/><feMergeNode in="hi"/></feMerge>
-        </filter>
-        <filter id="egBlurF" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="5"/></filter>
-        <clipPath id="egClip"><use href="#egText"/></clipPath>
-      </defs>
-      <g id="egGroup">
-        <text id="egText">ENTER</text>
-        <!-- frosted: a blurred copy of the photo, exactly aligned, shows only inside the letters -->
-        <g clip-path="url(#egClip)"><image id="egBlur" href="assets/bg.jpg" preserveAspectRatio="none" filter="url(#egBlurF)" opacity=".6"/></g>
-        <use href="#egText" class="eg-fill"/>
-        <use href="#egText" class="eg-edge"/>
-        <use href="#egText" class="eg-line"/>
-        <use href="#egText" class="eg-glint"/>
-      </g>
-    </svg>
-    <img class="photo fg" src="assets/bg-fg.png" alt="">
     <button id="login" type="button" aria-label="Enter RISEN">ENTER</button>
     <div class="hero">
       <h1>Stronger<em>Every day</em></h1>

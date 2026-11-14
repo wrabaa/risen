@@ -50,7 +50,7 @@ depth (`.54`): `--bg-top` #141414 + `--glow` (≤4% lime) = the background gradi
 browser cannot blur) · `--volt-glow` (under the main button and active tab icon) · `--r-card` 20px · `--card-depth` ·
 studio tags (Classes only, subtle): `--studio-energy` #D9A25E · `--studio-balance` #7CB9AE ·
 `--studio-power` #A592D6.
-No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + embossed glass "ENTER" letters behind his head (tap anywhere enters, `.64`/`.65`)
+No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + no ENTER button (tap anywhere enters; the look of ENTER is to be redesigned later, `.67`)
 (all text/buttons in code, never baked into images).
 
 ## Structure
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.66)
+## Status (release 2026-11-14.67)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -148,6 +148,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   set by `show()` in `app.js` from `TAB_TITLES`) · profile button. It is fixed (never scrolls, the same box on every tab to the pixel, touches pass through to the page below); pages start at `--topb`
   and fade out under it (mask). What each tab used to show at its top (date range, date, WEEK / TODAY button, workout name + clock) is now the small `.subline` right under the bar (Meals has none).
   Home's greeting stays below the bar. Sub-pages keep their own "<" bar. A NEW tab page: add it to `TAB_TITLES` and start its content with a `.subline` (or nothing). iPhone test pending.
+- `.67` the glass ENTER letters, the head cut-out layer (`assets/bg-fg.png` deleted, its `ASSETS` line removed) and the head measurements / `fitEnter()` in the code are REMOVED again. The intro is the photo, the
+  logo, STRONGER EVERY DAY + tagline at the bottom; tap anywhere enters; the hidden real ENTER button stays for VoiceOver. How ENTER looks is to be redesigned later (`IDEAS.md` item 3). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

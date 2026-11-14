@@ -211,30 +211,6 @@
 
   // ---- Name: set in Profile > Personal info (profile.js). Until it is set, Home says just "Hello" ----
 
-  // ---- Intro: the glass ENTER letters (.64) ----
-  // The letters are an inline SVG (index.html) placed here so they follow the photo on every screen: the photo and its cut-out are
-  // object-fit:cover, object-position 50% 35%, so the same maths tells where his head is. The word is ~45% of the width, Oswald, centred
-  // on his head, its bottom edge ~28% behind his head (the cut-out, layered on top, makes the head cover that edge).
-  function fitEnter(){
-    const IW=941, IH=1672, HEAD_TOP=378, HEAD_CX=458, WORD='ENTER', WIDTH=.45, SPACING=.1, OVERLAP=.28;      // head measures: pixels in assets/bg.jpg
-    const svg=$('enterSvg'), W=intro.clientWidth, H=intro.clientHeight; if(!svg||!W||!H) return;
-    const run=()=>{
-      const sc=Math.max(W/IW,H/IH), offX=(W-IW*sc)*.5, offY=(H-IH*sc)*.35;
-      const headTop=HEAD_TOP*sc+offY, headCx=HEAD_CX*sc+offX;
-      const c=document.createElement('canvas').getContext('2d'); c.font='600 100px Oswald';
-      const nat=c.measureText(WORD).width/100, cap=c.measureText('E').actualBoundingBoxAscent/100;      // per 1px of font size
-      if(!nat||!cap) return;
-      const F=W*WIDTH/(nat+SPACING*(WORD.length-1)), h=cap*F;                                      // the word is ~45% of the width, Oswald as it is (no stretching)
-      const base=headTop+h*OVERLAP, shift=Math.max(-20,Math.min(20,headCx-W/2));                   // the head covers the bottom edge of the letters
-      const t=$('egText'); t.setAttribute('x',W/2+shift); t.setAttribute('y',base); t.setAttribute('text-anchor','middle');
-      t.setAttribute('font-size',F); t.setAttribute('letter-spacing',(SPACING*F).toFixed(2));
-      const im=$('egBlur'); im.setAttribute('x',offX); im.setAttribute('y',offY); im.setAttribute('width',IW*sc); im.setAttribute('height',IH*sc);   // same box as the photo
-      svg.classList.add('ready');
-    };
-    (document.fonts&&document.fonts.load?document.fonts.load('600 100px Oswald'):Promise.resolve()).then(run,run);
-  }
-  fitEnter(); addEventListener('resize',fitEnter);
-
   // ---- ENTER: intro to Home (intro shows only when the app opens) ----
   // If the phone's storage can't be opened, the app must not look empty (that reads as "my data is gone"): a full-screen
   // message says the data is still there and offers to try again. Nothing else runs, so nothing can be saved over it.
