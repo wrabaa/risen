@@ -29,15 +29,20 @@ const Classes = (() => {
   const classesOn = d => S.classes.filter(c => c.day === d && (filter === 'ALL' || (filter === 'MINE' ? c.star : c.studio === filter))).sort(byTime);
   function lastAttended(classId) { const ds = S.classlogs.filter(l => l.classId === classId).map(l => l.date).sort(); return ds.length ? ds[ds.length - 1] : null; }
 
-  // For the Home tile: the next STARRED class today that is not attended yet; with none left, the next class of any kind.
-  // (One that has started but not ended counts as "now".)
+  // For the Home tile: the next STARRED class today that is not attended yet; with none left, the next class of any kind; with nothing left today, the first class
+  // of the next day that has one (within 7 days: dayOffset 1 = tomorrow, day = its weekday). (One that has started but not ended counts as "now".)
   function next() {
     const now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes(), k = dayKey(now), att = attMap();
     const today = S.classes.filter(c => c.day === isoDay(now)).sort(byTime);
-    if (!today.length) return { none: 'today' };
     const left = today.filter(x => !att.has(attId(x.id, k)) && toMin(x.time) + (x.duration || 60) > nowMin);
     const c = left.find(x => x.star) || left[0];
-    return c ? { c, i: inst(c.instructorId), now: toMin(c.time) <= nowMin, star: !!c.star } : { none: 'more' };
+    if (c) return { c, i: inst(c.instructorId), now: toMin(c.time) <= nowMin, star: !!c.star };
+    // Nothing left today: look ahead up to 7 days for the next day that has a class (the first class of that day). Used by Home only; the Classes tab does not call next().
+    for (let off = 1; off <= 7; off++) {
+      const dow = (isoDay(now) - 1 + off) % 7 + 1, list = S.classes.filter(x => x.day === dow).sort(byTime);
+      if (list.length) return { c: list[0], i: inst(list[0].instructorId), now: false, star: !!list[0].star, dayOffset: off, day: dow };
+    }
+    return today.length ? { none: 'more' } : { none: 'today' };
   }
 
   // For the NOW card on Home: a class that starts within `mins` minutes (not attended yet), starred first
@@ -439,7 +444,7 @@ const Classes = (() => {
 
   const flush = () => Promise.all([saveCls.flush(), saveIns.flush()]).catch(err => toast(err.message));
   let lastSig = '';
-  const sig = () => { const n = next(); return n.none || (n.c.id + (n.now ? 'n' : '')); };
+  const sig = () => { const n = next(); return n.none || (n.c.id + (n.now ? 'n' : '') + (n.dayOffset || '')); };
   function tick() {           // a new day, or the "next class" moved on: bring the screens up to date
     const quiet = !$('view-classes').hidden && !PAGES.some(id => $(id).classList.contains('open'));
     if (dayKey(new Date()) !== lastDay) {                       // a new day began while the app was open: today moves on by itself

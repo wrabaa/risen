@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.77)
+## Status (release 2026-11-14.78)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -184,6 +184,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   `min`, `speed`, `incline` (a blank or 0 field = left empty, saved as null); no new store, and strength entries save exactly what they did. "Last time" and the day-list targets read "28 min · 6.0 km/h · 3%" (empty fields skipped).
   No ▲ PR on cardio. iPhone test pending.
 - `.77` SUPPS NEXT UP picks the dose CLOSEST to now: the LATEST untaken dose whose time has passed (a dose missed in the morning no longer holds the card all day; it keeps its own card with its ✓ below), else the next one coming up later today, else "All done today ✓". iPhone test pending.
+- `.78` Home is a visual scan screen. `Classes.next()` looks ahead up to 7 days: when nothing is left today it returns the first class of the next day that has one (`dayOffset`, `day`); the Classes tab does not use it and is unchanged.
+  CLASSES tile: avatar, class name, time, ★ when mine; not today = the day in front ("Tomorrow · ZUMBA · 19:30", "Mon · SIXPAX · 18:00"); only with no class in 7 days it keeps its old message. SUPPLEMENTS tile (`Meds.homeInfo()`): the box photo
+  of the dose to feature (same pick as NEXT UP: the latest due, else the next today, else the first tomorrow), its name and time, the taken/total count, and under it a row of 44 px box photos for every other dose of today in time order (taken = dimmed
+  with a ✓); the row scrolls sideways, never smaller. Tapping an untaken thumb takes that dose from Home (pop, same log as the Supps tab); tapping the rest of the tile or a taken thumb opens the Supplements tab. The photo loader is
+  `Meds.loadThumbs(root)` (same cache as the Supps tab; pill icon without a photo). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

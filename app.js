@@ -95,18 +95,28 @@
     }},
     {title:'Supplements', tap:'meds', html(){ // the whole tile opens the SUPPLEMENTS tab (meds.js)
       if(typeof Meds==='undefined') return '';
-      const s=Meds.summary();
+      const s=Meds.homeInfo();
       if(!s.hasMeds) return `<div><div class="wname">Nothing added yet</div><div class="sub">Add them in Supplements</div></div><button class="ghost" data-tab="meds">ADD</button>`;
       if(!s.total) return `<div><div class="wname">No doses today</div><div class="sub">Nothing scheduled</div></div>`;
-      if(s.taken===s.total) return `<div><div class="wname">All done today ✓</div><div class="sub">${s.taken} of ${s.total} taken</div></div>`;
-      return `<div><div class="wname">${s.taken} of ${s.total} taken today</div><div class="sub">Next: ${esc(s.next.m.name)} · ${esc(s.next.t)}</div></div>`;
+      // a visual scan: the box photo of the dose to feature with its name and time and the taken/total count, and under it a small photo for every other dose of today
+      const p=s.pick, when=!p?'':s.kind==='due'?p.t+' · due':s.kind==='later'?'At '+p.t:s.kind==='tomorrow'?'Tomorrow · '+p.t:'Earlier today · '+p.t;
+      const thumbs=s.others.map(o=>`<button type="button" class="sthumb${o.taken?' taken':''}" data-homedose="${esc(o.id)}" aria-label="${o.taken?'Taken: ':'Take '}${esc(o.name)} (${esc(o.t)})"><span class="sph" data-mphoto="${esc(o.mid)}">${Meds.thumbHtml(o.mid)}</span>${o.taken?'<i class="stick" aria-hidden="true">✓</i>':''}</button>`).join('');
+      return `<div class="sup"><div class="sup-main">${p?`<div class="dphoto" data-mphoto="${esc(p.m.id)}">${Meds.thumbHtml(p.m.id)}</div>`:''}
+        <div class="sup-txt"><div class="wname${p?'':' ok'}">${p?esc(p.m.name):'All done today ✓'}</div>${p?`<div class="sub">${esc(when)}</div>`:''}</div>
+        <div class="sup-count"><span data-count="${s.taken}">${s.taken}</span><small>/${s.total}</small></div></div>
+        ${thumbs?`<div class="sup-thumbs">${thumbs}</div>`:''}</div>`;
     }},
     {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
       if(typeof Classes==='undefined') return '';
       if(!S.classes.length) return `<div><div class="wname">No classes yet</div><div class="sub">Add them in Classes</div></div>`;
       const n=Classes.next();
       if(n.none) return `<div><div class="wname">${n.none==='today'?'No classes today':'No more classes today'}</div></div>`;
-      return `<div><div class="wname">${n.star?`<span class="tstar" aria-label="My class">${ICONS.star}</span>`:''}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${esc(n.i?n.i.name.split(' ')[0]:'TBA')}</div></div>${Classes.avatar(n.i)}`;
+      const star=n.star?`<span class="tstar" aria-label="My class">${ICONS.star}</span>`:'', who=esc(n.i?n.i.name.split(' ')[0]:'TBA');
+      if(n.dayOffset){                                   // nothing left today: the next class on the next day that has one, with its day in front
+        const day=n.dayOffset===1?'Tomorrow':DAYS[n.day-1];
+        return `<div><div class="wname">${star}${day} · ${esc(n.c.name)} · ${esc(n.c.time)}</div><div class="sub">${who}</div></div>${Classes.avatar(n.i)}`;
+      }
+      return `<div><div class="wname">${star}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${who}</div></div>${Classes.avatar(n.i)}`;
     }},
     {title:'Water', tap:'water', cls:'water', html(){       // tap anywhere on the tile = one more glass (250 ml); − takes the last one back; the gear sets the goal
       const g=waterToday(), goal=waterGoal(), L=g*GLASS_L;
@@ -145,6 +155,7 @@
     $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
     $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile${t.title==='Training'?' train':''}${t.cls?' '+t.cls:''}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
       <div class="tile-body${t.stack?' stack':''}">${t.html()}</div></article>`).join('');
+    if(typeof Meds!=='undefined') Meds.loadThumbs($('tiles'));                                  // the box photos on the SUPPLEMENTS tile (same loader as the Supps tab)
   }
 
   // ---- NOW card: ONE glass card with the single next thing and one big button. First match wins:
@@ -279,6 +290,10 @@
   $('tiles').onclick=e=>{
     const w=e.target.closest('[data-water]');                                        // the − and the gear never add a glass
     if(w){ if(w.dataset.water==='minus'&&waterToday()>0){ setWaterToday(waterToday()-1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); } else if(w.dataset.water==='goal') openWaterGoal(); return; }
+    const th=e.target.closest('[data-homedose]');                                      // a small box photo: take that dose right here (a taken one just opens the tab)
+    if(th&&!th.classList.contains('taken')){
+      const id=th.dataset.homedose; Meds.takeDoses([{id}]).then(()=>{ renderHome(); Motion.pop(document.querySelector('[data-homedose="'+CSS.escape(id)+'"]')); }).catch(err=>toast('Could not save: '+err.message)); return;
+    }
     if(e.target.closest('[data-tap="water"]')){ setWaterToday(waterToday()+1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); return; }
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();

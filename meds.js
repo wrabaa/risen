@@ -39,6 +39,16 @@ const Meds = (() => {
     const lm = logMap(), now = new Date(), hm = hmOf(now), open = dosesOn(now).filter(x => !lm.has(x.id));
     return { due: open.filter(x => isDue(x, now)), next: open.find(x => x.t > hm) || null, hasMeds: S.meds.length > 0 };
   }
+  // For the Home SUPPLEMENTS tile: the dose to feature (the same pick as the NEXT UP card: the latest one due, else the next one later today; once the day is done, the first one
+  // tomorrow), and every other dose of today in time order (taken ones flagged) for the thumb row.
+  function homeInfo() {
+    const now = new Date(), lm = logMap(), doses = dosesOn(now), hm = hmOf(now), open = doses.filter(d => !lm.has(d.id));
+    const due = open.filter(d => isDue(d, now)).pop(), later = open.find(d => d.t > hm);
+    let pick = due || later || open[0], kind = due ? 'due' : later ? 'later' : open[0] ? 'earlier' : null;
+    if (!pick && doses.length) { const tm = new Date(now); tm.setDate(tm.getDate() + 1); pick = dosesOn(tm)[0] || null; if (pick) kind = 'tomorrow'; }
+    return { hasMeds: S.meds.length > 0, total: doses.length, taken: doses.length - open.length, pick, kind,
+      others: doses.filter(d => !pick || d.id !== pick.id).map(d => ({ id: d.id, name: d.m.name, t: d.t, mid: d.m.id, taken: lm.has(d.id) })) };
+  }
   async function takeDoses(doses) {       // ticks them (same as the ✓ in the Supps tab)
     for (const d of doses) { const [medId, date, time] = d.id.split('|'); S.medlogs.push(await RisenDB.logDose(medId, date, time)); }
   }
@@ -59,8 +69,8 @@ const Meds = (() => {
   const thumbHtml = id => thumbs.get(id) ? `<img alt="" src="${thumbs.get(id)}">` : I.pill;
   function dropThumb(id) { if (thumbs.get(id)) URL.revokeObjectURL(thumbs.get(id)); thumbs.delete(id); }
   function clearThumbs() { for (const id of [...thumbs.keys()]) dropThumb(id); }
-  async function loadThumbs() {
-    const els = [...document.querySelectorAll('#medsBody [data-mphoto]')];
+  async function loadThumbs(root) {       // root: where the [data-mphoto] boxes are (the Supps tab by default; Home passes its tiles)
+    const els = [...(root || document.getElementById('medsBody')).querySelectorAll('[data-mphoto]')];
     for (const el of els) {
       const id = el.dataset.mphoto; if (thumbs.has(id)) continue;
       const p = await RisenDB.getPhoto('med-' + id); thumbs.set(id, p ? URL.createObjectURL(p.blob) : null);
@@ -318,5 +328,5 @@ const Meds = (() => {
   $('medBack').onclick = closeEditor;
   $('medDone').onclick = closeEditor;
 
-  return { open, render, summary, dueNow, takeDoses, week, flush };
+  return { open, render, summary, dueNow, homeInfo, thumbHtml, loadThumbs, takeDoses, week, flush };
 })();
