@@ -63,6 +63,9 @@
   $('wgMinus').onclick=()=>stepGoal(-1); $('wgPlus').onclick=()=>stepGoal(1);
   $('wgDone').onclick=()=>{ $('waterSheet').hidden=true; renderHome(); };
 
+  // ONE layout for every tile with a picture (SUPPLEMENTS, CLASSES): a rounded square on the left, the text to its right (and an optional count on the far right)
+  const picRow=(pic,text,extra='')=>`<div class="picrow">${pic}<div class="ttxt">${text}</div>${extra}</div>`;
+
   // ---- Tiles: add a new tile by adding an entry here ----
   const PLAY=ICONS.play;
   const TILES=[
@@ -98,13 +101,11 @@
       const s=Meds.homeInfo();
       if(!s.hasMeds) return `<div><div class="wname">Nothing added yet</div><div class="sub">Add them in Supplements</div></div><button class="ghost" data-tab="meds">ADD</button>`;
       if(!s.total) return `<div><div class="wname">No doses today</div><div class="sub">Nothing scheduled</div></div>`;
-      // a visual scan: the box photo of the dose to feature with its name and time and the taken/total count, and under it a small photo for every other dose of today
+      // the next dose only: its box photo on the left (the shared picture layout), name and time, and the taken/total count
       const p=s.pick, when=!p?'':s.kind==='due'?p.t+' · due':s.kind==='later'?'At '+p.t:s.kind==='tomorrow'?'Tomorrow · '+p.t:'Earlier today · '+p.t;
-      const thumbs=s.others.map(o=>`<button type="button" class="sthumb${o.taken?' taken':''}" data-homedose="${esc(o.id)}" aria-label="${o.taken?'Taken: ':'Take '}${esc(o.name)} (${esc(o.t)})"><span class="sph" data-mphoto="${esc(o.mid)}">${Meds.thumbHtml(o.mid)}</span>${o.taken?'<i class="stick" aria-hidden="true">✓</i>':''}</button>`).join('');
-      return `<div class="sup"><div class="sup-main">${p?`<div class="dphoto" data-mphoto="${esc(p.m.id)}">${Meds.thumbHtml(p.m.id)}</div>`:''}
-        <div class="sup-txt"><div class="wname${p?'':' ok'}">${p?esc(p.m.name):'All done today ✓'}</div>${p?`<div class="sub">${esc(when)}</div>`:''}</div>
-        <div class="sup-count"><span data-count="${s.taken}">${s.taken}</span><small>/${s.total}</small></div></div>
-        ${thumbs?`<div class="sup-thumbs">${thumbs}</div>`:''}</div>`;
+      const count=`<div class="tcount"><span data-count="${s.taken}">${s.taken}</span><small>/${s.total}</small></div>`;
+      if(!p) return `<div class="picrow"><div class="ttxt"><div class="wname ok">All done today ✓</div></div>${count}</div>`;
+      return picRow(`<div class="tpic" data-mphoto="${esc(p.m.id)}">${Meds.thumbHtml(p.m.id)}</div>`,`<div class="wname">${esc(p.m.name)}</div><div class="sub">${esc(when)}</div>`,count);
     }},
     {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
       if(typeof Classes==='undefined') return '';
@@ -114,9 +115,9 @@
       const star=n.star?`<span class="tstar" aria-label="My class">${ICONS.star}</span>`:'', who=esc(n.i?n.i.name.split(' ')[0]:'TBA');
       if(n.dayOffset){                                   // nothing left today: the next class on the next day that has one, with its day in front
         const day=n.dayOffset===1?'Tomorrow':DAYS[n.day-1];
-        return `<div><div class="wname">${star}${day} · ${esc(n.c.name)} · ${esc(n.c.time)}</div><div class="sub">${who}</div></div>${Classes.avatar(n.i)}`;
+        return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${day} · ${esc(n.c.name)} · ${esc(n.c.time)}</div><div class="sub">${who}</div>`);
       }
-      return `<div><div class="wname">${star}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${who}</div></div>${Classes.avatar(n.i)}`;
+      return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${who}</div>`);
     }},
     {title:'Water', tap:'water', cls:'water', html(){       // tap anywhere on the tile = one more glass (250 ml); − takes the last one back; the gear sets the goal
       const g=waterToday(), goal=waterGoal(), L=g*GLASS_L;
@@ -290,10 +291,6 @@
   $('tiles').onclick=e=>{
     const w=e.target.closest('[data-water]');                                        // the − and the gear never add a glass
     if(w){ if(w.dataset.water==='minus'&&waterToday()>0){ setWaterToday(waterToday()-1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); } else if(w.dataset.water==='goal') openWaterGoal(); return; }
-    const th=e.target.closest('[data-homedose]');                                      // a small box photo: take that dose right here (a taken one just opens the tab)
-    if(th&&!th.classList.contains('taken')){
-      const id=th.dataset.homedose; Meds.takeDoses([{id}]).then(()=>{ renderHome(); Motion.pop(document.querySelector('[data-homedose="'+CSS.escape(id)+'"]')); }).catch(err=>toast('Could not save: '+err.message)); return;
-    }
     if(e.target.closest('[data-tap="water"]')){ setWaterToday(waterToday()+1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); return; }
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();

@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.78)
+## Status (release 2026-11-14.79)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -189,6 +189,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   of the dose to feature (same pick as NEXT UP: the latest due, else the next today, else the first tomorrow), its name and time, the taken/total count, and under it a row of 44 px box photos for every other dose of today in time order (taken = dimmed
   with a ✓); the row scrolls sideways, never smaller. Tapping an untaken thumb takes that dose from Home (pop, same log as the Supps tab); tapping the rest of the tile or a taken thumb opens the Supplements tab. The photo loader is
   `Meds.loadThumbs(root)` (same cache as the Supps tab; pill icon without a photo). iPhone test pending.
+- `.79` Home tiles with a picture share ONE layout (`picRow()` in `app.js`, `.picrow` / `.tpic` / `.ttxt` / `.tcount` in `styles.css`): the image on the LEFT, the text to its right, the image a rounded square (72 px, the card's
+  corner radius = 1.3 × the old 56 px avatar), same gap in the CLASSES and SUPPLEMENTS tiles. The SUPPLEMENTS tile shows only the next dose (photo, name, time) and the taken/total count: the row of small box photos and taking a dose from Home
+  are gone (tap the tile = the Supplements tab). The round `.avatar` is unchanged everywhere else in the app. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
