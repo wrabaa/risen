@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.76)
+## Status (release 2026-11-14.77)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -167,7 +167,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   count every dose; the rule now lives ONLY in `Meds.dueNow()` (NOW card: a dose earlier than the moment the supplement was added today is not due / overdue). The editor starts with "Photo of the box" (above Name). In this
   section the user-facing word is "supplement" (page title, New / Edit supplement, Delete supplement, hints, Untitled supplement); ids, data keys and the store name stay "med". iPhone test pending.
 - `.73` SUPPS redesign (`meds.js`): the plain ring card is now **NEXT UP**: one card with the next supplement's box photo big in the middle of the day's progress ring (same ring animation; pill icon without a photo; a big ✓ when all are
-  done), name, dose and time under it, a lime ✓ TAKE button that ticks it, and a small taken/total count in the corner. Which one: the earliest untaken DUE dose (a missed one keeps showing), else the next one later today ("At 14:00"),
+  done), name, dose and time under it, a lime ✓ TAKE button that ticks it, and a small taken/total count in the corner. Which one (changed in `.77`: the LATEST untaken dose that is due, i.e. the one closest to now; was the earliest untaken DUE dose), else the next one later today ("At 14:00"),
   else an untaken dose from before the supplement existed ("Earlier today"), else "All done today ✓". ONE due rule for everything (`isDue()` in `meds.js`: time reached today, unless the supplement was added today after that time):
   NOW card, NEXT UP and the dose cards. A due, unticked dose card gets a lime border and a lime "TIME TO TAKE" pill (`.dose.due`, same look as `.cls.live` / `.livepill`). The Supps tab redraws every minute while it is open and in front
   (`minuteTick()`), so a dose lights up at its time by itself. MY SUPPS rows show the box photo on the left (`data-mphoto`, same loader as the dose cards). The `+ ADD` there is `.nogl` (the NEXT UP button is the one glowing button). iPhone test pending.
@@ -183,6 +183,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   incline ±.5, never below 0) and a ✓; no "+ Add set", no rest timer; the ✓ needs minutes). It is stored as a one-set draft entry flagged `cardio`, so ticking / finishing work as before. The finished entry (log row) keeps `sets: []` plus
   `min`, `speed`, `incline` (a blank or 0 field = left empty, saved as null); no new store, and strength entries save exactly what they did. "Last time" and the day-list targets read "28 min · 6.0 km/h · 3%" (empty fields skipped).
   No ▲ PR on cardio. iPhone test pending.
+- `.77` SUPPS NEXT UP picks the dose CLOSEST to now: the LATEST untaken dose whose time has passed (a dose missed in the morning no longer holds the card all day; it keeps its own card with its ✓ below), else the next one coming up later today, else "All done today ✓". iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

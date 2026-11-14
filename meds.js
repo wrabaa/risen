@@ -105,10 +105,11 @@ const Meds = (() => {
 
   // NEXT UP: ONE information-only card (no button: ticking happens on the dose cards below). The box photo runs edge to edge at the top (4:3, cropped to fill; the pill icon on a plain
   // block of the same height when there is no photo), the name and "dose · time" sit under it, the taken/total count stays in the top corner.
-  // Which one: the earliest untaken dose that is due (a missed one keeps showing), else the next one later today ("At 14:00"), else all done.
+  // Which one: the untaken dose closest to now: the LATEST one whose time has passed (a dose missed this morning does not hold the card all day; it keeps its own card below),
+  // else the next one later today ("At 14:00"), else all done.
   function nextUpHtml(doses, lm, now, taken, total) {
     const open = doses.filter(d => !lm.has(d.id)), hm = hmOf(now);
-    const due = open.find(d => isDue(d, now)), later = open.find(d => d.t > hm), earlier = open[0];
+    const due = open.filter(d => isDue(d, now)).pop(), later = open.find(d => d.t > hm), earlier = open[0];       // the dose CLOSEST to now: the latest one whose time has passed, else the next one coming up
     const pick = due || later || earlier, complete = total > 0 && !open.length;
     let media, title, sub = '', pill = '';
     if (complete) { media = `<div class="nu-media ok">${I.check}</div>`; title = 'All done today ✓'; }

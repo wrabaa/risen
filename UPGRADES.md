@@ -325,6 +325,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.74` Water on Home: tile 06 (tap = a glass of 250 ml, − takes one back, gear = daily goal sheet), new store `waterlogs` in backup, 4th WATER ring in the week summary. iPhone test pending.
 - `.75` Supps NEXT UP: full-width 4:3 box photo on top, no ring, no TAKE button (information only). iPhone test pending.
 - `.76` Cardio exercises: MIN · SPEED · INCLINE instead of sets · kg · reps (setup screen, one row in the workout log with − / + steps, "Last time" like "28 min · 6.0 km/h · 3%", no PR badge). iPhone test pending.
+- `.77` Supps NEXT UP shows the dose closest to now (the latest one whose time has passed), not the earliest missed one. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)
