@@ -3,7 +3,22 @@
 Review-only passes over the commits. No code is changed by a review; findings are listed here and fixed
 (or not) on Siza's go. Each review starts from the "last reviewed" commit below.
 
-**Last reviewed: `e754172` — release 2026-11-14.59**
+**Last reviewed: `10d0110` — release 2026-11-14.70**
+
+## Review 3 — 14 Nov 2026 — commits `.60` → `.70` (`ae3aab3` … `10d0110`)
+Method: read every code diff since `.59` (`e754172`); nothing was run on an iPhone. No code changed.
+
+🔴 Must fix
+- None found. The new `body` store is in Export / Import / Reset (all-or-nothing import still holds, checked), DB upgrade 5→6 only adds a store, `profile.js` is in `CORE`, the deleted `bg-fg.png` leaves the image cache by itself.
+
+🟡 Should fix
+1. **Measurements typed just before leaving the app can be lost.** Personal info saves 0.45 s after the last key; every other editor also saves on `pagehide`, this one does not (`Profile.flush()` runs only when the page is closed with "<"). Fix: also call it on `pagehide` / when the app goes to the background. (`profile.js`, `app.js`)
+2. **NOW card nags about a dose that was never due.** A supplement added today with an earlier time (added 15:00, time 08:00) counts as "due / overdue" at once (same as the Supps tab and Home tile since the beginning). Fix: a dose earlier than the moment the med was created does not count today. (`meds.js` dueOn / dosesOn)
+3. **Two RISEN windows open at the same time can block the DB upgrade** ("Database blocked"); old behaviour, now more visible because `.61` upgrades the DB. Only if the app is open twice (rare on iPhone). (`db.js`)
+
+🟢 Fine
+- `.60` typing state re-checked on every focus change / tap / redraw · `.61` profile page (photo key `profile`, dated values, same-day correction, history) · `.62` tab swipe (not on inputs, sheets, sub-pages, sideways-scrolling rows; off in a running workout `.63`) · `.63`–`.67` intro (letters and cut-out fully removed, tap anywhere + hidden real button) · `.66` shared top bar · `.68` steppers (a scroll starting on a button never steps; hold repeats; typing intact) and PR (`prs` on the session, in backups) · `.69` NOW card (six cases, minute refresh, button is the one glow) · `.70` wording.
+- CLAUDE.md rules: no system `confirm()`, no raw colour codes added, status bar untouched, fixed IDs unchanged, only transform / opacity animate.
 
 ## Status of review 2
 Fixed in `.60`: 🟡1 (tab bar / swipe back always return: the typing state is re-checked on every focus change, tap and redraw),
