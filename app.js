@@ -122,10 +122,11 @@
   }
 
   // ---- Tabs ----
+  let tabSlide=false;                      // true while a tab swipe changes the page (it slides the pages itself, so show() adds no fade)
   function show(view){
     const wasHome=!$('view-home').hidden, changed=!!document.querySelector('.view:not([hidden]):not(#view-'+view+')');
     document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+view);
-    if(changed){ const v=$('view-'+view); v.classList.remove('enter'); void v.offsetWidth; v.classList.add('enter'); setTimeout(()=>v.classList.remove('enter'),400); }   // page change: slide + fade
+    if(changed&&!tabSlide){ const v=$('view-'+view); v.classList.remove('enter'); void v.offsetWidth; v.classList.add('enter'); setTimeout(()=>v.classList.remove('enter'),400); }   // page change: slide + fade
     if(view!=='classes') $('clsSheet').hidden=true; // the Classes question belongs to the Classes tab only
     if(view==='home'&&!wasHome){ renderHome(); Motion.count($('tiles')); }       // the numbers count up when Home opens
     if(view==='home') applyUpdate(); // a new release that arrived while you were busy loads now
@@ -144,6 +145,59 @@
     for(const ev of ['click','touchend']) document.addEventListener(ev,()=>setTimeout(sync,60),{capture:true,passive:true});
     new MutationObserver(soon).observe(document.body,{childList:true,subtree:true});      // any redraw
     document.addEventListener('visibilitychange',sync); }
+  // ---- Swipe between tabs (.62) ----
+  // On a TAB page a clear sideways swipe moves to the neighbour tab, in tab-bar order (swipe left = the tab to the right, swipe right = the
+  // tab to the left; not past Home or Classes). It runs the tab's own opener (the same as a tap on the tab bar) and slides the two pages.
+  // It never starts: on inputs, while typing, under a sheet / sub-page / photo viewer, on anything that scrolls sideways by itself
+  // (the Classes filter chips), or near the screen edges; vertical scrolling stays native (first move must be clearly sideways).
+  const TabSwipe=(()=>{
+    const ORDER=['home','gym','meals','meds','classes'], LOCK=10, EDGE=20, MIN=56, FRAC=.2, FLICK_V=.3, SAMPLE_MS=110;
+    const BLOCK='input,textarea,select,[contenteditable],[data-noswipe]';
+    let st=null, busyUntil=0;
+    const current=()=>{ const t=document.querySelector('.tab[aria-selected="true"]'); return t?t.dataset.view:null; };
+    const typing=()=>{ const a=document.activeElement; return document.body.classList.contains('typing')||!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); };
+    const overlay=()=>!!document.querySelector('.subpage.open,#settings.open,.sheet-wrap:not([hidden]),.pviewer.open');
+    const hscroll=(el,root)=>{ for(;el&&el!==root;el=el.parentElement){ if(el.scrollWidth>el.clientWidth+1){ const o=getComputedStyle(el).overflowX; if(o==='auto'||o==='scroll') return true; } } return false; };
+    function start(e){
+      st=null; if(Date.now()<busyUntil||e.touches.length!==1||app.classList.contains('hidden')) return;
+      const view=e.currentTarget, t=e.touches[0], from=current();
+      if(!from||view.id!=='view-'+from||e.target.closest(BLOCK)||typing()||overlay()||hscroll(e.target,view)) return;
+      if(t.clientX<EDGE||t.clientX>innerWidth-EDGE) return;
+      st={x0:t.clientX,y0:t.clientY,locked:false,dx:0,from,samples:[{t:e.timeStamp,x:t.clientX}]};
+    }
+    function move(e){
+      if(!st) return;
+      if(e.touches.length!==1){ st=null; return; }
+      const t=e.touches[0], dx=t.clientX-st.x0, dy=t.clientY-st.y0;
+      if(!st.locked){
+        if(Math.abs(dy)>LOCK&&Math.abs(dy)>Math.abs(dx)){ st=null; return; }              // vertical: the page scrolls, we step aside
+        if(Math.abs(dx)>LOCK&&Math.abs(dx)>Math.abs(dy)*2) st.locked=true; else return;      // clearly sideways: ours
+      }
+      if(e.cancelable) e.preventDefault();
+      st.dx=dx; st.samples.push({t:e.timeStamp,x:t.clientX});
+    }
+    function end(e){
+      if(!st) return; const s=st; st=null; if(!s.locked||e.type!=='touchend') return;
+      const r=s.samples.filter(x=>e.timeStamp-x.t<=SAMPLE_MS), v=r.length<2?0:Math.abs(r[r.length-1].x-r[0].x)/Math.max(1,r[r.length-1].t-r[0].t);
+      const dist=Math.abs(s.dx); if(dist<MIN||!(dist>=innerWidth*FRAC||v>=FLICK_V)) return;
+      go(s.dx<0?1:-1,s.from);
+    }
+    function go(dir,from){
+      const to=ORDER[ORDER.indexOf(from)+dir]; if(!to) return;                              // no wrap-around
+      const old=$('view-'+from), top=old.scrollTop, side=dir>0?'l':'r';
+      busyUntil=Date.now()+380; tabSlide=true;
+      try{ document.querySelector('.tab[data-view="'+to+'"]').click(); }finally{ tabSlide=false; }       // the tab's own opener
+      if(Motion.reduced()) return;
+      const nu=$('view-'+to); if(nu.hidden) return;
+      old.hidden=false; old.scrollTop=top; old.classList.add('slide-out-'+side); nu.classList.add('slide-in-'+side);
+      setTimeout(()=>{ old.classList.remove('slide-out-'+side); nu.classList.remove('slide-in-'+side); if(current()!==from) old.hidden=true; },330);
+    }
+    document.querySelectorAll('.view').forEach(v=>{
+      v.addEventListener('touchstart',start,{passive:true}); v.addEventListener('touchmove',move,{passive:false});
+      v.addEventListener('touchend',end,{passive:true}); v.addEventListener('touchcancel',end,{passive:true});
+    });
+    return {go};
+  })();
   $('tiles').onclick=e=>{
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();

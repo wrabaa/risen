@@ -27,7 +27,7 @@ Planning notes only. Each idea is discussed with the planner first, then built a
 - **DECIDED (Siza):** one glass pill **ENTER**, medium size (not tiny, not huge), placed in the empty dark space
   ABOVE his head in the photo. Tap anywhere (or the pill) enters.
 
-## 4. Swipe between tabs
+## 4. Swipe between tabs — BUILT in `.62` (option b)
 - On a TAB page, a horizontal swipe moves to the neighbour tab, in tab-bar order:
   HOME ⇄ GYM ⇄ MEALS ⇄ SUPPS ⇄ CLASSES (swipe left = next tab to the right, swipe right = tab to the left).
 - Sub-pages keep swipe right = back (`.52`/`.53`).

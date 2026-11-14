@@ -309,6 +309,8 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.61` Profile page: round profile button replaces the gear on every tab page; one page with SETTINGS · PERSONAL INFO (name, photo, height, weight, 12 body
   measurements + custom ones, each dated with a "prev" value and a history); new store `body` in Export / Import / Reset; no name pop-up (HELLO until set);
   Supps title SUPPLEMENTS. iPhone test pending.
+- `.62` Profile button on the title line (extra row removed); swipe between tabs (HOME ⇄ GYM ⇄ MEALS ⇄ SUPPS ⇄ CLASSES, pages slide); Classes day swipe removed
+  (days by tapping the weekday circles; option c if disliked). Sub-pages keep swipe-right = back. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

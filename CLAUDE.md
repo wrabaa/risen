@@ -54,7 +54,7 @@ No dot-matrix font. Intro = Siza's black & white photo + logo + "STRONGER EVERY 
 (all text/buttons in code, never baked into images).
 
 ## Structure
-Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. A round profile button (top right of every tab page) opens the profile page: SETTINGS · PERSONAL INFO.
+Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. A round profile button (top right, on the title line of every tab page) opens the profile page: SETTINGS · PERSONAL INFO.
 - **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
   02 THIS WEEK, 03 STREAK, 04 SUPPS, 05 CLASSES, 06 WEEK SUMMARY (three small rings: workouts · supps taken/due ·
   classes attended), backup reminder line.
@@ -68,8 +68,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - **CLASSES** (`classes.js`, `data/gym-classes.json`, `assets/instructors/`):
   opening the tab asks "Load Fitness Zone schedule?" until answered: YES / START EMPTY, or
   × / NOT NOW = ask again next time (the sheet stops above the tab bar). The tab opens on
-  TODAY'S TIMELINE (live timing, NOW line, ✓ ATTENDED, ⭐ star per class); swipe or tap a
-  weekday for another day; WEEK button = 7-day list + my stats + instructors list. Chips (one line, scrolls sideways if needed): ALL ·
+  TODAY'S TIMELINE (live timing, NOW line, ✓ ATTENDED, ⭐ star per class); tap a
+  weekday circle for another day (no day swipe: a sideways swipe changes the TAB); WEEK button = 7-day list + my stats + instructors list. Chips (one line, scrolls sideways if needed): ALL ·
   ★ (my classes) · Energy/Balance/Power. Tap a class = edit; tap an instructor photo = instructor page.
 - **MEALS** (`meals.js`): Shakes · Breakfast · Lunch · Snacks · Dinner → recipes →
   recipe page (photo, ingredients one per line stored as objects `{text}`, how-to, Move to…).
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.61)
+## Status (release 2026-11-14.62)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -126,6 +126,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   measurements in cm + "+ ADD MEASUREMENT"; each value is saved with its date, the latest is shown with a small "prev" value, tap a name for its history.
   New store `body` (DB 6) is in Export / Import / Reset. No name pop-up on first ENTER (Home says HELLO until a name is set). Supps page title: SUPPLEMENTS.
   iPhone test pending.
+- `.62` (`IDEAS.md` 4, option b) the profile button sits on the TITLE line (right side) of Gym / Meals / Supps / Classes (the extra row is gone); on SE width the
+  Supps date drops its weekday word. Tab swipe (`TabSwipe` in `app.js`): on a tab page a clear sideways swipe moves to the neighbour tab in tab-bar order (left = next to
+  the right, right = the one on the left, no wrap), running the tab's own opener, the two pages slide (transform only). Never on inputs, while typing, under a sheet /
+  sub-page / photo viewer, on anything that scrolls sideways itself (Classes chips), or within 20 px of the screen edges. Classes day swipe is REMOVED: days change
+  only by tapping the weekday circles (if Siza dislikes it: option c in `IDEAS.md`). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -164,7 +169,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   `black` status bar. Debug panel was removed after the fix.
 - Intro: text and buttons baked into a picture broke on every screen size → rule: photos are
   backgrounds only; all text/buttons are real HTML. Intro photo = Siza's real B&W photo (taken by Siza); since `.55` = the RISEN character (Siza, AI) doing battle ropes, B&W with the lime chest logo.
-- Navigation: ☰ menu was removed; bottom tab bar is the only navigation (the round profile button = Settings + Personal info).
+- Navigation: ☰ menu was removed; bottom tab bar (and, since `.62`, a sideways swipe on a tab page) moves between tabs (the round profile button = Settings + Personal info).
   Calendar and Progress tabs were removed on purpose (not needed; "Last time" on each
   exercise IS the progress tracking).
 - Name: set in Profile > Personal info (no pop-up on first ENTER since `.61`); until it is set the greeting is just "HELLO" (friends use the app too).

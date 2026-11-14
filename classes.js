@@ -195,18 +195,7 @@ const Classes = (() => {
     if (n === viewDay) return;
     slide = dir || (n > viewDay ? 'next' : 'prev'); viewDay = n; render(); slide = ''; scrollToNow();
   }
-  const step = dir => goDay(((viewDay - 1 + dir + 7) % 7) + 1, dir > 0 ? 'next' : 'prev');   // Sunday -> Monday and back
-  { // swipe left = next day, swipe right = previous day (day timeline only; not from the screen edges, which belong to the phone)
-    const vc = $('view-classes'); let tx = 0, ty = 0, tt = 0, on = false;
-    // (the Classes filter chip row scrolls sideways itself, so a touch on it never starts a day swipe)
-    vc.addEventListener('touchstart', e => { const t = e.touches[0]; on = e.touches.length === 1 && mode === 'day' && t.clientX > 24 && t.clientX < innerWidth - 24 && !e.target.closest('.cfilter'); tx = t.clientX; ty = t.clientY; tt = Date.now(); }, { passive: true });
-    vc.addEventListener('touchcancel', () => { on = false; }, { passive: true });
-    vc.addEventListener('touchend', e => {
-      if (!on) return; on = false;
-      const t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty;
-      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.6 && Date.now() - tt < 800) step(dx < 0 ? 1 : -1);
-    }, { passive: true });
-  }
+  // Days change only by tapping the weekday circles (since .62 a sideways swipe on this tab moves to the next tab, see TabSwipe in app.js)
 
   async function toggleStar(id) {
     const c = S.classes.find(x => x.id === id); if (!c) return;
