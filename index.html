@@ -20,7 +20,26 @@
   <section id="intro" class="screen">
     <img class="photo" src="assets/bg.jpg" alt="">
     <div class="brand"><img src="assets/mark.png" alt=""><span>RISEN</span></div>
-    <div class="enterwrap"><button id="login" type="button">ENTER</button></div>
+    <!-- ENTER as huge glass letters behind his head (the cut-out photo is layered on top, aligned exactly like the photo); the letters are drawn and fitted by fitEnter() in app.js -->
+    <svg class="enterglass" id="enterSvg" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="egFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#F4F6F9" stop-opacity=".66"/><stop offset=".5" stop-color="#C9CED6" stop-opacity=".32"/><stop offset="1" stop-color="#EDF0F4" stop-opacity=".5"/>
+        </linearGradient>
+        <linearGradient id="egEdge" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity=".85"/><stop offset=".6" stop-color="#FFFFFF" stop-opacity=".22"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".5"/>
+        </linearGradient>
+      </defs>
+      <g id="egGroup">
+        <text id="egText">ENTER</text>
+        <use href="#egText" class="eg-halo"/>
+        <use href="#egText" class="eg-fill"/>
+        <use href="#egText" class="eg-edge"/>
+        <use href="#egText" class="eg-glint"/>
+      </g>
+    </svg>
+    <img class="photo fg" src="assets/bg-fg.png" alt="">
+    <button id="login" type="button" aria-label="Enter RISEN">ENTER</button>
     <div class="hero">
       <h1>Stronger<em>Every day</em></h1>
       <p>Train &bull; Track &bull; Progress<br>Rise again</p>

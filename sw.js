@@ -1,6 +1,6 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of the APP files (pages, code, data) and delete the old one.
-const VERSION = '2026-11-14.63';
+const VERSION = '2026-11-14.64';
 const CACHE = 'risen-' + VERSION;
 
 // APP FILES: small, change often. All of them are downloaded again on every release, all or nothing.
@@ -16,6 +16,7 @@ const CORE = ['./', 'index.html', 'styles.css', 'shared.js', 'app.js', 'db.js', 
 // at the next release.
 const ASSETS = {
   'assets/bg.jpg': 2,
+  'assets/bg-fg.png': 1,
   'assets/mark.png': 1,
   'assets/icon-180.png': 1,
   'assets/icon-192.png': 1,

@@ -209,6 +209,32 @@
 
   // ---- Name: set in Profile > Personal info (profile.js). Until it is set, Home says just "Hello" ----
 
+  // ---- Intro: the glass ENTER letters (.64) ----
+  // The letters are an inline SVG (index.html) placed here so they follow the photo on every screen: the photo and its cut-out are
+  // object-fit:cover, object-position 50% 35%, so the same maths tells where his head is. The word spans ~85% of the width, starts under the
+  // logo and ends ~38% down his head (the cut-out, layered on top, makes the head cover the bottom of the letters).
+  function fitEnter(){
+    const IW=941, IH=1672, HEAD_TOP=378, HEAD_CX=458, WORD='ENTER', WIDTH=.85, OVERLAP=.38;      // head measures: pixels in assets/bg.jpg
+    const svg=$('enterSvg'), W=intro.clientWidth, H=intro.clientHeight; if(!svg||!W||!H) return;
+    const run=()=>{
+      const sc=Math.max(W/IW,H/IH), offX=(W-IW*sc)*.5, offY=(H-IH*sc)*.35;
+      const headTop=HEAD_TOP*sc+offY, headCx=HEAD_CX*sc+offX;
+      const c=document.createElement('canvas').getContext('2d'); c.font='300 100px Oswald';
+      const nat=c.measureText(WORD).width/100, cap=c.measureText('E').actualBoundingBoxAscent/100;      // per 1px of font size
+      if(!nat||!cap) return;
+      const Wt=W*WIDTH, F=Wt*.8/nat;                                                                // glyphs take 80% of the width, the rest is spacing (room between the letters)
+      const brandB=document.querySelector('#intro .brand').getBoundingClientRect().bottom, top=brandB+16;
+      let h=(headTop-top)/(1-OVERLAP); h=Math.max(cap*F*1.2,Math.min(cap*F*3.4,h));                   // letter height (never squashed, never absurd)
+      const sy=h/(cap*F), base=Math.min(top+h,headTop+h*OVERLAP), shift=Math.max(-20,Math.min(20,headCx-W/2));
+      const t=$('egText'); t.setAttribute('x',W/2+shift); t.setAttribute('y',base); t.setAttribute('text-anchor','middle');
+      t.setAttribute('font-size',F); t.setAttribute('textLength',Wt); t.setAttribute('lengthAdjust','spacing');
+      $('egGroup').setAttribute('transform','translate(0 '+base+') scale(1 '+sy+') translate(0 '+(-base)+')');
+      svg.classList.add('ready');
+    };
+    (document.fonts&&document.fonts.load?document.fonts.load('200 100px Oswald'):Promise.resolve()).then(run,run);
+  }
+  fitEnter(); addEventListener('resize',fitEnter);
+
   // ---- ENTER: intro to Home (intro shows only when the app opens) ----
   // If the phone's storage can't be opened, the app must not look empty (that reads as "my data is gone"): a full-screen
   // message says the data is still there and offers to try again. Nothing else runs, so nothing can be saved over it.

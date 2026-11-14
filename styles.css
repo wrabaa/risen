@@ -55,21 +55,26 @@
     animation:fade 1s ease .3s both}
   .brand img{height:30px;width:auto}
   .brand span{font-family:Oswald,sans-serif;font-weight:500;font-size:22px;letter-spacing:.32em;color:var(--text)}
-  .hero{position:absolute;z-index:2;left:28px;right:28px;bottom:calc(env(safe-area-inset-bottom) * .65 + 92px);       /* (the button used to sit under the text: the text stays where it was) */
+  .hero{position:absolute;z-index:2;left:28px;right:28px;bottom:calc(env(safe-area-inset-bottom) + 20px);       /* the empty dark floor at the bottom, clear of the home bar */
     animation:rise 1s cubic-bezier(.2,.8,.2,1) .2s both}
   .hero h1{font-family:Oswald,sans-serif;font-weight:700;font-size:clamp(44px,13vw,60px);line-height:.98;text-transform:uppercase;letter-spacing:.01em}
   .hero h1 em{display:block;font-style:normal;color:var(--volt)}
   .hero p{margin-top:14px;font-size:13px;letter-spacing:.24em;line-height:1.7;color:var(--soft);text-transform:uppercase}
-  /* ENTER (.63): one glass pill in the dark space above his head (the head starts at 22.6% of the photo's height on every phone: the photo
-     fills the height), same glass as the tab bar, slow gentle pulse. The whole intro is the tap target. */
-  .enterwrap{position:absolute;z-index:2;left:0;right:0;top:calc(22.6% - 60px);height:48px;display:flex;justify-content:center;pointer-events:none;
-    animation:fade 1s ease .6s both}
-  #login{pointer-events:none;min-width:168px;height:48px;padding:0 34px;border-radius:999px;border:1px solid var(--hairline);background:var(--glass);color:var(--text);
-    -webkit-backdrop-filter:blur(28px) saturate(120%);backdrop-filter:blur(28px) saturate(120%);
-    box-shadow:inset 0 1px 0 var(--hilite),0 12px 32px var(--shadow),0 2px 8px rgba(0,0,0,.35);
-    font-family:Oswald,sans-serif;font-weight:600;font-size:17px;letter-spacing:.28em;text-indent:.28em;
-    animation:enterpulse 3.4s ease-in-out 1.6s infinite}
-  @keyframes enterpulse{0%,100%{transform:scale(1);opacity:.82}50%{transform:scale(1.05);opacity:1}}
+  /* ENTER (.64): huge glass letters like the iOS lock-screen clock, in the dark upper part of the photo. They sit BEHIND his head: the cut-out
+     (assets/bg-fg.png, same size as the photo, shares the .photo rule so both scale and crop identically) is layered on top. The letters are an
+     inline SVG sized and placed by fitEnter() in app.js (width ~85%, bottom third behind the head). Tap anywhere enters. */
+  .enterglass{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible;opacity:0}
+  .enterglass.ready{opacity:1;transition:opacity 1s ease .5s}
+  #enterSvg text{font-family:Oswald,sans-serif;font-weight:300;fill:none}
+  #enterSvg .eg-halo{fill:#fff;opacity:.22;filter:blur(8px)}                       /* soft frosted bleed around the letters */
+  #enterSvg .eg-fill{fill:url(#egFill)}
+  #enterSvg .eg-edge{fill:none;stroke:url(#egEdge);stroke-width:1.2;vector-effect:non-scaling-stroke}   /* thin light edge = inner highlight */
+  #enterSvg .eg-glint{fill:#fff;opacity:0;animation:glint 9s ease-in-out 2s infinite}   /* very slow, subtle shimmer */
+  @keyframes glint{0%,100%{opacity:0}50%{opacity:.2}}
+  #intro .photo.fg{z-index:1;pointer-events:none}
+  #intro::after{z-index:1}
+  #login{position:absolute;z-index:0;left:0;top:0;width:1px;height:1px;padding:0;border:0;opacity:0;pointer-events:none;overflow:hidden}      /* the real button stays for keyboard / VoiceOver */
+  #intro{cursor:pointer;-webkit-tap-highlight-color:transparent}
   #intro{cursor:pointer;-webkit-tap-highlight-color:transparent}
   @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(204,255,0,0)}50%{box-shadow:0 0 22px 2px rgba(204,255,0,.5)}}
   @keyframes rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
@@ -635,7 +640,7 @@
 
   /* No backdrop-filter (old browser): glass becomes (almost) solid so text stays readable */
   @supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
-    .tabbar,.sheet,.restbar,#login{background:var(--glass-solid)}
+    .tabbar,.sheet,.restbar{background:var(--glass-solid)}
     .search{background:var(--bg)}
   }
 
@@ -691,3 +696,5 @@
 
   /* SE width: "SUPPLEMENTS" and the profile button leave no room for the weekday word next to the date, so only the date shows */
   @media (max-width:380px){ #medsBody .meta .wd{display:none} }
+
+  @media (prefers-reduced-motion:reduce){ #enterSvg .eg-glint{animation:none;opacity:.08} .enterglass.ready{transition:none} }

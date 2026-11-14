@@ -50,7 +50,7 @@ depth (`.54`): `--bg-top` #141414 + `--glow` (≤4% lime) = the background gradi
 browser cannot blur) · `--volt-glow` (under the main button and active tab icon) · `--r-card` 20px · `--card-depth` ·
 studio tags (Classes only, subtle): `--studio-energy` #D9A25E · `--studio-balance` #7CB9AE ·
 `--studio-power` #A592D6.
-No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + a glass ENTER pill above his head (tap anywhere enters, `.63`)
+No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + huge glass "ENTER" letters behind his head (tap anywhere enters, `.64`)
 (all text/buttons in code, never baked into images).
 
 ## Structure
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.63)
+## Status (release 2026-11-14.64)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -135,6 +135,12 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   opacity only) sits above his head: its top is a % of the screen height (the photo fills the height, so the head starts at 22.6% on every phone), so it never covers him
   on iPhone 13 or SE. Logo, STRONGER EVERY DAY and the tagline are unchanged (same place). The pill is still a real button (keyboard / VoiceOver). Tab swipe is OFF while the
   workout logger is open (Gym tab with a running workout); the tab bar still works. iPhone test pending.
+- `.64` intro like the iOS lock screen: the small ENTER pill is replaced by huge glass letters "ENTER" (tall, condensed Oswald 300, ~85% of the width, frosted translucent
+  grey, light edge, a very slow shimmer = opacity only) in the dark upper part of the photo. A background-removed cut-out of him (`assets/bg-fg.png`, made with Apple's Vision
+  foreground mask, same 941×1672 size, only head and shoulders kept, in `ASSETS`) is layered ON TOP of the letters through the same `.photo` rule, so it matches the photo exactly
+  on every screen: his head covers the bottom ~38% of the letters. `fitEnter()` in `app.js` places the SVG letters from the photo's cover/50% 35% maths (head top at
+  378 px and head centre at 458 px of bg.jpg): never under the logo, tied to his head. "STRONGER EVERY DAY" + tagline moved down to the dark floor (clear of the home bar).
+  Tap anywhere enters; a hidden real ENTER button stays for keyboard / VoiceOver. If bg.jpg is ever replaced, redo bg-fg.png and the two head numbers in `fitEnter()`. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
