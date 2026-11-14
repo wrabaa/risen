@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.75)
+## Status (release 2026-11-14.76)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -178,6 +178,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.75` SUPPS NEXT UP card is information only: no ring, no TAKE button (ticking is on the dose cards below). The box photo runs edge to edge at the top of the card (4:3, cropped to fill, the card's rounded top corners clip it);
   without a photo the pill icon sits centred on a plain card-coloured block of the same height. Name, "dose · time" (and TIME TO TAKE when due) sit under it; the taken/total count and the NEXT UP label are small chips in the top corners
   of the photo. The `+ ADD` in MY SUPPS is the Supps screen's glowing main button again. iPhone test pending.
+- `.76` CARDIO exercises (muscle group "Cardio": Treadmill, Elliptical, Stair Climber, Rowing, Indoor Cycling Bike, and any custom exercise put under Cardio; `isCardio()` in `gym.js`) get their own fields instead of sets · kg · reps:
+  setup screen = MIN · SPEED KM/H · INCLINE % (same `.targets` look, number keypad, blanks allowed; plan entry `{exerciseId, min, speed, incline}`); in a started workout ONE row (three labelled fields with big − / + (min ±1, speed ±.5,
+  incline ±.5, never below 0) and a ✓; no "+ Add set", no rest timer; the ✓ needs minutes). It is stored as a one-set draft entry flagged `cardio`, so ticking / finishing work as before. The finished entry (log row) keeps `sets: []` plus
+  `min`, `speed`, `incline` (a blank or 0 field = left empty, saved as null); no new store, and strength entries save exactly what they did. "Last time" and the day-list targets read "28 min · 6.0 km/h · 3%" (empty fields skipped).
+  No ▲ PR on cardio. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

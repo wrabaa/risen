@@ -12,7 +12,7 @@
 //   exercises  {id, name, ...}   exercise library, referenced by ID (its photo lives in `photos`)
 //   sessions   {id, date:'YYYY-MM-DD', workoutId, routineId, name, extra, startedAt, finishedAt}
 //              extra:true = unplanned session.  Skipped:  {..., skipped:true, reason, finishedAt:null}
-//   logs       {id, exerciseId, sessionId, date, at, sets:[{kg, reps}]}
+//   logs       {id, exerciseId, sessionId, date, at, sets:[{kg, reps}]}   a CARDIO entry (muscle group Cardio) has sets: [] and min / speed / incline instead
 //              History is stored per EXERCISE ID, so changing routines never loses progress.
 //   settings   {key, value}   name, nameAsked, restSec, waterGoal, activeSession (workout in progress), lastExport,
 //              backupAsked (when the weekly "Back up now?" was last shown), libraryFollowed (fingerprint of the library's
@@ -245,7 +245,8 @@ const RisenDB = (() => {
       startedAt: startedAt || at, finishedAt: at };
     if (prs && prs.length) session.prs = prs;                      // exercise ids where a set beat "Last time" (shows "PR today")
     t.objectStore('sessions').put(session);
-    for (const e of entries || []) t.objectStore('logs').put({ id: uid(), exerciseId: e.exerciseId, sessionId: session.id, date, at, sets: e.sets });
+    for (const e of entries || []) t.objectStore('logs').put({ id: uid(), exerciseId: e.exerciseId, sessionId: session.id, date, at, sets: e.sets,
+      ...(e.min != null || e.speed != null || e.incline != null ? { min: e.min ?? null, speed: e.speed ?? null, incline: e.incline ?? null } : {}) });       // cardio: min · speed · incline (strength saves exactly what it did)
     await done(t); return session;
   }
   async function skipWorkouts({ date, workoutIds, routineId, reason }) {

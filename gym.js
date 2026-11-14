@@ -28,7 +28,13 @@ const Gym = (() => {
   const exInfo = exerciseInfo;
   const daysText = d => (d && d.length) ? [...d].sort().map(x => DAYS[x - 1]).join(' · ') : 'No days set';
   const fmtDate = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const targetText = it => `${it.sets} × ${fmtN(it.reps)}${num(it.kg) > 0 ? ' · ' + fmtN(it.kg) + ' kg' : ''}`;
+  // CARDIO (muscle group "Cardio", also a custom exercise put under Cardio): MIN · SPEED (km/h) · INCLINE (%) instead of sets · kg · reps. Blank fields are fine.
+  const isCardio = id => exerciseInfo(id).muscle === 'Cardio';
+  const pos = v => { const n = num(v); return n != null && n > 0 ? n : null; };       // a blank or 0 field counts as "left empty"
+  const cardioText = o => [pos(o.min) != null ? `${fmtN(pos(o.min))} min` : '', pos(o.speed) != null ? `${pos(o.speed).toFixed(1)} km/h` : '', pos(o.incline) != null ? `${fmtN(pos(o.incline))}%` : ''].filter(Boolean).join(' · ');
+  const cardioLastOf = hs => hs.find(h => pos(h.min) != null);                          // newest history entry that has minutes
+  const CARDIO_FIELDS = [['min', 'MIN', 'numeric'], ['speed', 'SPEED KM/H', 'decimal'], ['incline', 'INCLINE %', 'decimal']];
+  const targetText = it => isCardio(it.exerciseId) ? (cardioText(it) || 'No target yet') : `${it.sets ?? 3} × ${fmtN(it.reps ?? 10)}${num(it.kg) > 0 ? ' · ' + fmtN(it.kg) + ' kg' : ''}`;
   function fmtClock(ms) { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = String(s % 60).padStart(2, '0'); return h ? `${h}:${String(m).padStart(2, '0')}:${x}` : `${m}:${x}`; }
   function fmtDur(ms) { const m = Math.max(1, Math.round(ms / 60000)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`; }
 
@@ -213,7 +219,7 @@ const Gym = (() => {
     }
     switch (t.dataset.act) {
       case 'addex': return openLibrary(async id => {
-        const rec = await ensureDay(curDay); rec.exercises.push({ exerciseId: id, sets: 3, kg: 0, reps: 10 });
+        const rec = await ensureDay(curDay); rec.exercises.push(isCardio(id) ? { exerciseId: id, min: null, speed: null, incline: null } : { exerciseId: id, sets: 3, kg: 0, reps: 10 });
         await persistDay(curDay); renderDay();
       });
       case 'startw': return start(w.id);
@@ -237,15 +243,19 @@ const Gym = (() => {
     const it = dayRec(curDay).exercises[curEx], x = exInfo(it.exerciseId);
     $('exTitle').textContent = x.name;
     $('exBody').innerHTML = `<div id="exPhoto"></div>
-      <div class="label">Sets · KG · Reps</div>
-      <div class="targets" style="margin-top:0">${['sets', 'kg', 'reps'].map(f => `<label>${f.toUpperCase()}<input class="num" data-t="${f}" inputmode="${f === 'kg' ? 'decimal' : 'numeric'}" value="${esc(fmtN(it[f]))}" placeholder="0"></label>`).join('')}</div>
+      ${isCardio(it.exerciseId)
+        ? `<div class="label">Min · Speed · Incline</div>
+      <div class="targets" style="margin-top:0">${CARDIO_FIELDS.map(([f, l, mode]) => `<label>${l}<input class="num" data-t="${f}" inputmode="${mode}" value="${esc(fmtN(it[f]))}" placeholder="–"></label>`).join('')}</div>`
+        : `<div class="label">Sets · KG · Reps</div>
+      <div class="targets" style="margin-top:0">${['sets', 'kg', 'reps'].map(f => `<label>${f.toUpperCase()}<input class="num" data-t="${f}" inputmode="${f === 'kg' ? 'decimal' : 'numeric'}" value="${esc(fmtN(it[f]))}" placeholder="0"></label>`).join('')}</div>`}
       <div class="last" id="exLast" style="margin-top:12px"></div>
       <div class="label">Notes</div><textarea class="field" id="exNotes" rows="2" maxlength="300" placeholder="Seat, machine, settings…">${esc(x.notes || '')}</textarea>
       ${x.custom ? `<div class="label">Muscle group</div><div class="chips" style="margin-top:0" id="exMuscle">${LIBRARY.groups.map(g => `<button type="button" data-xm="${g}" aria-pressed="${x.muscle === g}">${g}</button>`).join('')}</div>` : ''}`;
     PhotoSlot.mount($('exPhoto'), it.exerciseId, { editable: true });
     const idx = curEx;
     RisenDB.historyOf(it.exerciseId).then(hs => {
-      const l = hs.find(h => h.sets && h.sets.length), el = $('exLast'); if (!el || curEx !== idx) return;
+      const cardio = isCardio(it.exerciseId), l = cardio ? cardioLastOf(hs) : hs.find(h => h.sets && h.sets.length), el = $('exLast'); if (!el || curEx !== idx) return;
+      if (cardio) { el.innerHTML = l ? `Last time: <b>${esc(cardioText(l))}</b>` : 'No history yet'; return; }       // no PR on cardio
       const s = l && topSet(l.sets);
       el.innerHTML = (l ? `Last time: <b>${fmtN(s.kg)} kg × ${fmtN(s.reps)}</b>` : 'No history yet') + (prToday(it.exerciseId) ? ' <span class="prtoday">▲ PR today</span>' : '');
     });
@@ -253,7 +263,8 @@ const Gym = (() => {
   $('exBody').addEventListener('input', e => {
     const t = e.target, w = curDay != null && dayRec(curDay); if (!w || curEx == null) return;
     const it = w.exercises[curEx];
-    if (t.dataset.t) {
+    if (t.dataset.t && isCardio(it.exerciseId)) { it[t.dataset.t] = num(t.value); saveDay(); }         // blank = left empty (null)
+    else if (t.dataset.t) {
       let v = num(t.value) ?? 0;
       if (t.dataset.t === 'sets') v = Math.min(20, Math.max(1, Math.round(v) || 1));     // sets: a whole number from 1 to 20
       it[t.dataset.t] = v; saveDay();
@@ -283,6 +294,10 @@ const Gym = (() => {
   const beats = (last, s) => { if (!last) return false; const kg = num(s.kg) ?? 0, reps = num(s.reps) ?? 0, lk = num(last.kg) ?? 0, lr = num(last.reps) ?? 0; return (kg > lk && reps >= lr) || (kg === lk && reps > lr); };
   const prToday = exId => S.sessions.some(x => x.date === dayKey(new Date()) && x.finishedAt && (x.prs || []).includes(exId));
   async function newEntry(exerciseId, target) {
+    if (isCardio(exerciseId)) {                // ONE row (min · speed · incline) in the same shape as a set, so ticking, saving and the finish check work unchanged
+      const lc = cardioLastOf(await RisenDB.historyOf(exerciseId)), src = lc || target || {};
+      return { exerciseId, cardio: true, sets: [{ min: fmtN(pos(src.min)), speed: fmtN(pos(src.speed)), incline: fmtN(pos(src.incline)), done: false }], last: lc ? { min: lc.min, speed: lc.speed, incline: lc.incline } : null };
+    }
     const last = (await RisenDB.historyOf(exerciseId)).find(h => h.sets && h.sets.length);
     const n = Math.min(20, Math.max(1, Math.round(target && target.sets ? target.sets : (last ? last.sets.length : 3)) || 1));
     const sets = [...Array(n)].map((_, i) => {
@@ -304,16 +319,24 @@ const Gym = (() => {
     await saveDraft(); open();
   }
 
+  // The cardio row: three labelled fields (each with − / + around the number) and the ✓, one row for the whole exercise
+  const cardioRow = (i, j, s, name) => `<div class="setrow cardio${s.done ? ' done' : ''}" data-ex="${i}" data-set="${j}">
+    ${CARDIO_FIELDS.map(([f, l, mode]) => `<div class="cfield"><span class="cl">${l}</span><div class="step">
+      <button type="button" class="sbtn" data-step="-" data-f="${f}" aria-label="${l} minus">&minus;</button>
+      <input class="num" data-f="${f}" inputmode="${mode}" enterkeyhint="${f === 'incline' ? 'done' : 'next'}" autocomplete="off" value="${esc(s[f])}" placeholder="–" aria-label="${esc(name)} ${l}">
+      <button type="button" class="sbtn" data-step="+" data-f="${f}" aria-label="${l} plus">+</button></div></div>`).join('')}
+    <button class="tick" data-tick aria-label="Confirm ${esc(name)}">${I.check}</button></div>`;
   function renderLog(el, d) {
     let h = `<div class="subline"><span class="meta sname">${esc(d.name)}</span><span class="meta elapsed" id="elapsed">${fmtClock(Date.now() - new Date(d.startedAt))}</span></div><div class="gstack">`;
     d.exercises.forEach((e, i) => {
       const x = exerciseInfo(e.exerciseId);
       h += `<div class="card ex"><div class="exhead"><div><h3>${esc(x.name)}</h3>${x.notes ? `<div class="notes">${esc(x.notes)}</div>` : ''}</div>
         <div class="tools"><button data-rmex="${i}" aria-label="Delete from this workout">${I.trash}</button></div></div>
-        <div class="last">${e.last ? `Last time: <b>${fmtN(e.last.kg)} kg × ${fmtN(e.last.reps)}</b>` : 'First time'}</div>
+        <div class="last">${e.last ? `Last time: <b>${e.cardio ? esc(cardioText(e.last)) : fmtN(e.last.kg) + ' kg × ' + fmtN(e.last.reps)}</b>` : 'First time'}</div>
         <div data-photo="${esc(e.exerciseId)}"></div>
-        <div class="sets"><div class="setrow sethead"><span>KG</span><span>REPS</span><span></span></div>`;
+        <div class="sets">${e.cardio ? '' : '<div class="setrow sethead"><span>KG</span><span>REPS</span><span></span></div>'}`;
       e.sets.forEach((s, j) => {
+        if (e.cardio) { h += cardioRow(i, j, s, x.name); return; }
         const pr = s.done && beats(e.last, s);
         h += `<div class="setrow${s.done ? ' done' : ''}${pr ? ' pr' : ''}" data-ex="${i}" data-set="${j}"><span class="n">${j + 1}</span>
           <div class="step"><button type="button" class="sbtn" data-step="-" data-f="kg" aria-label="Set ${j + 1} kg minus">&minus;</button>
@@ -324,7 +347,7 @@ const Gym = (() => {
             <button type="button" class="sbtn" data-step="+" data-f="reps" aria-label="Set ${j + 1} reps plus">+</button></div>
           <button class="tick" data-tick aria-label="Confirm set ${j + 1}">${I.check}</button>${pr ? '<span class="prbadge">▲ PR</span>' : ''}</div>`;
       });
-      h += `</div><button class="dashed addset" data-addset="${i}">+ Add set</button></div>`;
+      h += e.cardio ? '</div></div>' : `</div><button class="dashed addset" data-addset="${i}">+ Add set</button></div>`;
     });
     h += `<button class="dashed" data-act="addex">+ Add exercise</button></div>
       <button class="primary finish" data-act="finish">FINISH WORKOUT</button>
@@ -342,18 +365,19 @@ const Gym = (() => {
   $('gymLog').addEventListener('keydown', e => {
     if (e.key !== 'Enter' || !e.target.matches('.num')) return;
     e.preventDefault(); const row = e.target.closest('.setrow');
-    if (e.target.dataset.f === 'kg') row.querySelector('[data-f="reps"]').focus(); else e.target.blur();
+    const f = e.target.dataset.f, next = { kg: 'reps', min: 'speed', speed: 'incline' }[f];
+    if (next) row.querySelector(`.num[data-f="${next}"]`).focus(); else e.target.blur();
   });
   // The lime ▲ PR badge on a ticked set that beats last time (it follows the numbers and the tick); it pops when it appears
   function syncPr(row) {
     const d = draft(); if (!d) return; const e = d.exercises[row.dataset.ex], s = e && e.sets[row.dataset.set]; if (!s) return;
-    const pr = !!s.done && beats(e.last, s), badge = row.querySelector('.prbadge');
+    const pr = !!s.done && !e.cardio && beats(e.last, s), badge = row.querySelector('.prbadge');       // no PR on cardio
     row.classList.toggle('pr', pr);
     if (pr && !badge) { const b = document.createElement('span'); b.className = 'prbadge'; b.textContent = '▲ PR'; row.appendChild(b); Motion.pop(b); }
     else if (!pr && badge) badge.remove();
   }
   // Big − / + on kg (±2.5) and reps (±1), never below 0. A tap steps once; holding repeats. Typing in the number still works.
-  const STEP = { kg: 2.5, reps: 1 };
+  const STEP = { kg: 2.5, reps: 1, min: 1, speed: .5, incline: .5 };
   function stepSet(btn) {
     const d = draft(), row = btn.closest('.setrow'); if (!d || !row) return;
     const s = d.exercises[row.dataset.ex].sets[row.dataset.set], f = btn.dataset.f;
@@ -378,8 +402,11 @@ const Gym = (() => {
     const t = e.target.closest('button'); if (!t || t.classList.contains('sbtn')) return;
     const d = draft();
     if (t.hasAttribute('data-tick')) {
-      const row = t.closest('.setrow'), s = d.exercises[row.dataset.ex].sets[row.dataset.set];
-      if (!s.done) {
+      const row = t.closest('.setrow'), ent = d.exercises[row.dataset.ex], s = ent.sets[row.dataset.set];
+      if (!s.done && ent.cardio) {             // cardio: minutes are needed, speed and incline may stay empty; no rest timer
+        if (!(num(s.min) > 0)) { row.querySelector('.num[data-f="min"]').focus(); toast('Enter the minutes first'); return; }
+        s.done = true; document.activeElement.blur();
+      } else if (!s.done) {
         if (!(num(s.reps) > 0)) { row.querySelector('[data-f="reps"]').focus(); toast('Enter the reps first'); return; }
         if (num(s.kg) == null) { s.kg = '0'; row.querySelector('[data-f="kg"]').value = '0'; }
         s.done = true; document.activeElement.blur(); Rest.start();
@@ -408,9 +435,11 @@ const Gym = (() => {
     const all = d.exercises.flatMap(e => e.sets), doneN = all.filter(s => s.done).length;
     if (!doneN) { if (await ask({ title: 'Nothing to save', text: 'No sets are ticked. Discard this workout?', ok: 'DISCARD', danger: true, cancel: 'Keep going' })) { S.settings.activeSession = null; await saveDraft(); Rest.stop(); renderGym(); } return; }
     if (doneN < all.length && !(await ask({ title: 'Finish anyway?', text: "Unchecked sets won't be saved.", ok: 'FINISH' }))) return;
-    const entries = d.exercises.map(e => ({ exerciseId: e.exerciseId, sets: e.sets.filter(s => s.done).map(s => ({ kg: num(s.kg) ?? 0, reps: num(s.reps) ?? 0 })) }))
-      .filter(e => e.sets.length);
-    const prs = d.exercises.filter(e => e.sets.some(s => s.done && beats(e.last, s))).map(e => e.exerciseId);       // exercises where a ticked set beat last time
+    const entries = d.exercises.map(e => e.cardio
+      ? (e.sets[0] && e.sets[0].done ? { exerciseId: e.exerciseId, sets: [], min: pos(e.sets[0].min), speed: pos(e.sets[0].speed), incline: pos(e.sets[0].incline) } : null)
+      : { exerciseId: e.exerciseId, sets: e.sets.filter(s => s.done).map(s => ({ kg: num(s.kg) ?? 0, reps: num(s.reps) ?? 0 })) })
+      .filter(e => e && (e.sets.length || e.min != null));
+    const prs = d.exercises.filter(e => !e.cardio && e.sets.some(s => s.done && beats(e.last, s))).map(e => e.exerciseId);       // exercises where a ticked set beat last time
     let ses;
     try { ses = await RisenDB.logSession({ date: d.date, workoutId: d.workoutId, routineId: d.routineId, name: d.name, extra: d.extra, startedAt: d.startedAt, entries, prs }); }
     catch (err) { toast('Could not save the workout. Nothing is lost: tap FINISH WORKOUT again.'); return; }
@@ -500,7 +529,7 @@ const Gym = (() => {
     let h = `<p class="note" style="margin:0 2px 16px">${fmtDate(r.created)} – ${fmtDate(r.archived)} · Archived, read-only</p><div class="gstack">`;
     for (const w of ws) h += `<div class="card ro"><div class="t" style="font-family:Oswald,sans-serif;font-weight:700;font-size:21px;text-transform:uppercase">${esc(workoutTitle(w))}</div>
       <div class="sub" style="margin-top:4px">${daysText(w.days)}</div>
-      <div class="sub" style="margin-top:10px;color:var(--text);line-height:1.6">${w.exercises.map(it => `${esc(exInfo(it.exerciseId).name)} <span style="color:var(--muted)">${it.sets} × ${fmtN(it.reps)} @ ${fmtN(it.kg)} kg</span>`).join('<br>')}</div></div>`;
+      <div class="sub" style="margin-top:10px;color:var(--text);line-height:1.6">${w.exercises.map(it => `${esc(exInfo(it.exerciseId).name)} <span style="color:var(--muted)">${isCardio(it.exerciseId) ? esc(cardioText(it) || 'No target yet') : `${it.sets ?? 3} × ${fmtN(it.reps ?? 10)} @ ${fmtN(it.kg ?? 0)} kg`}</span>`).join('<br>')}</div></div>`;
     if (!ws.length) h += '<div class="card"><div class="sub">No exercises in this program.</div></div>';
     $('gymPageBody').innerHTML = h + '</div>';
     curDay = null; onClose.gymPage = null; $('gymPage').classList.remove('editing'); $('gymPageTitle').textContent = r.name; openPage('gymPage');
