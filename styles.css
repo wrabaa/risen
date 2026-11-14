@@ -32,6 +32,9 @@
     --volt-flash:rgba(204,255,0,.2);  /* the short lime flash on a set row when its tick is pressed */
     --ease:cubic-bezier(.32,.72,0,1); /* the iOS curve for pages and sheets */
     --spring:cubic-bezier(.34,1.56,.64,1); /* a button springing back after a press */
+    --volt-tint:rgba(204,255,0,.14);   /* the lime tint on the 01 TRAINING tile (a gradient; an exercise image comes later) */
+    --volt-edge:rgba(204,255,0,.22);   /* its edge */
+    --glass-tile:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.012) 45%),rgba(26,26,26,.7);   /* Home tiles: frosted, no blur needed */
     --r-card:20px;
     --card-depth:inset 0 1px 0 var(--hilite),0 8px 24px var(--shadow);
     /* Studio tags in Classes (small and subtle; lime stays the only accent for actions) */
@@ -77,14 +80,14 @@
     display:grid;place-items:center;cursor:pointer}
   .iconbtn:active{background:var(--card)}
   .topbar .mark{height:20px;width:auto;opacity:.9}
-  .greet{margin:6px 0 20px}
-  .greet .date{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-  .greet h1{margin-top:6px;font-family:Oswald,sans-serif;font-weight:700;font-size:36px;line-height:1.05;text-transform:uppercase;letter-spacing:.02em;
+  .greet{margin:10px 0 26px}
+  .greet .date{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+  .greet h1{margin-top:8px;font-family:Oswald,sans-serif;font-weight:700;font-size:48px;line-height:1.02;text-transform:uppercase;letter-spacing:.02em;
     overflow-wrap:anywhere}
 
   /* Tiles: full-width cards, numbered */
   .tiles{display:flex;flex-direction:column;gap:16px}
-  .tile{position:relative;background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--card-depth);padding:18px 20px 20px;
+  .tile{position:relative;background:var(--glass-tile);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--card-depth);padding:18px 20px 20px;
     animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
   .tile[data-tap]{cursor:pointer}
   .tile[data-tap]:active{background:var(--press)}
@@ -93,7 +96,7 @@
   .tile-head{display:flex;align-items:baseline;gap:10px;font-family:Oswald,sans-serif;font-weight:500;font-size:14px;letter-spacing:.2em;text-transform:uppercase}
   .tile-head b{font-weight:500;color:var(--muted)}
   .tile-body{margin-top:14px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
-  .big{font-family:Oswald,sans-serif;font-weight:700;font-size:64px;line-height:.95;letter-spacing:.01em;color:var(--text)}
+  .big{font-family:Oswald,sans-serif;font-weight:700;font-size:72px;line-height:.95;letter-spacing:.01em;color:var(--text)}
   .big small{margin-left:2px;font-size:.5em;font-weight:500;color:var(--muted)}
   .sub{margin-top:8px;font-size:15px;color:var(--muted)}
   .wname{font-family:Oswald,sans-serif;font-weight:700;font-size:26px;line-height:1.1;text-transform:uppercase;overflow-wrap:anywhere}
@@ -559,6 +562,21 @@
     font-family:Oswald,sans-serif;font-weight:700;font-size:17px;letter-spacing:.12em;cursor:pointer;box-shadow:0 8px 26px var(--volt-glow)}
   .primary:active{transform:scale(.98)}
   .textbtn{display:block;margin:8px auto 0;min-height:44px;padding:0 16px;border:0;background:none;color:var(--muted);font:500 14px Inter,sans-serif;cursor:pointer}
+
+  /* ===== HOME PREMIUM (design pass step 3) ===== */
+  .tile.train{background:radial-gradient(120% 150% at 100% 0%,var(--volt-tint),transparent 62%),var(--glass-tile);border-color:var(--volt-edge)}
+  .wsum{display:flex;justify-content:space-between;gap:8px;margin-top:2px}
+  .wring{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .wring>span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .ring3{position:relative;width:76px;height:76px}
+  .ring3 svg{display:block;width:100%;height:100%}
+  .ring3 .rtrack{stroke-width:6}
+  .ring3 .rfill{stroke-width:6}
+  .rn{position:absolute;inset:0;display:grid;place-items:center;font-family:Oswald,sans-serif;font-weight:700;font-size:24px;line-height:1}
+  .rn>span{white-space:nowrap}
+  .rn small{margin-left:1px;font-size:.5em;font-weight:500;color:var(--muted)}
+  /* the lime glow is for the ONE main button on a screen (.nogl = this button is not the main one there) */
+  .primary.nogl{box-shadow:none}
 
   /* ===== MOTION (design pass step 2) =====
      Only transform and opacity move (cheap on an older iPhone). prefers-reduced-motion: no movement, only fades. */

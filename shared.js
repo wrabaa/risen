@@ -149,6 +149,12 @@ const Motion = (() => {
   // numbers inside `root` that carry data-count="N" count up from 0 (600 ms, ease-out); timers finish them even if frames are paused
   function count(root, ms = 600) {
     if (!root || reduced()) return;
+    for (const c of root.querySelectorAll('[data-ring]')) {      // small rings (Home): empty, then fill to their share
+      const C = Number(c.getAttribute('stroke-dasharray')), to = C * (1 - Number(c.dataset.ring));
+      c.style.transition = 'none'; c.style.strokeDashoffset = C; void c.getBoundingClientRect();
+      requestAnimationFrame(() => requestAnimationFrame(() => { c.style.transition = 'stroke-dashoffset .6s var(--ease)'; c.style.strokeDashoffset = to; }));
+      setTimeout(() => { c.style.transition = ''; c.style.strokeDashoffset = to; }, ms + 250);
+    }
     const items = [...root.querySelectorAll('[data-count]')].map(e => ({ e, to: Number(e.dataset.count) })).filter(i => i.to > 0);
     if (!items.length) return;
     const t0 = performance.now(), done = () => items.forEach(i => { i.e.textContent = String(i.to); });

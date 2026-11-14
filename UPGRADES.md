@@ -297,6 +297,9 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.56` Design step 2, motion (DESIGN.md "Motion"): page change slide + fade (250 ms, iOS curve), press feel (scale .97, darker,
   spring back), ✓ pop and a lime flash on the set row, rings and numbers count up from 0 (600 ms), sheets spring up with the
   dim fading in, reduced-motion = fades only. iPhone test pending.
+- `.57` Design step 3, premium Home (DESIGN.md): calm big greeting (48 px), frosted glass tiles, lime-tinted 01 TRAINING tile (an exercise
+  image comes later), bigger numbers (72 px) that count up, WEEK SUMMARY as three small rings that fill from empty; the lime glow only on
+  the ONE main button per screen. Same tiles, same taps. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

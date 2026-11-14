@@ -90,12 +90,18 @@
       if(n.none) return `<div><div class="wname">${n.none==='today'?'No classes today':'No more classes today'}</div></div>`;
       return `<div><div class="wname">${n.star?`<span class="tstar" aria-label="My class">${ICONS.star}</span>`:''}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${esc(n.i?n.i.name.split(' ')[0]:'TBA')}</div></div>${Classes.avatar(n.i)}`;
     }},
-    {title:'Week summary', stack:true, html(){ // this week (Mon–Sun) at a glance: all three sections in one line
+    {title:'Week summary', stack:true, html(){ // this week (Mon–Sun) at a glance: three small rings, one per section
       const wk=weekDays(), a=dayKey(wk[0]), b=dayKey(wk[6]), inWeek=k=>k>=a&&k<=b;
       const workouts=S.sessions.filter(x=>x.finishedAt&&inWeek(x.date)).length;       // every finished workout, extra ones too
       const m=typeof Meds==='undefined'?{taken:0,total:0}:Meds.week();                // doses due up to today
       const classes=S.classlogs.filter(l=>inWeek(l.date)).length;
-      return `<div class="stats"><div><b data-count="${workouts}">${workouts}</b><span>Workouts</span></div><div><b><span data-count="${m.taken}">${m.taken}</span><small>/${m.total}</small></b><span>Supps</span></div><div><b data-count="${classes}">${classes}</b><span>Classes</span></div></div>`;
+      // how full each ring is: workouts done of those planned this week · doses taken of those due · classes attended of the
+      // starred ones (with none starred, a ring is full as soon as there is one)
+      let planned=0; for(const d of wk){ const sk=skippedIds(d); planned+=plannedOn(d).filter(w=>!sk.has(w.id)).length; }
+      const starred=S.classes.filter(c=>c.star).length, share=(n,of)=>of?Math.min(1,n/of):(n>0?1:0);
+      const C=2*Math.PI*26, ring=(frac,inner,label)=>`<div class="wring"><div class="ring3"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rtrack" cx="32" cy="32" r="26"/>
+        <circle class="rfill" cx="32" cy="32" r="26" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" data-ring="${frac}" transform="rotate(-90 32 32)"/></svg><div class="rn"><span>${inner}</span></div></div><span>${label}</span></div>`;
+      return `<div class="wsum">${ring(share(workouts,planned),`<span data-count="${workouts}">${workouts}</span>`,'Workouts')}${ring(share(m.taken,m.total),`<span data-count="${m.taken}">${m.taken}</span><small>/${m.total}</small>`,'Supps')}${ring(share(classes,starred),`<span data-count="${classes}">${classes}</span>`,'Classes')}</div>`;
     }},
   ];
   // Quiet backup reminder: shows when there's a plan and the last export is missing or older than 7 days
@@ -110,7 +116,7 @@
     $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
-    $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
+    $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile${t.title==='Training'?' train':''}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
       <div class="tile-body${t.stack?' stack':''}">${t.html()}</div></article>`).join('');
   }
 

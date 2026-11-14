@@ -45,7 +45,8 @@ Supporting colours (named on `:root` in `styles.css`, use the names, never raw c
 `--faint` #6A6A6A · `--off` #2A2A2A · `--soft` #C9C9C9 · `--soft2` #D6D6D6 · `--volt-press` #B8E600 ·
 tab bar glass: `--glass` rgba(26,26,26,.62) · `--glass-hi` rgba(255,255,255,.1) (the pill behind the active tab) ·
 depth (`.54`): `--bg-top` #141414 + `--glow` (≤4% lime) = the background gradient `--bg-grad` · `--hairline` white 8% (card edge) ·
-`--hilite` white 6% (light along a card's top) · `--shadow` · `--glass-sheet` · `--glass-bar` · `--glass-solid` (fallback when the
+`--hilite` white 6% (light along a card's top) · Home (`.57`): `--glass-tile` (frosted tile, no blur) · `--volt-tint` / `--volt-edge`
+(lime tint and edge of the 01 TRAINING tile) · motion (`.56`): `--volt-flash` (lime flash on a ticked set row) · `--ease` / `--spring` (curves) · `--shadow` · `--glass-sheet` · `--glass-bar` · `--glass-solid` (fallback when the
 browser cannot blur) · `--volt-glow` (under the main button and active tab icon) · `--r-card` 20px · `--card-depth` ·
 studio tags (Classes only, subtle): `--studio-energy` #D9A25E · `--studio-balance` #7CB9AE ·
 `--studio-power` #A592D6.
@@ -55,7 +56,7 @@ No dot-matrix font. Intro = Siza's black & white photo + logo + "STRONGER EVERY 
 ## Structure
 Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. Gear ⚙️ (top right) = Settings.
 - **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
-  02 THIS WEEK, 03 STREAK, 04 SUPPS, 05 CLASSES, 06 WEEK SUMMARY (workouts · meds taken/due ·
+  02 THIS WEEK, 03 STREAK, 04 SUPPS, 05 CLASSES, 06 WEEK SUMMARY (three small rings: workouts · supps taken/due ·
   classes attended), backup reminder line.
 - **GYM** (`gym.js`, `library.js`): Week (Mon–Sun, today lime) → Day (+ ADD EXERCISE,
   list, Copy to…, START WORKOUT on today) → Exercise (photo, sets/kg/reps, notes,
@@ -75,7 +76,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-14.56)
+## Status (release 2026-11-14.57)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -110,6 +111,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.55` new intro image (Siza) · `.56` design step 2, motion (`DESIGN.md`): page change slide + fade, press feel (scale .97 + darker,
   spring back), ✓ pop + lime flash, rings and numbers count up from 0, sheets spring up, prefers-reduced-motion respected
   (iPhone test pending).
+- `.57` design step 3, premium Home (`DESIGN.md`): calm big greeting, glass tiles, lime-tinted 01 TRAINING, bigger animated numbers,
+  WEEK SUMMARY as three small rings; the lime glow only on the ONE main button per screen (iPhone test pending).
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -161,6 +164,10 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   item is discarded; an existing item whose name is cleared keeps its last saved version.
 - Add buttons: lime "+ ADD …" at the top of the list it adds to (exception: Classes' day
   timeline has it at the bottom, so the timeline comes first).
+- Glow (`.57`): the lime glow (`--volt-glow`) belongs to the ONE main button on a screen: `.play` on Home, the main `.primary` elsewhere
+  (the Gym day's ADD EXERCISE gets `.nogl` while START WORKOUT is shown). Never more than one glowing button per screen.
+- Home (`.57`): the week-summary rings fill as: workouts done / planned this week · doses taken / due · classes attended / starred
+  (with none starred, a ring is full from the first one). Rings and numbers fill from empty when Home opens (`data-ring`, `data-count`).
 - Motion (`.56`, `Motion` in `shared.js` + the MOTION block at the end of `styles.css`): only transform and opacity move. A
   new ✓ button calls `Motion.pop(button, row?)`; a number that should count up on open gets `data-count="N"` and its screen calls
   `Motion.count(root)` when it opens (Home: when the tab is entered or the app opens; Supps: when the tab opens, the ring starts

@@ -177,7 +177,8 @@ const Gym = (() => {
   }
   function renderDay() {
     const d = curDay, w = dayRec(d), list = w ? w.exercises : [], n = list.length;
-    let h = `<button class="primary" data-act="addex" style="margin-top:6px">+ ADD EXERCISE</button>
+    const canStart = d === isoDay(new Date()) && n && !doneIds(new Date()).has(w.id) && !skippedIds(new Date()).has(w.id);   // START WORKOUT is the main button then
+    let h = `<button class="primary${canStart ? ' nogl' : ''}" data-act="addex" style="margin-top:6px">+ ADD EXERCISE</button>
       <div class="gh" style="margin-top:22px"><h2>${esc(n ? workoutTitle(w) : 'Rest day')}</h2><span class="meta">${n} exercise${n === 1 ? '' : 's'}</span></div>`;
     if (d === isoDay(new Date()) && n) {              // starting is only possible on today's day
       const today = new Date();
