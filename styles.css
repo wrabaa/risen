@@ -2,7 +2,7 @@
   /* Fonts live in the app (Oswald and Inter, SIL Open Font License), so they work offline from the first launch */
   @font-face{font-family:Oswald;font-weight:200 700;font-display:swap;src:url(assets/fonts/oswald.woff2) format("woff2")}
   @font-face{font-family:Inter;font-weight:100 900;font-display:swap;src:url(assets/fonts/inter.woff2) format("woff2")}
-  :root{--bg:#0B0B0B;--card:#1A1A1A;--line:#262626;--text:#F2F2F2;--muted:#9A9A9A;--volt:#CCFF00;--tabh:64px;
+  :root{--topb:calc(env(safe-area-inset-top) + 60px);--bg:#0B0B0B;--card:#1A1A1A;--line:#262626;--text:#F2F2F2;--muted:#9A9A9A;--volt:#CCFF00;--tabh:64px;
     --tabb:max(12px,calc(env(safe-area-inset-bottom) - 12px));   /* gap under the floating tab bar (above the home bar) */
     --tabspace:calc(var(--tabb) + var(--tabh) + 28px);          /* bottom padding every screen needs so the last item clears the bar */
     --glass:rgba(26,26,26,.84);--glass-hi:rgba(255,255,255,.1);   /* tab bar: dark enough that a lime button scrolling under it only shows as a faint hint */
@@ -83,17 +83,16 @@
   /* APP shell: each view scrolls on its own, tab bar stays put */
   #app{background:var(--bg-grad),var(--bg)}
   .view{position:absolute;inset:0;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
-    padding:calc(env(safe-area-inset-top) + 4px) 20px var(--tabspace)}
+    padding:var(--topb) 20px var(--tabspace);
+    -webkit-mask-image:linear-gradient(to bottom,transparent calc(var(--topb) - 12px),#000 calc(var(--topb) + 4px));mask-image:linear-gradient(to bottom,transparent calc(var(--topb) - 12px),#000 calc(var(--topb) + 4px))}   /* content that scrolls up fades out under the top bar */
   .view[hidden]{display:none}
   .icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 
   /* Home header */
-  .topbar{display:flex;align-items:center;justify-content:space-between;height:44px}
   .iconbtn{width:44px;height:44px;margin-right:-10px;border:0;border-radius:50%;background:none;color:var(--text);
     display:grid;place-items:center;cursor:pointer}
   .iconbtn:active{background:var(--card)}
-  .topbar .mark{height:20px;width:auto;opacity:.9}
-  .greet{margin:10px 0 26px}
+  .greet{margin:2px 0 26px}
   .greet .date{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
   .greet h1{margin-top:8px;font-family:Oswald,sans-serif;font-weight:700;font-size:48px;line-height:1.02;text-transform:uppercase;letter-spacing:.02em;
     overflow-wrap:anywhere}
@@ -651,10 +650,7 @@
   .profbtn .icon{width:20px;height:20px}
   .profbtn img{display:block;width:100%;height:100%;object-fit:cover}
   .profbtn .pfl{font:700 17px Oswald,sans-serif;color:var(--text);letter-spacing:.02em;line-height:1}
-  .topbar .profbtn{margin-right:-1px}
   /* on Gym / Meals / Supps / Classes the button sits on the title's line, right side (the title row leaves room for it) */
-  .tabprof{position:absolute;top:env(safe-area-inset-top);right:20px;z-index:3}
-  .view .gh:first-child{padding-right:48px}
   .segs{flex:1;min-width:0;display:flex;margin:0 8px 0 4px;padding:3px;border-radius:999px;background:var(--card);border:1px solid var(--hairline)}
   .segs button{flex:1;min-width:0;min-height:34px;padding:0 6px;border:0;border-radius:999px;background:none;color:var(--muted);
     font:600 12px Oswald,sans-serif;letter-spacing:.1em;white-space:nowrap;cursor:pointer}
@@ -696,6 +692,18 @@
   }
 
   /* SE width: "SUPPLEMENTS" and the profile button leave no room for the weekday word next to the date, so only the date shows */
-  @media (max-width:380px){ #medsBody .meta .wd{display:none} }
 
   @media (prefers-reduced-motion:reduce){ #enterSvg .eg-glint{animation:none;opacity:.08} .enterglass.ready{transition:none} }
+
+  /* THE SHARED TOP BAR (.66): the same bar on every tab: R mark · title (Oswald, same size everywhere) · profile button. Fixed, never scrolls,
+     the same box on every tab (the touches pass through it to the page below). Under it, .subline = what each tab had at the top (date, WEEK...). */
+  .tbar{position:absolute;z-index:4;top:0;left:0;right:0;height:var(--topb);padding:calc(env(safe-area-inset-top) + 4px) 20px 0;display:flex;align-items:flex-start;gap:10px;pointer-events:none}
+  .tbar>*{height:44px}
+  .tb-mark{width:auto;height:24px;margin:10px 0 0;opacity:.95;flex:none}
+  .tbar h1{flex:1;min-width:0;margin:0;line-height:44px;height:44px;font-family:Oswald,sans-serif;font-weight:700;font-size:22px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tbar .profbtn{pointer-events:auto;margin:3px -1px 0 0;height:38px}
+  .subline{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:34px;margin:0 0 14px}
+  .subline .meta{font-size:13px;color:var(--muted);letter-spacing:.06em}
+  .subline .meta.sname{color:var(--text);font-weight:600;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .subline .elapsed{flex:none}
+  .subline .ghost.sm{min-height:34px;padding:0 14px}

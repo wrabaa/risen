@@ -56,7 +56,7 @@ const Meals = (() => {
 
   // ================= LEVEL 1: MEALS =================
   function renderCats() {
-    $('mealCats').innerHTML = `<div class="gh"><h2>Meals</h2></div><div class="gstack">${CATS.map(c => {
+    $('mealCats').innerHTML = `<div class="gstack">${CATS.map(c => {
       const n = inCat(c.id).length, lp = latestWithPhoto(c.id), u = lp && urls.get(lp.id);
       return `<button class="mcat${u ? ' ph' : ''}" data-cat="${c.id}"${u ? ` style="background-image:url('${esc(u)}')"` : ''}>
         <div><div class="mt">${c.label}</div><div class="mn">${n ? `${n} recipe${n === 1 ? '' : 's'}` : 'No recipes yet'}</div></div>${u ? '' : `<span class="micon">${c.icon}</span>`}</button>`;

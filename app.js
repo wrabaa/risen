@@ -122,6 +122,7 @@
   }
 
   // ---- Tabs ----
+  const TAB_TITLES={home:'Home',gym:'Gym',meals:'Meals',meds:'Supplements',classes:'Classes'};
   let tabSlide=false;                      // true while a tab swipe changes the page (it slides the pages itself, so show() adds no fade)
   function show(view){
     const wasHome=!$('view-home').hidden, changed=!!document.querySelector('.view:not([hidden]):not(#view-'+view+')');
@@ -130,6 +131,7 @@
     if(view!=='classes') $('clsSheet').hidden=true; // the Classes question belongs to the Classes tab only
     if(view==='home'&&!wasHome){ renderHome(); Motion.count($('tiles')); }       // the numbers count up when Home opens
     if(view==='home') applyUpdate(); // a new release that arrived while you were busy loads now
+    $('tbTitle').textContent=TAB_TITLES[view]||'';                                                  // the shared top bar shows the page title
     const tabs=[...document.querySelectorAll('.tab')]; tabs.forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
     $('tabbar').style.setProperty('--i',Math.max(0,tabs.findIndex(t=>t.dataset.view===view)));          // the glass pill slides to the active tab
   }

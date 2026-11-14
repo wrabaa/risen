@@ -121,8 +121,8 @@ const Classes = (() => {
   // ---- a day: header, filter, weekday strip, timeline ----
   function dayHtml() {
     const d = viewDay, tIso = isoDay(new Date()), isToday = d === tIso, date = weekDays()[d - 1];
-    const meta = date.toLocaleDateString('en-GB', isToday ? { weekday: 'long', day: 'numeric', month: 'short' } : { day: 'numeric', month: 'short' });
-    let h = `<div class="gh"><h2>${isToday ? 'Today' : DAYNAMES[d - 1]}</h2><span class="gh-r"><span class="meta">${meta}</span><button type="button" class="ghost sm" data-act="week">WEEK</button></span></div>`;
+    const meta = (isToday ? 'Today · ' : '') + date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
+    let h = `<div class="subline"><span class="meta">${meta}</span><button type="button" class="ghost sm" data-act="week">WEEK</button></div>`;
     h += chipsHtml();
     h += `<div class="dstrip">${[1, 2, 3, 4, 5, 6, 7].map(n => `<button type="button" class="dsd${n === d ? ' sel' : ''}${n === tIso ? ' tod' : ''}" data-goday="${n}" aria-label="${DAYNAMES[n - 1]}"${n === d ? ' aria-current="true"' : ''}>${'MTWTFSS'[n - 1]}</button>`).join('')}</div>`;
     const list = classesOn(d), att = attMap(), k = dayKey(new Date()), nowM = nowMinutes();
@@ -158,7 +158,7 @@ const Classes = (() => {
   function weekHtml() {
     const tIso = isoDay(new Date()), wk = weekDays();
     const fm = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-    let h = `<div class="gh"><h2>Classes</h2><span class="gh-r"><span class="meta">${fm(wk[0])} – ${fm(wk[6])}</span><button type="button" class="ghost sm" data-act="today">TODAY</button></span></div>` + chipsHtml() + '<div class="gstack">';
+    let h = `<div class="subline"><span class="meta">${fm(wk[0])} – ${fm(wk[6])}</span><button type="button" class="ghost sm" data-act="today">TODAY</button></div>` + chipsHtml() + '<div class="gstack">';
     for (let d = 1; d <= 7; d++) {
       const list = classesOn(d), n = list.length;
       h += `<button class="card dayrow${d === tIso ? ' today' : ''}" data-day="${d}"><div class="wrow"><span class="wdn">${DAYS[d - 1].toUpperCase()}</span>

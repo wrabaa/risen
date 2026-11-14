@@ -60,12 +60,15 @@
   </section>
 
   <section id="app" class="screen hidden">
+    <!-- THE TOP BAR: one bar for Home, Gym, Meals, Supps and Classes (R mark · page title · profile button). It never scrolls and never moves; only the title changes (show() in app.js).
+         What each tab used to show up there (date, WEEK ...) is the small line right under it. Sub-pages cover it with their own "<" bar. -->
+    <header class="tbar" id="tbar">
+      <img class="tb-mark" src="assets/mark.png" alt="">
+      <h1 id="tbTitle">Home</h1>
+      <button class="profbtn" type="button" aria-label="Profile"></button>
+    </header>
     <!-- HOME -->
     <div class="view" id="view-home">
-      <div class="topbar">
-        <img class="mark" src="assets/mark.png" alt="RISEN">
-        <button class="profbtn" type="button" aria-label="Profile"></button>
-      </div>
       <div class="greet">
         <div class="date" id="today"></div>
         <h1 id="hello">Hello Siza</h1>
@@ -75,13 +78,13 @@
     </div>
 
     <!-- GYM, MEALS, SUPPS (meds.js), CLASSES: each tab draws itself (gym.js, meals.js, meds.js, classes.js) -->
-    <div class="view" id="view-gym" hidden><button class="profbtn tabprof" type="button" aria-label="Profile"></button>
+    <div class="view" id="view-gym" hidden>
       <div id="gymWeek"></div>
       <div id="gymLog" hidden></div>
     </div>
-    <div class="view" id="view-meals" hidden><button class="profbtn tabprof" type="button" aria-label="Profile"></button><div id="mealCats"></div></div>
-    <div class="view" id="view-meds" hidden><button class="profbtn tabprof" type="button" aria-label="Profile"></button><div id="medsBody"></div></div>
-    <div class="view" id="view-classes" hidden><button class="profbtn tabprof" type="button" aria-label="Profile"></button><div id="clsWeek"></div></div>
+    <div class="view" id="view-meals" hidden><div id="mealCats"></div></div>
+    <div class="view" id="view-meds" hidden><div id="medsBody"></div></div>
+    <div class="view" id="view-classes" hidden><div id="clsWeek"></div></div>
 
     <!-- Rest timer: starts when a set is ticked -->
     <div class="restbar" id="restbar" aria-live="polite">

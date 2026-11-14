@@ -89,7 +89,7 @@ const Meds = (() => {
   function render() {
     const el = $('medsBody'); lastDay = dayKey(new Date());
     const now = new Date(), lm = logMap(), doses = dosesOn(now), total = doses.length, taken = doses.filter(d => lm.has(d.id)).length;
-    let h = `<div class="gh"><h2>Supplements</h2><span class="meta"><span class="wd">${now.toLocaleDateString('en-GB', { weekday: 'long' })} </span>${now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span></div>`;
+    let h = `<div class="subline"><span class="meta">${now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}</span></div>`;
     const groups = []; for (const d of doses) { const g = groups[groups.length - 1]; if (g && g.t === d.t) g.ds.push(d); else groups.push({ t: d.t, ds: [d] }); }
     let ring = null;
     if (!S.meds.length) {

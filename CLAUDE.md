@@ -54,7 +54,7 @@ No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + embosse
 (all text/buttons in code, never baked into images).
 
 ## Structure
-Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. A round profile button (top right, on the title line of every tab page) opens the profile page: SETTINGS · PERSONAL INFO.
+Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. A round profile button (top right of the shared top bar) opens the profile page: SETTINGS · PERSONAL INFO.
 - **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
   02 THIS WEEK, 03 STREAK, 04 SUPPS, 05 CLASSES, 06 WEEK SUMMARY (three small rings: workouts · supps taken/due ·
   classes attended), backup reminder line.
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.65)
+## Status (release 2026-11-14.66)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -144,6 +144,10 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.65` ENTER letters reworked: about half the size (~45% of the width, centred, just above his head so the cut-out head covers only their bottom edge), Oswald 600 uppercase with a little
   letter-spacing (the app's headline font, not stretched), embossed transparent glass: mostly see-through fill, light top-left edge + soft dark bottom-right inner shadow (SVG filter `egEmboss`),
   a blurred copy of the photo shows inside the letters (frost), slow faint shimmer kept. Font settings sit on `#enterSvg` itself (copies made by `<use>` do not get rules on `text`). iPhone test pending.
+- `.66` ONE shared top bar (`#tbar` in `index.html`, `.tbar` in `styles.css`) on Home, Gym, Meals, Supps and Classes: R mark (24 px) · page title (Oswald 22 px, HOME / GYM / MEALS / SUPPLEMENTS / CLASSES,
+  set by `show()` in `app.js` from `TAB_TITLES`) · profile button. It is fixed (never scrolls, the same box on every tab to the pixel, touches pass through to the page below); pages start at `--topb`
+  and fade out under it (mask). What each tab used to show at its top (date range, date, WEEK / TODAY button, workout name + clock) is now the small `.subline` right under the bar (Meals has none).
+  Home's greeting stays below the bar. Sub-pages keep their own "<" bar. A NEW tab page: add it to `TAB_TITLES` and start its content with a `.subline` (or nothing). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

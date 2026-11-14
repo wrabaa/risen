@@ -116,7 +116,7 @@ const Gym = (() => {
     lastDay = dayKey(new Date());
     const el = $('gymWeek'), r = activeRoutine(), tIso = isoDay(new Date()), today = new Date(), wk = weekDays();
     const ids = doneIds(today), sk = skippedIds(today), fm = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-    let h = `<div class="gh"><h2>Week</h2><span class="meta">${fm(wk[0])} – ${fm(wk[6])}</span></div><div class="gstack">`;
+    let h = `<div class="subline"><span class="meta">${fm(wk[0])} – ${fm(wk[6])}</span></div><div class="gstack">`;
     let pending = false;
     for (let d = 1; d <= 7; d++) {
       const w = dayRec(d), n = w ? w.exercises.length : 0, isToday = d === tIso;
@@ -302,7 +302,7 @@ const Gym = (() => {
   }
 
   function renderLog(el, d) {
-    let h = `<div class="gh"><h2>${esc(d.name)}</h2><span class="meta elapsed" id="elapsed">${fmtClock(Date.now() - new Date(d.startedAt))}</span></div><div class="gstack">`;
+    let h = `<div class="subline"><span class="meta sname">${esc(d.name)}</span><span class="meta elapsed" id="elapsed">${fmtClock(Date.now() - new Date(d.startedAt))}</span></div><div class="gstack">`;
     d.exercises.forEach((e, i) => {
       const x = exerciseInfo(e.exerciseId);
       h += `<div class="card ex"><div class="exhead"><div><h3>${esc(x.name)}</h3>${x.notes ? `<div class="notes">${esc(x.notes)}</div>` : ''}</div>
