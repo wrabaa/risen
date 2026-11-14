@@ -567,14 +567,14 @@
 
   /* ===== HOME PREMIUM (design pass step 3) ===== */
   .tile.train{background:radial-gradient(120% 150% at 100% 0%,var(--volt-tint),transparent 62%),var(--glass-tile);border-color:var(--volt-edge)}
-  .wsum{display:flex;justify-content:space-between;gap:8px;margin-top:2px}
-  .wring{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px}
-  .wring>span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
-  .ring3{position:relative;width:76px;height:76px}
+  .wsum{display:flex;justify-content:space-between;gap:6px;margin:2px -6px 0}
+  .wring{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .wring>span{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}      /* four rings on one line */
+  .ring3{position:relative;width:64px;height:64px}
   .ring3 svg{display:block;width:100%;height:100%}
   .ring3 .rtrack{stroke-width:6}
   .ring3 .rfill{stroke-width:6}
-  .rn{position:absolute;inset:0;display:grid;place-items:center;font-family:Oswald,sans-serif;font-weight:700;font-size:24px;line-height:1}
+  .rn{position:absolute;inset:0;display:grid;place-items:center;font-family:Oswald,sans-serif;font-weight:700;font-size:19px;line-height:1}
   .rn>span{white-space:nowrap}
   .rn small{margin-left:1px;font-size:.5em;font-weight:500;color:var(--muted)}
   /* the lime glow is for the ONE main button on a screen (.nogl = this button is not the main one there) */
@@ -739,3 +739,20 @@
   .lrow .ltxt{min-width:0;flex:1}
   .lrow .dphoto{width:56px;height:56px}
   .card.paused .dphoto{opacity:.8}
+
+  /* WATER (.74): the Home card (tap anywhere = a glass; the − and the gear are separate buttons) and its goal sheet */
+  .tile.water .tile-body{padding-right:0}
+  .wminus{flex:none;width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--press);color:var(--text);font:500 28px/1 Inter,sans-serif;display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
+  .wminus:disabled{opacity:.35;cursor:default}
+  .wminus:active:not(:disabled){background:var(--line)}
+  .wgear{position:absolute;top:8px;right:10px;width:44px;height:44px;border:0;border-radius:50%;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+  .wgear .icon{width:20px;height:20px}
+  .wgear:active{background:var(--press)}
+  .wgoal{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:18px}
+  .stepbtn{flex:none;width:60px;height:60px;border-radius:50%;border:1px solid var(--line);background:var(--press);color:var(--text);font:500 30px/1 Inter,sans-serif;display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
+  .stepbtn:disabled{opacity:.35}
+  .wgval{min-width:110px;text-align:center}
+  .wgval b{display:block;font-family:Oswald,sans-serif;font-weight:700;font-size:56px;line-height:1}
+  .wgval span{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .sheet .wgl{margin-top:12px;text-align:center;font-size:16px;color:var(--text)}
+  #waterSheet .primary{margin-top:18px}

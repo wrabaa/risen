@@ -14,9 +14,10 @@
 //              extra:true = unplanned session.  Skipped:  {..., skipped:true, reason, finishedAt:null}
 //   logs       {id, exerciseId, sessionId, date, at, sets:[{kg, reps}]}
 //              History is stored per EXERCISE ID, so changing routines never loses progress.
-//   settings   {key, value}   name, nameAsked, restSec, activeSession (workout in progress), lastExport,
+//   settings   {key, value}   name, nameAsked, restSec, waterGoal, activeSession (workout in progress), lastExport,
 //              backupAsked (when the weekly "Back up now?" was last shown), libraryFollowed (fingerprint of the library's
 //              aliases/retired that this phone has already been brought in line with; see Gym.followLibrary)
+//   waterlogs  {date:'YYYY-MM-DD', glasses}   ONE record per day (keyPath date); a glass = 250 ml; the goal is the setting `waterGoal` (glasses, default 10)
 //   body       {id, kind, label?, value, date, at}   dated body values (height, weight, measurements); the profile photo lives in `photos` under the key 'profile'
 //   photos     {exerciseId, type, data:ArrayBuffer, width, height, updated}
 //              ONE photo per exercise, keyed by exercise ID. Resized to max 1000px JPEG before saving.
@@ -39,8 +40,8 @@
 // SCHEMA VERSION: raise DB_VERSION and add a new `if (old < N)` step in upgrade().
 // Never delete or rename a store in an upgrade, so updates never lose data.
 const RisenDB = (() => {
-  const DB_NAME = 'risen', DB_VERSION = 6;
-  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs', 'recipes', 'body'];
+  const DB_NAME = 'risen', DB_VERSION = 7;
+  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs', 'recipes', 'body', 'waterlogs'];
   let dbp;
 
   function upgrade(db, old) {
@@ -72,6 +73,9 @@ const RisenDB = (() => {
     if (old < 6) {                                                  // v6: Profile (body measurements)
       db.createObjectStore('body', { keyPath: 'id' });
     }
+    if (old < 7) {                                                  // v7: Water (one record per day)
+      db.createObjectStore('waterlogs', { keyPath: 'date' });
+    }
   }
 
   function open() {
@@ -101,7 +105,7 @@ const RisenDB = (() => {
   const now = () => new Date().toISOString();
 
   // ---- Settings ----
-  const DEFAULTS = { name: '', nameAsked: false, restSec: 90 };
+  const DEFAULTS = { name: '', nameAsked: false, restSec: 90, waterGoal: 10 };
   async function getSettings() {
     const rows = await all('settings'), s = { ...DEFAULTS };
     for (const r of rows) s[r.key] = r.value;
@@ -149,6 +153,9 @@ const RisenDB = (() => {
     for (const id of [].concat(ids)) t.objectStore('body').delete(id);
     await done(t);
   }
+
+  // ---- Water (Home): one record per day {date:'YYYY-MM-DD', glasses:n} (a glass = 250 ml); the daily goal is the setting `waterGoal` (glasses) ----
+  async function setWater(date, glasses) { return put('waterlogs', { date, glasses }); }
 
   async function deleteMed(id) {            // the med, its box photo and every dose logged for it
     const db = await open(), t = db.transaction(['meds', 'medlogs', 'photos'], 'readwrite');
@@ -291,7 +298,7 @@ const RisenDB = (() => {
     return new Blob(parts, { type: 'application/json' });
   }
   // Import is all-or-nothing: the file is checked first, and if anything goes wrong while writing, every change is undone.
-  const KEY_OF = { settings: 'key', photos: 'exerciseId' };      // every other store is keyed by `id`
+  const KEY_OF = { settings: 'key', photos: 'exerciseId', waterlogs: 'date' };      // every other store is keyed by `id`
   const DAMAGED = 'This backup file is damaged. Nothing was changed.';
   async function importAll(b) {
     if (!b || b.app !== 'RISEN') throw new Error('Not a RISEN backup');
@@ -487,5 +494,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, migrateLibrary, adoptSeedClasses, saveWorkout, workoutsOf,
-    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, saveBody, deleteBody, exportAll, exportBlob, importAll };
+    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, saveBody, deleteBody, setWater, exportAll, exportBlob, importAll };
 })();

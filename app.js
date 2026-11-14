@@ -3,13 +3,13 @@
   const intro=$('intro'), app=$('app');
 
   // ---- Data: lives in IndexedDB (db.js). This is an in-memory copy for drawing the screens. ----
-  const S={settings:{name:'',restSec:90},body:[],routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[],classes:[],instructors:[],classlogs:[],recipes:[]};
+  const S={settings:{name:'',restSec:90,waterGoal:10},body:[],water:[],routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[],classes:[],instructors:[],classlogs:[],recipes:[]};
   async function load(){
     [S.settings,S.routines,S.workouts,S.sessions,S.exercises]=await Promise.all([RisenDB.getSettings(),RisenDB.all('routines'),
       RisenDB.all('workouts'),RisenDB.all('sessions'),RisenDB.all('exercises')]);
     [S.meds,S.medlogs]=await Promise.all([RisenDB.all('meds'),RisenDB.all('medlogs')]);
     [S.classes,S.instructors,S.classlogs]=await Promise.all([RisenDB.all('classes'),RisenDB.all('instructors'),RisenDB.all('classlogs')]);
-    S.recipes=await RisenDB.all('recipes'); S.body=await RisenDB.all('body');
+    S.recipes=await RisenDB.all('recipes'); S.body=await RisenDB.all('body'); S.water=await RisenDB.all('waterlogs');
   }
 
   // ---- Schedule helpers ----
@@ -44,6 +44,24 @@
     }
     return n;
   }
+
+  // ---- Water (Home only): one record per day in `waterlogs`, a glass = 250 ml, the goal (glasses) is the setting `waterGoal` ----
+  const GLASS_L=.25, litres=L=>String(Math.round(L*100)/100);
+  const waterGoal=()=>Math.max(1,Math.min(30,Math.round(Number(S.settings.waterGoal)||10)));
+  const waterOn=k=>{ const r=S.water.find(w=>w.date===k); return r?r.glasses:0; };
+  const waterToday=()=>waterOn(dayKey(new Date()));
+  function setWaterToday(n){
+    const k=dayKey(new Date()), g=Math.max(0,Math.min(99,n)), r=S.water.find(w=>w.date===k);
+    if(r) r.glasses=g; else S.water.push({date:k,glasses:g});
+    RisenDB.setWater(k,g).catch(e=>toast('Could not save: '+e.message));
+  }
+
+  // The goal sheet (the small gear on the WATER card): glasses per day with − / +, saved at once in the settings record; DONE closes it
+  const paintGoal=()=>{ const g=waterGoal(); $('wgN').textContent=g; $('wgL').textContent='= '+litres(g*GLASS_L)+' L a day'; $('wgMinus').disabled=g<=1; $('wgPlus').disabled=g>=30; };
+  function openWaterGoal(){ paintGoal(); $('waterSheet').hidden=false; }
+  function stepGoal(d){ const g=Math.max(1,Math.min(30,waterGoal()+d)); S.settings.waterGoal=g; RisenDB.setSetting('waterGoal',g).catch(e=>toast('Could not save: '+e.message)); paintGoal(); }
+  $('wgMinus').onclick=()=>stepGoal(-1); $('wgPlus').onclick=()=>stepGoal(1);
+  $('wgDone').onclick=()=>{ $('waterSheet').hidden=true; renderHome(); };
 
   // ---- Tiles: add a new tile by adding an entry here ----
   const PLAY=ICONS.play;
@@ -90,6 +108,12 @@
       if(n.none) return `<div><div class="wname">${n.none==='today'?'No classes today':'No more classes today'}</div></div>`;
       return `<div><div class="wname">${n.star?`<span class="tstar" aria-label="My class">${ICONS.star}</span>`:''}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${esc(n.i?n.i.name.split(' ')[0]:'TBA')}</div></div>${Classes.avatar(n.i)}`;
     }},
+    {title:'Water', tap:'water', cls:'water', html(){       // tap anywhere on the tile = one more glass (250 ml); − takes the last one back; the gear sets the goal
+      const g=waterToday(), goal=waterGoal(), L=g*GLASS_L;
+      return `<button type="button" class="wgear" data-water="goal" aria-label="Water goal"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+        <div><div class="big"><span data-count="${L}" data-dec="2">${litres(L)}</span><small> L</small></div><div class="sub">${g} of ${goal} glasses</div></div>
+        <button type="button" class="wminus" data-water="minus" aria-label="Remove a glass"${g?'':' disabled'}>&minus;</button>`;
+    }},
     {title:'Week summary', stack:true, html(){ // this week (Mon–Sun) at a glance: three small rings, one per section
       const wk=weekDays(), a=dayKey(wk[0]), b=dayKey(wk[6]), inWeek=k=>k>=a&&k<=b;
       const workouts=S.sessions.filter(x=>x.finishedAt&&inWeek(x.date)).length;       // every finished workout, extra ones too
@@ -98,10 +122,11 @@
       // how full each ring is: workouts done of those planned this week · doses taken of those due · classes attended of the
       // starred ones (with none starred, a ring is full as soon as there is one)
       let planned=0; for(const d of wk){ const sk=skippedIds(d); planned+=plannedOn(d).filter(w=>!sk.has(w.id)).length; }
+      const upTo=wk.filter(d=>dayKey(d)<=dayKey(new Date())), wDrunk=upTo.reduce((n,d)=>n+waterOn(dayKey(d)),0), wGoal=waterGoal()*upTo.length;      // glasses from Monday up to today against the goal for those days
       const starred=S.classes.filter(c=>c.star).length, share=(n,of)=>of?Math.min(1,n/of):(n>0?1:0);
       const C=2*Math.PI*26, ring=(frac,inner,label)=>`<div class="wring"><div class="ring3"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rtrack" cx="32" cy="32" r="26"/>
         <circle class="rfill" cx="32" cy="32" r="26" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" data-ring="${frac}" transform="rotate(-90 32 32)"/></svg><div class="rn"><span>${inner}</span></div></div><span>${label}</span></div>`;
-      return `<div class="wsum">${ring(share(workouts,planned),`<span data-count="${workouts}">${workouts}</span>`,'Workouts')}${ring(share(m.taken,m.total),`<span data-count="${m.taken}">${m.taken}</span><small>/${m.total}</small>`,'Supplements')}${ring(share(classes,starred),`<span data-count="${classes}">${classes}</span>`,'Classes')}</div>`;
+      return `<div class="wsum">${ring(share(workouts,planned),`<span data-count="${workouts}">${workouts}</span>`,'Workouts')}${ring(share(m.taken,m.total),`<span data-count="${m.taken}">${m.taken}</span><small>/${m.total}</small>`,'Supplements')}${ring(share(classes,starred),`<span data-count="${classes}">${classes}</span>`,'Classes')}${ring(share(wDrunk,wGoal),`<span data-count="${wDrunk}">${wDrunk}</span><small>/${wGoal}</small>`,'Water')}</div>`;
     }},
   ];
   // Quiet backup reminder: shows when there's a plan and the last export is missing or older than 7 days
@@ -110,15 +135,15 @@
     el.hidden=!activeRoutine()||(days!=null&&days<7);
     el.innerHTML=(days==null?'No backup yet':`Last backup: ${days} days ago`)+' · <u>Back up</u>';
   }
-  let homeDrawn=false;
+  let homeDrawn=false, homeDay=dayKey(new Date());
   function renderHome(){
     renderBackupLine();
     $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
     if(typeof Profile!=='undefined') Profile.avatars();
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-    renderNow();
+    renderNow(); homeDay=dayKey(new Date());
     $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
-    $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile${t.title==='Training'?' train':''}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
+    $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile${t.title==='Training'?' train':''}${t.cls?' '+t.cls:''}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
       <div class="tile-body${t.stack?' stack':''}">${t.html()}</div></article>`).join('');
   }
 
@@ -169,7 +194,7 @@
     }
   };
   // every minute (the time moves on: a dose becomes due, a class gets close) and when the app comes back to the front (below)
-  setInterval(()=>{ if(loaded&&!app.classList.contains('hidden')&&!$('view-home').hidden&&!document.querySelector('.sheet-wrap:not([hidden])')) renderNow(); },60000);
+  setInterval(()=>{ if(loaded&&!app.classList.contains('hidden')&&!$('view-home').hidden&&!document.querySelector('.sheet-wrap:not([hidden])')) { if(dayKey(new Date())!==homeDay) renderHome(); else renderNow(); } },60000);       // a new day (water, the week) starts by itself at midnight
 
   // ---- Tabs ----
   const TAB_TITLES={home:'Home',gym:'Gym',meals:'Meals',meds:'Supplements',classes:'Classes'};
@@ -252,6 +277,9 @@
     return {go};
   })();
   $('tiles').onclick=e=>{
+    const w=e.target.closest('[data-water]');                                        // the − and the gear never add a glass
+    if(w){ if(w.dataset.water==='minus'&&waterToday()>0){ setWaterToday(waterToday()-1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); } else if(w.dataset.water==='goal') openWaterGoal(); return; }
+    if(e.target.closest('[data-tap="water"]')){ setWaterToday(waterToday()+1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); return; }
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();
     if(e.target.closest('[data-tap="classes"]')) Classes.openToday();
@@ -402,7 +430,7 @@ $('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
   // Say what is in the file before anything is replaced
   const st=b.stores||{}, cnt=k=>Array.isArray(st[k])?st[k].length:0, plural=(n,w)=>n+' '+w+(n===1?'':w.endsWith('s')?'es':'s');
   const old=b.format===1;
-  const inside=old?'':[[cnt('workouts'),'gym day'],[cnt('sessions'),'workout'],[cnt('meds'),'med'],[cnt('classes'),'class'],[cnt('recipes'),'recipe'],[cnt('body'),'body value'],[cnt('photos'),'photo']]
+  const inside=old?'':[[cnt('workouts'),'gym day'],[cnt('sessions'),'workout'],[cnt('meds'),'med'],[cnt('classes'),'class'],[cnt('recipes'),'recipe'],[cnt('body'),'body value'],[cnt('waterlogs'),'water day'],[cnt('photos'),'photo']]
     .filter(x=>x[0]).map(x=>plural(x[0],x[1])).join(', ');
   // One RISEN sheet: what is in the file, and a way to save what is on the phone first
   if(old){

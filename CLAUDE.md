@@ -56,8 +56,8 @@ No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + no ENTE
 ## Structure
 Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. A round profile button (top right of the shared top bar) opens the profile page: SETTINGS · PERSONAL INFO.
 - **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
-  02 THIS WEEK, 03 STREAK, 04 SUPPLEMENTS, 05 CLASSES, 06 WEEK SUMMARY (three small rings: workouts · supps taken/due ·
-  classes attended), backup reminder line.
+  02 THIS WEEK, 03 STREAK, 04 SUPPLEMENTS, 05 CLASSES, 06 WATER, 07 WEEK SUMMARY (four small rings: workouts · supplements taken/due ·
+  classes attended · water), backup reminder line.
 - **GYM** (`gym.js`, `library.js`): Week (Mon–Sun, today lime) → Day (+ ADD EXERCISE,
   list, Copy to…, START WORKOUT on today) → Exercise (photo, sets/kg/reps, notes,
   "Last time"). Logging: pre-filled sets, ✓, auto rest timer, finish. History per exercise ID.
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.73)
+## Status (release 2026-11-14.74)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -171,6 +171,10 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   else an untaken dose from before the supplement existed ("Earlier today"), else "All done today ✓". ONE due rule for everything (`isDue()` in `meds.js`: time reached today, unless the supplement was added today after that time):
   NOW card, NEXT UP and the dose cards. A due, unticked dose card gets a lime border and a lime "TIME TO TAKE" pill (`.dose.due`, same look as `.cls.live` / `.livepill`). The Supps tab redraws every minute while it is open and in front
   (`minuteTick()`), so a dose lights up at its time by itself. MY SUPPS rows show the box photo on the left (`data-mphoto`, same loader as the dose cards). The `+ ADD` there is `.nogl` (the NEXT UP button is the one glowing button). iPhone test pending.
+- `.74` WATER on Home only (no tab): new store `waterlogs` (DB 7, one record per day `{date, glasses}`, keyed by `date`, a glass = 250 ml) in Export / Import / Reset; the goal is the setting `waterGoal` (glasses, default 10; nothing new in Settings).
+  Home tile 06 WATER (week summary is now 07): big litres, "N of G glasses"; a tap ANYWHERE on the tile adds a glass (count-up via `Motion.count`, which now also counts decimals with `data-dec`), the round − takes the last one back (never below 0),
+  the small gear opens the goal sheet (glasses with − / +, the litres it adds up to, DONE); − and gear never add a glass. It resets by itself at midnight (Home redraws when the day changes: minute timer). The week summary has a 4th ring, WATER:
+  glasses from Monday up to today against the goal × those days (rings are smaller: 64 px, labels 9 px). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
