@@ -5,7 +5,7 @@
   :root{--bg:#0B0B0B;--card:#1A1A1A;--line:#262626;--text:#F2F2F2;--muted:#9A9A9A;--volt:#CCFF00;--tabh:64px;
     --tabb:max(12px,calc(env(safe-area-inset-bottom) - 12px));   /* gap under the floating tab bar (above the home bar) */
     --tabspace:calc(var(--tabb) + var(--tabh) + 28px);          /* bottom padding every screen needs so the last item clears the bar */
-    --glass:rgba(26,26,26,.62);--glass-hi:rgba(255,255,255,.1);
+    --glass:rgba(26,26,26,.84);--glass-hi:rgba(255,255,255,.1);   /* tab bar: dark enough that a lime button scrolling under it only shows as a faint hint */
     /* Supporting colours (not brand colours: greys for depth, and one red for destructive actions only) */
     --danger:#FF6B6B;     /* delete / reset */
     --field:#0F0F0F;      /* inputs and inset boxes */
@@ -126,7 +126,7 @@
      under it (it is translucent), so every screen keeps bottom padding for it (see --tabspace). */
   .tabbar{position:absolute;left:16px;right:16px;bottom:var(--tabb);z-index:5;display:flex;align-items:stretch;height:var(--tabh);padding:6px;
     border-radius:999px;border:1px solid var(--hairline);background:var(--glass);
-    -webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);
+    -webkit-backdrop-filter:blur(28px) saturate(120%);backdrop-filter:blur(28px) saturate(120%);      /* low saturation: the blur must not boost colours behind it */
     box-shadow:inset 0 1px 0 var(--hilite),0 12px 32px var(--shadow),0 2px 8px rgba(0,0,0,.35);
     transition:transform .3s cubic-bezier(.32,.72,0,1),opacity .2s ease}
   .tabpill{position:absolute;top:6px;bottom:6px;left:6px;width:calc((100% - 12px) / 5);border-radius:999px;background:var(--glass-hi);

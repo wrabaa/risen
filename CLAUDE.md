@@ -43,7 +43,7 @@ Supporting colours (named on `:root` in `styles.css`, use the names, never raw c
 `--danger` #FF6B6B (delete/reset ONLY — the one exception to "one accent") · `--field` #0F0F0F
 (inputs) · `--press` #202020 · `--dash` #3A3A3A · `--mid` #4A4A4A · `--dim` #5A5A5A ·
 `--faint` #6A6A6A · `--off` #2A2A2A · `--soft` #C9C9C9 · `--soft2` #D6D6D6 · `--volt-press` #B8E600 ·
-tab bar glass: `--glass` rgba(26,26,26,.62) · `--glass-hi` rgba(255,255,255,.1) (the pill behind the active tab) ·
+tab bar glass: `--glass` rgba(26,26,26,.84) (`.58`; it was .62 and let lime show through bright) · `--glass-hi` rgba(255,255,255,.1) (the pill behind the active tab) ·
 depth (`.54`): `--bg-top` #141414 + `--glow` (≤4% lime) = the background gradient `--bg-grad` · `--hairline` white 8% (card edge) ·
 `--hilite` white 6% (light along a card's top) · Home (`.57`): `--glass-tile` (frosted tile, no blur) · `--volt-tint` / `--volt-edge`
 (lime tint and edge of the 01 TRAINING tile) · motion (`.56`): `--volt-flash` (lime flash on a ticked set row) · `--ease` / `--spring` (curves) · `--shadow` · `--glass-sheet` · `--glass-bar` · `--glass-solid` (fallback when the
@@ -76,7 +76,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-14.57)
+## Status (release 2026-11-14.58)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -113,6 +113,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   (iPhone test pending).
 - `.57` design step 3, premium Home (`DESIGN.md`): calm big greeting, glass tiles, lime-tinted 01 TRAINING, bigger animated numbers,
   WEEK SUMMARY as three small rings; the lime glow only on the ONE main button per screen (iPhone test pending).
+- `.58` tab bar glass darker (84%, less colour boost) so a lime button scrolling under it is only a faint hint; schedule: Sixpax (Fri 18:00,
+  Sat 09:30) and Fri Pound are 30 min (phones take it with Settings → Reload gym schedule).
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -242,7 +244,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 **CLASSES**
 - Gym = Fitness Zone; 3 studios: Energy, Balance, Power. 37 classes, 15 instructors
   (Cesar has no photo; Zumba Thu 19:30 instructor unknown = TBA).
-  Fri Pound time set to 17:30 (not labeled on the board — Siza's call).
+  Fri Pound time set to 17:30 (not labeled on the board — Siza's call). Since `.58`: Sixpax (Fri 18:00, Sat 09:30) and Fri Pound
+  (17:30–18:00) last 30 minutes; every other class 60.
 - Seed loads once on YES; afterwards it's normal editable data. Schedule classes carry
   `seed:true` and a fixed ID; "Reload gym schedule" resets only those.
 - Instructor photos are public in the repo — Siza decided this is fine (they're already

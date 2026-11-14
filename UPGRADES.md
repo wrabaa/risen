@@ -300,6 +300,8 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.57` Design step 3, premium Home (DESIGN.md): calm big greeting (48 px), frosted glass tiles, lime-tinted 01 TRAINING tile (an exercise
   image comes later), bigger numbers (72 px) that count up, WEEK SUMMARY as three small rings that fill from empty; the lime glow only on
   the ONE main button per screen. Same tiles, same taps. iPhone test pending.
+- `.58` Two fixes: the floating tab bar glass is darker (84%) so lime under it is only a faint hint; schedule durations: Sixpax (Fri 18:00, Sat 09:30)
+  and Fri Pound = 30 min, same IDs (a phone gets them via Settings → Reload gym schedule; its notes and attendance stay). iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

@@ -218,7 +218,7 @@
    "time": "17:30",
    "name": "Pound",
    "instructor": "jad",
-   "duration": 60
+   "duration": 30
   },
   {
    "id": "fz-c16",
@@ -227,7 +227,7 @@
    "time": "18:00",
    "name": "Sixpax",
    "instructor": "jad",
-   "duration": 60
+   "duration": 30
   },
   {
    "id": "fz-c17",
@@ -245,7 +245,7 @@
    "time": "09:30",
    "name": "Sixpax",
    "instructor": "mjay",
-   "duration": 60
+   "duration": 30
   },
   {
    "id": "fz-c19",
