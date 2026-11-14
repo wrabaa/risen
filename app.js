@@ -116,10 +116,60 @@
     $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
     if(typeof Profile!=='undefined') Profile.avatars();
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    renderNow();
     $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
     $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile${t.title==='Training'?' train':''}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
       <div class="tile-body${t.stack?' stack':''}">${t.html()}</div></article>`).join('');
   }
+
+  // ---- NOW card: ONE glass card with the single next thing and one big button. First match wins:
+  //   1 workout running · 2 a dose due now / overdue · 3 a class starting within 60 min · 4 today's workout not done · 5 next dose later today (no button) · 6 all done
+  function nowInfo(){
+    const today=new Date(), hm=String(today.getHours()).padStart(2,'0')+':'+String(today.getMinutes()).padStart(2,'0');
+    const ses=S.settings.activeSession;
+    if(ses){
+      const m=Math.max(0,Math.round((Date.now()-new Date(ses.startedAt))/60000));
+      return {label:'Now', title:'Workout in progress', sub:m>=60?Math.floor(m/60)+' h '+String(m%60).padStart(2,'0')+' min':m+' min', btn:'Resume', act:'resume'};
+    }
+    const meds=typeof Meds==='undefined'?{due:[],next:null,hasMeds:false}:Meds.dueNow();
+    if(meds.due.length){
+      const names=[...new Set(meds.due.map(d=>d.m.name))], shown=names.length>3?names.slice(0,3).join(', ')+' +'+(names.length-3):names.join(', ');
+      const t=meds.due[0].t, late=(today.getHours()*60+today.getMinutes())-(+t.slice(0,2)*60+ +t.slice(3));
+      return {label:'Now', title:shown, sub:t+(late>=30?' · overdue':' · due now'), btn:'✓ Take', act:'take', doses:meds.due};
+    }
+    const cl=typeof Classes==='undefined'?null:Classes.soon(60);
+    if(cl) return {label:'Soon', title:cl.c.name, sub:(cl.min<=0?'Starts now':'Starts in '+cl.min+' min')+' · '+cl.c.time+(cl.i?' · '+cl.i.name.split(' ')[0]:''), btn:'Open', act:'class', inst:cl.i};
+    if(activeRoutine()){
+      const sk=skippedIds(today), ids=doneIds(today), w=plannedOn(today).find(x=>!ids.has(x.id)&&!sk.has(x.id));
+      if(w){ const n=(w.exercises||[]).length; return {label:'Today', title:wTitle(w), sub:n+' exercise'+(n===1?'':'s'), btn:'Start', act:'start', wid:w.id}; }
+    }
+    if(meds.next) return {label:'Next', title:'Next: '+meds.next.m.name+' at '+meds.next.t};
+    if(!S.meds.length&&!activeRoutine()&&!S.classes.length) return null;           // a brand-new app has nothing to say yet
+    return {label:'Today', title:'All done today ✓', done:true};
+  }
+  let nowAct=null;
+  function renderNow(){
+    const el=$('nowCard'); if(!el) return; const n=nowInfo(); nowAct=n;
+    if(!n){ el.hidden=true; el.innerHTML=''; return; }
+    const av=n.inst!==undefined&&typeof Classes!=='undefined'?Classes.avatar(n.inst):'';
+    el.hidden=false; el.classList.toggle('alldone',!!n.done);
+    el.innerHTML=`<div class="now-label">${n.label}</div><div class="now-main"><div class="now-txt"><div class="wname">${esc(n.title)}</div>${n.sub?`<div class="sub">${esc(n.sub)}</div>`:''}</div>${av}</div>`
+      +(n.act?`<button type="button" class="primary now-btn" data-now="${n.act}">${n.btn}</button>`:'');
+  }
+  $('nowCard').onclick=async e=>{
+    const b=e.target.closest('[data-now]'); if(!b||!nowAct||b.disabled) return;
+    const n=nowAct;
+    if(n.act==='resume') return Gym.open();
+    if(n.act==='class') return Classes.openToday();
+    if(n.act==='start') return Gym.start(n.wid);
+    if(n.act==='take'){
+      b.disabled=true; Motion.pop(b);
+      try{ await Meds.takeDoses(n.doses); }catch(err){ b.disabled=false; toast('Could not save: '+err.message); return; }
+      setTimeout(renderHome,420);                                                      // let the pop show, then the card moves on to the next thing
+    }
+  };
+  // every minute (the time moves on: a dose becomes due, a class gets close) and when the app comes back to the front (below)
+  setInterval(()=>{ if(loaded&&!app.classList.contains('hidden')&&!$('view-home').hidden&&!document.querySelector('.sheet-wrap:not([hidden])')) renderNow(); },60000);
 
   // ---- Tabs ----
   const TAB_TITLES={home:'Home',gym:'Gym',meals:'Meals',meds:'Supplements',classes:'Classes'};

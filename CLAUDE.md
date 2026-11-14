@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.68)
+## Status (release 2026-11-14.69)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -154,6 +154,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   label in the row's top-left corner (the row is `kg group · reps group · ✓`). Beat last time: a TICKED set that beats the best set of "Last time" (more kg at the same or more reps, or more reps at the same kg;
   nothing to beat the first time) gets a lime ▲ PR badge (pops in, follows edits and un-ticking); on FINISH the session stores `prs` (exercise ids) and those exercises show "▲ PR today" in the day's list and
   on the exercise page. iPhone test pending.
+- `.69` NOW card on Home (`nowInfo()` / `renderNow()` in `app.js`; `#nowCard` between the greeting and the tiles): ONE glass card with the single next thing and one big button, first match wins:
+  1 workout running ("Workout in progress · N min", RESUME → Gym) · 2 a dose due now or overdue today (names + time, ✓ TAKE ticks them with `Motion.pop`; `Meds.dueNow()` / `Meds.takeDoses()`) ·
+  3 a class starting within 60 min, starred first (photo, "Starts in N min", OPEN → Classes; `Classes.soon()`) · 4 today's workout not done (day title, exercise count, START) ·
+  5 next dose later today ("Next: Omega 3 at 14:00", no button) · 6 "All done today ✓" in lime. A brand-new app (no meds, no program, no classes) shows no card. It refreshes every minute
+  (not while a sheet is open), whenever Home is drawn and when the app comes back to the front. Its button is the ONE glowing button on Home; the ▶ on the TRAINING tile no longer glows. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -205,7 +210,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   item is discarded; an existing item whose name is cleared keeps its last saved version.
 - Add buttons: lime "+ ADD …" at the top of the list it adds to (exception: Classes' day
   timeline has it at the bottom, so the timeline comes first).
-- Glow (`.57`): the lime glow (`--volt-glow`) belongs to the ONE main button on a screen: `.play` on Home, the main `.primary` elsewhere
+- Glow (`.57`): the lime glow (`--volt-glow`) belongs to the ONE main button on a screen: the NOW card's button on Home (since `.69`; `.play` no longer glows), the main `.primary` elsewhere
   (the Gym day's ADD EXERCISE gets `.nogl` while START WORKOUT is shown). Never more than one glowing button per screen.
 - Home (`.57`): the week-summary rings fill as: workouts done / planned this week · doses taken / due · classes attended / starred
   (with none starred, a ring is full from the first one). Rings and numbers fill from empty when Home opens (`data-ring`, `data-count`).

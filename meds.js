@@ -26,6 +26,14 @@ const Meds = (() => {
     const lm = logMap(), doses = dosesOn(new Date());
     return { hasMeds: S.meds.length > 0, total: doses.length, taken: doses.filter(x => lm.has(x.id)).length, next: doses.find(x => !lm.has(x.id)) };
   }
+  // For the NOW card on Home: the doses due now or overdue today (not taken, time reached), and the next one later today
+  function dueNow() {
+    const lm = logMap(), now = new Date(), hm = pad(now.getHours()) + ':' + pad(now.getMinutes()), open = dosesOn(now).filter(x => !lm.has(x.id));
+    return { due: open.filter(x => x.t <= hm), next: open.find(x => x.t > hm) || null, hasMeds: S.meds.length > 0 };
+  }
+  async function takeDoses(doses) {       // ticks them (same as the ✓ in the Supps tab)
+    for (const d of doses) { const [medId, date, time] = d.id.split('|'); S.medlogs.push(await RisenDB.logDose(medId, date, time)); }
+  }
   function week() {       // for Home's week summary: doses due from Monday up to today, and how many were taken
     const lm = logMap(), today = dayKey(new Date()); let total = 0, taken = 0;
     for (const d of weekDays()) { if (dayKey(d) > today) break; for (const x of dosesOn(d)) { total++; if (lm.has(x.id)) taken++; } }
@@ -281,5 +289,5 @@ const Meds = (() => {
   $('medBack').onclick = closeEditor;
   $('medDone').onclick = closeEditor;
 
-  return { open, render, summary, week, flush };
+  return { open, render, summary, dueNow, takeDoses, week, flush };
 })();

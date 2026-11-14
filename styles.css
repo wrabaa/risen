@@ -701,3 +701,16 @@
   .prbadge{position:absolute;right:50px;top:-9px;z-index:1;padding:2px 7px;border-radius:8px;background:var(--volt);color:var(--bg);font:700 10px/1.2 Oswald,sans-serif;letter-spacing:.1em;pointer-events:none}
   .setrow.pr .num{border-color:var(--volt)}
   .prtoday{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:8px;background:var(--volt);color:var(--bg);font:700 10px/1.4 Oswald,sans-serif;letter-spacing:.1em;vertical-align:middle;white-space:nowrap}
+
+  /* NOW CARD (.68→.69): one glass card on Home with the single next thing; its button is the ONE glowing button on Home (the ▶ on the TRAINING tile does not glow) */
+  .nowcard{margin:0 0 14px;padding:16px;border-radius:var(--r-card);border:1px solid var(--hairline);background:var(--glass-tile);box-shadow:var(--card-depth)}
+  .nowcard[hidden]{display:none}
+  .now-label{font-family:Oswald,sans-serif;font-weight:500;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+  .now-main{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:8px}
+  .now-txt{min-width:0}
+  .now-txt .wname{font-size:26px}
+  .now-txt .sub{margin-top:4px;font-size:14px;color:var(--muted)}
+  .now-main .avatar{flex:none}
+  .now-btn{margin-top:14px;width:100%;text-transform:uppercase}
+  .nowcard.alldone .wname{color:var(--volt)}
+  .tile .play{box-shadow:none}

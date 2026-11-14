@@ -40,6 +40,14 @@ const Classes = (() => {
     return c ? { c, i: inst(c.instructorId), now: toMin(c.time) <= nowMin, star: !!c.star } : { none: 'more' };
   }
 
+  // For the NOW card on Home: a class that starts within `mins` minutes (not attended yet), starred first
+  function soon(mins = 60) {
+    const now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes(), k = dayKey(now), att = attMap();
+    const list = S.classes.filter(c => c.day === isoDay(now) && !att.has(attId(c.id, k)) && toMin(c.time) >= nowMin && toMin(c.time) - nowMin <= mins).sort(byTime);
+    const c = list.find(x => x.star) || list[0];
+    return c ? { c, i: inst(c.instructorId), min: toMin(c.time) - nowMin } : null;
+  }
+
   // ================= Instructor photos =================
   // A seed instructor's photo is a file in the app; a photo chosen on the phone is kept in the photo store and wins.
   const custom = new Set();           // instructor ids that have a photo of their own
@@ -471,5 +479,5 @@ const Classes = (() => {
     return { ...res, total: (seed.classes || []).length, gym: seed.gym || 'gym' };
   }
 
-  return { open, openToday, next, avatar, reset, flush, matchSeed, reloadSchedule };
+  return { open, openToday, next, soon, avatar, reset, flush, matchSeed, reloadSchedule };
 })();
