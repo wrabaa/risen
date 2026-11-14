@@ -18,6 +18,19 @@
     --soft:#C9C9C9;       /* intro tagline */
     --soft2:#D6D6D6;      /* text over a photo card */
     --volt-press:#B8E600; /* volt while pressed */
+    /* Design pass (.54): depth and glass. Cards = hairline + faint top light + soft shadow; glass = translucent dark + blur. */
+    --bg-top:#141414;                 /* top of the background gradient */
+    --glow:rgba(204,255,0,.04);       /* the almost invisible lime glow behind the hero area (never more than 4%) */
+    --hairline:rgba(255,255,255,.08); /* 1px edge of cards and glass */
+    --hilite:rgba(255,255,255,.06);   /* faint light edge along the top of a card or glass */
+    --shadow:rgba(0,0,0,.45);         /* soft shadow under cards */
+    --glass-sheet:rgba(26,26,26,.72); /* sheets */
+    --glass-bar:rgba(11,11,11,.72);   /* sticky headers */
+    --glass-solid:rgba(26,26,26,.97); /* what glass becomes when the browser cannot blur */
+    --volt-glow:rgba(204,255,0,.22);  /* soft lime glow under the ONE primary button and the active tab icon */
+    --bg-grad:radial-gradient(75% 42% at 14% 0%,var(--glow),transparent 72%),radial-gradient(130% 58% at 50% 0%,var(--bg-top),var(--bg) 78%);
+    --r-card:20px;
+    --card-depth:inset 0 1px 0 var(--hilite),0 8px 24px var(--shadow);
     /* Studio tags in Classes (small and subtle; lime stays the only accent for actions) */
     --studio-energy:#D9A25E;   /* amber */
     --studio-balance:#7CB9AE;  /* sage */
@@ -49,11 +62,11 @@
   @keyframes rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
   @keyframes fade{from{opacity:0}to{opacity:1}}
   /* APP shell: each view scrolls on its own, tab bar stays put */
-  #app{background:var(--bg)}
+  #app{background:var(--bg-grad),var(--bg)}
   .view{position:absolute;inset:0;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
     padding:calc(env(safe-area-inset-top) + 4px) 20px var(--tabspace)}
   .view[hidden]{display:none}
-  .icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 
   /* Home header */
   .topbar{display:flex;align-items:center;justify-content:space-between;height:44px}
@@ -67,8 +80,8 @@
     overflow-wrap:anywhere}
 
   /* Tiles: full-width cards, numbered */
-  .tiles{display:flex;flex-direction:column;gap:14px}
-  .tile{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px 20px;
+  .tiles{display:flex;flex-direction:column;gap:16px}
+  .tile{position:relative;background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--card-depth);padding:18px 20px 20px;
     animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
   .tile[data-tap]{cursor:pointer}
   .tile[data-tap]:active{background:var(--press)}
@@ -79,10 +92,10 @@
   .tile-body{margin-top:14px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
   .big{font-family:Oswald,sans-serif;font-weight:700;font-size:64px;line-height:.95;letter-spacing:.01em;color:var(--text)}
   .big small{margin-left:2px;font-size:.5em;font-weight:500;color:var(--muted)}
-  .sub{margin-top:8px;font-size:14px;color:var(--muted)}
+  .sub{margin-top:8px;font-size:15px;color:var(--muted)}
   .wname{font-family:Oswald,sans-serif;font-weight:700;font-size:26px;line-height:1.1;text-transform:uppercase;overflow-wrap:anywhere}
   .play{flex:none;width:60px;height:60px;border:0;border-radius:50%;background:var(--volt);color:var(--bg);display:grid;place-items:center;cursor:pointer;
-    transition:transform .12s ease}
+    box-shadow:0 8px 26px var(--volt-glow);transition:transform .12s ease}
   .play:active{transform:scale(.93)}
   .play svg{width:24px;height:24px;margin-left:3px;fill:currentColor}
   .ghost{flex:none;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--text);
@@ -106,9 +119,9 @@
   /* Bottom tab bar: a floating glass pill (like iOS 26). Detached from the edges, above the home bar, icons only. Content scrolls
      under it (it is translucent), so every screen keeps bottom padding for it (see --tabspace). */
   .tabbar{position:absolute;left:16px;right:16px;bottom:var(--tabb);z-index:5;display:flex;align-items:stretch;height:var(--tabh);padding:6px;
-    border-radius:999px;border:1px solid var(--line);background:var(--glass);
+    border-radius:999px;border:1px solid var(--hairline);background:var(--glass);
     -webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);
-    box-shadow:0 12px 32px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.35);
+    box-shadow:inset 0 1px 0 var(--hilite),0 12px 32px var(--shadow),0 2px 8px rgba(0,0,0,.35);
     transition:transform .3s cubic-bezier(.32,.72,0,1),opacity .2s ease}
   .tabpill{position:absolute;top:6px;bottom:6px;left:6px;width:calc((100% - 12px) / 5);border-radius:999px;background:var(--glass-hi);
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);transform:translateX(calc(var(--i, 0) * 100%));
@@ -117,21 +130,22 @@
     transition:color .2s ease}
   .tab .icon{width:24px;height:24px}
   .tab[aria-selected="true"]{color:var(--volt)}
+  .tab[aria-selected="true"] .icon{filter:drop-shadow(0 0 7px var(--volt-glow))}
   /* a text field is focused (the keyboard is up): the pill steps out of the way so it never floats over the field */
   body.typing .tabbar{transform:translateY(calc(100% + 40px));opacity:0;pointer-events:none}
 
   /* SETTINGS: page slides in from the right */
-  #settings{position:absolute;inset:0;z-index:10;background:var(--bg);overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+  #settings{position:absolute;inset:0;z-index:10;background:var(--bg-grad),var(--bg);overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
     padding:calc(env(safe-area-inset-top) + 4px) 20px calc(env(safe-area-inset-bottom) + 28px);
     transform:translateX(100%);visibility:hidden;transition:transform .3s cubic-bezier(.32,.72,0,1),visibility 0s .3s}
   #settings.open{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.32,.72,0,1)}
   .settings-top{display:flex;align-items:center;height:44px}
   .settings-top .iconbtn{margin:0 0 0 -10px}
   .settings-top h1{margin-left:4px;font-family:Oswald,sans-serif;font-weight:700;font-size:22px;letter-spacing:.08em;text-transform:uppercase}
-  .group-label{margin:26px 4px 8px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-  .group{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .group-label{margin:26px 4px 8px;font-family:Oswald,sans-serif;font-weight:500;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .group{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--card-depth);overflow:hidden}
   .row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:0 16px;font-size:16px}
-  .row+.row{border-top:1px solid var(--line)}
+  .row+.row{border-top:1px solid var(--hairline)}
   button.row{width:100%;border:0;background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer}
   button.row:active{background:var(--line)}
   .row .chev{width:18px;height:18px;color:var(--muted)}
@@ -147,7 +161,7 @@
   .settings-version{margin-top:30px;padding:10px;text-align:center;font-size:11px;letter-spacing:.1em;color:var(--muted);opacity:.6}
   .toast{position:fixed;left:50%;bottom:calc(var(--tabb) + var(--tabh) + 14px);z-index:30;transform:translate(-50%,20px);opacity:0;pointer-events:none;
     padding:12px 20px;border-radius:22px;background:rgba(40,40,40,.92);color:var(--text);font-size:14px;line-height:1.35;text-align:center;width:max-content;max-width:calc(100% - 32px);
-    -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transition:opacity .25s ease,transform .25s ease}
+    box-shadow:0 8px 24px var(--shadow);transition:opacity .25s ease,transform .25s ease}       /* no blur here: at most two blurred layers on screen */
   .toast.show{opacity:1;transform:translate(-50%,0)}
 
 
@@ -155,14 +169,14 @@
   .gh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 14px}
   .gh h2{font-family:Oswald,sans-serif;font-weight:700;font-size:28px;line-height:1.05;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
   .gh .meta{flex:none;font-size:13px;color:var(--muted);letter-spacing:.06em}
-  .label{margin:24px 2px 10px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-  .gstack{display:flex;flex-direction:column;gap:12px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .label{margin:24px 2px 10px;font-family:Oswald,sans-serif;font-weight:500;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .gstack{display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--card-depth);padding:16px}
   button.card{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer}
   button.card:active{background:var(--press)}
   .wrow{display:flex;align-items:center;justify-content:space-between;gap:14px}
   .wrow .t{font-family:Oswald,sans-serif;font-weight:700;font-size:21px;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
-  .wrow .s{margin-top:4px;font-size:14px;color:var(--muted)}
+  .wrow .s{margin-top:4px;font-size:15px;color:var(--muted)}
   .status{flex:none;font-family:Oswald,sans-serif;font-weight:500;font-size:13px;letter-spacing:.14em;color:var(--muted)}
   .status.ok{color:var(--volt)}
   .play.sm{width:48px;height:48px}.play.sm svg{width:20px;height:20px}
@@ -226,8 +240,8 @@
 
   /* Rest timer bar (above the tab bar) */
   .restbar{position:absolute;left:12px;right:12px;bottom:calc(var(--tabb) + var(--tabh) + 10px);z-index:6;
-    display:flex;align-items:center;gap:8px;padding:8px 10px 8px 18px;border-radius:20px;border:1px solid var(--line);
-    background:rgba(26,26,26,.88);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);
+    display:flex;align-items:center;gap:8px;padding:8px 10px 8px 18px;border-radius:24px;border:1px solid var(--hairline);box-shadow:inset 0 1px 0 var(--hilite),0 10px 30px var(--shadow);
+    background:rgba(26,26,26,.88);-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%);
     transform:translateY(16px);opacity:0;pointer-events:none;transition:transform .3s cubic-bezier(.32,.72,0,1),opacity .25s ease}
   .restbar.show{transform:none;opacity:1;pointer-events:auto}
   .restbar .lbl{font-size:11px;letter-spacing:.2em;color:var(--muted)}
@@ -272,7 +286,7 @@
   .wcard .tools{margin:0 -8px 0 0}
 
   /* Sub-pages (workout editor, exercise library, archived routine) slide in from the right */
-  .subpage{position:absolute;inset:0;z-index:12;background:var(--bg);overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+  .subpage{position:absolute;inset:0;z-index:12;background:var(--bg-grad),var(--bg);overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
     padding:calc(env(safe-area-inset-top) + 4px) 20px calc(env(safe-area-inset-bottom) + 40px);
     transform:translateX(100%);visibility:hidden;transition:transform .3s cubic-bezier(.32,.72,0,1),visibility 0s .3s}
   .subpage.open{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.32,.72,0,1)}
@@ -326,7 +340,8 @@
   .subtop .iconbtn{margin:0 0 0 -10px}
   .subtop h1{margin-left:4px;font-family:Oswald,sans-serif;font-weight:700;font-size:22px;letter-spacing:.08em;text-transform:uppercase;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .search{position:sticky;top:calc(env(safe-area-inset-top) * -1 - 4px);z-index:2;margin:0 -20px;padding:8px 20px 10px;background:var(--bg)}
+  .search{position:sticky;top:calc(env(safe-area-inset-top) * -1 - 4px);z-index:2;margin:0 -20px;padding:8px 20px 10px;background:var(--glass-bar);
+    -webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%);border-bottom:1px solid var(--hairline)}
   .libgroup .row{font-size:16px}
   .libgroup .row small{color:var(--muted);font-size:13px}
 
@@ -341,7 +356,7 @@
     font:500 16px Inter,sans-serif;text-align:left;cursor:pointer}
   .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px}
   .stats div{padding:14px 8px;border-radius:14px;background:var(--field);border:1px solid var(--line);text-align:center}
-  .stats b{display:block;font-family:Oswald,sans-serif;font-weight:700;font-size:30px;line-height:1.1}
+  .stats b{display:block;font-family:Oswald,sans-serif;font-weight:700;font-size:38px;line-height:1.1}
   .stats b small{font-size:.55em;font-weight:500;color:var(--muted)}
   .tile .stats{margin-top:0}
   .stats span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
@@ -368,12 +383,12 @@
   .dgroup{display:flex;flex-direction:column;gap:8px}
   .dhead{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:40px;padding:0 4px;margin-top:6px}
   .dh{font-family:Oswald,sans-serif;font-weight:500;font-size:15px;letter-spacing:.16em;text-transform:uppercase}
-  .takeall{flex:none;min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);
+  .takeall{flex:none;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);
     font-family:Oswald,sans-serif;font-weight:500;font-size:13px;letter-spacing:.14em;cursor:pointer}
   .takeall:active{background:var(--line)}
   .alldone{font-family:Oswald,sans-serif;font-weight:500;font-size:13px;letter-spacing:.14em;color:var(--volt)}
-  .dstack{display:flex;flex-direction:column;gap:10px}
-  .dose{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;transition:background .25s ease,border-color .25s ease,color .25s ease}
+  .dstack{display:flex;flex-direction:column;gap:12px}
+  .dose{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--card-depth);padding:12px;transition:background .25s ease,border-color .25s ease,color .25s ease}
   .dose.taken{background:var(--volt);border-color:var(--volt);color:var(--bg)}
   .drow{display:flex;align-items:center;gap:12px}
   .dphoto{flex:none;width:64px;height:64px;border-radius:12px;overflow:hidden;background:var(--field);display:grid;place-items:center;color:var(--dim)}
@@ -416,7 +431,7 @@
   #recipePage .subtop h1{flex:1;min-width:0}
   #recipePage .saved,#recipePage .donebtn{display:block}
   .mcat{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;width:100%;min-height:124px;padding:18px 20px;
-    border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card) center/cover no-repeat;color:var(--text);text-align:left;cursor:pointer}
+    border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--card-depth);overflow:hidden;background:var(--card) center/cover no-repeat;color:var(--text);text-align:left;cursor:pointer}
   .mcat:active{filter:brightness(1.12)}
   .mcat.ph{border-color:transparent}
   .mcat.ph::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,11,.1) 0%,rgba(11,11,11,.82) 100%)}
@@ -426,7 +441,7 @@
   .mcat.ph .mn{color:var(--soft2)}
   .micon{color:var(--muted)}
   .micon .icon{width:44px;height:44px;stroke-width:1.5}
-  .rcard{display:block;width:100%;padding:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);color:var(--text);text-align:left;cursor:pointer}
+  .rcard{display:block;width:100%;padding:0;border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--card-depth);overflow:hidden;background:var(--card);color:var(--text);text-align:left;cursor:pointer}
   .rcard:active{background:var(--press)}
   .rimg{position:relative;overflow:hidden;display:grid;place-items:center;width:100%;aspect-ratio:16/10;background:var(--field);color:var(--dim)}
   .rimg img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
@@ -482,7 +497,7 @@
   .starmark{flex:none;display:grid;place-items:center}
   .tstar{display:inline-block;margin-right:7px;vertical-align:-3px}
   .tstar svg{width:20px;height:20px}
-  .cls.mine,.ivrow.mine{box-shadow:inset 3px 0 0 var(--volt)}
+  .cls.mine,.ivrow.mine{box-shadow:inset 3px 0 0 var(--volt),var(--card-depth)}
   .cls.live{border-color:var(--volt)}
   .cls.past .clsrow{opacity:.45}
   .stat{margin-top:6px}
@@ -496,7 +511,7 @@
   .tag.st-balance{color:var(--studio-balance);border-color:var(--studio-balance)}
   .tag.st-power{color:var(--studio-power);border-color:var(--studio-power)}
   .statscard{margin-top:22px}
-  .statlabel{margin-bottom:8px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .statlabel{margin-bottom:8px;font-family:Oswald,sans-serif;font-weight:500;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
   .stline{font-size:15px;line-height:1.5;color:var(--muted)}
   .stline b{font-weight:600;color:var(--text)}
   .ivrow .xt .t{font-size:18px}
@@ -522,10 +537,10 @@
 
   /* First-launch name question */
   .sheet-wrap{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-start;justify-content:center;
-    padding:calc(env(safe-area-inset-top) + 14vh) 20px 20px;background:rgba(0,0,0,.72);
-    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:opacity .3s ease}
+    padding:calc(env(safe-area-inset-top) + 14vh) 20px 20px;background:rgba(0,0,0,.6);transition:opacity .3s ease}       /* only dims: the sheet itself is the blurred glass */
   .sheet-wrap[hidden]{display:none}
-  .sheet{width:100%;max-width:420px;background:rgba(26,26,26,.86);border:1px solid var(--line);border-radius:22px;padding:26px 22px 18px;
+  .sheet{width:100%;max-width:420px;background:var(--glass-sheet);border:1px solid var(--hairline);border-radius:24px;padding:26px 22px 18px;
+    -webkit-backdrop-filter:blur(28px) saturate(150%);backdrop-filter:blur(28px) saturate(150%);box-shadow:inset 0 1px 0 var(--hilite),0 24px 60px var(--shadow);
     animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
   .sheet{position:relative}
   .sheet-x{position:absolute;top:6px;right:6px;width:44px;height:44px;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
@@ -538,6 +553,12 @@
     color:var(--text);font:500 17px Inter,sans-serif;outline:none;-webkit-user-select:text;user-select:text}
   .sheet input:focus{border-color:var(--volt)}
   .primary{margin-top:16px;width:100%;min-height:54px;border:0;border-radius:999px;background:var(--volt);color:var(--bg);
-    font-family:Oswald,sans-serif;font-weight:700;font-size:17px;letter-spacing:.12em;cursor:pointer}
+    font-family:Oswald,sans-serif;font-weight:700;font-size:17px;letter-spacing:.12em;cursor:pointer;box-shadow:0 8px 26px var(--volt-glow)}
   .primary:active{transform:scale(.98)}
   .textbtn{display:block;margin:8px auto 0;min-height:44px;padding:0 16px;border:0;background:none;color:var(--muted);font:500 14px Inter,sans-serif;cursor:pointer}
+
+  /* No backdrop-filter (old browser): glass becomes (almost) solid so text stays readable */
+  @supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+    .tabbar,.sheet,.restbar{background:var(--glass-solid)}
+    .search{background:var(--bg)}
+  }

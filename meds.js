@@ -80,7 +80,7 @@ const Meds = (() => {
       ? `<button class="takeall" data-takeall="${esc(g.t)}">✓ TAKE ALL</button>` : '<span class="alldone">ALL TAKEN ✓</span>'}</div>
       <div class="dstack">${g.ds.map(d => doseCard(d, lm)).join('')}</div></div>`;
   }
-  // A row of "My meds": the whole row opens the editor (pause and delete live there)
+  // A row of "My supps": the whole row opens the editor (pause and delete live there)
   function listCard(m) {
     const sub = [m.dose, (m.times || []).join(', '), freqText(m), m.paused ? 'Paused' : ''].filter(Boolean).map(esc).join(' · ');
     return `<button class="card${m.paused ? ' paused' : ''}" data-edit="${esc(m.id)}"><div class="wrow"><div><div class="t">${esc(m.name)}</div><div class="s">${sub}</div></div></div></button>`;
@@ -94,7 +94,7 @@ const Meds = (() => {
     let ring = null;
     if (!S.meds.length) {
       h += `<div class="card empty"><div class="wname">No meds yet</div><div class="sub">Add your medication and supplements to tick off what you take each day.</div>
-        <button class="primary" data-act="add">+ ADD MED</button></div>`;
+        <button class="primary" data-act="add">+ ADD</button></div>`;
     } else {
       const C = 2 * Math.PI * 52, frac = total ? taken / total : 0, from = lastFrac == null ? frac : lastFrac; lastFrac = frac;
       const complete = total > 0 && taken === total;
@@ -106,7 +106,7 @@ const Meds = (() => {
         ${groups.map(g => groupHtml(g, lm)).join('')}</div>`;
       const list = [...S.meds].sort((a, b) => (a.paused ? 1 : 0) - (b.paused ? 1 : 0)           // active first (by time), paused last
         || ((a.times || [])[0] || '').localeCompare((b.times || [])[0] || '') || a.name.localeCompare(b.name));
-      h += `<div class="label">My meds</div><button class="primary" data-act="add" style="margin-top:0">+ ADD MED</button><div class="gstack" style="margin-top:14px">${list.map(listCard).join('')}</div>`;
+      h += `<div class="label">My supps</div><button class="primary" data-act="add" style="margin-top:0">+ ADD</button><div class="gstack" style="margin-top:14px">${list.map(listCard).join('')}</div>`;
     }
     el.innerHTML = h;
     if (ring && ring.from !== ring.frac) requestAnimationFrame(() => requestAnimationFrame(() => { const c = $('rfill'); if (c) c.style.strokeDashoffset = ring.C * (1 - ring.frac); }));

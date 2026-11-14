@@ -38,12 +38,15 @@ Rule of thumb: **one screen, one job, one big button. No manual needed.**
 ## Brand (keep EXACTLY)
 Background #0B0B0B · cards #1A1A1A · borders #262626 · text #F2F2F2 · muted #9A9A9A ·
 ONE accent volt #CCFF00 (buttons, active, highlights, done). Oswald (headlines, uppercase,
-big numbers) + Inter (body). 16px rounded cards, pill buttons, simple line icons.
+big numbers) + Inter (body). 20px rounded cards (since `.54`, see `DESIGN.md`), pill buttons, simple line icons.
 Supporting colours (named on `:root` in `styles.css`, use the names, never raw codes):
 `--danger` #FF6B6B (delete/reset ONLY — the one exception to "one accent") · `--field` #0F0F0F
 (inputs) · `--press` #202020 · `--dash` #3A3A3A · `--mid` #4A4A4A · `--dim` #5A5A5A ·
 `--faint` #6A6A6A · `--off` #2A2A2A · `--soft` #C9C9C9 · `--soft2` #D6D6D6 · `--volt-press` #B8E600 ·
 tab bar glass: `--glass` rgba(26,26,26,.62) · `--glass-hi` rgba(255,255,255,.1) (the pill behind the active tab) ·
+depth (`.54`): `--bg-top` #141414 + `--glow` (≤4% lime) = the background gradient `--bg-grad` · `--hairline` white 8% (card edge) ·
+`--hilite` white 6% (light along a card's top) · `--shadow` · `--glass-sheet` · `--glass-bar` · `--glass-solid` (fallback when the
+browser cannot blur) · `--volt-glow` (under the main button and active tab icon) · `--r-card` 20px · `--card-depth` ·
 studio tags (Classes only, subtle): `--studio-energy` #D9A25E · `--studio-balance` #7CB9AE ·
 `--studio-power` #A592D6.
 No dot-matrix font. Intro = Siza's black & white photo + logo + "STRONGER EVERY DAY" + ENTER
@@ -72,7 +75,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-14.53)
+## Status (release 2026-11-14.54)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -101,6 +104,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.52` swipe back: swipe right anywhere on a sub-page or Settings = tap its "<" (the page follows the finger, a short
   or slow swipe snaps back). iPhone test pending.
 - `.53` swipe-back tuning: back when dragged past 50% of the width (any speed) OR flicked fast past 25%, like iOS.
+- `.54` design step 1 (`DESIGN.md`): glass and depth everywhere (background gradient, cards with hairline + soft shadow + 20px
+  corners, glass sheets and sticky header, glow on the main button and active tab icon, section titles in Oswald); "My supps"
+  and "+ ADD" in Supps. No layout, flow or word changes otherwise (iPhone test pending).
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -152,6 +158,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   item is discarded; an existing item whose name is cleared keeps its last saved version.
 - Add buttons: lime "+ ADD …" at the top of the list it adds to (exception: Classes' day
   timeline has it at the bottom, so the timeline comes first).
+- Depth and glass (`.54`): a card = `--card` + hairline + `--card-depth` + `--r-card`; sheets and the sticky library header are
+  blurred glass (the sheet backdrop only dims); at most TWO blurred layers on a screen (tab bar + one other: sheet, rest bar or
+  sticky header; the toast does not blur); always a solid fallback in `@supports not (backdrop-filter)`.
 - Tab bar (`.51`): a floating glass pill (16 px side margin, above the home bar via `--tabb`), icons only (names are
   `aria-label`s), volt icon + lighter pill (`.tabpill`, slides via `--i`) on the active tab. It sits over the content, so
   EVERY screen that shows it needs `padding-bottom: var(--tabspace)`; toast / rest bar / Classes question sit above it

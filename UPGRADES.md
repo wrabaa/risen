@@ -289,6 +289,10 @@ Siza's order. Each item: built? tested on iPhone? release number.
   pages, while typing, on inputs; vertical scroll untouched). iPhone test pending.
 - `.53` Swipe-back tuning: back past 50% of the width at any speed, or a fast flick past 25% (like iOS); anything less
   snaps back. iPhone test pending.
+- `.54` Design step 1 (DESIGN.md "glass & depth everywhere"): background gradient with a faint lime glow, cards with hairline +
+  soft shadow + 20px corners, glass sheets and sticky header, lime glow under the main button and active tab icon, Oswald
+  section titles, slightly larger week-summary numbers and secondary text, a little more space between cards. Words:
+  "My supps", "+ ADD" (Supps). iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)
