@@ -81,6 +81,35 @@
       const n=(w.exercises||[]).length;
       return `<div>${day}<div class="sub">${esc(wTitle(w))} · ${n} exercise${n===1?'':'s'}</div></div>${go}`;
     }},
+    {title:'Supplements', tap:'meds', html(){ // the whole tile opens the SUPPLEMENTS tab (meds.js)
+      if(typeof Meds==='undefined') return '';
+      const s=Meds.homeInfo();
+      if(!s.hasMeds) return `<div><div class="wname">Nothing added yet</div><div class="sub">Add them in Supplements</div></div><button class="ghost" data-tab="meds">ADD</button>`;
+      if(!s.total) return `<div><div class="wname">No doses today</div><div class="sub">Nothing scheduled</div></div>`;
+      // the next dose only: its box photo on the left (the shared picture layout), name and time, and the taken/total count
+      const p=s.pick, when=!p?'':s.kind==='due'?p.t+' · due':s.kind==='later'?'At '+p.t:s.kind==='tomorrow'?'Tomorrow · '+p.t:'Earlier today · '+p.t;
+      const count=`<div class="tcount"><span data-count="${s.taken}">${s.taken}</span><small>/${s.total}</small></div>`;
+      if(!p) return `<div class="picrow"><div class="ttxt"><div class="wname ok">All done today ✓</div></div>${count}</div>`;
+      return picRow(`<div class="tpic" data-mphoto="${esc(p.m.id)}">${Meds.thumbHtml(p.m.id)}</div>`,`<div class="wname">${esc(p.m.name)}</div><div class="sub">${esc(when)}</div>`,count);
+    }},
+    {title:'Water', tap:'water', cls:'water', html(){       // tap anywhere on the tile = one more glass (250 ml); − takes the last one back; the gear sets the goal
+      const g=waterToday(), goal=waterGoal(), L=g*GLASS_L;
+      return `<button type="button" class="wgear" data-water="goal" aria-label="Water goal"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+        <div><div class="big"><span data-count="${L}" data-dec="2">${litres(L)}</span><small> L</small></div><div class="sub">${g} of ${goal} glasses</div></div>
+        <button type="button" class="wminus" data-water="minus" aria-label="Remove a glass"${g?'':' disabled'}>&minus;</button>`;
+    }},
+    {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
+      if(typeof Classes==='undefined') return '';
+      if(!S.classes.length) return `<div><div class="wname">No classes yet</div><div class="sub">Add them in Classes</div></div>`;
+      const n=Classes.next();
+      if(n.none) return `<div><div class="wname">${n.none==='today'?'No classes today':'No more classes today'}</div></div>`;
+      const star=n.star?`<span class="tstar" aria-label="My class">${ICONS.star}</span>`:'', who=esc(n.i?n.i.name.split(' ')[0]:'TBA');
+      if(n.dayOffset){                                   // nothing left today: the next class on the next day that has one, with its day in front
+        const day=n.dayOffset===1?'Tomorrow':DAYS[n.day-1];
+        return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${day} · ${esc(n.c.name)} · ${esc(n.c.time)}</div><div class="sub">${who}</div>`);
+      }
+      return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${who}</div>`);
+    }},
     {title:'This week', stack:true, html(){
       const days=weekDays(), today=dayKey(new Date());
       let plannedN=0, doneN=0;
@@ -95,35 +124,6 @@
     {title:'Streak', html(){
       const n=streak();
       return `<div><div class="big"><span data-count="${n}">${n}</span></div><div class="sub">Planned workout${n===1?'':'s'} in a row</div></div>`;
-    }},
-    {title:'Supplements', tap:'meds', html(){ // the whole tile opens the SUPPLEMENTS tab (meds.js)
-      if(typeof Meds==='undefined') return '';
-      const s=Meds.homeInfo();
-      if(!s.hasMeds) return `<div><div class="wname">Nothing added yet</div><div class="sub">Add them in Supplements</div></div><button class="ghost" data-tab="meds">ADD</button>`;
-      if(!s.total) return `<div><div class="wname">No doses today</div><div class="sub">Nothing scheduled</div></div>`;
-      // the next dose only: its box photo on the left (the shared picture layout), name and time, and the taken/total count
-      const p=s.pick, when=!p?'':s.kind==='due'?p.t+' · due':s.kind==='later'?'At '+p.t:s.kind==='tomorrow'?'Tomorrow · '+p.t:'Earlier today · '+p.t;
-      const count=`<div class="tcount"><span data-count="${s.taken}">${s.taken}</span><small>/${s.total}</small></div>`;
-      if(!p) return `<div class="picrow"><div class="ttxt"><div class="wname ok">All done today ✓</div></div>${count}</div>`;
-      return picRow(`<div class="tpic" data-mphoto="${esc(p.m.id)}">${Meds.thumbHtml(p.m.id)}</div>`,`<div class="wname">${esc(p.m.name)}</div><div class="sub">${esc(when)}</div>`,count);
-    }},
-    {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
-      if(typeof Classes==='undefined') return '';
-      if(!S.classes.length) return `<div><div class="wname">No classes yet</div><div class="sub">Add them in Classes</div></div>`;
-      const n=Classes.next();
-      if(n.none) return `<div><div class="wname">${n.none==='today'?'No classes today':'No more classes today'}</div></div>`;
-      const star=n.star?`<span class="tstar" aria-label="My class">${ICONS.star}</span>`:'', who=esc(n.i?n.i.name.split(' ')[0]:'TBA');
-      if(n.dayOffset){                                   // nothing left today: the next class on the next day that has one, with its day in front
-        const day=n.dayOffset===1?'Tomorrow':DAYS[n.day-1];
-        return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${day} · ${esc(n.c.name)} · ${esc(n.c.time)}</div><div class="sub">${who}</div>`);
-      }
-      return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${who}</div>`);
-    }},
-    {title:'Water', tap:'water', cls:'water', html(){       // tap anywhere on the tile = one more glass (250 ml); − takes the last one back; the gear sets the goal
-      const g=waterToday(), goal=waterGoal(), L=g*GLASS_L;
-      return `<button type="button" class="wgear" data-water="goal" aria-label="Water goal"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
-        <div><div class="big"><span data-count="${L}" data-dec="2">${litres(L)}</span><small> L</small></div><div class="sub">${g} of ${goal} glasses</div></div>
-        <button type="button" class="wminus" data-water="minus" aria-label="Remove a glass"${g?'':' disabled'}>&minus;</button>`;
     }},
     {title:'Week summary', stack:true, html(){ // this week (Mon–Sun) at a glance: three small rings, one per section
       const wk=weekDays(), a=dayKey(wk[0]), b=dayKey(wk[6]), inWeek=k=>k>=a&&k<=b;
@@ -152,61 +152,15 @@
     $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
     if(typeof Profile!=='undefined') Profile.avatars();
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-    renderNow(); homeDay=dayKey(new Date());
+    homeDay=dayKey(new Date());
     $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
     $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile${t.title==='Training'?' train':''}${t.cls?' '+t.cls:''}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
       <div class="tile-body${t.stack?' stack':''}">${t.html()}</div></article>`).join('');
     if(typeof Meds!=='undefined') Meds.loadThumbs($('tiles'));                                  // the box photos on the SUPPLEMENTS tile (same loader as the Supps tab)
   }
 
-  // ---- NOW card: ONE glass card with the single next thing and one big button. First match wins:
-  //   1 workout running · 2 a dose due now / overdue · 3 a class starting within 60 min · 4 today's workout not done · 5 next dose later today (no button) · 6 all done
-  function nowInfo(){
-    const today=new Date(), hm=String(today.getHours()).padStart(2,'0')+':'+String(today.getMinutes()).padStart(2,'0');
-    const ses=S.settings.activeSession;
-    if(ses){
-      const m=Math.max(0,Math.round((Date.now()-new Date(ses.startedAt))/60000));
-      return {label:'Now', title:'Workout in progress', sub:m>=60?Math.floor(m/60)+' h '+String(m%60).padStart(2,'0')+' min':m+' min', btn:'Resume', act:'resume'};
-    }
-    const meds=typeof Meds==='undefined'?{due:[],next:null,hasMeds:false}:Meds.dueNow();
-    if(meds.due.length){
-      const names=[...new Set(meds.due.map(d=>d.m.name))], shown=names.length>3?names.slice(0,3).join(', ')+' +'+(names.length-3):names.join(', ');
-      const t=meds.due[0].t, late=(today.getHours()*60+today.getMinutes())-(+t.slice(0,2)*60+ +t.slice(3));
-      return {label:'Now', title:shown, sub:t+(late>=30?' · overdue':' · due now'), btn:'✓ Take', act:'take', doses:meds.due};
-    }
-    const cl=typeof Classes==='undefined'?null:Classes.soon(60);
-    if(cl) return {label:'Soon', title:cl.c.name, sub:(cl.min<=0?'Starts now':'Starts in '+cl.min+' min')+' · '+cl.c.time+(cl.i?' · '+cl.i.name.split(' ')[0]:''), btn:'Open', act:'class', inst:cl.i};
-    if(activeRoutine()){
-      const sk=skippedIds(today), ids=doneIds(today), w=plannedOn(today).find(x=>!ids.has(x.id)&&!sk.has(x.id));
-      if(w){ const n=(w.exercises||[]).length; return {label:'Today', title:wTitle(w), sub:n+' exercise'+(n===1?'':'s'), btn:'Start', act:'start', wid:w.id}; }
-    }
-    if(meds.next) return {label:'Next', title:'Next: '+meds.next.m.name+' at '+meds.next.t};
-    if(!S.meds.length&&!activeRoutine()&&!S.classes.length) return null;           // a brand-new app has nothing to say yet
-    return {label:'Today', title:'All done today ✓', done:true};
-  }
-  let nowAct=null;
-  function renderNow(){
-    const el=$('nowCard'); if(!el) return; const n=nowInfo(); nowAct=n;
-    if(!n){ el.hidden=true; el.innerHTML=''; return; }
-    const av=n.inst!==undefined&&typeof Classes!=='undefined'?Classes.avatar(n.inst):'';
-    el.hidden=false; el.classList.toggle('alldone',!!n.done);
-    el.innerHTML=`<div class="now-label">${n.label}</div><div class="now-main"><div class="now-txt"><div class="wname">${esc(n.title)}</div>${n.sub?`<div class="sub">${esc(n.sub)}</div>`:''}</div>${av}</div>`
-      +(n.act?`<button type="button" class="primary now-btn" data-now="${n.act}">${n.btn}</button>`:'');
-  }
-  $('nowCard').onclick=async e=>{
-    const b=e.target.closest('[data-now]'); if(!b||!nowAct||b.disabled) return;
-    const n=nowAct;
-    if(n.act==='resume') return Gym.open();
-    if(n.act==='class') return Classes.openToday();
-    if(n.act==='start') return Gym.start(n.wid);
-    if(n.act==='take'){
-      b.disabled=true; Motion.pop(b);
-      try{ await Meds.takeDoses(n.doses); }catch(err){ b.disabled=false; toast('Could not save: '+err.message); return; }
-      setTimeout(renderHome,420);                                                      // let the pop show, then the card moves on to the next thing
-    }
-  };
-  // every minute (the time moves on: a dose becomes due, a class gets close) and when the app comes back to the front (below)
-  setInterval(()=>{ if(loaded&&!app.classList.contains('hidden')&&!$('view-home').hidden&&!document.querySelector('.sheet-wrap:not([hidden])')) { if(dayKey(new Date())!==homeDay) renderHome(); else renderNow(); } },60000);       // a new day (water, the week) starts by itself at midnight
+  // every minute while Home is open: the time moves on (a dose becomes due, a class gets close, a new day starts at midnight)
+  setInterval(()=>{ if(loaded&&!app.classList.contains('hidden')&&!$('view-home').hidden&&!document.querySelector('.sheet-wrap:not([hidden])')) renderHome(); },60000);
 
   // ---- Tabs ----
   const TAB_TITLES={home:'Home',gym:'Gym',meals:'Meals',meds:'Supplements',classes:'Classes'};

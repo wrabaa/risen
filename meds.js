@@ -34,11 +34,6 @@ const Meds = (() => {
     const c = new Date(d.m.created);
     return !(!isNaN(c) && dayKey(c) === dayKey(now) && d.t < hmOf(c));
   }
-  // For the NOW card on Home: the doses due now or overdue today (not taken), and the next one later today
-  function dueNow() {
-    const lm = logMap(), now = new Date(), hm = hmOf(now), open = dosesOn(now).filter(x => !lm.has(x.id));
-    return { due: open.filter(x => isDue(x, now)), next: open.find(x => x.t > hm) || null, hasMeds: S.meds.length > 0 };
-  }
   // For the Home SUPPLEMENTS tile: the dose to feature (the same pick as the NEXT UP card: the latest one due, else the next one later today; once the day is done, the first one tomorrow).
   function homeInfo() {
     const now = new Date(), lm = logMap(), doses = dosesOn(now), hm = hmOf(now), open = doses.filter(d => !lm.has(d.id));
@@ -326,5 +321,5 @@ const Meds = (() => {
   $('medBack').onclick = closeEditor;
   $('medDone').onclick = closeEditor;
 
-  return { open, render, summary, dueNow, homeInfo, thumbHtml, loadThumbs, takeDoses, week, flush };
+  return { open, render, summary, homeInfo, thumbHtml, loadThumbs, takeDoses, week, flush };
 })();

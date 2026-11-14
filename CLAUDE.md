@@ -56,7 +56,7 @@ No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + no ENTE
 ## Structure
 Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. A round profile button (top right of the shared top bar) opens the profile page: SETTINGS · PERSONAL INFO.
 - **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
-  02 THIS WEEK, 03 STREAK, 04 SUPPLEMENTS, 05 CLASSES, 06 WATER, 07 WEEK SUMMARY (four small rings: workouts · supplements taken/due ·
+  02 SUPPLEMENTS, 03 WATER, 04 CLASSES, 05 THIS WEEK, 06 STREAK, 07 WEEK SUMMARY (four small rings: workouts · supplements taken/due ·
   classes attended · water), backup reminder line.
 - **GYM** (`gym.js`, `library.js`): Week (Mon–Sun, today lime) → Day (+ ADD EXERCISE,
   list, Copy to…, START WORKOUT on today) → Exercise (photo, sets/kg/reps, notes,
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.79)
+## Status (release 2026-11-14.80)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -192,6 +192,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.79` Home tiles with a picture share ONE layout (`picRow()` in `app.js`, `.picrow` / `.tpic` / `.ttxt` / `.tcount` in `styles.css`): the image on the LEFT, the text to its right, the image a rounded square (72 px, the card's
   corner radius = 1.3 × the old 56 px avatar), same gap in the CLASSES and SUPPLEMENTS tiles. The SUPPLEMENTS tile shows only the next dose (photo, name, time) and the taken/total count: the row of small box photos and taking a dose from Home
   are gone (tap the tile = the Supplements tab). The round `.avatar` is unchanged everywhere else in the app. iPhone test pending.
+- `.80` Home reordered: the NOW card is REMOVED (the tiles cover the same ground with photos and times; `nowInfo()` / `renderNow()` / `#nowCard`, `Meds.dueNow()`, `Classes.soon()` and the `.nowcard` CSS are gone). Tile order, numbered 01 up:
+  TRAINING · SUPPLEMENTS · WATER · CLASSES · THIS WEEK · STREAK · WEEK SUMMARY. Nothing inside any tile changed. Home redraws every minute while it is open (a dose becomes due, a class gets close, midnight). The ▶ on the TRAINING tile
+  is the one glowing button on Home again. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -243,7 +246,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   item is discarded; an existing item whose name is cleared keeps its last saved version.
 - Add buttons: lime "+ ADD …" at the top of the list it adds to (exception: Classes' day
   timeline has it at the bottom, so the timeline comes first).
-- Glow (`.57`): the lime glow (`--volt-glow`) belongs to the ONE main button on a screen: the NOW card's button on Home (since `.69`; `.play` no longer glows), the main `.primary` elsewhere
+- Glow (`.57`): the lime glow (`--volt-glow`) belongs to the ONE main button on a screen: the ▶ (`.play`) on Home's TRAINING tile (the NOW card that took the glow in `.69` was removed in `.80`), the main `.primary` elsewhere
   (the Gym day's ADD EXERCISE gets `.nogl` while START WORKOUT is shown). Never more than one glowing button per screen.
 - Home (`.57`): the week-summary rings fill as: workouts done / planned this week · doses taken / due · classes attended / starred
   (with none starred, a ring is full from the first one). Rings and numbers fill from empty when Home opens (`data-ring`, `data-count`).

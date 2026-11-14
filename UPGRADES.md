@@ -328,6 +328,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.77` Supps NEXT UP shows the dose closest to now (the latest one whose time has passed), not the earliest missed one. iPhone test pending.
 - `.78` Home visual scan: CLASSES tile looks ahead 7 days (day in front), SUPPLEMENTS tile with box photos and a thumb row (tap a thumb = take that dose). iPhone test pending.
 - `.79` Home tiles with a picture: one shared layout (rounded square image on the left, text right, 72 px); the SUPPLEMENTS tile shows only the next dose (thumb row removed). iPhone test pending.
+- `.80` Home: NOW card removed (duplicate of the tiles); tile order Training · Supplements · Water · Classes · This week · Streak · Week summary, renumbered 01-07. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)
