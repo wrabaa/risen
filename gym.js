@@ -189,7 +189,7 @@ const Gym = (() => {
     h += `<div class="gstack">${list.map((it, i) => {
       const x = exInfo(it.exerciseId);
       return `<div class="card wcard"><div class="wrow xrow"><button class="wmain" data-open="${i}"><span class="exthumb" data-xph="${esc(it.exerciseId)}">${thumbHtml(it.exerciseId)}</span>
-        <div class="xt"><div class="t">${esc(x.name)}</div><div class="s">${esc(targetText(it))}</div></div></button>
+        <div class="xt"><div class="t">${esc(x.name)}${prToday(it.exerciseId) ? ' <span class="prtoday">▲ PR today</span>' : ''}</div><div class="s">${esc(targetText(it))}</div></div></button>
         <div class="tools"><button data-mv="${i}" data-dir="-1" aria-label="Move up" ${i === 0 ? 'disabled' : ''}>${I.up}</button>
         <button data-mv="${i}" data-dir="1" aria-label="Move down" ${i === n - 1 ? 'disabled' : ''}>${I.down}</button>
         <button data-del="${i}" aria-label="Delete">${I.trash}</button></div></div></div>`;
@@ -247,7 +247,7 @@ const Gym = (() => {
     RisenDB.historyOf(it.exerciseId).then(hs => {
       const l = hs.find(h => h.sets && h.sets.length), el = $('exLast'); if (!el || curEx !== idx) return;
       const s = l && topSet(l.sets);
-      el.innerHTML = l ? `Last time: <b>${fmtN(s.kg)} kg × ${fmtN(s.reps)}</b>` : 'No history yet';
+      el.innerHTML = (l ? `Last time: <b>${fmtN(s.kg)} kg × ${fmtN(s.reps)}</b>` : 'No history yet') + (prToday(it.exerciseId) ? ' <span class="prtoday">▲ PR today</span>' : '');
     });
   }
   $('exBody').addEventListener('input', e => {
@@ -279,6 +279,9 @@ const Gym = (() => {
   const saveDraftSoon = debounce(saveDraft, 400);
 
   function topSet(sets) { return sets.reduce((a, b) => (num(b.kg) ?? 0) > (num(a.kg) ?? 0) || ((num(b.kg) ?? 0) === (num(a.kg) ?? 0) && (num(b.reps) ?? 0) > (num(a.reps) ?? 0)) ? b : a); }
+  // Beat last time: a set beats the best set of "Last time" with more kg at the same or more reps, or more reps at the same kg (nothing to beat the first time)
+  const beats = (last, s) => { if (!last) return false; const kg = num(s.kg) ?? 0, reps = num(s.reps) ?? 0, lk = num(last.kg) ?? 0, lr = num(last.reps) ?? 0; return (kg > lk && reps >= lr) || (kg === lk && reps > lr); };
+  const prToday = exId => S.sessions.some(x => x.date === dayKey(new Date()) && x.finishedAt && (x.prs || []).includes(exId));
   async function newEntry(exerciseId, target) {
     const last = (await RisenDB.historyOf(exerciseId)).find(h => h.sets && h.sets.length);
     const n = Math.min(20, Math.max(1, Math.round(target && target.sets ? target.sets : (last ? last.sets.length : 3)) || 1));
@@ -309,12 +312,17 @@ const Gym = (() => {
         <div class="tools"><button data-rmex="${i}" aria-label="Delete from this workout">${I.trash}</button></div></div>
         <div class="last">${e.last ? `Last time: <b>${fmtN(e.last.kg)} kg × ${fmtN(e.last.reps)}</b>` : 'First time'}</div>
         <div data-photo="${esc(e.exerciseId)}"></div>
-        <div class="sets"><div class="setrow sethead"><span>SET</span><span>KG</span><span>REPS</span><span></span></div>`;
+        <div class="sets"><div class="setrow sethead"><span>KG</span><span>REPS</span><span></span></div>`;
       e.sets.forEach((s, j) => {
-        h += `<div class="setrow${s.done ? ' done' : ''}" data-ex="${i}" data-set="${j}"><span class="n">${j + 1}</span>
-          <input class="num" data-f="kg" inputmode="decimal" enterkeyhint="next" autocomplete="off" value="${esc(s.kg)}" placeholder="0" aria-label="Set ${j + 1} kg">
-          <input class="num" data-f="reps" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" autocomplete="off" value="${esc(s.reps)}" placeholder="0" aria-label="Set ${j + 1} reps">
-          <button class="tick" data-tick aria-label="Confirm set ${j + 1}">${I.check}</button></div>`;
+        const pr = s.done && beats(e.last, s);
+        h += `<div class="setrow${s.done ? ' done' : ''}${pr ? ' pr' : ''}" data-ex="${i}" data-set="${j}"><span class="n">${j + 1}</span>
+          <div class="step"><button type="button" class="sbtn" data-step="-" data-f="kg" aria-label="Set ${j + 1} kg minus">&minus;</button>
+            <input class="num" data-f="kg" inputmode="decimal" enterkeyhint="next" autocomplete="off" value="${esc(s.kg)}" placeholder="0" aria-label="Set ${j + 1} kg">
+            <button type="button" class="sbtn" data-step="+" data-f="kg" aria-label="Set ${j + 1} kg plus">+</button></div>
+          <div class="step"><button type="button" class="sbtn" data-step="-" data-f="reps" aria-label="Set ${j + 1} reps minus">&minus;</button>
+            <input class="num" data-f="reps" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" autocomplete="off" value="${esc(s.reps)}" placeholder="0" aria-label="Set ${j + 1} reps">
+            <button type="button" class="sbtn" data-step="+" data-f="reps" aria-label="Set ${j + 1} reps plus">+</button></div>
+          <button class="tick" data-tick aria-label="Confirm set ${j + 1}">${I.check}</button>${pr ? '<span class="prbadge">▲ PR</span>' : ''}</div>`;
       });
       h += `</div><button class="dashed addset" data-addset="${i}">+ Add set</button></div>`;
     });
@@ -329,15 +337,45 @@ const Gym = (() => {
   $('gymLog').addEventListener('input', e => {
     const inp = e.target.closest('.num'); if (!inp) return;
     const row = inp.closest('.setrow'), d = draft();
-    d.exercises[row.dataset.ex].sets[row.dataset.set][inp.dataset.f] = inp.value; saveDraftSoon();
+    d.exercises[row.dataset.ex].sets[row.dataset.set][inp.dataset.f] = inp.value; saveDraftSoon(); syncPr(row);
   });
   $('gymLog').addEventListener('keydown', e => {
     if (e.key !== 'Enter' || !e.target.matches('.num')) return;
     e.preventDefault(); const row = e.target.closest('.setrow');
     if (e.target.dataset.f === 'kg') row.querySelector('[data-f="reps"]').focus(); else e.target.blur();
   });
+  // The lime ▲ PR badge on a ticked set that beats last time (it follows the numbers and the tick); it pops when it appears
+  function syncPr(row) {
+    const d = draft(); if (!d) return; const e = d.exercises[row.dataset.ex], s = e && e.sets[row.dataset.set]; if (!s) return;
+    const pr = !!s.done && beats(e.last, s), badge = row.querySelector('.prbadge');
+    row.classList.toggle('pr', pr);
+    if (pr && !badge) { const b = document.createElement('span'); b.className = 'prbadge'; b.textContent = '▲ PR'; row.appendChild(b); Motion.pop(b); }
+    else if (!pr && badge) badge.remove();
+  }
+  // Big − / + on kg (±2.5) and reps (±1), never below 0. A tap steps once; holding repeats. Typing in the number still works.
+  const STEP = { kg: 2.5, reps: 1 };
+  function stepSet(btn) {
+    const d = draft(), row = btn.closest('.setrow'); if (!d || !row) return;
+    const s = d.exercises[row.dataset.ex].sets[row.dataset.set], f = btn.dataset.f;
+    s[f] = fmtN(Math.max(0, Math.round(((num(s[f]) ?? 0) + (btn.dataset.step === '+' ? 1 : -1) * STEP[f]) * 100) / 100));
+    row.querySelector(`.num[data-f="${f}"]`).value = s[f]; saveDraftSoon(); syncPr(row);
+  }
+  { let t1 = null, t2 = null, held = false;
+    const stop = () => { clearTimeout(t1); clearInterval(t2); t1 = t2 = null; };
+    $('gymLog').addEventListener('pointerdown', e => {
+      const b = e.target.closest('.sbtn'); if (!b) return; held = false; stop();
+      t1 = setTimeout(() => { held = true; stepSet(b); t2 = setInterval(() => stepSet(b), 130); }, 450);      // a scroll that starts on the button cancels this before it fires
+    });
+    for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) $('gymLog').addEventListener(ev, e => { if (ev === 'pointerleave' && !e.target.closest('.sbtn')) return; stop(); });
+    $('gymLog').addEventListener('click', e => {
+      const b = e.target.closest('.sbtn'); if (!b) return;
+      if (held) { held = false; return; }                                                                  // the press was a hold: it already stepped
+      stepSet(b);
+    });
+    $('gymLog').addEventListener('contextmenu', e => { if (e.target.closest('.sbtn')) e.preventDefault(); });
+  }
   $('gymLog').addEventListener('click', async e => {
-    const t = e.target.closest('button'); if (!t) return;
+    const t = e.target.closest('button'); if (!t || t.classList.contains('sbtn')) return;
     const d = draft();
     if (t.hasAttribute('data-tick')) {
       const row = t.closest('.setrow'), s = d.exercises[row.dataset.ex].sets[row.dataset.set];
@@ -346,7 +384,7 @@ const Gym = (() => {
         if (num(s.kg) == null) { s.kg = '0'; row.querySelector('[data-f="kg"]').value = '0'; }
         s.done = true; document.activeElement.blur(); Rest.start();
       } else s.done = false;
-      row.classList.toggle('done', s.done); if (s.done) Motion.pop(row.querySelector('.tick'), row); saveDraft(); return;
+      row.classList.toggle('done', s.done); if (s.done) Motion.pop(row.querySelector('.tick'), row); syncPr(row); saveDraft(); return;
     }
     if (t.dataset.addset != null) {
       const sets = d.exercises[t.dataset.addset].sets, p = sets[sets.length - 1] || { kg: '', reps: '' };
@@ -372,8 +410,9 @@ const Gym = (() => {
     if (doneN < all.length && !(await ask({ title: 'Finish anyway?', text: "Unchecked sets won't be saved.", ok: 'FINISH' }))) return;
     const entries = d.exercises.map(e => ({ exerciseId: e.exerciseId, sets: e.sets.filter(s => s.done).map(s => ({ kg: num(s.kg) ?? 0, reps: num(s.reps) ?? 0 })) }))
       .filter(e => e.sets.length);
+    const prs = d.exercises.filter(e => e.sets.some(s => s.done && beats(e.last, s))).map(e => e.exerciseId);       // exercises where a ticked set beat last time
     let ses;
-    try { ses = await RisenDB.logSession({ date: d.date, workoutId: d.workoutId, routineId: d.routineId, name: d.name, extra: d.extra, startedAt: d.startedAt, entries }); }
+    try { ses = await RisenDB.logSession({ date: d.date, workoutId: d.workoutId, routineId: d.routineId, name: d.name, extra: d.extra, startedAt: d.startedAt, entries, prs }); }
     catch (err) { toast('Could not save the workout. Nothing is lost: tap FINISH WORKOUT again.'); return; }
     S.settings.activeSession = null; await saveDraft(); Rest.stop();
     await load(); renderHome(); renderGym();

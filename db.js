@@ -226,10 +226,11 @@ const RisenDB = (() => {
   async function undoDose(id) { const db = await open(), t = db.transaction('medlogs', 'readwrite'); t.objectStore('medlogs').delete(id); await done(t); }
 
   // ---- Sessions + per-exercise logs, saved together ----
-  async function logSession({ date, workoutId, routineId, name, extra, startedAt, entries }) {
+  async function logSession({ date, workoutId, routineId, name, extra, startedAt, entries, prs }) {
     const db = await open(), t = db.transaction(['sessions', 'logs'], 'readwrite'), at = now();
     const session = { id: uid(), date, workoutId: workoutId || null, routineId: routineId || null, name: name || '', extra: !!extra,
       startedAt: startedAt || at, finishedAt: at };
+    if (prs && prs.length) session.prs = prs;                      // exercise ids where a set beat "Last time" (shows "PR today")
     t.objectStore('sessions').put(session);
     for (const e of entries || []) t.objectStore('logs').put({ id: uid(), exerciseId: e.exerciseId, sessionId: session.id, date, at, sets: e.sets });
     await done(t); return session;

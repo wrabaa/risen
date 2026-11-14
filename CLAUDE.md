@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.67)
+## Status (release 2026-11-14.68)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -150,6 +150,10 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   Home's greeting stays below the bar. Sub-pages keep their own "<" bar. A NEW tab page: add it to `TAB_TITLES` and start its content with a `.subline` (or nothing). iPhone test pending.
 - `.67` the glass ENTER letters, the head cut-out layer (`assets/bg-fg.png` deleted, its `ASSETS` line removed) and the head measurements / `fitEnter()` in the code are REMOVED again. The intro is the photo, the
   logo, STRONGER EVERY DAY + tagline at the bottom; tap anywhere enters; the hidden real ENTER button stays for VoiceOver. How ENTER looks is to be redesigned later (`IDEAS.md` item 3). iPhone test pending.
+- `.68` workout log: every set's kg and reps have big − / + buttons (kg ±2.5, reps ±1, never below 0; a tap steps once, holding repeats), the number is still a typing field; the set number is now a tiny
+  label in the row's top-left corner (the row is `kg group · reps group · ✓`). Beat last time: a TICKED set that beats the best set of "Last time" (more kg at the same or more reps, or more reps at the same kg;
+  nothing to beat the first time) gets a lime ▲ PR badge (pops in, follows edits and un-ticking); on FINISH the session stores `prs` (exercise ids) and those exercises show "▲ PR today" in the day's list and
+  on the exercise page. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -259,6 +263,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - 🗑 inside a running workout removes the exercise only for that day.
 - Gym comfort (`.37`): screen stays awake during a workout; a workout in progress skips the
   intro and opens directly; sets are whole numbers 1–20; a failed FINISH keeps the workout open.
+- Big − / + steppers on kg (±2.5) and reps (±1) in the log (`.68`); a ticked set that beats "Last time" gets ▲ PR (stored as `prs` on the finished session, shown as "PR today").
 - Reps required to tick a set; empty kg = 0 (bodyweight). No sets ticked → offer discard.
 - Rest timer starts automatically on ✓, default from Settings (1:30), ±15 s, flashes lime at 0.
 - One photo per exercise, linked to exercise ID, shown everywhere; addable in the gym too.
