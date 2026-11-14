@@ -726,11 +726,23 @@
   .card.paused .dphoto{opacity:.8}
 
   /* WATER (.74): the Home card (tap anywhere = a glass; the − and the gear are separate buttons) and its goal sheet */
-  .tile.water .tile-body{padding-right:0}
-  .wminus{flex:none;width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--press);color:var(--text);font:500 28px/1 Inter,sans-serif;display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
+  .tile.water .tile-body{padding-right:0;display:block}
+  .tile.water .wbody{min-width:0}
+  .tile.water .big{font-size:60px}
+  .wtools{position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:2px}
+  .wminus{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--press);color:var(--text);font:500 24px/1 Inter,sans-serif;display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
   .wminus:disabled{opacity:.35;cursor:default}
   .wminus:active:not(:disabled){background:var(--line)}
-  .wgear{position:absolute;top:8px;right:10px;width:44px;height:44px;border:0;border-radius:50%;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+  .wgear{flex:none;width:44px;height:44px;border:0;border-radius:50%;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+  .wline{display:flex;align-items:baseline;gap:10px}
+  .wline .big{flex:none;white-space:nowrap}
+  .wcount{margin-left:auto;font-size:14px;color:var(--muted);white-space:nowrap}
+  .wglasses{margin-top:14px}
+  .wgrow{display:flex;align-items:center;gap:6px}
+  .wgrow+.wgrow{margin-top:6px}
+  .wg{flex:none;width:22px;height:30px;fill:none;stroke:var(--line);stroke-width:1.5;stroke-linejoin:round}
+  .wg.on{fill:var(--volt);stroke:var(--volt)}
+  .wover{margin-left:4px;font:700 16px/1 Oswald,sans-serif;color:var(--volt)}
   .wgear .icon{width:20px;height:20px}
   .wgear:active{background:var(--press)}
   .wgoal{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:18px}

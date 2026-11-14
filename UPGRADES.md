@@ -329,6 +329,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.78` Home visual scan: CLASSES tile looks ahead 7 days (day in front), SUPPLEMENTS tile with box photos and a thumb row (tap a thumb = take that dose). iPhone test pending.
 - `.79` Home tiles with a picture: one shared layout (rounded square image on the left, text right, 72 px); the SUPPLEMENTS tile shows only the next dose (thumb row removed). iPhone test pending.
 - `.80` Home: NOW card removed (duplicate of the tiles); tile order Training · Supplements · Water · Classes · This week · Streak · Week summary, renumbered 01-07. iPhone test pending.
+- `.81` Water tile: litres + "N of G glasses" on one line and a row of glasses (lime = drunk, +N when over the goal); the − moved to the tile's top corner. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

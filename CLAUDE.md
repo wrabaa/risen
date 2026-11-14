@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.80)
+## Status (release 2026-11-14.81)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -195,6 +195,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.80` Home reordered: the NOW card is REMOVED (the tiles cover the same ground with photos and times; `nowInfo()` / `renderNow()` / `#nowCard`, `Meds.dueNow()`, `Classes.soon()` and the `.nowcard` CSS are gone). Tile order, numbered 01 up:
   TRAINING · SUPPLEMENTS · WATER · CLASSES · THIS WEEK · STREAK · WEEK SUMMARY. Nothing inside any tile changed. Home redraws every minute while it is open (a dose becomes due, a class gets close, midnight). The ▶ on the TRAINING tile
   is the one glowing button on Home again. iPhone test pending.
+- `.81` WATER tile look (nothing it does changed): litres as the big number with a small L, "6 of 10 glasses" on the same line pushed to the right, and under it one small glass (22 × 30 px, 6 px apart, rounded-bottom shape, thin `--line` outline,
+  filled `--volt` when drunk) per glass of the goal. Too many for one line = evenly filled rows (never narrower than 22 px); over the goal the row stays at the goal and a lime "+2" ends it (room is kept for it). The round − now sits in the
+  tile's top corner next to the gear (so the glasses can use the full width; 10 fit on one line on iPhone 13 and SE). Class names: `.wbody` / `.wline` / `.wcount` / `.wglasses` / `.wgrow` / `.wg` (not `.wmain`, which the Gym lists use). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
