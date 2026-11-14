@@ -26,13 +26,18 @@ const Meds = (() => {
     const lm = logMap(), doses = dosesOn(new Date());
     return { hasMeds: S.meds.length > 0, total: doses.length, taken: doses.filter(x => lm.has(x.id)).length, next: doses.find(x => !lm.has(x.id)) };
   }
-  // For the NOW card on Home: the doses due now or overdue today (not taken, time reached), and the next one later today
+  // ONE rule for "due now / overdue" (NOW card on Home, NEXT UP card and the TIME TO TAKE highlight all use it): the dose's time has been reached today,
+  // unless the supplement was added today AFTER that time (it could not be late for something that did not exist yet). Whether it is ticked is the caller's job.
+  const hmOf = dt => pad(dt.getHours()) + ':' + pad(dt.getMinutes());
+  function isDue(d, now = new Date()) {
+    if (d.t > hmOf(now)) return false;
+    const c = new Date(d.m.created);
+    return !(!isNaN(c) && dayKey(c) === dayKey(now) && d.t < hmOf(c));
+  }
+  // For the NOW card on Home: the doses due now or overdue today (not taken), and the next one later today
   function dueNow() {
-    const lm = logMap(), now = new Date(), hm = pad(now.getHours()) + ':' + pad(now.getMinutes()), open = dosesOn(now).filter(x => !lm.has(x.id));
-    // A dose is not "due / overdue" on the NOW card if its time is before the moment its supplement was added (today): it could not be late for
-    // something that did not exist yet. (It still shows in TODAY, the Home tile and the week dots like any other dose.)
-    const addedAt = x => { const c = new Date(x.m.created); return !isNaN(c) && dayKey(c) === dayKey(now) ? pad(c.getHours()) + ':' + pad(c.getMinutes()) : null; };
-    return { due: open.filter(x => x.t <= hm && !(addedAt(x) && x.t < addedAt(x))), next: open.find(x => x.t > hm) || null, hasMeds: S.meds.length > 0 };
+    const lm = logMap(), now = new Date(), hm = hmOf(now), open = dosesOn(now).filter(x => !lm.has(x.id));
+    return { due: open.filter(x => isDue(x, now)), next: open.find(x => x.t > hm) || null, hasMeds: S.meds.length > 0 };
   }
   async function takeDoses(doses) {       // ticks them (same as the ✓ in the Supps tab)
     for (const d of doses) { const [medId, date, time] = d.id.split('|'); S.medlogs.push(await RisenDB.logDose(medId, date, time)); }
@@ -64,7 +69,7 @@ const Meds = (() => {
   }
 
   // ================= TODAY + MY MEDS =================
-  let lastFrac = null, lastDay = dayKey(new Date());
+  let lastFrac = null, lastDay = dayKey(new Date()), lastMin = -1;      // lastMin: the minute last drawn (a dose lights up at its time by itself)
 
   function stripHtml(m, lm) {   // last 7 days (Mon-Sun): lime = all taken, half = some, grey = missed, tiny = not scheduled
     const todayK = dayKey(new Date());
@@ -74,31 +79,53 @@ const Meds = (() => {
       return `<span class="sd${k === todayK ? ' today' : ''}"><i class="md ${st}"></i><b>${'MTWTFSS'[isoDay(d) - 1]}</b></span>`;
     }).join('') + '</div>';
   }
-  function doseCard(d, lm) {
-    const m = d.m, log = lm.get(d.id), food = foodText(m);
+  function doseCard(d, lm, now) {
+    const m = d.m, log = lm.get(d.id), food = foodText(m), due = !log && isDue(d, now);
     const meta = [log ? `<b>Taken ${hhmm(log.takenAt)}</b>` : '', food].filter(Boolean).join(' · ');
-    return `<div class="dose${log ? ' taken' : ''}"><div class="drow">
+    return `<div class="dose${log ? ' taken' : ''}${due ? ' due' : ''}"><div class="drow">
       <div class="dphoto" data-mphoto="${esc(m.id)}">${thumbHtml(m.id)}</div>
-      <div class="dmain"><div class="dname">${esc(m.name)}</div>${m.dose ? `<div class="ddose">${esc(m.dose)}</div>` : ''}${meta ? `<div class="dtime">${meta}</div>` : ''}</div>
+      <div class="dmain">${due ? '<span class="livepill">TIME TO TAKE</span>' : ''}<div class="dname">${esc(m.name)}</div>${m.dose ? `<div class="ddose">${esc(m.dose)}</div>` : ''}${meta ? `<div class="dtime">${meta}</div>` : ''}</div>
       <button class="dtick" data-dose="${esc(d.id)}" aria-label="${log ? 'Taken, tap to undo' : 'Mark as taken'}">${I.check}</button></div>
       ${stripHtml(m, lm)}</div>`;
   }
   // Doses with the same time sit under one header, e.g. "14:00 · LUNCH"
   function dayPart(t) { const h = +String(t).slice(0, 2); return h >= 5 && h < 11 ? 'Morning' : h >= 11 && h < 15 ? 'Lunch' : h >= 15 && h < 21 ? 'Evening' : 'Night'; }
-  function groupHtml(g, lm) {
+  function groupHtml(g, lm, now) {
     const left = g.ds.filter(d => !lm.has(d.id)).length;
     return `<div class="dgroup"><div class="dhead"><span class="dh">${esc(g.t)} · ${dayPart(g.t)}</span>${left
       ? `<button class="takeall" data-takeall="${esc(g.t)}">✓ TAKE ALL</button>` : '<span class="alldone">ALL TAKEN ✓</span>'}</div>
-      <div class="dstack">${g.ds.map(d => doseCard(d, lm)).join('')}</div></div>`;
+      <div class="dstack">${g.ds.map(d => doseCard(d, lm, now)).join('')}</div></div>`;
   }
   // A row of "My supps": the whole row opens the editor (pause and delete live there)
   function listCard(m) {
     const sub = [m.dose, (m.times || []).join(', '), freqText(m), m.paused ? 'Paused' : ''].filter(Boolean).map(esc).join(' · ');
-    return `<button class="card${m.paused ? ' paused' : ''}" data-edit="${esc(m.id)}"><div class="wrow"><div><div class="t">${esc(m.name)}</div><div class="s">${sub}</div></div></div></button>`;
+    return `<button class="card${m.paused ? ' paused' : ''}" data-edit="${esc(m.id)}"><div class="wrow lrow"><div class="dphoto" data-mphoto="${esc(m.id)}">${thumbHtml(m.id)}</div>
+      <div class="ltxt"><div class="t">${esc(m.name)}</div><div class="s">${sub}</div></div></div></button>`;
+  }
+
+  // NEXT UP: ONE card with the next supplement: its photo big in the middle of the day's progress ring, name, dose and time, and a lime button that ticks it.
+  // Which one: the earliest untaken dose that is due (a missed one keeps showing), else the next one later today ("At 14:00"), else all done.
+  function nextUpHtml(doses, lm, now, C, from, taken, total) {
+    const open = doses.filter(d => !lm.has(d.id)), hm = hmOf(now);
+    const due = open.find(d => isDue(d, now)), later = open.find(d => d.t > hm), earlier = open[0];
+    const pick = due || later || earlier, complete = total > 0 && !open.length;
+    let center, title, sub = '', btn = '', pill = '';
+    if (complete) { center = `<div class="rphoto ok">${I.check}</div>`; title = 'All done today ✓'; }
+    else if (!pick) { center = `<div class="rphoto">${I.pill}</div>`; title = 'No doses today'; sub = 'Nothing scheduled'; }
+    else {
+      const m = pick.m; center = `<div class="rphoto" data-mphoto="${esc(m.id)}">${thumbHtml(m.id)}</div>`; title = esc(m.name);
+      sub = [m.dose ? esc(m.dose) : '', due ? esc(pick.t) : later ? 'At ' + esc(pick.t) : 'Earlier today · ' + esc(pick.t)].filter(Boolean).join(' · ');
+      if (due) pill = '<span class="livepill">TIME TO TAKE</span>';
+      btn = `<button class="primary nu-btn" type="button" data-dose="${esc(pick.id)}">✓ TAKE</button>`;
+    }
+    return `<div class="card ringcard nextup${due ? ' due' : ''}"><div class="nu-top"><span class="nu-label">NEXT UP</span><span class="nu-count"><span data-count="${taken}">${taken}</span>/${total}</span></div>
+      <div class="ringwrap"><svg viewBox="0 0 120 120"><circle class="rtrack" cx="60" cy="60" r="52"/>
+        <circle class="rfill" id="rfill" cx="60" cy="60" r="52" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - from)}" transform="rotate(-90 60 60)"/></svg>${center}</div>
+      ${pill}<div class="nu-name${complete ? ' ok' : ''}">${title}</div>${sub ? `<div class="nu-sub">${sub}</div>` : ''}${btn}</div>`;
   }
 
   function render() {
-    const el = $('medsBody'); lastDay = dayKey(new Date());
+    const el = $('medsBody'); lastDay = dayKey(new Date()); lastMin = new Date().getHours() * 60 + new Date().getMinutes();
     const now = new Date(), lm = logMap(), doses = dosesOn(now), total = doses.length, taken = doses.filter(d => lm.has(d.id)).length;
     let h = `<div class="subline"><span class="meta">${now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}</span></div>`;
     const groups = []; for (const d of doses) { const g = groups[groups.length - 1]; if (g && g.t === d.t) g.ds.push(d); else groups.push({ t: d.t, ds: [d] }); }
@@ -108,16 +135,12 @@ const Meds = (() => {
         <button class="primary" data-act="add">+ ADD</button></div>`;
     } else {
       const C = 2 * Math.PI * 52, frac = total ? taken / total : 0, from = lastFrac == null ? frac : lastFrac; lastFrac = frac;
-      const complete = total > 0 && taken === total;
-      const label = complete ? 'All done today ✓' : total ? `${total - taken} dose${total - taken === 1 ? '' : 's'} to go` : 'No doses today';
       ring = { C, frac, from };
-      h += `<div class="gstack"><div class="card ringcard"><div class="ringwrap"><svg viewBox="0 0 120 120"><circle class="rtrack" cx="60" cy="60" r="52"/>
-        <circle class="rfill" id="rfill" cx="60" cy="60" r="52" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - from)}" transform="rotate(-90 60 60)"/></svg>
-        <div class="rnum"><span><span data-count="${taken}">${taken}</span><small>/${total}</small></span></div></div><div class="rlabel${complete ? ' ok' : ''}">${label}</div></div>
-        ${groups.map(g => groupHtml(g, lm)).join('')}</div>`;
+      h += `<div class="gstack">${nextUpHtml(doses, lm, now, C, from, taken, total)}
+        ${groups.map(g => groupHtml(g, lm, now)).join('')}</div>`;
       const list = [...S.meds].sort((a, b) => (a.paused ? 1 : 0) - (b.paused ? 1 : 0)           // active first (by time), paused last
         || ((a.times || [])[0] || '').localeCompare((b.times || [])[0] || '') || a.name.localeCompare(b.name));
-      h += `<div class="label">My supps</div><button class="primary" data-act="add" style="margin-top:0">+ ADD</button><div class="gstack" style="margin-top:14px">${list.map(listCard).join('')}</div>`;
+      h += `<div class="label">My supps</div><button class="primary nogl" data-act="add" style="margin-top:0">+ ADD</button><div class="gstack" style="margin-top:14px">${list.map(listCard).join('')}</div>`;
     }
     el.innerHTML = h;
     if (ring && ring.from !== ring.frac) requestAnimationFrame(() => requestAnimationFrame(() => { const c = $('rfill'); if (c) c.style.strokeDashoffset = ring.C * (1 - ring.frac); }));
@@ -190,9 +213,17 @@ const Meds = (() => {
   let dirty = false;                   // something was changed in the editor since it opened
   const touch = () => { dirty = true; updateHint(); saveMed(); };
   const flush = () => saveMed.flush().catch(err => toast(err.message));
+  // While the Supps tab is open and the app is in front it redraws every minute (like Classes' live timing): a dose gets its TIME TO TAKE look at its time, the
+  // NEXT UP card moves on. Not while the editor or a sheet is open.
+  function minuteTick() {
+    if (document.visibilityState !== 'visible' || $('view-meds').hidden || $('medPage').classList.contains('open') || document.querySelector('.sheet-wrap:not([hidden])')) return;
+    const m = new Date().getHours() * 60 + new Date().getMinutes();
+    if (m !== lastMin || dayKey(new Date()) !== lastDay) render();
+  }
+  setInterval(minuteTick, 20000);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') flush();
-    else if (dayKey(new Date()) !== lastDay) { if (!$('view-meds').hidden) render(); renderHome(); }   // the day changed while away
+    else { if (dayKey(new Date()) !== lastDay) { if (!$('view-meds').hidden) render(); renderHome(); } else minuteTick(); }   // a new day began, or a dose came due, while away
   });
   addEventListener('pagehide', flush);
 

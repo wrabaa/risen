@@ -714,3 +714,28 @@
   .now-btn{margin-top:14px;width:100%;text-transform:uppercase}
   .nowcard.alldone .wname{color:var(--volt)}
   .tile .play{box-shadow:none}
+
+  /* SUPPS (.73): NEXT UP card (photo inside the day's ring), TIME TO TAKE highlight (like LIVE NOW in classes), photos in MY SUPPS */
+  .nextup{position:relative}
+  .nu-top{align-self:stretch;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .nu-label{font-family:Oswald,sans-serif;font-weight:500;font-size:12px;letter-spacing:.24em;color:var(--muted)}
+  .nu-count{font-family:Oswald,sans-serif;font-weight:700;font-size:16px;color:var(--muted)}
+  .nu-count>span{color:var(--text)}
+  .rphoto{position:absolute;inset:24px;border-radius:50%;overflow:hidden;background:var(--field);display:grid;place-items:center;color:var(--dim)}
+  .rphoto img{display:block;width:100%;height:100%;object-fit:cover}
+  .rphoto .icon{width:48px;height:48px}
+  .rphoto.ok{background:none;color:var(--volt)}
+  .rphoto.ok .icon,.rphoto.ok svg{width:64px;height:64px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .nextup .livepill{margin-top:14px}
+  .nu-name{margin-top:12px;font-family:Oswald,sans-serif;font-weight:700;font-size:26px;line-height:1.1;text-transform:uppercase;text-align:center;overflow-wrap:anywhere}
+  .nextup .livepill+.nu-name{margin-top:8px}
+  .nu-name.ok{color:var(--volt)}
+  .nu-sub{margin-top:4px;font-size:15px;color:var(--muted);text-align:center}
+  .nu-btn{margin-top:16px;width:100%}
+  .nextup.due{border-color:var(--volt)}
+  .dose.due{border-color:var(--volt)}
+  .dmain .livepill{margin-bottom:5px}
+  .lrow{justify-content:flex-start}
+  .lrow .ltxt{min-width:0;flex:1}
+  .lrow .dphoto{width:56px;height:56px}
+  .card.paused .dphoto{opacity:.8}

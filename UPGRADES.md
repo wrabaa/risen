@@ -321,6 +321,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.70` Home tile, week-summary ring and empty text say "Supplements" in full instead of "Supps". iPhone test pending.
 - `.71` Review 3 fixes: Personal info saves on background / close; a dose is not overdue before its supplement was added; blocked database upgrade shows a plain RISEN message (old window steps aside). iPhone test pending.
 - `.72` Supps: doses are shown again for a supplement added after their time (the not-overdue rule is only on the NOW card); editor starts with the box photo; the word is "supplement" in this section. iPhone test pending.
+- `.73` Supps redesign: NEXT UP card (box photo inside the day's ring, big lime ✓ TAKE), TIME TO TAKE highlight on due doses (one due rule with the NOW card, redraws every minute), box photos in MY SUPPS. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)
