@@ -72,7 +72,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-14.51)
+## Status (release 2026-11-14.52)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -98,6 +98,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   version (read at start); star label "Delete". `.42`–`.50`: iPhone test pending.
 - `.51` floating glass tab bar (icons only, sliding lighter pill behind the active icon, content scrolls under it);
   MEDS tab renamed SUPPS; star label "Unstar" (iPhone test pending).
+- `.52` swipe back: swipe right anywhere on a sub-page or Settings = tap its "<" (the page follows the finger, a short
+  or slow swipe snaps back). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -154,6 +156,14 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   EVERY screen that shows it needs `padding-bottom: var(--tabspace)`; toast / rest bar / Classes question sit above it
   (`--tabb` + `--tabh`). It steps out of the way (`body.typing`) while a text field is focused. Sub-pages, Settings and
   sheets cover it. Never touch the status bar meta.
+- Swipe back (`.52`, `SwipeBack` in `shared.js`): on every sub-page (`.subpage`) and Settings. The page follows the finger;
+  on release it commits only if dragged ≥ 25% of the width AND still moving ≥ 0.3 px/ms (short or slow = snaps back).
+  Commit slides the page out and then presses the page's OWN "<" button, so each page closes exactly as before (saves,
+  flushes, redraws): a NEW sub-page therefore needs its "<" as the first `.iconbtn` in its `.subtop`. Never starts on
+  top-level tab pages (not sub-pages), while a field is focused / `body.typing`, on input / textarea / select (sliders
+  too) / `[data-noswipe]`, under a sheet or the photo viewer, or unless the first move is clearly horizontal and to the
+  right (vertical scroll stays native; pages are `touch-action: pan-y`). A region with its own horizontal swipe gets
+  `data-hswipe`: there only a swipe from the left edge (24 px) goes back.
 - Storage cannot open → full-screen "RISEN can't open your data" + TRY AGAIN (`.40`); the app
   never opens looking empty. Home redraws whenever the app returns to the front.
 - Delete levels: 🗑 exercise (history kept) · 🗑 day/workout · "New program" (archives,

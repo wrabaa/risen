@@ -276,6 +276,9 @@
     padding:calc(env(safe-area-inset-top) + 4px) 20px calc(env(safe-area-inset-bottom) + 40px);
     transform:translateX(100%);visibility:hidden;transition:transform .3s cubic-bezier(.32,.72,0,1),visibility 0s .3s}
   .subpage.open{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.32,.72,0,1)}
+  /* swipe back (SwipeBack in shared.js): only vertical panning is native, the horizontal drag is ours; the page casts a shadow while it is dragged */
+  .subpage,#settings{touch-action:pan-y}
+  .subpage.dragging,#settings.dragging{box-shadow:-14px 0 36px rgba(0,0,0,.55)}
   #libPage{z-index:13}
   #gymPage .subtop h1{flex:1;min-width:0}
   .saved,.donebtn{display:none}
