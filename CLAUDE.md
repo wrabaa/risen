@@ -50,7 +50,7 @@ depth (`.54`): `--bg-top` #141414 + `--glow` (≤4% lime) = the background gradi
 browser cannot blur) · `--volt-glow` (under the main button and active tab icon) · `--r-card` 20px · `--card-depth` ·
 studio tags (Classes only, subtle): `--studio-energy` #D9A25E · `--studio-balance` #7CB9AE ·
 `--studio-power` #A592D6.
-No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + huge glass "ENTER" letters behind his head (tap anywhere enters, `.64`)
+No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + embossed glass "ENTER" letters behind his head (tap anywhere enters, `.64`/`.65`)
 (all text/buttons in code, never baked into images).
 
 ## Structure
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.64)
+## Status (release 2026-11-14.65)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -141,6 +141,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   on every screen: his head covers the bottom ~38% of the letters. `fitEnter()` in `app.js` places the SVG letters from the photo's cover/50% 35% maths (head top at
   378 px and head centre at 458 px of bg.jpg): never under the logo, tied to his head. "STRONGER EVERY DAY" + tagline moved down to the dark floor (clear of the home bar).
   Tap anywhere enters; a hidden real ENTER button stays for keyboard / VoiceOver. If bg.jpg is ever replaced, redo bg-fg.png and the two head numbers in `fitEnter()`. iPhone test pending.
+- `.65` ENTER letters reworked: about half the size (~45% of the width, centred, just above his head so the cut-out head covers only their bottom edge), Oswald 600 uppercase with a little
+  letter-spacing (the app's headline font, not stretched), embossed transparent glass: mostly see-through fill, light top-left edge + soft dark bottom-right inner shadow (SVG filter `egEmboss`),
+  a blurred copy of the photo shows inside the letters (frost), slow faint shimmer kept. Font settings sit on `#enterSvg` itself (copies made by `<use>` do not get rules on `text`). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

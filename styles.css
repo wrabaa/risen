@@ -65,10 +65,11 @@
      inline SVG sized and placed by fitEnter() in app.js (width ~85%, bottom third behind the head). Tap anywhere enters. */
   .enterglass{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible;opacity:0}
   .enterglass.ready{opacity:1;transition:opacity 1s ease .5s}
-  #enterSvg text{font-family:Oswald,sans-serif;font-weight:300;fill:none}
-  #enterSvg .eg-halo{fill:#fff;opacity:.22;filter:blur(8px)}                       /* soft frosted bleed around the letters */
-  #enterSvg .eg-fill{fill:url(#egFill)}
-  #enterSvg .eg-edge{fill:none;stroke:url(#egEdge);stroke-width:1.2;vector-effect:non-scaling-stroke}   /* thin light edge = inner highlight */
+  #enterSvg{font-family:Oswald,sans-serif;font-weight:600;text-transform:uppercase}       /* on the svg itself: the copies made by <use> inherit it (a rule on `text` does not reach them) */
+  #enterSvg text{fill:none}
+  #enterSvg .eg-fill{fill:url(#egFill)}                                           /* mostly see-through */
+  #enterSvg .eg-edge{fill:#fff;filter:url(#egEmboss)}                              /* light top-left edge + soft dark bottom-right inner shadow */
+  #enterSvg .eg-line{fill:none;stroke:#fff;stroke-opacity:.22;stroke-width:.8;vector-effect:non-scaling-stroke}
   #enterSvg .eg-glint{fill:#fff;opacity:0;animation:glint 9s ease-in-out 2s infinite}   /* very slow, subtle shimmer */
   @keyframes glint{0%,100%{opacity:0}50%{opacity:.2}}
   #intro .photo.fg{z-index:1;pointer-events:none}

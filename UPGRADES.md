@@ -313,6 +313,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
   (days by tapping the weekday circles; option c if disliked). Sub-pages keep swipe-right = back. iPhone test pending.
 - `.63` Intro: ENTER button replaced by a glass "ENTER" pill above his head, tap anywhere enters; tab swipe is off while the workout logger is open. iPhone test pending.
 - `.64` Intro like the iOS lock screen: huge glass ENTER letters behind his head (cut-out `assets/bg-fg.png` layered on top, letters fitted by `fitEnter()`), STRONGER EVERY DAY moved to the bottom. iPhone test pending.
+- `.65` ENTER letters smaller (~45% width), Oswald, embossed transparent glass (light top-left edge, soft dark bottom-right inner shadow, frost inside); head still overlaps their bottom edge. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

@@ -211,27 +211,25 @@
 
   // ---- Intro: the glass ENTER letters (.64) ----
   // The letters are an inline SVG (index.html) placed here so they follow the photo on every screen: the photo and its cut-out are
-  // object-fit:cover, object-position 50% 35%, so the same maths tells where his head is. The word spans ~85% of the width, starts under the
-  // logo and ends ~38% down his head (the cut-out, layered on top, makes the head cover the bottom of the letters).
+  // object-fit:cover, object-position 50% 35%, so the same maths tells where his head is. The word is ~45% of the width, Oswald, centred
+  // on his head, its bottom edge ~28% behind his head (the cut-out, layered on top, makes the head cover that edge).
   function fitEnter(){
-    const IW=941, IH=1672, HEAD_TOP=378, HEAD_CX=458, WORD='ENTER', WIDTH=.85, OVERLAP=.38;      // head measures: pixels in assets/bg.jpg
+    const IW=941, IH=1672, HEAD_TOP=378, HEAD_CX=458, WORD='ENTER', WIDTH=.45, SPACING=.1, OVERLAP=.28;      // head measures: pixels in assets/bg.jpg
     const svg=$('enterSvg'), W=intro.clientWidth, H=intro.clientHeight; if(!svg||!W||!H) return;
     const run=()=>{
       const sc=Math.max(W/IW,H/IH), offX=(W-IW*sc)*.5, offY=(H-IH*sc)*.35;
       const headTop=HEAD_TOP*sc+offY, headCx=HEAD_CX*sc+offX;
-      const c=document.createElement('canvas').getContext('2d'); c.font='300 100px Oswald';
+      const c=document.createElement('canvas').getContext('2d'); c.font='600 100px Oswald';
       const nat=c.measureText(WORD).width/100, cap=c.measureText('E').actualBoundingBoxAscent/100;      // per 1px of font size
       if(!nat||!cap) return;
-      const Wt=W*WIDTH, F=Wt*.8/nat;                                                                // glyphs take 80% of the width, the rest is spacing (room between the letters)
-      const brandB=document.querySelector('#intro .brand').getBoundingClientRect().bottom, top=brandB+16;
-      let h=(headTop-top)/(1-OVERLAP); h=Math.max(cap*F*1.2,Math.min(cap*F*3.4,h));                   // letter height (never squashed, never absurd)
-      const sy=h/(cap*F), base=Math.min(top+h,headTop+h*OVERLAP), shift=Math.max(-20,Math.min(20,headCx-W/2));
+      const F=W*WIDTH/(nat+SPACING*(WORD.length-1)), h=cap*F;                                      // the word is ~45% of the width, Oswald as it is (no stretching)
+      const base=headTop+h*OVERLAP, shift=Math.max(-20,Math.min(20,headCx-W/2));                   // the head covers the bottom edge of the letters
       const t=$('egText'); t.setAttribute('x',W/2+shift); t.setAttribute('y',base); t.setAttribute('text-anchor','middle');
-      t.setAttribute('font-size',F); t.setAttribute('textLength',Wt); t.setAttribute('lengthAdjust','spacing');
-      $('egGroup').setAttribute('transform','translate(0 '+base+') scale(1 '+sy+') translate(0 '+(-base)+')');
+      t.setAttribute('font-size',F); t.setAttribute('letter-spacing',(SPACING*F).toFixed(2));
+      const im=$('egBlur'); im.setAttribute('x',offX); im.setAttribute('y',offY); im.setAttribute('width',IW*sc); im.setAttribute('height',IH*sc);   // same box as the photo
       svg.classList.add('ready');
     };
-    (document.fonts&&document.fonts.load?document.fonts.load('200 100px Oswald'):Promise.resolve()).then(run,run);
+    (document.fonts&&document.fonts.load?document.fonts.load('600 100px Oswald'):Promise.resolve()).then(run,run);
   }
   fitEnter(); addEventListener('resize',fitEnter);
 
