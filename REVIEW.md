@@ -5,6 +5,9 @@ Review-only passes over the commits. No code is changed by a review; findings ar
 
 **Last reviewed: `10d0110` — release 2026-11-14.70**
 
+## Status of review 3
+Fixed in `.71`: 🟡1 (Personal info saves on `pagehide` / hidden), 🟡2 (a dose before the med was added is not due), 🟡3 (`onblocked` / `onversionchange`: plain messages).
+
 ## Review 3 — 14 Nov 2026 — commits `.60` → `.70` (`ae3aab3` … `10d0110`)
 Method: read every code diff since `.59` (`e754172`); nothing was run on an iPhone. No code changed.
 

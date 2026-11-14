@@ -76,11 +76,17 @@ const RisenDB = (() => {
 
   function open() {
     return dbp || (dbp = new Promise((res, rej) => {
-      const r = indexedDB.open(DB_NAME, DB_VERSION);
+      const r = indexedDB.open(DB_NAME, DB_VERSION); let wait = null;
       r.onupgradeneeded = e => upgrade(r.result, e.oldVersion);
-      r.onsuccess = () => { r.result.onversionchange = () => r.result.close(); res(r.result); };
-      r.onerror = () => rej(r.error);
-      r.onblocked = () => rej(new Error('Database blocked: close other RISEN tabs'));
+      r.onsuccess = () => {
+        clearTimeout(wait); const db = r.result;
+        // A newer RISEN window wants to upgrade: this (old) window lets go of the database at once and tells the app (it shows a plain message).
+        db.onversionchange = () => { db.close(); dbp = null; try { dispatchEvent(new CustomEvent('risen-db', { detail: 'closed' })); } catch (e) {} };
+        res(db);
+      };
+      r.onerror = () => { clearTimeout(wait); rej(r.error); };
+      // The upgrade waits for old windows to close (they were just asked to). Give them a moment; if it is still blocked, a plain message (no system error).
+      r.onblocked = () => { clearTimeout(wait); wait = setTimeout(() => { const e = new Error('Close other RISEN windows, then reopen.'); e.blocked = true; rej(e); }, 4000); };
     }));
   }
   const done = t => new Promise((res, rej) => { t.oncomplete = () => res(); t.onerror = t.onabort = () => rej(t.error); });

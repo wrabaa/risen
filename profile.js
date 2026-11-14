@@ -160,5 +160,9 @@ const Profile = (() => {
   // the round button: every tab page has one
   document.addEventListener('click', e => { if (e.target.closest('.profbtn')) openSettings(); });
 
+  // Like every other editor: what is typed is saved when the app goes to the background or closes, not only on "<"
+  addEventListener('pagehide', flush);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+
   return { avatars, showPane, flush, render };
 })();

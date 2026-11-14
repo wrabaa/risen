@@ -17,9 +17,17 @@ const Meds = (() => {
     if (m.paused || dayKey(d) < dayKey(new Date(m.created))) return false;
     return m.freq === 'daily' || !m.freq ? true : (m.days || []).includes(isoDay(d));
   }
+  // The dose times that count on that day. On the day a med was ADDED, a time earlier than the moment it was added is not due (it cannot be overdue
+  // for something that did not exist yet), unless that dose was already ticked.
+  function doseTimes(m, d) {
+    const k = dayKey(d), c = new Date(m.created);
+    if (isNaN(c) || dayKey(c) !== k) return m.times || [];
+    const hm = pad(c.getHours()) + ':' + pad(c.getMinutes());
+    return (m.times || []).filter(t => t >= hm || S.medlogs.some(l => l.id === logId(m.id, k, t)));
+  }
   function dosesOn(d) {   // every dose due that day, in time order
     const k = dayKey(d), out = [];
-    for (const m of S.meds) if (dueOn(m, d)) for (const t of m.times || []) out.push({ m, t, id: logId(m.id, k, t) });
+    for (const m of S.meds) if (dueOn(m, d)) for (const t of doseTimes(m, d)) out.push({ m, t, id: logId(m.id, k, t) });
     return out.sort((a, b) => a.t.localeCompare(b.t) || a.m.name.localeCompare(b.m.name));
   }
   function summary() {    // for the Home tile
@@ -66,7 +74,7 @@ const Meds = (() => {
   function stripHtml(m, lm) {   // last 7 days (Mon-Sun): lime = all taken, half = some, grey = missed, tiny = not scheduled
     const todayK = dayKey(new Date());
     return '<div class="mstrip">' + weekDays().map(d => {
-      const k = dayKey(d), due = dueOn(m, d) ? m.times : [], n = due.filter(t => lm.has(logId(m.id, k, t))).length;
+      const k = dayKey(d), due = dueOn(m, d) ? doseTimes(m, d) : [], n = due.filter(t => lm.has(logId(m.id, k, t))).length;
       const st = !due.length ? 'off' : n === due.length ? 'full' : n > 0 ? 'half' : k < todayK ? 'miss' : 'pend';
       return `<span class="sd${k === todayK ? ' today' : ''}"><i class="md ${st}"></i><b>${'MTWTFSS'[isoDay(d) - 1]}</b></span>`;
     }).join('') + '</div>';

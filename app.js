@@ -265,12 +265,18 @@
   // If the phone's storage can't be opened, the app must not look empty (that reads as "my data is gone"): a full-screen
   // message says the data is still there and offers to try again. Nothing else runs, so nothing can be saved over it.
   let loaded=false;
+  function storageProblem(title,text,why){
+    $('storageFail').querySelector('h2').textContent=title; $('storageFail').querySelector('p').textContent=text;
+    $('storageWhy').textContent=why||''; $('storageFail').hidden=false;
+  }
   const ready=RisenDB.init().then(load).then(()=>{loaded=true}).catch(e=>{
     console.error(e);
-    $('storageWhy').textContent=(e&&e.message)||'Unknown error';
-    $('storageFail').hidden=false;
+    if(e&&e.blocked) storageProblem('RISEN is open in another window','Close other RISEN windows, then reopen. Your data has not been deleted.');       // the upgrade is waiting for an old window: plain words
+    else storageProblem("RISEN can't open your data",'Your data has not been deleted. This usually clears up by itself: close RISEN completely and open it again, or tap the button.',(e&&e.message)||'Unknown error');
     return new Promise(()=>{}); // never continues
   });
+  // This window is the OLD one and another RISEN window has just upgraded the data: it lets go of the database (db.js) and asks to be reopened
+  addEventListener('risen-db',e=>{ if(e.detail==='closed') storageProblem('RISEN was updated','RISEN was updated in another window. Close this window, then reopen RISEN. Your data has not been deleted.'); });
   $('storageRetry').onclick=()=>location.reload();
   // Back to the front (from another app, or the phone was unlocked): Home shows the current day, doses and next class
   document.addEventListener('visibilitychange',()=>{
