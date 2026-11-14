@@ -24,6 +24,8 @@ Planning notes only. Each idea is discussed with the planner first, then built a
 - Instead of the button: one small **glass** element, iOS-lock-screen style (e.g. a glassy "tap to enter" or a
   big lock-screen-like clock/date at the top or middle). Exact look to be decided together first.
 - Text stays real HTML (never in the image).
+- **DECIDED (Siza):** one glass pill **ENTER**, medium size (not tiny, not huge), placed in the empty dark space
+  ABOVE his head in the photo. Tap anywhere (or the pill) enters.
 
 ## 4. Swipe between tabs
 - On a TAB page, a horizontal swipe moves to the neighbour tab, in tab-bar order:
@@ -41,3 +43,12 @@ Planning notes only. Each idea is discussed with the planner first, then built a
 
 ## Order (suggestion)
 1 + 2 together (profile page) → 4 (tab swipe, after the Classes decision) → 3 (intro, after the look is agreed).
+
+## 6. Planner's ideas — easier, faster, nicer (for Siza to pick)
+- **Gym steppers:** kg and reps change with big − / + buttons (kg ±2.5, reps ±1) — no keyboard in the gym. Typing still possible.
+- **Beat last time:** when a set beats "Last time", a lime ▲ and a small celebration (PR!). Progress you can feel.
+- **Rest timer as a floating pill** at the top (Dynamic-Island style), visible on every tab while it runs.
+- **Swipe to take:** swipe a supplement dose right = taken (like Mail), no need to hit the small ✓.
+- **Activity ring around the profile photo:** this week's progress as a thin lime ring around the avatar.
+- **One NOW card on Home:** the single next thing — workout, next dose, or next class (with instructor face) — with one big button.
+- **Character empty states:** rest day / nothing added yet shows the RISEN character (Siza) in a matching image, not just text.
