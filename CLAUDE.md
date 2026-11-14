@@ -69,8 +69,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   opening the tab asks "Load Fitness Zone schedule?" until answered: YES / START EMPTY, or
   × / NOT NOW = ask again next time (the sheet stops above the tab bar). The tab opens on
   TODAY'S TIMELINE (live timing, NOW line, ✓ ATTENDED, ⭐ star per class); swipe or tap a
-  weekday for another day; WEEK button = 7-day list + my stats + instructors list. Chips: ALL ·
-  ★ MINE · Energy/Balance/Power. Tap a class = edit; tap an instructor photo = instructor page.
+  weekday for another day; WEEK button = 7-day list + my stats + instructors list. Chips (one line, scrolls sideways if needed): ALL ·
+  ★ (my classes) · Energy/Balance/Power. Tap a class = edit; tap an instructor photo = instructor page.
 - **MEALS** (`meals.js`): Shakes · Breakfast · Lunch · Snacks · Dinner → recipes →
   recipe page (photo, ingredients one per line stored as objects `{text}`, how-to, Move to…).
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,

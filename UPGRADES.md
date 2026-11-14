@@ -302,6 +302,8 @@ Siza's order. Each item: built? tested on iPhone? release number.
   the ONE main button per screen. Same tiles, same taps. iPhone test pending.
 - `.58` Two fixes: the floating tab bar glass is darker (84%) so lime under it is only a faint hint; schedule durations: Sixpax (Fri 18:00, Sat 09:30)
   and Fri Pound = 30 min, same IDs (a phone gets them via Settings → Reload gym schedule; its notes and attendance stay). iPhone test pending.
+- `.59` Classes filter chips on one line: "★ MINE" is just ★ (aria-label "My classes"), chips slightly smaller; on a screen still too narrow the row scrolls
+  sideways, never wraps; swiping on the chip row does not change the day. Nothing else changed. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)
