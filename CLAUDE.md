@@ -72,7 +72,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-14.52)
+## Status (release 2026-11-14.53)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -100,6 +100,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   MEDS tab renamed SUPPS; star label "Unstar" (iPhone test pending).
 - `.52` swipe back: swipe right anywhere on a sub-page or Settings = tap its "<" (the page follows the finger, a short
   or slow swipe snaps back). iPhone test pending.
+- `.53` swipe-back tuning: back when dragged past 50% of the width (any speed) OR flicked fast past 25%, like iOS.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -157,7 +158,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   (`--tabb` + `--tabh`). It steps out of the way (`body.typing`) while a text field is focused. Sub-pages, Settings and
   sheets cover it. Never touch the status bar meta.
 - Swipe back (`.52`, `SwipeBack` in `shared.js`): on every sub-page (`.subpage`) and Settings. The page follows the finger;
-  on release it commits only if dragged ≥ 25% of the width AND still moving ≥ 0.3 px/ms (short or slow = snaps back).
+  on release (`.53`, like iOS) it goes back if dragged past 50% of the width at ANY speed, or flicked past 25% while still
+  moving ≥ 0.3 px/ms; anything less snaps back.
   Commit slides the page out and then presses the page's OWN "<" button, so each page closes exactly as before (saves,
   flushes, redraws): a NEW sub-page therefore needs its "<" as the first `.iconbtn` in its `.subtop`. Never starts on
   top-level tab pages (not sub-pages), while a field is focused / `body.typing`, on input / textarea / select (sliders

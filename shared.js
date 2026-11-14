@@ -66,12 +66,12 @@ function savedFlash(id) {
 // ---- Swipe back ----
 // Swipe right anywhere on a sub-page (or Settings) = tap its "<". The page follows the finger and slides away like iOS. The back
 // button of the page itself is what gets pressed, so every page closes exactly as it does today (saves, flushes, redraws).
-// A short or slow swipe snaps back and does nothing. It never starts: on a top-level tab page (these are not sub-pages), while a
+// Back when the page is dragged past half the width (any speed) or flicked fast past a quarter, like iOS; anything less snaps back and does nothing. It never starts: on a top-level tab page (these are not sub-pages), while a
 // text field is focused (keyboard up), on inputs / textareas / selects (sliders too), under a sheet or the photo viewer, or when
 // the first movement is not clearly horizontal (vertical scrolling stays native). A region that has its own horizontal swipe
 // carries data-hswipe; there only a swipe that starts at the left screen edge goes back.
 const SwipeBack = (() => {
-  const EDGE = 24, LOCK = 10, MIN_FRAC = 0.25, MIN_V = 0.3, SAMPLE_MS = 110;   // px · px · share of the width · px per ms · ms
+  const EDGE = 24, LOCK = 10, FAR = 0.5, FLICK_FRAC = 0.25, FLICK_V = 0.3, SAMPLE_MS = 110;   // px · px · past this share of the width = back at any speed · a fast flick needs this share · and this speed (px per ms) · ms
   const BLOCK = 'input,textarea,select,[contenteditable],[data-noswipe]';
   let st = null, busyUntil = 0;                                // busyUntil: a swipe-back is being carried out (a time, so a stalled timer can never block it for long)
   const backBtn = p => p.querySelector('.subtop .iconbtn, .settings-top .iconbtn, button.iconbtn');
@@ -114,7 +114,9 @@ const SwipeBack = (() => {
     if (!st) return;
     const s = st; st = null; if (!s.locked) return;
     const btn = backBtn(s.p), v = velocity(s.samples, e.timeStamp);
-    if (!(e.type === 'touchend' && btn && s.off >= innerWidth * MIN_FRAC && v >= MIN_V)) return snap(s.p);
+    // like iOS: dragged past half the width = back, at any speed; or a fast flick past a quarter; anything less snaps back
+    const far = s.off >= innerWidth * FAR, flick = s.off >= innerWidth * FLICK_FRAC && v >= FLICK_V;
+    if (!(e.type === 'touchend' && btn && (far || flick))) return snap(s.p);
     busyUntil = Date.now() + 1500; const p = s.p;                                // slide the rest of the way out, then press the page's own "<"
     p.style.transition = 'transform .22s cubic-bezier(.32,.72,0,1)'; p.style.transform = 'translate3d(100%,0,0)';
     setTimeout(() => {
