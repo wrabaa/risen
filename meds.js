@@ -93,7 +93,7 @@ const Meds = (() => {
     const groups = []; for (const d of doses) { const g = groups[groups.length - 1]; if (g && g.t === d.t) g.ds.push(d); else groups.push({ t: d.t, ds: [d] }); }
     let ring = null;
     if (!S.meds.length) {
-      h += `<div class="card empty"><div class="wname">No meds yet</div><div class="sub">Add your medication and supplements to tick off what you take each day.</div>
+      h += `<div class="card empty"><div class="wname">Nothing added yet</div><div class="sub">Add your medication and supplements to tick off what you take each day.</div>
         <button class="primary" data-act="add">+ ADD</button></div>`;
     } else {
       const C = 2 * Math.PI * 52, frac = total ? taken / total : 0, from = lastFrac == null ? frac : lastFrac; lastFrac = frac;

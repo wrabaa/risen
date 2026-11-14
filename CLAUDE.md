@@ -76,7 +76,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-14.59)
+## Status (release 2026-11-14.60)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -117,6 +117,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   Sat 09:30) and Fri Pound are 30 min (phones take it with Settings → Reload gym schedule).
 - `.59` Classes filter chips always on ONE line: "★ MINE" is just ★ (aria-label "My classes"), chips a bit smaller; if a screen is still too
   narrow the row scrolls sideways (never wraps), and a touch on the row never swipes the day (`.cfilter` in `styles.css` / `classes.js`). iPhone test pending.
+- `.60` review 2 fixes (`REVIEW.md`): the tab bar and swipe back always return as soon as no text field is focused (`body.typing` is re-checked
+  on every focus change, tap and redraw, `app.js`); Supps empty state says "Nothing added yet". iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -183,7 +185,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - Tab bar (`.51`): a floating glass pill (16 px side margin, above the home bar via `--tabb`), icons only (names are
   `aria-label`s), volt icon + lighter pill (`.tabpill`, slides via `--i`) on the active tab. It sits over the content, so
   EVERY screen that shows it needs `padding-bottom: var(--tabspace)`; toast / rest bar / Classes question sit above it
-  (`--tabb` + `--tabh`). It steps out of the way (`body.typing`) while a text field is focused. Sub-pages, Settings and
+  (`--tabb` + `--tabh`). It steps out of the way (`body.typing`) while a text field is focused; that state is re-checked on every focus change,
+  tap and redraw (`.60`), never left to the "focus lost" event alone (a field redrawn away while focused sends none). Sub-pages, Settings and
   sheets cover it. Never touch the status bar meta.
 - Swipe back (`.52`, `SwipeBack` in `shared.js`): on every sub-page (`.subpage`) and Settings. The page follows the finger;
   on release (`.53`, like iOS) it goes back if dragged past 50% of the width at ANY speed, or flicked past 25% while still

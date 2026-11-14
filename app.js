@@ -132,10 +132,17 @@
     $('tabbar').style.setProperty('--i',Math.max(0,tabs.findIndex(t=>t.dataset.view===view)));          // the glass pill slides to the active tab
   }
   document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open(); else if(t.dataset.view==='meds') Meds.open(); else if(t.dataset.view==='classes') Classes.open(); else if(t.dataset.view==='meals') Meals.open(); else show(t.dataset.view)};
-  // The floating tab bar steps aside while a text field is focused (keyboard up), and comes back when the focus is gone.
-  { const field=e=>e.target.matches&&e.target.matches('input:not([type=file]):not([type=checkbox]):not([type=radio]):not([type=button]),textarea,select');
-    document.addEventListener('focusin',e=>{ if(field(e)) document.body.classList.add('typing'); });
-    document.addEventListener('focusout',()=>setTimeout(()=>{ const a=document.activeElement; if(!(a&&a.matches&&a.matches('input,textarea,select'))) document.body.classList.remove('typing'); },120)); }
+  // The floating tab bar steps aside while a text field is focused (keyboard up), and comes back as soon as none is.
+  // The state is never trusted to "focus lost" alone: a field that is redrawn away while still focused (iPhone: tapping a button
+  // does not leave the field) sends no such event. So it is simply re-checked on every focus change, tap and redraw.
+  { const FIELD='input:not([type=file]):not([type=checkbox]):not([type=radio]):not([type=button]),textarea,select';
+    const sync=()=>{ const a=document.activeElement; document.body.classList.toggle('typing',!!(a&&a.isConnected&&a.matches&&a.matches(FIELD))); };
+    let queued=false; const soon=()=>{ if(queued) return; queued=true; setTimeout(()=>{ queued=false; sync(); },0); };
+    document.addEventListener('focusin',sync);
+    document.addEventListener('focusout',()=>setTimeout(sync,120));       // moving from one field to the next: no flicker
+    for(const ev of ['click','touchend']) document.addEventListener(ev,()=>setTimeout(sync,60),{capture:true,passive:true});
+    new MutationObserver(soon).observe(document.body,{childList:true,subtree:true});      // any redraw
+    document.addEventListener('visibilitychange',sync); }
   $('tiles').onclick=e=>{
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();

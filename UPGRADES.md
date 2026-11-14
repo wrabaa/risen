@@ -304,6 +304,8 @@ Siza's order. Each item: built? tested on iPhone? release number.
   and Fri Pound = 30 min, same IDs (a phone gets them via Settings → Reload gym schedule; its notes and attendance stay). iPhone test pending.
 - `.59` Classes filter chips on one line: "★ MINE" is just ★ (aria-label "My classes"), chips slightly smaller; on a screen still too narrow the row scrolls
   sideways, never wraps; swiping on the chip row does not change the day. Nothing else changed. iPhone test pending.
+- `.60` Review 2 fixes: tab bar and swipe back always come back when no text field is focused (it could stay hidden after a redraw while typing);
+  Supps empty state "Nothing added yet". The "deliberate double" item is accepted as is. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

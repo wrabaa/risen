@@ -5,6 +5,11 @@ Review-only passes over the commits. No code is changed by a review; findings ar
 
 **Last reviewed: `e754172` — release 2026-11-14.59**
 
+## Status of review 2
+Fixed in `.60`: 🟡1 (tab bar / swipe back always return: the typing state is re-checked on every focus change, tap and redraw),
+🟡3 ("Nothing added yet"). 🟡2 (deliberate double of a merged exercise) is ACCEPTED as it is: rare, no history lost. 🟡4 stays open
+(iPhone test).
+
 ## Review 2 — 14 Nov 2026 — commits `.50` → `.59` (`fd888c5` … `e754172`)
 Method: read every code diff since `.49` (`1e03b39`); nothing was run on an iPhone. No code changed.
 
