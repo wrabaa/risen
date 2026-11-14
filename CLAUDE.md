@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.71)
+## Status (release 2026-11-14.72)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -161,8 +161,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   (not while a sheet is open), whenever Home is drawn and when the app comes back to the front. Its button is the ONE glowing button on Home; the ▶ on the TRAINING tile no longer glows. iPhone test pending.
 - `.70` Home says "Supplements" in full (tile 04, the week-summary ring label and "Add them in Supplements"); the tab bar has no words, so nothing else is short any more. iPhone test pending.
 - `.71` review 3 fixes (`REVIEW.md`): Personal info also saves pending edits on `pagehide` / when the app is hidden (`profile.js`); a dose is not due on the day its supplement was added if its time is earlier than the moment it
-  was added (`doseTimes()` in `meds.js`: NOW card, Supps tab, Home tile, week dots; a dose already ticked still counts); the database upgrade no longer fails with a system error: an old window lets go of the database when a newer one asks
+  was added (first done in `doseTimes()`, which hid doses and was reverted in `.72`; now only in `Meds.dueNow()`); the database upgrade no longer fails with a system error: an old window lets go of the database when a newer one asks
   (`onversionchange`, shows "RISEN was updated"), and an upgrade still blocked after 4 s shows "RISEN is open in another window / Close other RISEN windows, then reopen" (`onblocked`, `db.js` + `app.js`). iPhone test pending.
+- `.72` SUPPS fixes: the `.71` rule hid doses (a supplement added after its dose time lost that dose from TODAY: no card, no ✓, "No doses today"). `doseTimes()` is gone again: TODAY, the Home tile and the week dots show and
+  count every dose; the rule now lives ONLY in `Meds.dueNow()` (NOW card: a dose earlier than the moment the supplement was added today is not due / overdue). The editor starts with "Photo of the box" (above Name). In this
+  section the user-facing word is "supplement" (page title, New / Edit supplement, Delete supplement, hints, Untitled supplement); ids, data keys and the store name stay "med". iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -285,7 +288,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   (the first); the old check at start-up runs once per library change (fingerprint in settings `libraryFollowed`).
 
 **SUPPS (meds.js)**
-- A med counts from the day it's added (earlier days = "not scheduled", not "missed"); on that day, a dose time earlier than the moment it was added is not due (`.71`).
+- A med counts from the day it's added (earlier days = "not scheduled", not "missed"); every dose still shows in TODAY, but a dose earlier than the moment it was added is not counted as due / overdue on the NOW card (`.72`, `Meds.dueNow()` only).
 - Known small flaw (accepted for now): changing a schedule re-judges past days. Exception
   (`.32`): a dose already taken TODAY follows its med to the new time (no double dose).
 - Weekly = one weekday. Groups by exact time. Undo is per dose (on purpose, safer).

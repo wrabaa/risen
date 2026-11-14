@@ -365,7 +365,7 @@
   .stats span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 
   /* ===== MEDS ===== */
-  #medPage .subtop h1{flex:1;min-width:0}
+  #medPage .subtop h1{flex:1;min-width:0;font-size:19px;letter-spacing:.04em;white-space:nowrap}      /* "EDIT SUPPLEMENT" has to fit next to ✓ Saved and DONE */
   #medPage .saved,#medPage .donebtn{display:block}
   .hint{margin:0 2px 10px;color:var(--danger)}
   .hint[hidden]{display:none}

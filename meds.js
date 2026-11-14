@@ -17,17 +17,9 @@ const Meds = (() => {
     if (m.paused || dayKey(d) < dayKey(new Date(m.created))) return false;
     return m.freq === 'daily' || !m.freq ? true : (m.days || []).includes(isoDay(d));
   }
-  // The dose times that count on that day. On the day a med was ADDED, a time earlier than the moment it was added is not due (it cannot be overdue
-  // for something that did not exist yet), unless that dose was already ticked.
-  function doseTimes(m, d) {
-    const k = dayKey(d), c = new Date(m.created);
-    if (isNaN(c) || dayKey(c) !== k) return m.times || [];
-    const hm = pad(c.getHours()) + ':' + pad(c.getMinutes());
-    return (m.times || []).filter(t => t >= hm || S.medlogs.some(l => l.id === logId(m.id, k, t)));
-  }
   function dosesOn(d) {   // every dose due that day, in time order
     const k = dayKey(d), out = [];
-    for (const m of S.meds) if (dueOn(m, d)) for (const t of doseTimes(m, d)) out.push({ m, t, id: logId(m.id, k, t) });
+    for (const m of S.meds) if (dueOn(m, d)) for (const t of m.times || []) out.push({ m, t, id: logId(m.id, k, t) });
     return out.sort((a, b) => a.t.localeCompare(b.t) || a.m.name.localeCompare(b.m.name));
   }
   function summary() {    // for the Home tile
@@ -37,7 +29,10 @@ const Meds = (() => {
   // For the NOW card on Home: the doses due now or overdue today (not taken, time reached), and the next one later today
   function dueNow() {
     const lm = logMap(), now = new Date(), hm = pad(now.getHours()) + ':' + pad(now.getMinutes()), open = dosesOn(now).filter(x => !lm.has(x.id));
-    return { due: open.filter(x => x.t <= hm), next: open.find(x => x.t > hm) || null, hasMeds: S.meds.length > 0 };
+    // A dose is not "due / overdue" on the NOW card if its time is before the moment its supplement was added (today): it could not be late for
+    // something that did not exist yet. (It still shows in TODAY, the Home tile and the week dots like any other dose.)
+    const addedAt = x => { const c = new Date(x.m.created); return !isNaN(c) && dayKey(c) === dayKey(now) ? pad(c.getHours()) + ':' + pad(c.getMinutes()) : null; };
+    return { due: open.filter(x => x.t <= hm && !(addedAt(x) && x.t < addedAt(x))), next: open.find(x => x.t > hm) || null, hasMeds: S.meds.length > 0 };
   }
   async function takeDoses(doses) {       // ticks them (same as the ✓ in the Supps tab)
     for (const d of doses) { const [medId, date, time] = d.id.split('|'); S.medlogs.push(await RisenDB.logDose(medId, date, time)); }
@@ -74,7 +69,7 @@ const Meds = (() => {
   function stripHtml(m, lm) {   // last 7 days (Mon-Sun): lime = all taken, half = some, grey = missed, tiny = not scheduled
     const todayK = dayKey(new Date());
     return '<div class="mstrip">' + weekDays().map(d => {
-      const k = dayKey(d), due = dueOn(m, d) ? doseTimes(m, d) : [], n = due.filter(t => lm.has(logId(m.id, k, t))).length;
+      const k = dayKey(d), due = dueOn(m, d) ? m.times : [], n = due.filter(t => lm.has(logId(m.id, k, t))).length;
       const st = !due.length ? 'off' : n === due.length ? 'full' : n > 0 ? 'half' : k < todayK ? 'miss' : 'pend';
       return `<span class="sd${k === todayK ? ' today' : ''}"><i class="md ${st}"></i><b>${'MTWTFSS'[isoDay(d) - 1]}</b></span>`;
     }).join('') + '</div>';
@@ -176,8 +171,8 @@ const Meds = (() => {
     }
   }
   const flashSaved = () => savedFlash('medSaved');
-  const problem = () => !med.name.trim() ? 'Add a name to save this med.' : !med.times.some(Boolean) ? 'Add at least one time to save this med.'
-    : (med.freq !== 'daily' && !med.days.length) ? 'Pick at least one day to save this med.' : '';
+  const problem = () => !med.name.trim() ? 'Add a name to save this supplement.' : !med.times.some(Boolean) ? 'Add at least one time to save this supplement.'
+    : (med.freq !== 'daily' && !med.days.length) ? 'Pick at least one day to save this supplement.' : '';
   function updateHint() { const p = problem(), h = $('mHint'); if (!h) return; h.textContent = p; h.hidden = !p; }
   function normalized() {
     const m = med;
@@ -208,23 +203,23 @@ const Meds = (() => {
     persisted = !!ex; dirty = false;
     med = ex ? JSON.parse(JSON.stringify(ex)) : { id: RisenDB.uid(), name: '', dose: '', times: ['08:00'], freq: 'daily', days: [], food: 'any', notes: '', paused: false, created: new Date().toISOString() };
     med.times = med.times || []; med.days = med.days || []; tickAt = ex ? [...med.times] : [];
-    $('medTitle').textContent = ex ? 'Edit med' : 'New med';
+    $('medTitle').textContent = ex ? 'Edit supplement' : 'New supplement';
     renderEditor(); openPage();
     if (!ex) setTimeout(() => $('mName').focus(), 320);
   }
   function renderEditor() {
     const m = med;
     $('medBody').innerHTML = `<p class="note hint" id="mHint" hidden></p>
-      <div class="label" style="margin-top:4px">Name</div><input class="field" id="mName" type="text" maxlength="40" autocapitalize="words" autocomplete="off" enterkeyhint="next" placeholder="e.g. Vitamin D" value="${esc(m.name)}">
+      <div class="label" style="margin-top:4px">Photo of the box</div><div id="mPhoto"></div>
+      <div class="label">Name</div><input class="field" id="mName" type="text" maxlength="40" autocapitalize="words" autocomplete="off" enterkeyhint="next" placeholder="e.g. Vitamin D" value="${esc(m.name)}">
       <div class="label">Dose</div><input class="field" id="mDose" type="text" maxlength="40" autocomplete="off" enterkeyhint="done" placeholder="1 tablet, 40 mg, 1 injection" value="${esc(m.dose)}">
       <div class="label">When</div><div id="mTimes"></div>
       <div class="label">How often</div><div id="mFreq"></div>
       <div class="label">With food?</div><div class="chips" style="margin-top:0" id="mFood">${[['yes', 'Yes'], ['no', 'No'], ['any', 'Doesn’t matter']].map(([v, t]) =>
         `<button type="button" data-food="${v}" aria-pressed="${m.food === v}">${t}</button>`).join('')}</div>
       <div class="label">Notes (optional)</div><textarea class="field" id="mNotes" rows="2" maxlength="300" placeholder="e.g. keep in the fridge">${esc(m.notes)}</textarea>
-      <div class="label">Photo of the box</div><div id="mPhoto"></div>
       <button class="ghost" id="mPause" type="button" style="width:100%;margin-top:26px"></button>
-      <button class="quiet danger" data-act="del" type="button">Delete med</button>`;
+      <button class="quiet danger" data-act="del" type="button">Delete supplement</button>`;
     renderTimes(); renderFreq(); renderPauseBtn(); updateHint();
     PhotoSlot.mount($('mPhoto'), 'med-' + m.id, { editable: true });
   }
@@ -274,7 +269,7 @@ const Meds = (() => {
     }
     if (t.id === 'mPause') { med.paused = !med.paused; renderPauseBtn(); return touch(); }
     if (t.dataset.act === 'del') {
-      if (!(await ask({ title: 'Delete med?', text: `“${med.name.trim() || 'This med'}”, its photo and its history are deleted.`, ok: 'DELETE', danger: true }))) return;
+      if (!(await ask({ title: 'Delete supplement?', text: `“${med.name.trim() || 'This supplement'}”, its photo and its history are deleted.`, ok: 'DELETE', danger: true }))) return;
       const id = med.id, wasSaved = persisted; med = null;       // a waiting auto-save then does nothing
       if (wasSaved) await removeMed(id); else { await RisenDB.deletePhoto('med-' + id); dropThumb(id); }
       closePage(); render(); renderHome();
@@ -285,13 +280,13 @@ const Meds = (() => {
     if (!med) return closePage();
     document.activeElement && document.activeElement.blur();
     // A new med with something filled in but no name is kept as "Untitled med" instead of being thrown away
-    if (!persisted && !med.name.trim() && (dirty || await RisenDB.getPhoto('med-' + med.id))) { med.name = 'Untitled med'; saveMed(); toast('Saved as “Untitled med”'); }
+    if (!persisted && !med.name.trim() && (dirty || await RisenDB.getPhoto('med-' + med.id))) { med.name = 'Untitled supplement'; saveMed(); toast('Saved as “Untitled supplement”'); }
     await flush();
     const id = med.id, wasSaved = persisted, p = problem(), touched = med.name || med.dose || med.notes;
     if (!wasSaved) {             // a brand-new med that was left untouched (or still has no time): nothing is kept, not even its photo
       const photo = await RisenDB.getPhoto('med-' + id); if (photo) await RisenDB.deletePhoto('med-' + id);
-      if (p && (touched || photo)) toast('Not saved: ' + p.replace(' to save this med.', '.').toLowerCase());
-    } else if (p) toast('Not saved: ' + p.replace(' to save this med.', '.').toLowerCase() + ' Last saved version kept.');
+      if (p && (touched || photo)) toast('Not saved: ' + p.replace(' to save this supplement.', '.').toLowerCase());
+    } else if (p) toast('Not saved: ' + p.replace(' to save this supplement.', '.').toLowerCase() + ' Last saved version kept.');
     med = null; dropThumb(id); closePage(); await load(); render(); renderHome();
   }
   $('medBack').onclick = closeEditor;
