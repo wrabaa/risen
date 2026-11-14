@@ -43,21 +43,23 @@ Supporting colours (named on `:root` in `styles.css`, use the names, never raw c
 `--danger` #FF6B6B (delete/reset ONLY — the one exception to "one accent") · `--field` #0F0F0F
 (inputs) · `--press` #202020 · `--dash` #3A3A3A · `--mid` #4A4A4A · `--dim` #5A5A5A ·
 `--faint` #6A6A6A · `--off` #2A2A2A · `--soft` #C9C9C9 · `--soft2` #D6D6D6 · `--volt-press` #B8E600 ·
+tab bar glass: `--glass` rgba(26,26,26,.62) · `--glass-hi` rgba(255,255,255,.1) (the pill behind the active tab) ·
 studio tags (Classes only, subtle): `--studio-energy` #D9A25E · `--studio-balance` #7CB9AE ·
 `--studio-power` #A592D6.
 No dot-matrix font. Intro = Siza's black & white photo + logo + "STRONGER EVERY DAY" + ENTER
 (all text/buttons in code, never baked into images).
 
 ## Structure
-Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙️ (top right) = Settings.
+Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. Gear ⚙️ (top right) = Settings.
 - **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
-  02 THIS WEEK, 03 STREAK, 04 MEDS, 05 CLASSES, 06 WEEK SUMMARY (workouts · meds taken/due ·
+  02 THIS WEEK, 03 STREAK, 04 SUPPS, 05 CLASSES, 06 WEEK SUMMARY (workouts · meds taken/due ·
   classes attended), backup reminder line.
 - **GYM** (`gym.js`, `library.js`): Week (Mon–Sun, today lime) → Day (+ ADD EXERCISE,
   list, Copy to…, START WORKOUT on today) → Exercise (photo, sets/kg/reps, notes,
   "Last time"). Logging: pre-filled sets, ✓, auto rest timer, finish. History per exercise ID.
   Program in background (rename / New program link at bottom).
-- **MEDS** (`meds.js`): progress ring, doses grouped by time with ✓ TAKE ALL, compact
+- **SUPPS** (`meds.js`; the tab used to be called MEDS, code and data keep the name "meds"; title inside the tab:
+  "Supplements & Meds"): progress ring, doses grouped by time with ✓ TAKE ALL, compact
   cards with box photo, 7-day dots; My meds list (tap row → edit, pause/delete inside).
 - **CLASSES** (`classes.js`, `data/gym-classes.json`, `assets/instructors/`):
   opening the tab asks "Load Fitness Zone schedule?" until answered: YES / START EMPTY, or
@@ -70,9 +72,9 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-14.50)
+## Status (release 2026-11-14.51)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
-- ✅ MEDS — done.
+- ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
 - 🔄 GYM — works; Siza is testing it in real gym sessions. Exercise library rebuilt (82, `.48`); images to come.
 - 🟡 MEALS — base only.
@@ -94,6 +96,8 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
 - `.50` fixes from review 1 (`REVIEW.md`): a merge never leaves the same exercise twice in a day; the old photo stays in the
   backup when both had one; the old-ID check runs once (`libraryFollowed`, import forces it); Settings shows the RUNNING
   version (read at start); star label "Delete". `.42`–`.50`: iPhone test pending.
+- `.51` floating glass tab bar (icons only, sliding lighter pill behind the active icon, content scrolls under it);
+  MEDS tab renamed SUPPS; star label "Unstar" (iPhone test pending).
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -145,6 +149,11 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   item is discarded; an existing item whose name is cleared keeps its last saved version.
 - Add buttons: lime "+ ADD …" at the top of the list it adds to (exception: Classes' day
   timeline has it at the bottom, so the timeline comes first).
+- Tab bar (`.51`): a floating glass pill (16 px side margin, above the home bar via `--tabb`), icons only (names are
+  `aria-label`s), volt icon + lighter pill (`.tabpill`, slides via `--i`) on the active tab. It sits over the content, so
+  EVERY screen that shows it needs `padding-bottom: var(--tabspace)`; toast / rest bar / Classes question sit above it
+  (`--tabb` + `--tabh`). It steps out of the way (`body.typing`) while a text field is focused. Sub-pages, Settings and
+  sheets cover it. Never touch the status bar meta.
 - Storage cannot open → full-screen "RISEN can't open your data" + TRY AGAIN (`.40`); the app
   never opens looking empty. Home redraws whenever the app returns to the front.
 - Delete levels: 🗑 exercise (history kept) · 🗑 day/workout · "New program" (archives,
@@ -187,7 +196,7 @@ Intro → Home. Tab bar: **HOME · GYM · MEALS · MEDS · CLASSES**. Gear ⚙�
   moves it (plan, history, notes, photo) and drops the stale entry. After a merge a day keeps ONE copy of the same exercise
   (the first); the old check at start-up runs once per library change (fingerprint in settings `libraryFollowed`).
 
-**MEDS**
+**SUPPS (meds.js)**
 - A med counts from the day it's added (earlier days = "not scheduled", not "missed").
 - Known small flaw (accepted for now): changing a schedule re-judges past days. Exception
   (`.32`): a dose already taken TODAY follows its med to the new time (no double dose).

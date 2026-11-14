@@ -3,6 +3,9 @@
   @font-face{font-family:Oswald;font-weight:200 700;font-display:swap;src:url(assets/fonts/oswald.woff2) format("woff2")}
   @font-face{font-family:Inter;font-weight:100 900;font-display:swap;src:url(assets/fonts/inter.woff2) format("woff2")}
   :root{--bg:#0B0B0B;--card:#1A1A1A;--line:#262626;--text:#F2F2F2;--muted:#9A9A9A;--volt:#CCFF00;--tabh:64px;
+    --tabb:max(12px,calc(env(safe-area-inset-bottom) - 12px));   /* gap under the floating tab bar (above the home bar) */
+    --tabspace:calc(var(--tabb) + var(--tabh) + 28px);          /* bottom padding every screen needs so the last item clears the bar */
+    --glass:rgba(26,26,26,.62);--glass-hi:rgba(255,255,255,.1);
     /* Supporting colours (not brand colours: greys for depth, and one red for destructive actions only) */
     --danger:#FF6B6B;     /* delete / reset */
     --field:#0F0F0F;      /* inputs and inset boxes */
@@ -48,7 +51,7 @@
   /* APP shell: each view scrolls on its own, tab bar stays put */
   #app{background:var(--bg)}
   .view{position:absolute;inset:0;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
-    padding:calc(env(safe-area-inset-top) + 4px) 20px calc(env(safe-area-inset-bottom) + var(--tabh) + 28px)}
+    padding:calc(env(safe-area-inset-top) + 4px) 20px var(--tabspace)}
   .view[hidden]{display:none}
   .icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
@@ -100,13 +103,22 @@
 
   /* Placeholder views (Plan, Calendar, Progress come in a later step) */
 
-  /* Bottom tab bar: frosted glass */
-  .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:5;display:flex;
-    padding:0 4px env(safe-area-inset-bottom);background:rgba(18,18,18,.72);border-top:1px solid rgba(255,255,255,.06);
-    -webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%)}
-  .tab{flex:1;height:var(--tabh);border:0;background:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-    font-family:Inter,sans-serif;font-size:11px;font-weight:500;letter-spacing:.04em;cursor:pointer;transition:color .2s ease}
+  /* Bottom tab bar: a floating glass pill (like iOS 26). Detached from the edges, above the home bar, icons only. Content scrolls
+     under it (it is translucent), so every screen keeps bottom padding for it (see --tabspace). */
+  .tabbar{position:absolute;left:16px;right:16px;bottom:var(--tabb);z-index:5;display:flex;align-items:stretch;height:var(--tabh);padding:6px;
+    border-radius:999px;border:1px solid var(--line);background:var(--glass);
+    -webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);
+    box-shadow:0 12px 32px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.35);
+    transition:transform .3s cubic-bezier(.32,.72,0,1),opacity .2s ease}
+  .tabpill{position:absolute;top:6px;bottom:6px;left:6px;width:calc((100% - 12px) / 5);border-radius:999px;background:var(--glass-hi);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);transform:translateX(calc(var(--i, 0) * 100%));
+    transition:transform .4s cubic-bezier(.32,.72,0,1)}
+  .tab{position:relative;flex:1;min-width:0;border:0;background:none;color:var(--muted);display:grid;place-items:center;border-radius:999px;cursor:pointer;
+    transition:color .2s ease}
+  .tab .icon{width:24px;height:24px}
   .tab[aria-selected="true"]{color:var(--volt)}
+  /* a text field is focused (the keyboard is up): the pill steps out of the way so it never floats over the field */
+  body.typing .tabbar{transform:translateY(calc(100% + 40px));opacity:0;pointer-events:none}
 
   /* SETTINGS: page slides in from the right */
   #settings{position:absolute;inset:0;z-index:10;background:var(--bg);overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
@@ -133,7 +145,7 @@
   .stepper output{min-width:56px;text-align:center;font-family:Oswald,sans-serif;font-weight:500;font-size:20px}
   .note{margin:10px 4px 0;font-size:13px;line-height:1.5;color:var(--muted)}
   .settings-version{margin-top:30px;padding:10px;text-align:center;font-size:11px;letter-spacing:.1em;color:var(--muted);opacity:.6}
-  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);z-index:30;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  .toast{position:fixed;left:50%;bottom:calc(var(--tabb) + var(--tabh) + 14px);z-index:30;transform:translate(-50%,20px);opacity:0;pointer-events:none;
     padding:12px 20px;border-radius:22px;background:rgba(40,40,40,.92);color:var(--text);font-size:14px;line-height:1.35;text-align:center;width:max-content;max-width:calc(100% - 32px);
     -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transition:opacity .25s ease,transform .25s ease}
   .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -213,7 +225,7 @@
   .elapsed{font-variant-numeric:tabular-nums}
 
   /* Rest timer bar (above the tab bar) */
-  .restbar{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + var(--tabh) + 10px);z-index:6;
+  .restbar{position:absolute;left:12px;right:12px;bottom:calc(var(--tabb) + var(--tabh) + 10px);z-index:6;
     display:flex;align-items:center;gap:8px;padding:8px 10px 8px 18px;border-radius:20px;border:1px solid var(--line);
     background:rgba(26,26,26,.88);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);
     transform:translateY(16px);opacity:0;pointer-events:none;transition:transform .3s cubic-bezier(.32,.72,0,1),opacity .25s ease}
@@ -226,7 +238,7 @@
   .restbar.zero{animation:flash .5s ease-in-out 8 alternate;border-color:var(--volt)}
   .restbar.zero .cd{color:var(--volt)}
   @keyframes flash{from{background:rgba(26,26,26,.88)}to{background:rgba(204,255,0,.32)}}
-  #app.resting .view{padding-bottom:calc(env(safe-area-inset-bottom) + var(--tabh) + 100px)}
+  #app.resting .view{padding-bottom:calc(var(--tabspace) + 72px)}
 
   /* Plan editing */
   .field{color-scheme:dark;width:100%;height:52px;padding:0 16px;border-radius:14px;border:1px solid var(--line);background:var(--field);color:var(--text);
@@ -516,7 +528,7 @@
   .sheet-x{position:absolute;top:6px;right:6px;width:44px;height:44px;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
   .sheet h2{font-family:Oswald,sans-serif;font-weight:700;font-size:26px;text-transform:uppercase;letter-spacing:.03em}
   /* the Classes question stops above the tab bar, so the tabs stay visible and usable */
-  #clsSheet{bottom:calc(var(--tabh) + env(safe-area-inset-bottom));padding-top:calc(env(safe-area-inset-top) + 8vh);padding-bottom:12px;overflow-y:auto}
+  #clsSheet{bottom:calc(var(--tabb) + var(--tabh) + 12px);padding-top:calc(env(safe-area-inset-top) + 8vh);padding-bottom:12px;overflow-y:auto}
   #clsSheet .sheet h2{padding-right:34px}
   .sheet p{margin-top:6px;color:var(--muted);font-size:14px}
   .sheet input{margin-top:20px;width:100%;height:54px;padding:0 18px;border-radius:14px;border:1px solid var(--line);background:var(--field);

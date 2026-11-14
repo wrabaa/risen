@@ -44,7 +44,7 @@
       <button class="backup-line" id="backupLine" hidden></button>
     </div>
 
-    <!-- GYM, MEALS, MEDS, CLASSES: each tab draws itself (gym.js, meals.js, meds.js, classes.js) -->
+    <!-- GYM, MEALS, SUPPS (meds.js), CLASSES: each tab draws itself (gym.js, meals.js, meds.js, classes.js) -->
     <div class="view" id="view-gym" hidden>
       <div id="gymWeek"></div>
       <div id="gymLog" hidden></div>
@@ -116,17 +116,19 @@
       <div id="libBody"></div>
     </section>
 
-    <nav class="tabbar" role="tablist">
-      <button class="tab" role="tab" data-view="home" aria-selected="true">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>Home</button>
-      <button class="tab" role="tab" data-view="gym" aria-selected="false">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>Gym</button>
-      <button class="tab" role="tab" data-view="meals" aria-selected="false">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v5a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V3M9 3v5"/><path d="M17 21V3c-2 1-3 3.5-3 7 0 2 1 3 3 3"/></svg>Meals</button>
-      <button class="tab" role="tab" data-view="meds" aria-selected="false">
-        <svg class="icon" viewBox="0 0 24 24"><rect x="2.8" y="8.2" width="18.4" height="7.6" rx="3.8" transform="rotate(-45 12 12)"/><path d="m8.6 8.6 6.8 6.8"/></svg>Meds</button>
-      <button class="tab" role="tab" data-view="classes" aria-selected="false">
-        <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 20v-1a5.5 5.5 0 0 1 11 0v1"/><path d="M16 5.2a3 3 0 0 1 0 5.6"/><path d="M17.5 14a5.5 5.5 0 0 1 3 4.9V20"/></svg>Classes</button>
+    <!-- Floating glass tab bar: icons only (names are in aria-label); .tabpill is the lighter glass that slides behind the active icon -->
+    <nav class="tabbar" id="tabbar" role="tablist" aria-label="Main" style="--i:0">
+      <span class="tabpill" aria-hidden="true"></span>
+      <button class="tab" role="tab" data-view="home" aria-label="Home" aria-selected="true">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg></button>
+      <button class="tab" role="tab" data-view="gym" aria-label="Gym" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg></button>
+      <button class="tab" role="tab" data-view="meals" aria-label="Meals" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v5a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V3M9 3v5"/><path d="M17 21V3c-2 1-3 3.5-3 7 0 2 1 3 3 3"/></svg></button>
+      <button class="tab" role="tab" data-view="meds" aria-label="Supps" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="2.8" y="8.2" width="18.4" height="7.6" rx="3.8" transform="rotate(-45 12 12)"/><path d="m8.6 8.6 6.8 6.8"/></svg></button>
+      <button class="tab" role="tab" data-view="classes" aria-label="Classes" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 20v-1a5.5 5.5 0 0 1 11 0v1"/><path d="M16 5.2a3 3 0 0 1 0 5.6"/><path d="M17.5 14a5.5 5.5 0 0 1 3 4.9V20"/></svg></button>
     </nav>
   </section>
 

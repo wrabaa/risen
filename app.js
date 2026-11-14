@@ -75,10 +75,10 @@
       const n=streak();
       return `<div><div class="big">${n}</div><div class="sub">Planned workout${n===1?'':'s'} in a row</div></div>`;
     }},
-    {title:'Meds', tap:'meds', html(){ // the whole tile opens Meds
+    {title:'Supps', tap:'meds', html(){ // the whole tile opens the SUPPS tab (meds.js)
       if(typeof Meds==='undefined') return '';
       const s=Meds.summary();
-      if(!s.hasMeds) return `<div><div class="wname">No meds yet</div><div class="sub">Add them in Meds</div></div><button class="ghost" data-tab="meds">ADD</button>`;
+      if(!s.hasMeds) return `<div><div class="wname">Nothing added yet</div><div class="sub">Add them in Supps</div></div><button class="ghost" data-tab="meds">ADD</button>`;
       if(!s.total) return `<div><div class="wname">No doses today</div><div class="sub">Nothing scheduled</div></div>`;
       if(s.taken===s.total) return `<div><div class="wname">All done today ✓</div><div class="sub">${s.taken} of ${s.total} taken</div></div>`;
       return `<div><div class="wname">${s.taken} of ${s.total} taken today</div><div class="sub">Next: ${esc(s.next.m.name)} · ${esc(s.next.t)}</div></div>`;
@@ -95,7 +95,7 @@
       const workouts=S.sessions.filter(x=>x.finishedAt&&inWeek(x.date)).length;       // every finished workout, extra ones too
       const m=typeof Meds==='undefined'?{taken:0,total:0}:Meds.week();                // doses due up to today
       const classes=S.classlogs.filter(l=>inWeek(l.date)).length;
-      return `<div class="stats"><div><b>${workouts}</b><span>Workouts</span></div><div><b>${m.taken}<small>/${m.total}</small></b><span>Meds</span></div><div><b>${classes}</b><span>Classes</span></div></div>`;
+      return `<div class="stats"><div><b>${workouts}</b><span>Workouts</span></div><div><b>${m.taken}<small>/${m.total}</small></b><span>Supps</span></div><div><b>${classes}</b><span>Classes</span></div></div>`;
     }},
   ];
   // Quiet backup reminder: shows when there's a plan and the last export is missing or older than 7 days
@@ -121,9 +121,14 @@
     if(view!=='classes') $('clsSheet').hidden=true; // the Classes question belongs to the Classes tab only
     if(view==='home'&&!wasHome) renderHome();
     if(view==='home') applyUpdate(); // a new release that arrived while you were busy loads now
-    document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
+    const tabs=[...document.querySelectorAll('.tab')]; tabs.forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
+    $('tabbar').style.setProperty('--i',Math.max(0,tabs.findIndex(t=>t.dataset.view===view)));          // the glass pill slides to the active tab
   }
   document.querySelector('.tabbar').onclick=e=>{const t=e.target.closest('.tab'); if(!t) return; if(t.dataset.view==='gym') Gym.open(); else if(t.dataset.view==='meds') Meds.open(); else if(t.dataset.view==='classes') Classes.open(); else if(t.dataset.view==='meals') Meals.open(); else show(t.dataset.view)};
+  // The floating tab bar steps aside while a text field is focused (keyboard up), and comes back when the focus is gone.
+  { const field=e=>e.target.matches&&e.target.matches('input:not([type=file]):not([type=checkbox]):not([type=radio]):not([type=button]),textarea,select');
+    document.addEventListener('focusin',e=>{ if(field(e)) document.body.classList.add('typing'); });
+    document.addEventListener('focusout',()=>setTimeout(()=>{ const a=document.activeElement; if(!(a&&a.matches&&a.matches('input,textarea,select'))) document.body.classList.remove('typing'); },120)); }
   $('tiles').onclick=e=>{
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();

@@ -282,6 +282,9 @@ Siza's order. Each item: built? tested on iPhone? release number.
      import runs it again.
   4. Settings shows the version that is RUNNING (read once at start), not the newest one downloaded.
   5. These notes. 6. Star label "Remove" → "Delete" (screen-reader text).
+- `.51` Floating glass tab bar (iOS 26 style pill, icons only, sliding active pill, content scrolls under it, bar steps aside
+  while typing); MEDS tab renamed SUPPS (tab, Home tile, week summary; title inside "Supplements & Meds"; data and code
+  names unchanged); star label "Unstar". iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)
