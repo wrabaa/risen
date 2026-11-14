@@ -293,6 +293,10 @@ Siza's order. Each item: built? tested on iPhone? release number.
   soft shadow + 20px corners, glass sheets and sticky header, lime glow under the main button and active tab icon, Oswald
   section titles, slightly larger week-summary numbers and secondary text, a little more space between cards. Words:
   "My supps", "+ ADD" (Supps). iPhone test pending.
+- `.55` New intro image (Siza).
+- `.56` Design step 2, motion (DESIGN.md "Motion"): page change slide + fade (250 ms, iOS curve), press feel (scale .97, darker,
+  spring back), ✓ pop and a lime flash on the set row, rings and numbers count up from 0 (600 ms), sheets spring up with the
+  dim fading in, reduced-motion = fades only. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

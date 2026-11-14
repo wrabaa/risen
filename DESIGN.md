@@ -38,7 +38,7 @@ Build ONE step per release, test on iPhone 13 + SE, never touch the status bar m
 - `.51` Floating glass tab bar + SUPPS rename (prompt already sent).
 - `.52` (built as release `.54`, DONE) **Glass & depth everywhere:** background gradient, card style (hairline, shadow, radius), glass sheets
   and sticky headers, button glow, spacing + type scale. All tabs, no layout changes.
-- `.53` **Motion:** everything in the Motion section.
+- `.53` (built as release `.56`, DONE) **Motion:** everything in the Motion section.
 - `.54` **Home premium:** greeting big and calm; tiles as glass cards over the subtle background; 01 TRAINING
   tile shows today's exercise image (when images exist) or a lime-tinted gradient; big animated numbers in
   THIS WEEK / STREAK; WEEK SUMMARY as three small rings or bars.

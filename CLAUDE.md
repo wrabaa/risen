@@ -75,7 +75,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - **SETTINGS**: name, rest timer, Export/Import backup, View intro, Reload gym schedule,
   Clear all classes, Reset all data.
 
-## Status (release 2026-11-14.54)
+## Status (release 2026-11-14.56)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -107,6 +107,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.54` design step 1 (`DESIGN.md`): glass and depth everywhere (background gradient, cards with hairline + soft shadow + 20px
   corners, glass sheets and sticky header, glow on the main button and active tab icon, section titles in Oswald); "My supps"
   and "+ ADD" in Supps. No layout, flow or word changes otherwise (iPhone test pending).
+- `.55` new intro image (Siza) · `.56` design step 2, motion (`DESIGN.md`): page change slide + fade, press feel (scale .97 + darker,
+  spring back), ✓ pop + lime flash, rings and numbers count up from 0, sheets spring up, prefers-reduced-motion respected
+  (iPhone test pending).
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -158,6 +161,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   item is discarded; an existing item whose name is cleared keeps its last saved version.
 - Add buttons: lime "+ ADD …" at the top of the list it adds to (exception: Classes' day
   timeline has it at the bottom, so the timeline comes first).
+- Motion (`.56`, `Motion` in `shared.js` + the MOTION block at the end of `styles.css`): only transform and opacity move. A
+  new ✓ button calls `Motion.pop(button, row?)`; a number that should count up on open gets `data-count="N"` and its screen calls
+  `Motion.count(root)` when it opens (Home: when the tab is entered or the app opens; Supps: when the tab opens, the ring starts
+  from 0). Sub-pages, sheets and tab pages animate through their shared classes (nothing to add). Under
+  `prefers-reduced-motion` nothing moves, only fades; keep that block in step with any new animation.
 - Depth and glass (`.54`): a card = `--card` + hairline + `--card-depth` + `--r-card`; sheets and the sticky library header are
   blurred glass (the sheet backdrop only dims); at most TWO blurred layers on a screen (tab bar + one other: sheet, rest bar or
   sticky header; the toast does not blur); always a solid fallback in `@supports not (backdrop-filter)`.
