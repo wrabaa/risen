@@ -75,10 +75,10 @@
       const n=streak();
       return `<div><div class="big"><span data-count="${n}">${n}</span></div><div class="sub">Planned workout${n===1?'':'s'} in a row</div></div>`;
     }},
-    {title:'Supps', tap:'meds', html(){ // the whole tile opens the SUPPS tab (meds.js)
+    {title:'Supplements', tap:'meds', html(){ // the whole tile opens the SUPPLEMENTS tab (meds.js)
       if(typeof Meds==='undefined') return '';
       const s=Meds.summary();
-      if(!s.hasMeds) return `<div><div class="wname">Nothing added yet</div><div class="sub">Add them in Supps</div></div><button class="ghost" data-tab="meds">ADD</button>`;
+      if(!s.hasMeds) return `<div><div class="wname">Nothing added yet</div><div class="sub">Add them in Supplements</div></div><button class="ghost" data-tab="meds">ADD</button>`;
       if(!s.total) return `<div><div class="wname">No doses today</div><div class="sub">Nothing scheduled</div></div>`;
       if(s.taken===s.total) return `<div><div class="wname">All done today ✓</div><div class="sub">${s.taken} of ${s.total} taken</div></div>`;
       return `<div><div class="wname">${s.taken} of ${s.total} taken today</div><div class="sub">Next: ${esc(s.next.m.name)} · ${esc(s.next.t)}</div></div>`;
@@ -101,7 +101,7 @@
       const starred=S.classes.filter(c=>c.star).length, share=(n,of)=>of?Math.min(1,n/of):(n>0?1:0);
       const C=2*Math.PI*26, ring=(frac,inner,label)=>`<div class="wring"><div class="ring3"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rtrack" cx="32" cy="32" r="26"/>
         <circle class="rfill" cx="32" cy="32" r="26" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" data-ring="${frac}" transform="rotate(-90 32 32)"/></svg><div class="rn"><span>${inner}</span></div></div><span>${label}</span></div>`;
-      return `<div class="wsum">${ring(share(workouts,planned),`<span data-count="${workouts}">${workouts}</span>`,'Workouts')}${ring(share(m.taken,m.total),`<span data-count="${m.taken}">${m.taken}</span><small>/${m.total}</small>`,'Supps')}${ring(share(classes,starred),`<span data-count="${classes}">${classes}</span>`,'Classes')}</div>`;
+      return `<div class="wsum">${ring(share(workouts,planned),`<span data-count="${workouts}">${workouts}</span>`,'Workouts')}${ring(share(m.taken,m.total),`<span data-count="${m.taken}">${m.taken}</span><small>/${m.total}</small>`,'Supplements')}${ring(share(classes,starred),`<span data-count="${classes}">${classes}</span>`,'Classes')}</div>`;
     }},
   ];
   // Quiet backup reminder: shows when there's a plan and the last export is missing or older than 7 days

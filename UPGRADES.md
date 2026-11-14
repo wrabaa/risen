@@ -318,6 +318,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.67` Intro: the glass ENTER letters and the head cut-out layer are removed (tap anywhere still enters, hidden ENTER button for VoiceOver, logo and bottom text kept); the ENTER look is to be redesigned later. iPhone test pending.
 - `.68` Gym log: big − / + on kg (±2.5) and reps (±1, hold repeats); ▲ PR badge on a ticked set that beats "Last time", "PR today" after FINISH. iPhone test pending.
 - `.69` NOW card on Home: one glass card with the single next thing + one big button (resume workout · take due supplements · open a class starting within 60 min · start today's workout · next dose · all done); refreshes every minute; its button is the one glowing button on Home. iPhone test pending.
+- `.70` Home tile, week-summary ring and empty text say "Supplements" in full instead of "Supps". iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

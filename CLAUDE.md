@@ -56,7 +56,7 @@ No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + no ENTE
 ## Structure
 Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. A round profile button (top right of the shared top bar) opens the profile page: SETTINGS · PERSONAL INFO.
 - **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
-  02 THIS WEEK, 03 STREAK, 04 SUPPS, 05 CLASSES, 06 WEEK SUMMARY (three small rings: workouts · supps taken/due ·
+  02 THIS WEEK, 03 STREAK, 04 SUPPLEMENTS, 05 CLASSES, 06 WEEK SUMMARY (three small rings: workouts · supps taken/due ·
   classes attended), backup reminder line.
 - **GYM** (`gym.js`, `library.js`): Week (Mon–Sun, today lime) → Day (+ ADD EXERCISE,
   list, Copy to…, START WORKOUT on today) → Exercise (photo, sets/kg/reps, notes,
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.69)
+## Status (release 2026-11-14.70)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -159,6 +159,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   3 a class starting within 60 min, starred first (photo, "Starts in N min", OPEN → Classes; `Classes.soon()`) · 4 today's workout not done (day title, exercise count, START) ·
   5 next dose later today ("Next: Omega 3 at 14:00", no button) · 6 "All done today ✓" in lime. A brand-new app (no meds, no program, no classes) shows no card. It refreshes every minute
   (not while a sheet is open), whenever Home is drawn and when the app comes back to the front. Its button is the ONE glowing button on Home; the ▶ on the TRAINING tile no longer glows. iPhone test pending.
+- `.70` Home says "Supplements" in full (tile 04, the week-summary ring label and "Add them in Supplements"); the tab bar has no words, so nothing else is short any more. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
