@@ -345,7 +345,7 @@ const Gym = (() => {
         if (num(s.kg) == null) { s.kg = '0'; row.querySelector('[data-f="kg"]').value = '0'; }
         s.done = true; document.activeElement.blur(); Rest.start();
       } else s.done = false;
-      row.classList.toggle('done', s.done); saveDraft(); return;
+      row.classList.toggle('done', s.done); if (s.done) Motion.pop(row.querySelector('.tick'), row); saveDraft(); return;
     }
     if (t.dataset.addset != null) {
       const sets = d.exercises[t.dataset.addset].sets, p = sets[sets.length - 1] || { kg: '', reps: '' };

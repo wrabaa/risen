@@ -229,12 +229,12 @@ const Classes = (() => {
     if (d.instview) return openInstView(d.instview);
     if (d.star) return toggleStar(d.star);
     if (d.att) {
-      const id = attId(d.att, dayKey(new Date()));
+      const id = attId(d.att, dayKey(new Date())); let attended = false;
       if (attMap().has(id)) {
         if (!(await ask({ title: 'Mark as not attended?', ok: 'YES, UNDO' }))) return;
         await RisenDB.unattendClass(id); S.classlogs = S.classlogs.filter(l => l.id !== id);
-      } else S.classlogs.push(await RisenDB.attendClass(d.att, dayKey(new Date())));
-      render(); renderHome();
+      } else { S.classlogs.push(await RisenDB.attendClass(d.att, dayKey(new Date()))); attended = true; }
+      render(); renderHome(); if (attended) Motion.pop([...document.querySelectorAll('#clsWeek [data-att]')].find(b => b.dataset.att === d.att));
     }
   });
 

@@ -29,6 +29,9 @@
     --glass-solid:rgba(26,26,26,.97); /* what glass becomes when the browser cannot blur */
     --volt-glow:rgba(204,255,0,.22);  /* soft lime glow under the ONE primary button and the active tab icon */
     --bg-grad:radial-gradient(75% 42% at 14% 0%,var(--glow),transparent 72%),radial-gradient(130% 58% at 50% 0%,var(--bg-top),var(--bg) 78%);
+    --volt-flash:rgba(204,255,0,.2);  /* the short lime flash on a set row when its tick is pressed */
+    --ease:cubic-bezier(.32,.72,0,1); /* the iOS curve for pages and sheets */
+    --spring:cubic-bezier(.34,1.56,.64,1); /* a button springing back after a press */
     --r-card:20px;
     --card-depth:inset 0 1px 0 var(--hilite),0 8px 24px var(--shadow);
     /* Studio tags in Classes (small and subtle; lime stays the only accent for actions) */
@@ -556,6 +559,49 @@
     font-family:Oswald,sans-serif;font-weight:700;font-size:17px;letter-spacing:.12em;cursor:pointer;box-shadow:0 8px 26px var(--volt-glow)}
   .primary:active{transform:scale(.98)}
   .textbtn{display:block;margin:8px auto 0;min-height:44px;padding:0 16px;border:0;background:none;color:var(--muted);font:500 14px Inter,sans-serif;cursor:pointer}
+
+  /* ===== MOTION (design pass step 2) =====
+     Only transform and opacity move (cheap on an older iPhone). prefers-reduced-motion: no movement, only fades. */
+  /* page change: sub-pages and Settings slide in and fade, 250 ms on the iOS curve; tab pages slide up a little and fade */
+  .subpage,#settings{opacity:0;transition:transform .25s var(--ease),opacity .25s var(--ease),visibility 0s .25s}
+  .subpage.open,#settings.open{opacity:1;transition:transform .25s var(--ease),opacity .25s var(--ease)}
+  .view.enter{animation:viewin .25s var(--ease) both}
+  @keyframes viewin{from{opacity:0;transform:translate3d(0,10px,0)}to{opacity:1;transform:none}}
+  /* press feel: scale .97 and a little darker, then a spring back */
+  .primary,.ghost,.play,.takeall,.attbtn,.dashed,.chips button,.starbtn,.donebtn,.dsd,.tick,.dtick,.stepper button,.avbtn,.textbtn,
+  button.card,.tile[data-tap],.mcat,.rcard,.dayrow{
+    transition:transform .45s var(--spring),background-color .2s ease,border-color .2s ease,color .2s ease,filter .2s ease,opacity .2s ease}
+  .primary:active,.ghost:active,.play:active,.takeall:active,.attbtn:active,.dashed:active,.chips button:active,.starbtn:active,.donebtn:active,.dsd:active,
+  .tick:active,.dtick:active,.stepper button:active,.avbtn:active,button.card:active,.tile[data-tap]:active,.mcat:active,.rcard:active,.dayrow:active{
+    transform:scale(.97);transition-duration:.08s}
+  .primary:active,.ghost:active,.play:active,.takeall:active,.attbtn:active,.chips button:active,.donebtn:active,.stepper button:active{filter:brightness(.9)}
+  .iconbtn{transition:transform .45s var(--spring),background-color .2s ease}
+  .iconbtn:active{transform:scale(.9);transition-duration:.08s}
+  .tab:active .icon{transform:scale(.88)}
+  .tab .icon{transition:transform .45s var(--spring)}
+  /* ✓ pop (scale .6 -> 1.1 -> 1) and a short lime flash on the set row */
+  @keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+  .tick.pop,.dtick.pop,.attbtn.pop{animation:pop .4s ease-out}
+  @keyframes rowflash{from{background:var(--volt-flash)}to{background:transparent}}
+  .setrow.flash{animation:rowflash .7s ease-out;border-radius:12px}
+  /* sheets spring up; the dim behind them fades in (the blur is the sheet's own glass) */
+  .sheet-wrap{background:none}
+  .sheet-wrap::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.6);animation:fade .3s ease both}
+  .sheet{animation:sheetin .5s cubic-bezier(.2,1.1,.3,1) both}
+  @keyframes sheetin{from{opacity:0;transform:translate3d(0,44px,0) scale(.97)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){
+    .subpage,#settings{transform:none}                          /* appear by fading only (a swipe-back drag still follows the finger) */
+    .view.enter,.dlist.next,.dlist.prev,.tile,.hero{animation:fade .2s ease both}
+    .sheet{animation:fade .2s ease both}
+    .tick.pop,.dtick.pop,.attbtn.pop{animation:none}
+    .primary:active,.ghost:active,.play:active,.takeall:active,.attbtn:active,.dashed:active,.chips button:active,.starbtn:active,.donebtn:active,.dsd:active,
+    .tick:active,.dtick:active,.stepper button:active,.avbtn:active,button.card:active,.tile[data-tap]:active,.mcat:active,.rcard:active,.dayrow:active,
+    .iconbtn:active,.tab:active .icon{transform:none}
+    .rfill{transition:none}
+    .tabpill{transition:none}
+    .restbar{transform:none}
+    body.typing .tabbar{transform:none}
+  }
 
   /* No backdrop-filter (old browser): glass becomes (almost) solid so text stays readable */
   @supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){

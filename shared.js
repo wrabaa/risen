@@ -134,3 +134,30 @@ const SwipeBack = (() => {
   document.querySelectorAll('.subpage, #settings').forEach(attach);
   return { attach };
 })();
+
+// ---- Motion (design pass, DESIGN.md) ----
+// Small helpers for the few things CSS cannot do alone. Everything respects prefers-reduced-motion: then nothing moves (the CSS
+// replaces slides and pops by plain fades, and these helpers do nothing / jump to the final value).
+const Motion = (() => {
+  const reduced = () => !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  // ✓ pop on a button (scale .6 -> 1.1 -> 1) and, if a row is given, a short lime flash on that row
+  function pop(el, row) {
+    if (reduced()) return;
+    const go = (e, c, ms) => { if (!e) return; e.classList.remove(c); void e.offsetWidth; e.classList.add(c); setTimeout(() => e.classList.remove(c), ms); };
+    go(el, 'pop', 500); go(row, 'flash', 800);
+  }
+  // numbers inside `root` that carry data-count="N" count up from 0 (600 ms, ease-out); timers finish them even if frames are paused
+  function count(root, ms = 600) {
+    if (!root || reduced()) return;
+    const items = [...root.querySelectorAll('[data-count]')].map(e => ({ e, to: Number(e.dataset.count) })).filter(i => i.to > 0);
+    if (!items.length) return;
+    const t0 = performance.now(), done = () => items.forEach(i => { i.e.textContent = String(i.to); });
+    items.forEach(i => { i.e.textContent = '0'; });
+    (function frame(now) {
+      const k = Math.min(1, (now - t0) / ms), eased = 1 - Math.pow(1 - k, 3);
+      if (k < 1) { items.forEach(i => { i.e.textContent = String(Math.round(i.to * eased)); }); requestAnimationFrame(frame); } else done();
+    })(t0);
+    setTimeout(done, ms + 250);
+  }
+  return { reduced, pop, count };
+})();

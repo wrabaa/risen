@@ -102,7 +102,7 @@ const Meds = (() => {
       ring = { C, frac, from };
       h += `<div class="gstack"><div class="card ringcard"><div class="ringwrap"><svg viewBox="0 0 120 120"><circle class="rtrack" cx="60" cy="60" r="52"/>
         <circle class="rfill" id="rfill" cx="60" cy="60" r="52" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - from)}" transform="rotate(-90 60 60)"/></svg>
-        <div class="rnum"><span>${taken}<small>/${total}</small></span></div></div><div class="rlabel${complete ? ' ok' : ''}">${label}</div></div>
+        <div class="rnum"><span><span data-count="${taken}">${taken}</span><small>/${total}</small></span></div></div><div class="rlabel${complete ? ' ok' : ''}">${label}</div></div>
         ${groups.map(g => groupHtml(g, lm)).join('')}</div>`;
       const list = [...S.meds].sort((a, b) => (a.paused ? 1 : 0) - (b.paused ? 1 : 0)           // active first (by time), paused last
         || ((a.times || [])[0] || '').localeCompare((b.times || [])[0] || '') || a.name.localeCompare(b.name));
@@ -113,26 +113,27 @@ const Meds = (() => {
     loadThumbs();
   }
 
-  function open() { clearThumbs(); show('meds'); render(); $('view-meds').scrollTop = 0; }
+  function open() { clearThumbs(); show('meds'); lastFrac = 0; render(); $('view-meds').scrollTop = 0; Motion.count($('medsBody')); }     // the ring and its number start from 0 each time the tab opens
 
   $('medsBody').addEventListener('click', async e => {
     const t = e.target.closest('button'); if (!t) return;
     if (t.dataset.dose) {
       const id = t.dataset.dose;
+      let marked = false;
       if (logMap().has(id)) {
         if (!(await ask({ title: 'Mark as not taken?', ok: 'YES, UNDO' }))) return;
         await RisenDB.undoDose(id); S.medlogs = S.medlogs.filter(l => l.id !== id);
       } else {
-        const [medId, date, time] = id.split('|'); S.medlogs.push(await RisenDB.logDose(medId, date, time));
+        const [medId, date, time] = id.split('|'); S.medlogs.push(await RisenDB.logDose(medId, date, time)); marked = true;
       }
-      render(); renderHome(); return;
+      render(); renderHome(); if (marked) Motion.pop([...document.querySelectorAll('#medsBody [data-dose]')].find(b => b.dataset.dose === id)); return;
     }
     if (t.dataset.takeall) {
-      const lm = logMap();
+      const lm = logMap(), newly = [];
       for (const d of dosesOn(new Date()).filter(x => x.t === t.dataset.takeall && !lm.has(x.id))) {
-        const [medId, date, time] = d.id.split('|'); S.medlogs.push(await RisenDB.logDose(medId, date, time));
+        const [medId, date, time] = d.id.split('|'); S.medlogs.push(await RisenDB.logDose(medId, date, time)); newly.push(d.id);
       }
-      render(); renderHome(); return;
+      render(); renderHome(); for (const b of document.querySelectorAll('#medsBody [data-dose]')) if (newly.includes(b.dataset.dose)) Motion.pop(b); return;
     }
     if (t.dataset.edit) return openEditor(t.dataset.edit);
     if (t.dataset.act === 'add') return openEditor(null);

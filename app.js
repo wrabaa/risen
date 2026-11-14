@@ -69,11 +69,11 @@
         const cls=[all?'plan':'', all&&dn===all?'done':'', dayKey(d)===today?'today':''].join(' ');
         return `<span class="${cls}">${'MTWTFSS'[isoDay(d)-1]}</span>`;
       }).join('');
-      return `<div><div class="big">${doneN}<small>/${plannedN}</small></div><div class="sub">Workouts done</div></div><div class="days">${dots}</div>`;
+      return `<div><div class="big"><span data-count="${doneN}">${doneN}</span><small>/${plannedN}</small></div><div class="sub">Workouts done</div></div><div class="days">${dots}</div>`;
     }},
     {title:'Streak', html(){
       const n=streak();
-      return `<div><div class="big">${n}</div><div class="sub">Planned workout${n===1?'':'s'} in a row</div></div>`;
+      return `<div><div class="big"><span data-count="${n}">${n}</span></div><div class="sub">Planned workout${n===1?'':'s'} in a row</div></div>`;
     }},
     {title:'Supps', tap:'meds', html(){ // the whole tile opens the SUPPS tab (meds.js)
       if(typeof Meds==='undefined') return '';
@@ -95,7 +95,7 @@
       const workouts=S.sessions.filter(x=>x.finishedAt&&inWeek(x.date)).length;       // every finished workout, extra ones too
       const m=typeof Meds==='undefined'?{taken:0,total:0}:Meds.week();                // doses due up to today
       const classes=S.classlogs.filter(l=>inWeek(l.date)).length;
-      return `<div class="stats"><div><b>${workouts}</b><span>Workouts</span></div><div><b>${m.taken}<small>/${m.total}</small></b><span>Supps</span></div><div><b>${classes}</b><span>Classes</span></div></div>`;
+      return `<div class="stats"><div><b data-count="${workouts}">${workouts}</b><span>Workouts</span></div><div><b><span data-count="${m.taken}">${m.taken}</span><small>/${m.total}</small></b><span>Supps</span></div><div><b data-count="${classes}">${classes}</b><span>Classes</span></div></div>`;
     }},
   ];
   // Quiet backup reminder: shows when there's a plan and the last export is missing or older than 7 days
@@ -116,10 +116,11 @@
 
   // ---- Tabs ----
   function show(view){
-    const wasHome=!$('view-home').hidden;
+    const wasHome=!$('view-home').hidden, changed=!!document.querySelector('.view:not([hidden]):not(#view-'+view+')');
     document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+view);
+    if(changed){ const v=$('view-'+view); v.classList.remove('enter'); void v.offsetWidth; v.classList.add('enter'); setTimeout(()=>v.classList.remove('enter'),400); }   // page change: slide + fade
     if(view!=='classes') $('clsSheet').hidden=true; // the Classes question belongs to the Classes tab only
-    if(view==='home'&&!wasHome) renderHome();
+    if(view==='home'&&!wasHome){ renderHome(); Motion.count($('tiles')); }       // the numbers count up when Home opens
     if(view==='home') applyUpdate(); // a new release that arrived while you were busy loads now
     const tabs=[...document.querySelectorAll('.tab')]; tabs.forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
     $('tabbar').style.setProperty('--i',Math.max(0,tabs.findIndex(t=>t.dataset.view===view)));          // the glass pill slides to the active tab
@@ -163,7 +164,7 @@
   });
   $('login').onclick=async()=>{
     await ready; renderHome(); show('home');
-    intro.classList.add('hidden'); app.classList.remove('hidden');
+    intro.classList.add('hidden'); app.classList.remove('hidden'); Motion.count($('tiles'));
     if(!S.settings.nameAsked){ $('nameSheet').hidden=false; setTimeout(()=>$('nameInput').focus(),350); }
     else backupPrompt();
   };
