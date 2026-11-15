@@ -334,6 +334,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.83` Coffee card on Home (under Water): tap = a drink at the current price, month total + cups, − takes the last one back, gear = name and price; new store `coffeelogs` (price stored per purchase) in backup. iPhone test pending.
 - `.84` Photo rows: flush-left square photos filling the row height and fixed row heights on the gym day list, the Supps dose cards and MY SUPPS rows, and the Home picture tiles (Supplements, Classes, Coffee); the day page's big heading is gone (count on the title line). iPhone test pending.
 - `.85` Animated GIF / WebP pictures are stored as they are (up to 5 MB, plain toast above that), so they keep moving everywhere a photo shows and through Export / Import; the photo slot shows each photo's stored size. iPhone test pending.
+- `.86` Class rows: flush square instructor photo (120 px), fixed row height, initial on a card-coloured square without a photo. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

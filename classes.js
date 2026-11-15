@@ -151,10 +151,11 @@ const Classes = (() => {
     const i = inst(c.instructorId), done = today && att.has(attId(c.id, k)), s = toMin(c.time), e = s + (c.duration || 60);
     const st = !today ? '' : nowM >= e ? 'past' : nowM >= s ? 'live' : 'soon';       // live timing: only for today
     const status = st === 'live' ? '<div class="stat"><span class="livepill">LIVE NOW</span></div>' : st === 'soon' ? `<div class="stat starts">Starts in ${inText(s - nowM)}</div>` : '';
-    const av = i ? `<button class="avbtn" type="button" data-instview="${esc(i.id)}" aria-label="${esc(i.name)}: classes this week">${avatar(i)}</button>` : avatar(i);
-    return `<div class="card cls${st ? ' ' + st : ''}${c.star ? ' mine' : ''}"><div class="clsrow">${av}
+    // the instructor photo is a square flush with the row's left, top and bottom edges (the card's corners clip it); without a photo the initial sits on a plain card-coloured square of the same size
+    const av = i ? `<button class="avbtn cpic" type="button" data-instview="${esc(i.id)}" aria-label="${esc(i.name)}: classes this week">${avatar(i)}</button>` : `<div class="cpic">${avatar(i)}</div>`;
+    return `<div class="card cls ccard${st ? ' ' + st : ''}${c.star ? ' mine' : ''}"><div class="clsrow">${av}
       <button class="wmain" data-open="${esc(c.id)}"><div class="xt"><div class="t">${esc(c.name)}</div><div class="s">${range(c)}</div>${status}
-        <div class="s ctag">${tagHtml(c.studio)}${i ? esc(i.name) : 'TBA'}</div></div>${CHEV}</button>
+        <div class="s ctag">${tagHtml(c.studio)}<span class="ctn">${i ? esc(i.name) : 'TBA'}</span></div></div>${CHEV}</button>
       <button class="starbtn${c.star ? ' on' : ''}" type="button" data-star="${esc(c.id)}" aria-pressed="${!!c.star}" aria-label="${c.star ? 'Unstar' : 'Add to my classes'}">${STAR}</button></div>
       ${today ? `<button class="attbtn${done ? ' on' : ''}" data-att="${esc(c.id)}">✓ ATTENDED</button>` : ''}</div>`;
   }

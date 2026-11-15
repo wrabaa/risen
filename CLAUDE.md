@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-15.85)
+## Status (release 2026-11-15.86)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -214,6 +214,10 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.85` animated pictures keep moving: `PhotoSlot.prepare(file)` (`photo.js`, also used for instructor photos) stores a GIF or WebP file EXACTLY as chosen (no canvas, no re-encode, so the frames survive; its real width and height are read from the image;
   the `type` is kept in the photos store, so every `<img>` made from the stored blob animates: gym rows and exercise page, Supps cards, MY SUPPS, NEXT UP, Home tiles; Export / Import carry the bytes unchanged). Over 5 MB is refused with the toast "That file is too big — keep it under 5 MB"
   (nothing stored). Everything else still goes through `resize()` to a JPEG. The photo slot shows the stored size and kind ("GIF · 1.2 MB", "JPG · 180 KB") on the photo. The slot's error is a toast now (no system `alert()`). iPhone test pending.
+- `.86` CLASS ROWS (`classCard()` in `classes.js`, the day timeline for any day) get the `.84` photo treatment: the instructor photo is a 120 px square flush with the row's left, top and bottom edges (the card's rounded corners clip it, no padding, `object-fit: cover`,
+  never stretched), the class name (2 lines then an ellipsis), time, LIVE NOW / Starts in, studio tag + instructor beside it, the > and the star on the right; every row 120 px (the ✓ ATTENDED button sits under it on today). No photo (Cesar) or no instructor (TBA) =
+  the initial / TBA centred on a plain card-coloured square of the same size. Tapping the photo still opens the instructor page. The WEEK list's day rows have no photo, and the round `.avatar` is unchanged everywhere else (instructor lists / pages, profile button). The lime "mine" edge
+  is not drawn on these rows (the photo covers it; the star shows it). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
