@@ -17,6 +17,7 @@
 //   settings   {key, value}   name, nameAsked, restSec, waterGoal, activeSession (workout in progress), lastExport,
 //              backupAsked (when the weekly "Back up now?" was last shown), libraryFollowed (fingerprint of the library's
 //              aliases/retired that this phone has already been brought in line with; see Gym.followLibrary)
+//   coffeelogs {id, date:'YYYY-MM-DD', price}   one record per drink bought, the price of that day stored with it; name + current price = settings `coffeeName` / `coffeePrice`
 //   waterlogs  {date:'YYYY-MM-DD', glasses}   ONE record per day (keyPath date); a glass = 250 ml; the goal is the setting `waterGoal` (glasses, default 10)
 //   body       {id, kind, label?, value, date, at}   dated body values (height, weight, measurements); the profile photo lives in `photos` under the key 'profile'
 //   photos     {exerciseId, type, data:ArrayBuffer, width, height, updated}
@@ -40,8 +41,8 @@
 // SCHEMA VERSION: raise DB_VERSION and add a new `if (old < N)` step in upgrade().
 // Never delete or rename a store in an upgrade, so updates never lose data.
 const RisenDB = (() => {
-  const DB_NAME = 'risen', DB_VERSION = 7;
-  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs', 'recipes', 'body', 'waterlogs'];
+  const DB_NAME = 'risen', DB_VERSION = 8;
+  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs', 'recipes', 'body', 'waterlogs', 'coffeelogs'];
   let dbp;
 
   function upgrade(db, old) {
@@ -76,6 +77,9 @@ const RisenDB = (() => {
     if (old < 7) {                                                  // v7: Water (one record per day)
       db.createObjectStore('waterlogs', { keyPath: 'date' });
     }
+    if (old < 8) {                                                  // v8: Coffee (one record per drink bought)
+      db.createObjectStore('coffeelogs', { keyPath: 'id' });
+    }
   }
 
   function open() {
@@ -105,7 +109,7 @@ const RisenDB = (() => {
   const now = () => new Date().toISOString();
 
   // ---- Settings ----
-  const DEFAULTS = { name: '', nameAsked: false, restSec: 90, waterGoal: 10 };
+  const DEFAULTS = { name: '', nameAsked: false, restSec: 90, waterGoal: 10, coffeeName: 'Coffee', coffeePrice: 3.5 };
   async function getSettings() {
     const rows = await all('settings'), s = { ...DEFAULTS };
     for (const r of rows) s[r.key] = r.value;
@@ -156,6 +160,11 @@ const RisenDB = (() => {
 
   // ---- Water (Home): one record per day {date:'YYYY-MM-DD', glasses:n} (a glass = 250 ml); the daily goal is the setting `waterGoal` (glasses) ----
   async function setWater(date, glasses) { return put('waterlogs', { date, glasses }); }
+
+  // ---- Coffee (Home): one record per drink bought {id, date:'YYYY-MM-DD', price}; the price is stored WITH each purchase, so changing the price later never rewrites what was spent.
+  //   The drink name and the current price are the settings `coffeeName` / `coffeePrice`. The id starts with the time (made in app.js), so records sort in the order they were added.
+  async function putCoffee(rec) { return put('coffeelogs', rec); }
+  async function deleteCoffee(id) { const db = await open(), t = db.transaction('coffeelogs', 'readwrite'); t.objectStore('coffeelogs').delete(id); await done(t); }
 
   async function deleteMed(id) {            // the med, its box photo and every dose logged for it
     const db = await open(), t = db.transaction(['meds', 'medlogs', 'photos'], 'readwrite');
@@ -495,5 +504,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, migrateLibrary, adoptSeedClasses, saveWorkout, workoutsOf,
-    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, saveBody, deleteBody, setWater, exportAll, exportBlob, importAll };
+    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, saveBody, deleteBody, setWater, putCoffee, deleteCoffee, exportAll, exportBlob, importAll };
 })();

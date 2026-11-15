@@ -3,13 +3,13 @@
   const intro=$('intro'), app=$('app');
 
   // ---- Data: lives in IndexedDB (db.js). This is an in-memory copy for drawing the screens. ----
-  const S={settings:{name:'',restSec:90,waterGoal:10},body:[],water:[],routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[],classes:[],instructors:[],classlogs:[],recipes:[]};
+  const S={settings:{name:'',restSec:90,waterGoal:10,coffeeName:'Coffee',coffeePrice:3.5},body:[],water:[],coffee:[],routines:[],workouts:[],sessions:[],exercises:[],meds:[],medlogs:[],classes:[],instructors:[],classlogs:[],recipes:[]};
   async function load(){
     [S.settings,S.routines,S.workouts,S.sessions,S.exercises]=await Promise.all([RisenDB.getSettings(),RisenDB.all('routines'),
       RisenDB.all('workouts'),RisenDB.all('sessions'),RisenDB.all('exercises')]);
     [S.meds,S.medlogs]=await Promise.all([RisenDB.all('meds'),RisenDB.all('medlogs')]);
     [S.classes,S.instructors,S.classlogs]=await Promise.all([RisenDB.all('classes'),RisenDB.all('instructors'),RisenDB.all('classlogs')]);
-    S.recipes=await RisenDB.all('recipes'); S.body=await RisenDB.all('body'); S.water=await RisenDB.all('waterlogs');
+    S.recipes=await RisenDB.all('recipes'); S.body=await RisenDB.all('body'); S.water=await RisenDB.all('waterlogs'); S.coffee=await RisenDB.all('coffeelogs');
   }
 
   // ---- Schedule helpers ----
@@ -66,6 +66,29 @@
   // ONE layout for every tile with a picture (SUPPLEMENTS, CLASSES): a rounded square on the left, the text to its right (and an optional count on the far right)
   const picRow=(pic,text,extra='')=>`<div class="picrow">${pic}<div class="ttxt">${text}</div>${extra}</div>`;
 
+  // ---- Coffee (Home only): one record per drink bought {id, date, price} in `coffeelogs`; the month's total is for the current calendar month (it starts again on the 1st, older months stay in the data) ----
+  const coffeePrice=()=>Math.max(0,Math.round((Number(S.settings.coffeePrice)||0)*100)/100), coffeeName=()=>String(S.settings.coffeeName||'').trim()||'Coffee';
+  const money=n=>'$'+n.toFixed(2);
+  const coffeeMonth=()=>{ const k=dayKey(new Date()).slice(0,7); return S.coffee.filter(c=>c.date.slice(0,7)===k).sort((a,b)=>(a.date+a.id).localeCompare(b.date+b.id)); };
+  let coffeePic=false; { const im=new Image(); im.onload=()=>{ coffeePic=true; if(typeof loaded!=='undefined'&&loaded&&!$('view-home').hidden) renderHome(); }; im.src='assets/coffee.png'; }   // the drink image is a file dropped in later; a cup icon until then
+  function addCoffee(){
+    const r={id:Date.now().toString(36).padStart(9,'0')+'-'+Math.random().toString(36).slice(2,8),date:dayKey(new Date()),price:coffeePrice()};
+    S.coffee.push(r); RisenDB.putCoffee(r).catch(e=>toast('Could not save: '+e.message));
+  }
+  function removeLastCoffee(){
+    const last=coffeeMonth().pop(); if(!last) return;
+    S.coffee=S.coffee.filter(c=>c.id!==last.id); RisenDB.deleteCoffee(last.id).catch(e=>toast('Could not save: '+e.message));
+  }
+  // The coffee sheet (the small gear on the COFFEE card): drink name and price, saved at once, "✓ Saved"; DONE closes it
+  const paintCoffee=()=>{ $('cfName').value=S.settings.coffeeName===undefined?'Coffee':S.settings.coffeeName; $('cfPrice').textContent=money(coffeePrice()); $('cfMinus').disabled=coffeePrice()<=0; };
+  const saveCoffeeSetting=(k,v)=>{ S.settings[k]=v; RisenDB.setSetting(k,v).then(()=>savedFlash('cfSaved')).catch(e=>toast('Could not save: '+e.message)); };
+  function openCoffeeSheet(){ paintCoffee(); $('coffeeSheet').hidden=false; }
+  const saveCoffeeName=debounce(()=>saveCoffeeSetting('coffeeName',$('cfName').value.trim()||'Coffee'),350);
+  $('cfName').oninput=saveCoffeeName; $('cfName').onkeydown=e=>{ if(e.key==='Enter') $('cfName').blur(); };
+  const stepCoffee=d=>{ saveCoffeeSetting('coffeePrice',Math.max(0,Math.round((coffeePrice()+d)*100)/100)); $('cfPrice').textContent=money(coffeePrice()); $('cfMinus').disabled=coffeePrice()<=0; };
+  $('cfMinus').onclick=()=>stepCoffee(-.5); $('cfPlus').onclick=()=>stepCoffee(.5);
+  $('cfDone').onclick=async()=>{ if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); await saveCoffeeName.flush(); $('coffeeSheet').hidden=true; renderHome(); };
+
   // ---- Tiles: add a new tile by adding an entry here ----
   const PLAY=ICONS.play;
   const TILES=[
@@ -101,6 +124,12 @@
       return `<div class="wtools"><button type="button" class="wminus" data-water="minus" aria-label="Delete a glass"${g?'':' disabled'}>&minus;</button><button type="button" class="wgear" data-water="goal" aria-label="Water goal"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
         <div class="wbody"><div class="wline"><div class="big"><span data-count="${L}" data-dec="2">${litres(L)}</span><small> L</small></div><div class="wcount">${g} of ${goal} glasses</div></div>
         <div class="wglasses" role="img" aria-label="${g} of ${goal} glasses">${glasses}</div></div>`;
+    }},
+    {title:'Coffee', tap:'coffee', cls:'coffee', html(){       // tap anywhere on the card = one more drink at the current price; − takes the last one of this month back; the gear sets the name and the price
+      const list=coffeeMonth(), total=list.reduce((n,c)=>n+(Number(c.price)||0),0), month=new Date().toLocaleDateString('en-GB',{month:'long'});
+      const pic=`<div class="tpic">${coffeePic?'<img alt="" src="assets/coffee.png">':'<svg class="icon" viewBox="0 0 24 24"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3v2M12 3v2"/></svg>'}</div>`;
+      return `<div class="wtools"><button type="button" class="wminus" data-coffee="minus" aria-label="Delete the last drink"${list.length?'':' disabled'}>&minus;</button><button type="button" class="wgear" data-coffee="goal" aria-label="Coffee name and price"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>`
+        +picRow(pic,`<div class="big">$<span data-count="${total}" data-dec="2" data-fix="2">${total.toFixed(2)}</span></div><div class="sub">${list.length} ${list.length===1?'cup':'cups'} · ${month}</div>`);
     }},
     {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
       if(typeof Classes==='undefined') return '';
@@ -267,6 +296,9 @@
   $('tiles').onclick=e=>{
     const w=e.target.closest('[data-water]');                                        // the − and the gear never add a glass
     if(w){ if(w.dataset.water==='minus'&&waterToday()>0){ setWaterToday(waterToday()-1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); } else if(w.dataset.water==='goal') openWaterGoal(); return; }
+    const cf=e.target.closest('[data-coffee]');                                        // the − and the gear never add a drink
+    if(cf){ if(cf.dataset.coffee==='minus'&&coffeeMonth().length){ removeLastCoffee(); renderHome(); Motion.count(document.querySelector('.tile.coffee'),380); } else if(cf.dataset.coffee==='goal') openCoffeeSheet(); return; }
+    if(e.target.closest('[data-tap="coffee"]')){ addCoffee(); renderHome(); Motion.count(document.querySelector('.tile.coffee'),380); return; }
     if(e.target.closest('[data-tap="water"]')){ setWaterToday(waterToday()+1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); return; }
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();
@@ -418,7 +450,7 @@ $('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
   // Say what is in the file before anything is replaced
   const st=b.stores||{}, cnt=k=>Array.isArray(st[k])?st[k].length:0, plural=(n,w)=>n+' '+w+(n===1?'':w.endsWith('s')?'es':'s');
   const old=b.format===1;
-  const inside=old?'':[[cnt('workouts'),'gym day'],[cnt('sessions'),'workout'],[cnt('meds'),'med'],[cnt('classes'),'class'],[cnt('recipes'),'recipe'],[cnt('body'),'body value'],[cnt('waterlogs'),'water day'],[cnt('photos'),'photo']]
+  const inside=old?'':[[cnt('workouts'),'gym day'],[cnt('sessions'),'workout'],[cnt('meds'),'med'],[cnt('classes'),'class'],[cnt('recipes'),'recipe'],[cnt('body'),'body value'],[cnt('waterlogs'),'water day'],[cnt('coffeelogs'),'drink'],[cnt('photos'),'photo']]
     .filter(x=>x[0]).map(x=>plural(x[0],x[1])).join(', ');
   // One RISEN sheet: what is in the file, and a way to save what is on the phone first
   if(old){

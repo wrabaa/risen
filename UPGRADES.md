@@ -331,6 +331,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.80` Home: NOW card removed (duplicate of the tiles); tile order Training · Supplements · Water · Classes · This week · Streak · Week summary, renumbered 01-07. iPhone test pending.
 - `.81` Water tile: litres + "N of G glasses" on one line and a row of glasses (lime = drunk, +N when over the goal); the − moved to the tile's top corner. iPhone test pending.
 - `.82` Review 4 fixes: Home's minute timer redraws only clock tiles that really changed (never the top bar / profile photo); named colour `--chip`; Classes tile shows the date for a class a week away; small wording / clamp / saved-flash fixes. iPhone test pending.
+- `.83` Coffee card on Home (under Water): tap = a drink at the current price, month total + cups, − takes the last one back, gear = name and price; new store `coffeelogs` (price stored per purchase) in backup. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

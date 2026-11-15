@@ -56,7 +56,7 @@ No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + no ENTE
 ## Structure
 Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. A round profile button (top right of the shared top bar) opens the profile page: SETTINGS · PERSONAL INFO.
 - **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
-  02 SUPPLEMENTS, 03 WATER, 04 CLASSES, 05 THIS WEEK, 06 STREAK, 07 WEEK SUMMARY (four small rings: workouts · supplements taken/due ·
+  02 SUPPLEMENTS, 03 WATER, 04 COFFEE, 05 CLASSES, 06 THIS WEEK, 07 STREAK, 08 WEEK SUMMARY (four small rings: workouts · supplements taken/due ·
   classes attended · water), backup reminder line.
 - **GYM** (`gym.js`, `library.js`): Week (Mon–Sun, today lime) → Day (+ ADD EXERCISE,
   list, Copy to…, START WORKOUT on today) → Exercise (photo, sets/kg/reps, notes,
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-15.82)
+## Status (release 2026-11-15.83)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -201,6 +201,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.82` review 4 fixes (`REVIEW.md`): the minute timer on Home (`tickHome()` in `app.js`) only looks at the clock tiles (SUPPLEMENTS, CLASSES, WATER) and redraws one only when what it SAYS changed (`tileText`); a new day redraws the
   greeting and tiles (`drawHome()`); the timer never touches the top bar or the profile photo, and `Profile.avatars()` no longer rebuilds an unchanged photo / letter (`avSig`). New named colour `--chip` (label chips on a photo). CLASSES tile day
   label: Tomorrow, the weekday for 2-6 days ahead, the date ("Sat 22 Nov") from 7 days. Water − label "Delete a glass"; a cardio target typed below 0 is kept as 0; the water goal sheet shows "✓ Saved". iPhone test pending.
+- `.83` COFFEE card on Home, directly under WATER (tiles below renumbered; no ring in the week summary): new store `coffeelogs` (DB 8, one record per drink bought `{id, date, price}`; the price is stored WITH the purchase, so changing the price never
+  rewrites what was spent; the id starts with the time so records keep their order) in Export / Import / Reset. The drink name and the current price are the settings `coffeeName` / `coffeePrice` (default "Coffee", $3.50; nothing in the Settings page).
+  Card: the picture on the left (shared `.tpic`; the file `assets/coffee.png` when it exists, a cup icon until then — to use a picture, drop the file in `assets/` and add `'assets/coffee.png': 1` to `ASSETS` in `sw.js`), the CURRENT CALENDAR MONTH's total as the
+  big number ("$84.50") and "19 cups · November" under it (it starts again on the 1st; past months stay in the data). A tap anywhere adds a drink at the current price (count-up; `data-fix` = fixed decimals in `Motion.count`), the round − removes
+  the last drink of this month (never below zero), the gear (water-card corner buttons) opens a sheet with the name and the price (− / + by $0.50, saved at once with "✓ Saved", DONE closes). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

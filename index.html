@@ -222,7 +222,7 @@
   <div class="sheet-wrap" id="resetSheet" hidden>
     <div class="sheet">
       <h2>Reset all data?</h2>
-      <p>Deletes everything on this phone: programs, workouts, meds, classes, recipes, history, photos, body measurements, name and settings. Export a backup first if you might want it back.</p>
+      <p>Deletes everything on this phone: programs, workouts, meds, water, coffee, classes, recipes, history, photos, body measurements, name and settings. Export a backup first if you might want it back.</p>
       <button class="primary" type="button" id="resetExport">EXPORT BACKUP FIRST</button>
       <button class="dangerbtn" type="button" id="resetGo">RESET EVERYTHING</button>
       <button class="textbtn" type="button" id="resetCancel">Cancel</button>
@@ -239,6 +239,20 @@
         <button type="button" class="stepbtn" id="wgPlus" aria-label="More glasses">+</button></div>
       <p class="wgl" id="wgL">= 2.5 L a day</p>
       <button class="primary nogl" type="button" id="wgDone">DONE</button>
+    </div>
+  </div>
+  <!-- Home > COFFEE card: the drink name and its price (the small gear on the card) -->
+  <div class="sheet-wrap" id="coffeeSheet" hidden>
+    <div class="sheet">
+      <h2>Coffee</h2><span class="saved" id="cfSaved" aria-live="polite">✓ Saved</span>
+      <div class="label" style="margin-top:14px">Drink</div>
+      <input class="field" id="cfName" type="text" maxlength="30" autocomplete="off" autocapitalize="sentences" enterkeyhint="done" placeholder="Coffee">
+      <div class="label">Price</div>
+      <div class="wgoal" style="margin-top:6px"><button type="button" class="stepbtn" id="cfMinus" aria-label="Lower the price">&minus;</button>
+        <div class="wgval"><b id="cfPrice">$3.50</b></div>
+        <button type="button" class="stepbtn" id="cfPlus" aria-label="Raise the price">+</button></div>
+      <p class="wgl">New drinks are added at this price; earlier ones keep theirs.</p>
+      <button class="primary nogl" type="button" id="cfDone">DONE</button>
     </div>
   </div>
   <!-- Profile > Personal info: history of one value, and a new custom measurement -->

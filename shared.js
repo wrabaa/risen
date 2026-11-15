@@ -157,8 +157,8 @@ const Motion = (() => {
     }
     const items = [...root.querySelectorAll('[data-count]')].map(e => ({ e, to: Number(e.dataset.count) })).filter(i => i.to > 0);
     if (!items.length) return;
-    const shown = (i, v) => i.e.dataset.dec ? String(Math.round(v * 100) / 100) : String(Math.round(v));      // data-dec: a number with decimals (litres)
-    const t0 = performance.now(), done = () => items.forEach(i => { i.e.textContent = String(i.to); });
+    const shown = (i, v) => i.e.dataset.fix ? v.toFixed(+i.e.dataset.fix) : i.e.dataset.dec ? String(Math.round(v * 100) / 100) : String(Math.round(v));      // data-dec: decimals (litres); data-fix: a fixed number of decimals (money)
+    const t0 = performance.now(), done = () => items.forEach(i => { i.e.textContent = shown(i, i.to); });
     items.forEach(i => { i.e.textContent = '0'; });
     (function frame(now) {
       const k = Math.min(1, (now - t0) / ms), eased = 1 - Math.pow(1 - k, 3);

@@ -775,4 +775,10 @@
   .tcount small{font-size:.6em;font-weight:500;color:var(--muted);margin-left:1px}
 
   /* the water goal sheet shows the same "✓ Saved" as the other editors */
-  #waterSheet .saved{display:block;position:absolute;top:30px;right:22px;margin:0}
+  #waterSheet .saved,#coffeeSheet .saved{display:block;position:absolute;top:30px;right:22px;margin:0}
+
+  /* COFFEE card (.83): the picture on the left (shared .tpic), the month's total on the right; − and the gear are the water card's corner buttons */
+  .tile.coffee .big{font-size:48px;white-space:nowrap}
+  .tile.coffee .tpic .icon{width:34px;height:34px}
+  #coffeeSheet .primary{margin-top:18px}
+  #coffeeSheet .label{margin-top:16px}
