@@ -23,6 +23,29 @@ const PhotoSlot = (() => {
     });
   }
 
+  // What gets stored. An animated picture (GIF, WebP) is kept EXACTLY as the file is (no canvas, no re-encode: that would flatten it to its first frame), with its real
+  // width and height read from the image; up to 5 MB. Everything else is resized to a JPEG as before.
+  const KEEP = ['image/gif', 'image/webp'], MAX_ANIMATED = 5 * 1024 * 1024;
+  const TOO_BIG = 'That file is too big — keep it under 5 MB';
+  function naturalSize(file) {
+    return new Promise((res, rej) => {
+      const src = URL.createObjectURL(file), img = new Image();
+      img.onload = () => { URL.revokeObjectURL(src); res({ width: img.naturalWidth, height: img.naturalHeight }); };
+      img.onerror = () => { URL.revokeObjectURL(src); rej(new Error('Could not read that photo')); };
+      img.src = src;
+    });
+  }
+  async function prepare(file) {
+    if (KEEP.includes(file.type)) {
+      if (file.size > MAX_ANIMATED) throw new Error(TOO_BIG);
+      const { width, height } = await naturalSize(file);
+      return { blob: file, width, height };
+    }
+    return resize(file);
+  }
+  const sizeText = b => b < 1024 * 1024 ? Math.max(1, Math.round(b / 1024)) + ' KB' : (b / 1024 / 1024).toFixed(1) + ' MB';
+  const kindText = t => t === 'image/gif' ? 'GIF' : t === 'image/webp' ? 'WebP' : 'JPG';
+
   function urlFor(id, blob) {
     if (urls.has(id)) URL.revokeObjectURL(urls.get(id));
     const u = URL.createObjectURL(blob); urls.set(id, u); return u;
@@ -49,7 +72,7 @@ const PhotoSlot = (() => {
     el.classList.add('pslot');
     if (p) {
       el.innerHTML = `<button class="pslot-img" aria-label="View photo"><img alt="" src="${urlFor(exerciseId, p.blob)}"></button>` +
-        (editable ? `<button class="pslot-del" aria-label="Delete photo">${TRASH}</button>` : '');
+        (editable ? `<span class="pslot-size" aria-label="Stored size">${kindText(p.type)} · ${sizeText(p.blob.size)}</span><button class="pslot-del" aria-label="Delete photo">${TRASH}</button>` : '');       // what this photo costs
       el.querySelector('.pslot-img').onclick = () => openViewer(urls.get(exerciseId));
       if (editable) el.querySelector('.pslot-del').onclick = async () => {
         if (!(await ask({ title: 'Delete this photo?', ok: 'DELETE', danger: true }))) return;
@@ -60,8 +83,8 @@ const PhotoSlot = (() => {
       el.querySelector('input').onchange = async e => {
         const f = e.target.files[0]; if (!f) return;
         el.querySelector('span').textContent = 'Saving…';
-        try { const r = await resize(f); await RisenDB.setPhoto(exerciseId, r.blob, r.width, r.height); }
-        catch (err) { alert(err.message); }
+        try { const r = await prepare(f); await RisenDB.setPhoto(exerciseId, r.blob, r.width, r.height); }
+        catch (err) { toast(err.message || 'Could not read that photo'); }
         await mount(el, exerciseId, { editable, onChange }); if (onChange) onChange();
       };
     } else {
@@ -69,5 +92,5 @@ const PhotoSlot = (() => {
     }
   }
 
-  return { mount, resize };
+  return { mount, resize, prepare };
 })();

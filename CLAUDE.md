@@ -16,7 +16,7 @@ Rule of thumb: **one screen, one job, one big button. No manual needed.**
 - Fully offline, no accounts, no server, no analytics. Each phone keeps its own data.
 - Data: IndexedDB (`db.js`) with a versioned schema — never lose user data on update.
   Every new store goes into Export / Import / Reset.
-- Photos: `photo.js` (resize ≤1000px JPEG, stored in IndexedDB, included in backup).
+- Photos: `photo.js` (resize ≤1000px JPEG, stored in IndexedDB, included in backup; a GIF / WebP is kept as it is, up to 5 MB, so it stays animated).
 - Service worker `sw.js` — bump `VERSION` on every release (format `YYYY-MM-DD.N`).
   App files (pages, code, `data/`) are re-downloaded on every release. Images and fonts live
   in their own cache that survives releases, driven by the `ASSETS` list at the top of `sw.js`:
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-15.84)
+## Status (release 2026-11-15.85)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -211,6 +211,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   day title's line in the top bar (`#gymPageCount`). Supps: TODAY dose cards 124 px (name ≤ 2 lines, dose, ONE status line: TIME TO TAKE or taken / food, the 7-day strip, the tick on the right), MY SUPPS rows 96 px. Home picture tiles (SUPPLEMENTS, CLASSES, COFFEE; drawn by
   `tileHtml()` from a `picRow()` object): the image is a 134 px square flush left over the tile's full 136 px height, the head and the text to its right; the Classes tile shows the class name (2 lines) and the day · time · instructor on the small line. The minute
   tick redraws a changed tile as a whole (`tileHtml()`). iPhone test pending.
+- `.85` animated pictures keep moving: `PhotoSlot.prepare(file)` (`photo.js`, also used for instructor photos) stores a GIF or WebP file EXACTLY as chosen (no canvas, no re-encode, so the frames survive; its real width and height are read from the image;
+  the `type` is kept in the photos store, so every `<img>` made from the stored blob animates: gym rows and exercise page, Supps cards, MY SUPPS, NEXT UP, Home tiles; Export / Import carry the bytes unchanged). Over 5 MB is refused with the toast "That file is too big — keep it under 5 MB"
+  (nothing stored). Everything else still goes through `resize()` to a JPEG. The photo slot shows the stored size and kind ("GIF · 1.2 MB", "JPG · 180 KB") on the photo. The slot's error is a toast now (no system `alert()`). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

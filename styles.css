@@ -814,3 +814,6 @@
   .lcard .ltxt{flex:1;min-width:0;align-self:center;padding:0 14px}
   .lcard .ltxt .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:19px;line-height:1.15}
   .lcard .ltxt .s{margin-top:4px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* the stored size (and kind) of a photo, in the photo slot: what each one costs */
+  .pslot-size{position:absolute;left:8px;bottom:8px;z-index:1;padding:2px 9px;border-radius:999px;background:var(--chip);color:var(--soft);font:600 11px Inter,sans-serif;letter-spacing:.04em;pointer-events:none}

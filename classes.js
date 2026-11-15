@@ -64,7 +64,7 @@ const Classes = (() => {
     } catch (e) { /* the original photos still show */ }
   }
   async function setInstPhoto(id, file) {
-    const r = await PhotoSlot.resize(file); await RisenDB.setPhoto('inst-' + id, r.blob, r.width, r.height);
+    const r = await PhotoSlot.prepare(file); await RisenDB.setPhoto('inst-' + id, r.blob, r.width, r.height);
     if (urls.get(id)) URL.revokeObjectURL(urls.get(id)); custom.add(id); urls.set(id, URL.createObjectURL(r.blob));
   }
   async function removeInstPhoto(id) {
