@@ -425,7 +425,7 @@
   .dose.taken .md.off{background:rgba(0,0,0,.18)}
   .dose.taken .sd b{color:rgba(0,0,0,.55)}
   .dose.taken .sd.today::after{background:var(--bg)}
-  @media (max-width:350px){.dphoto{width:56px;height:56px}.drow{gap:10px}}
+  @media (max-width:350px){.drow{gap:10px}}
 
   /* ===== MEALS ===== */
   #recipePage{z-index:13}
@@ -762,14 +762,19 @@
   .setrow.cardio .step{grid-template-columns:52px minmax(0,1fr) 52px;gap:4px}
   .setrow.cardio .tick{width:100%;height:50px}
 
-  /* HOME tiles with a picture (.79): ONE layout, image left (a rounded square with the card's corner radius, 1.3 x the old 56 px avatar), text to its right */
-  .picrow{flex:1;min-width:0;display:flex;align-items:center;gap:14px}
-  .tpic{flex:none;width:72px;height:72px;border-radius:var(--r-card);overflow:hidden;background:var(--field);display:grid;place-items:center;color:var(--dim)}
+  /* HOME tiles with a picture (.84): the image is a square flush with the tile's left, top and bottom edges (the tile's rounded corners clip it), the head and the text sit to its right;
+     every picture tile (SUPPLEMENTS, CLASSES, COFFEE) has the same height. The stored image is scaled to fit (object-fit: cover), never stretched. */
+  .tile.pic{display:flex;align-items:stretch;padding:0;overflow:hidden;height:136px}
+  .tile.pic .tpic{flex:none;width:134px;height:auto;border-radius:0;overflow:hidden;background:var(--field);display:grid;place-items:center;color:var(--dim)}
   .tpic img{display:block;width:100%;height:100%;object-fit:cover}
-  .tpic .icon{width:30px;height:30px}
+  .tpic .icon{width:34px;height:34px}
   .tpic .avatar{width:100%;height:100%;border:0;border-radius:0}
+  .tpic .avatar img{object-position:50% 22%}
+  .tile.pic .tcol{flex:1;min-width:0;display:flex;flex-direction:column;padding:15px 16px 12px 16px}
+  .tile.pic .tile-body{margin-top:12px;flex:1;min-height:0;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .tile.pic .wname{font-size:22px;line-height:1.1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .ttxt{flex:1;min-width:0}
-  .ttxt .sub{margin-top:4px}
+  .ttxt .sub{margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ttxt .wname.ok{color:var(--volt)}
   .tcount{flex:none;align-self:flex-start;font-family:Oswald,sans-serif;font-weight:700;font-size:22px;color:var(--text)}
   .tcount small{font-size:.6em;font-weight:500;color:var(--muted);margin-left:1px}
@@ -778,7 +783,34 @@
   #waterSheet .saved,#coffeeSheet .saved{display:block;position:absolute;top:30px;right:22px;margin:0}
 
   /* COFFEE card (.83): the picture on the left (shared .tpic), the month's total on the right; − and the gear are the water card's corner buttons */
-  .tile.coffee .big{font-size:48px;white-space:nowrap}
-  .tile.coffee .tpic .icon{width:34px;height:34px}
+  .tile.coffee .big{font-size:40px;white-space:nowrap}
+  .tile.coffee .wtools{top:4px;right:4px}
+  .tile.coffee .wminus{width:36px;height:36px}
   #coffeeSheet .primary{margin-top:18px}
   #coffeeSheet .label{margin-top:16px}
+
+  /* .84: rows with a picture: gym day exercises, Supps dose cards and MY SUPPS rows. The picture is a square flush with the row's left, top and bottom edges (the card's rounded corners clip it),
+     text beside it, every row the same height. The stored photo is scaled to fit (object-fit: cover), never stretched. */
+  .card.xcard{display:flex;align-items:stretch;padding:0;height:112px;overflow:hidden}
+  .xmain{flex:1;min-width:0;display:flex;align-items:center;gap:14px;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+  .xcard .exthumb{width:112px;height:112px;border-radius:0}
+  .xcard .xt{flex:1;min-width:0}
+  .xcard .xt .t{font-size:18px;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .xcard .xt .s{margin-top:4px;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vtools{flex:none;display:flex;flex-direction:column;justify-content:center;gap:0;margin:0 4px 0 0}
+  .vtools button{width:40px;height:36px;border-radius:12px}
+  .gcount{flex:none;margin-right:10px;font-size:13px;color:var(--muted);letter-spacing:.06em;white-space:nowrap}
+  .dose{display:flex;align-items:stretch;padding:0;height:124px;overflow:hidden}
+  .dose .dphoto{width:124px;height:auto;border-radius:0}
+  .dbody{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;padding:10px 12px 8px}
+  .dname{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .dline{height:22px;display:flex;align-items:center}
+  .dline .dtime{margin-top:0}
+  .dline .livepill{margin:0}
+  .dbody .mstrip{margin-top:4px}
+  .dtick{width:48px;height:48px}
+  .card.lcard{display:flex;align-items:stretch;padding:0;height:96px;overflow:hidden}
+  .lcard .dphoto{width:96px;height:auto;border-radius:0}
+  .lcard .ltxt{flex:1;min-width:0;align-self:center;padding:0 14px}
+  .lcard .ltxt .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:19px;line-height:1.15}
+  .lcard .ltxt .s{margin-top:4px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

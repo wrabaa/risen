@@ -85,11 +85,12 @@ const Meds = (() => {
   function doseCard(d, lm, now) {
     const m = d.m, log = lm.get(d.id), food = foodText(m), due = !log && isDue(d, now);
     const meta = [log ? `<b>Taken ${hhmm(log.takenAt)}</b>` : '', food].filter(Boolean).join(' · ');
-    return `<div class="dose${log ? ' taken' : ''}${due ? ' due' : ''}"><div class="drow">
+    // the box photo is a square flush with the card's left, top and bottom edges; every dose card has the same height (name up to 2 lines, dose, then ONE status line: TIME TO TAKE or the taken / food text)
+    return `<div class="dose${log ? ' taken' : ''}${due ? ' due' : ''}">
       <div class="dphoto" data-mphoto="${esc(m.id)}">${thumbHtml(m.id)}</div>
-      <div class="dmain">${due ? '<span class="livepill">TIME TO TAKE</span>' : ''}<div class="dname">${esc(m.name)}</div>${m.dose ? `<div class="ddose">${esc(m.dose)}</div>` : ''}${meta ? `<div class="dtime">${meta}</div>` : ''}</div>
-      <button class="dtick" data-dose="${esc(d.id)}" aria-label="${log ? 'Taken, tap to undo' : 'Mark as taken'}">${I.check}</button></div>
-      ${stripHtml(m, lm)}</div>`;
+      <div class="dbody"><div class="drow"><div class="dmain"><div class="dname">${esc(m.name)}</div>${m.dose ? `<div class="ddose">${esc(m.dose)}</div>` : ''}<div class="dline">${due ? '<span class="livepill">TIME TO TAKE</span>' : meta ? `<div class="dtime">${meta}</div>` : ''}</div></div>
+        <button class="dtick" data-dose="${esc(d.id)}" aria-label="${log ? 'Taken, tap to undo' : 'Mark as taken'}">${I.check}</button></div>
+        ${stripHtml(m, lm)}</div></div>`;
   }
   // Doses with the same time sit under one header, e.g. "14:00 · LUNCH"
   function dayPart(t) { const h = +String(t).slice(0, 2); return h >= 5 && h < 11 ? 'Morning' : h >= 11 && h < 15 ? 'Lunch' : h >= 15 && h < 21 ? 'Evening' : 'Night'; }
@@ -102,8 +103,8 @@ const Meds = (() => {
   // A row of "My supps": the whole row opens the editor (pause and delete live there)
   function listCard(m) {
     const sub = [m.dose, (m.times || []).join(', '), freqText(m), m.paused ? 'Paused' : ''].filter(Boolean).map(esc).join(' · ');
-    return `<button class="card${m.paused ? ' paused' : ''}" data-edit="${esc(m.id)}"><div class="wrow lrow"><div class="dphoto" data-mphoto="${esc(m.id)}">${thumbHtml(m.id)}</div>
-      <div class="ltxt"><div class="t">${esc(m.name)}</div><div class="s">${sub}</div></div></div></button>`;
+    return `<button class="card lcard${m.paused ? ' paused' : ''}" data-edit="${esc(m.id)}"><div class="dphoto" data-mphoto="${esc(m.id)}">${thumbHtml(m.id)}</div>
+      <div class="ltxt"><div class="t">${esc(m.name)}</div><div class="s">${sub}</div></div></button>`;
   }
 
   // NEXT UP: ONE information-only card (no button: ticking happens on the dose cards below). The box photo runs edge to edge at the top (4:3, cropped to fill; the pill icon on a plain

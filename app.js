@@ -63,8 +63,8 @@
   $('wgMinus').onclick=()=>stepGoal(-1); $('wgPlus').onclick=()=>stepGoal(1);
   $('wgDone').onclick=()=>{ $('waterSheet').hidden=true; renderHome(); };
 
-  // ONE layout for every tile with a picture (SUPPLEMENTS, CLASSES): a rounded square on the left, the text to its right (and an optional count on the far right)
-  const picRow=(pic,text,extra='')=>`<div class="picrow">${pic}<div class="ttxt">${text}</div>${extra}</div>`;
+  // ONE layout for every tile with a picture (SUPPLEMENTS, CLASSES, COFFEE): a square image flush with the tile's left, top and bottom edges (the tile's corners round it), the head and the text to its right
+  const picRow=(pic,text,extra='',tools='')=>({__pic:true,pic,text,extra,tools});      // (a picture tile: drawn by tileHtml(); the picture is a square flush with the tile's left edge, filling its full height)
 
   // ---- Coffee (Home only): one record per drink bought {id, date, price} in `coffeelogs`; the month's total is for the current calendar month (it starts again on the 1st, older months stay in the data) ----
   const coffeePrice=()=>Math.max(0,Math.round((Number(S.settings.coffeePrice)||0)*100)/100), coffeeName=()=>String(S.settings.coffeeName||'').trim()||'Coffee';
@@ -112,7 +112,7 @@
       // the next dose only: its box photo on the left (the shared picture layout), name and time, and the taken/total count
       const p=s.pick, when=!p?'':s.kind==='due'?p.t+' · due':s.kind==='later'?'At '+p.t:s.kind==='tomorrow'?'Tomorrow · '+p.t:'Earlier today · '+p.t;
       const count=`<div class="tcount"><span data-count="${s.taken}">${s.taken}</span><small>/${s.total}</small></div>`;
-      if(!p) return `<div class="picrow"><div class="ttxt"><div class="wname ok">All done today ✓</div></div>${count}</div>`;
+      if(!p) return `<div><div class="wname ok">All done today ✓</div></div>${count}`;
       return picRow(`<div class="tpic" data-mphoto="${esc(p.m.id)}">${Meds.thumbHtml(p.m.id)}</div>`,`<div class="wname">${esc(p.m.name)}</div><div class="sub">${esc(when)}</div>`,count);
     }},
     {title:'Water', tap:'water', cls:'water', html(){       // tap anywhere on the tile = one more glass (250 ml); − takes the last one back; the gear sets the goal
@@ -128,8 +128,7 @@
     {title:'Coffee', tap:'coffee', cls:'coffee', html(){       // tap anywhere on the card = one more drink at the current price; − takes the last one of this month back; the gear sets the name and the price
       const list=coffeeMonth(), total=list.reduce((n,c)=>n+(Number(c.price)||0),0), month=new Date().toLocaleDateString('en-GB',{month:'long'});
       const pic=`<div class="tpic">${coffeePic?'<img alt="" src="assets/coffee.png">':'<svg class="icon" viewBox="0 0 24 24"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3v2M12 3v2"/></svg>'}</div>`;
-      return `<div class="wtools"><button type="button" class="wminus" data-coffee="minus" aria-label="Delete the last drink"${list.length?'':' disabled'}>&minus;</button><button type="button" class="wgear" data-coffee="goal" aria-label="Coffee name and price"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>`
-        +picRow(pic,`<div class="big">$<span data-count="${total}" data-dec="2" data-fix="2">${total.toFixed(2)}</span></div><div class="sub">${list.length} ${list.length===1?'cup':'cups'} · ${month}</div>`);
+      return picRow(pic,`<div class="big">$<span data-count="${total}" data-dec="2" data-fix="2">${total.toFixed(2)}</span></div><div class="sub">${list.length} ${list.length===1?'cup':'cups'} · ${month}</div>`,'',`<div class="wtools"><button type="button" class="wminus" data-coffee="minus" aria-label="Delete the last drink"${list.length?'':' disabled'}>&minus;</button><button type="button" class="wgear" data-coffee="goal" aria-label="Coffee name and price"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>`);
     }},
     {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
       if(typeof Classes==='undefined') return '';
@@ -140,7 +139,7 @@
       if(n.dayOffset){                                   // nothing left today: the next class on the next day that has one, with its day in front
         const when=new Date(); when.setDate(when.getDate()+n.dayOffset);              // Tomorrow, then the weekday for the next five days, then the date (so "Sat" never reads as today)
         const day=n.dayOffset===1?'Tomorrow':n.dayOffset<=6?DAYS[n.day-1]:when.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}).replace(',','');
-        return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${day} · ${esc(n.c.name)} · ${esc(n.c.time)}</div><div class="sub">${who}</div>`);
+        return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${esc(n.c.name)}</div><div class="sub">${day} · ${esc(n.c.time)} · ${who}</div>`);       // the day first on the small line, so a long class name keeps its two lines
       }
       return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${who}</div>`);
     }},
@@ -183,15 +182,20 @@
   let homeDrawn=false, homeDay=dayKey(new Date());
   const tileText=html=>html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();       // what a tile SAYS (to tell whether it really changed)
   const tileSaid={};
+  function tileHtml(t,i){                            // one tile; a picture tile has the image flush left over the tile's full height, the head and the text to its right
+    const h=t.html(), pic=h&&h.__pic, head=`<div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>`;
+    const cls=`tile${pic?' pic':''}${t.title==='Training'?' train':''}${t.cls?' '+t.cls:''}`, attrs=`data-tile="${t.title}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}`;
+    const html=pic?`<article class="${cls}" ${attrs}>${h.pic}<div class="tcol">${head}<div class="tile-body"><div class="ttxt">${h.text}</div>${h.extra||''}</div></div>${h.tools||''}</article>`
+      :`<article class="${cls}" ${attrs}>${head}<div class="tile-body${t.stack?' stack':''}">${h}</div></article>`;
+    tileSaid[t.title]=tileText(html); return html;
+  }
   function drawHome(){                               // the greeting, the date and every tile (never the top bar or the profile photo)
     renderBackupLine();
     $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     homeDay=dayKey(new Date());
     $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
-    $('tiles').innerHTML=TILES.map((t,i)=>{ const html=t.html(); tileSaid[t.title]=tileText(html);
-      return `<article class="tile${t.title==='Training'?' train':''}${t.cls?' '+t.cls:''}" data-tile="${t.title}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
-      <div class="tile-body${t.stack?' stack':''}">${html}</div></article>`; }).join('');
+    $('tiles').innerHTML=TILES.map(tileHtml).join('');
     if(typeof Meds!=='undefined') Meds.loadThumbs($('tiles'));                                  // the box photos on the SUPPLEMENTS tile (same loader as the Supps tab)
   }
   function renderHome(){
@@ -204,9 +208,9 @@
   function tickHome(){
     if(dayKey(new Date())!==homeDay) return drawHome();
     for(const name of CLOCK_TILES){
-      const t=TILES.find(x=>x.title===name), body=document.querySelector('#tiles [data-tile="'+name+'"] .tile-body'); if(!t||!body) continue;
-      const html=t.html(), said=tileText(html); if(said===tileSaid[name]) continue;
-      tileSaid[name]=said; body.innerHTML=html; if(name==='Supplements'&&typeof Meds!=='undefined') Meds.loadThumbs(body);
+      const i=TILES.findIndex(x=>x.title===name), art=document.querySelector('#tiles [data-tile="'+name+'"]'); if(i<0||!art) continue;
+      const prev=tileSaid[name], html=tileHtml(TILES[i],i); if(tileSaid[name]===prev) continue;            // unchanged: leave the tile alone
+      art.outerHTML=html; if(name==='Supplements'&&typeof Meds!=='undefined') Meds.loadThumbs(document.querySelector('#tiles [data-tile="'+name+'"]'));
     }
   }
 

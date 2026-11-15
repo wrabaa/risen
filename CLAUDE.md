@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-15.83)
+## Status (release 2026-11-15.84)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -206,6 +206,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   Card: the picture on the left (shared `.tpic`; the file `assets/coffee.png` when it exists, a cup icon until then — to use a picture, drop the file in `assets/` and add `'assets/coffee.png': 1` to `ASSETS` in `sw.js`), the CURRENT CALENDAR MONTH's total as the
   big number ("$84.50") and "19 cups · November" under it (it starts again on the 1st; past months stay in the data). A tap anywhere adds a drink at the current price (count-up; `data-fix` = fixed decimals in `Motion.count`), the round − removes
   the last drink of this month (never below zero), the gear (water-card corner buttons) opens a sheet with the name and the price (− / + by $0.50, saved at once with "✓ Saved", DONE closes). iPhone test pending.
+- `.84` photo rows share one look: the picture is a SQUARE flush with the row's left, top and bottom edges (the card's rounded corners clip it, no padding; the stored photo is scaled with `object-fit: cover`, never stretched), the text beside it,
+  every row of a list the same height. Gym day exercises: 112 px rows, name up to 2 lines then an ellipsis, target line, ▲ ▼ 🗑 stacked on the right (same x on every row); the big muscle-group heading is gone and the "N exercises" count (or "Rest day") is on the
+  day title's line in the top bar (`#gymPageCount`). Supps: TODAY dose cards 124 px (name ≤ 2 lines, dose, ONE status line: TIME TO TAKE or taken / food, the 7-day strip, the tick on the right), MY SUPPS rows 96 px. Home picture tiles (SUPPLEMENTS, CLASSES, COFFEE; drawn by
+  `tileHtml()` from a `picRow()` object): the image is a 134 px square flush left over the tile's full 136 px height, the head and the text to its right; the Classes tile shows the class name (2 lines) and the day · time · instructor on the small line. The minute
+  tick redraws a changed tile as a whole (`tileHtml()`). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

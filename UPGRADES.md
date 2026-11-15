@@ -332,6 +332,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.81` Water tile: litres + "N of G glasses" on one line and a row of glasses (lime = drunk, +N when over the goal); the − moved to the tile's top corner. iPhone test pending.
 - `.82` Review 4 fixes: Home's minute timer redraws only clock tiles that really changed (never the top bar / profile photo); named colour `--chip`; Classes tile shows the date for a class a week away; small wording / clamp / saved-flash fixes. iPhone test pending.
 - `.83` Coffee card on Home (under Water): tap = a drink at the current price, month total + cups, − takes the last one back, gear = name and price; new store `coffeelogs` (price stored per purchase) in backup. iPhone test pending.
+- `.84` Photo rows: flush-left square photos filling the row height and fixed row heights on the gym day list, the Supps dose cards and MY SUPPS rows, and the Home picture tiles (Supplements, Classes, Coffee); the day page's big heading is gone (count on the title line). iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

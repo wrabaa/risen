@@ -184,8 +184,8 @@ const Gym = (() => {
   function renderDay() {
     const d = curDay, w = dayRec(d), list = w ? w.exercises : [], n = list.length;
     const canStart = d === isoDay(new Date()) && n && !doneIds(new Date()).has(w.id) && !skippedIds(new Date()).has(w.id);   // START WORKOUT is the main button then
-    let h = `<button class="primary${canStart ? ' nogl' : ''}" data-act="addex" style="margin-top:6px">+ ADD EXERCISE</button>
-      <div class="gh" style="margin-top:22px"><h2>${esc(n ? workoutTitle(w) : 'Rest day')}</h2><span class="meta">${n} exercise${n === 1 ? '' : 's'}</span></div>`;
+    $('gymPageCount').textContent = n ? `${n} exercise${n === 1 ? '' : 's'}` : 'Rest day';       // the count lives on the day title's line (no big muscle-group heading any more)
+    let h = `<button class="primary${canStart ? ' nogl' : ''}" data-act="addex" style="margin-top:6px">+ ADD EXERCISE</button>`;
     if (d === isoDay(new Date()) && n) {              // starting is only possible on today's day
       const today = new Date();
       if (doneIds(today).has(w.id)) h += `<div class="card" style="margin-bottom:14px"><div class="wrow"><div><div class="t">Workout done</div></div><span class="status ok">DONE ✓</span></div></div>`;
@@ -194,11 +194,11 @@ const Gym = (() => {
     }
     h += `<div class="gstack">${list.map((it, i) => {
       const x = exInfo(it.exerciseId);
-      return `<div class="card wcard"><div class="wrow xrow"><button class="wmain" data-open="${i}"><span class="exthumb" data-xph="${esc(it.exerciseId)}">${thumbHtml(it.exerciseId)}</span>
+      return `<div class="card xcard"><button class="xmain" data-open="${i}"><span class="exthumb" data-xph="${esc(it.exerciseId)}">${thumbHtml(it.exerciseId)}</span>
         <div class="xt"><div class="t">${esc(x.name)}${prToday(it.exerciseId) ? ' <span class="prtoday">▲ PR today</span>' : ''}</div><div class="s">${esc(targetText(it))}</div></div></button>
-        <div class="tools"><button data-mv="${i}" data-dir="-1" aria-label="Move up" ${i === 0 ? 'disabled' : ''}>${I.up}</button>
+        <div class="tools vtools"><button data-mv="${i}" data-dir="-1" aria-label="Move up" ${i === 0 ? 'disabled' : ''}>${I.up}</button>
         <button data-mv="${i}" data-dir="1" aria-label="Move down" ${i === n - 1 ? 'disabled' : ''}>${I.down}</button>
-        <button data-del="${i}" aria-label="Delete">${I.trash}</button></div></div></div>`;
+        <button data-del="${i}" aria-label="Delete">${I.trash}</button></div></div>`;
     }).join('')}</div>`;
     if (n) h += `<button class="ghost" data-act="copy" style="width:100%;margin-top:18px">COPY TO…</button>`;
     $('gymPageBody').innerHTML = h;
@@ -534,7 +534,7 @@ const Gym = (() => {
       <div class="sub" style="margin-top:10px;color:var(--text);line-height:1.6">${w.exercises.map(it => `${esc(exInfo(it.exerciseId).name)} <span style="color:var(--muted)">${isCardio(it.exerciseId) ? esc(cardioText(it) || 'No target yet') : `${it.sets ?? 3} × ${fmtN(it.reps ?? 10)} @ ${fmtN(it.kg ?? 0)} kg`}</span>`).join('<br>')}</div></div>`;
     if (!ws.length) h += '<div class="card"><div class="sub">No exercises in this program.</div></div>';
     $('gymPageBody').innerHTML = h + '</div>';
-    curDay = null; onClose.gymPage = null; $('gymPage').classList.remove('editing'); $('gymPageTitle').textContent = r.name; openPage('gymPage');
+    curDay = null; onClose.gymPage = null; $('gymPage').classList.remove('editing'); $('gymPageTitle').textContent = r.name; $('gymPageCount').textContent = ''; openPage('gymPage');
   }
 
   // ================= Exercise library =================
