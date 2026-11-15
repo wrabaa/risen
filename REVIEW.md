@@ -3,7 +3,25 @@
 Review-only passes over the commits. No code is changed by a review; findings are listed here and fixed
 (or not) on Siza's go. Each review starts from the "last reviewed" commit below.
 
-**Last reviewed: `10d0110` — release 2026-11-14.70**
+**Last reviewed: `16b9b21` — release 2026-11-14.81**
+
+## Review 4 — 15 Nov 2026 — commits `.71` → `.81` (`a3b2ad2` … `16b9b21`)
+Method: read the code changes since `.70` (`10d0110`); nothing was run on an iPhone. No code changed.
+
+🔴 Must fix
+- None found. `waterlogs` (DB 7) is in Export / Import / Reset and only adds a store; cardio entries add fields to the log row without touching strength entries; no new file outside `CORE`; no system `confirm()`.
+
+🟡 Should fix
+1. **Home redraws everything every minute (`.80`).** Since the NOW card went, the minute timer calls the full `renderHome()`: all tiles are rebuilt and the profile photo is re-read from the database and swapped (a possible flicker every minute; a tap that lands exactly on the redraw can be lost). Fix: redraw only what depends on the time (Supplements, Classes, and the day change), and load the profile photo once, not on every redraw. (`app.js`, `profile.js`)
+2. **One raw colour code.** The NEXT UP chips use `rgba(11,11,11,.55)` written out (rule: named colours only). Give it a name on `:root`. (`styles.css`)
+3. **"Sat" can mean today.** When the only next class is a week away on today's weekday, the Classes tile says "Sat · SPINNING · 17:00" on a Saturday, which reads like today. Say "Next Sat". (`app.js` / `classes.js`)
+4. **Small wording / input points.** The water − is labelled "Remove a glass" (rule: "delete", screen-reader text only); a cardio target accepts a negative number typed by hand (it is hidden, not refused); the water goal sheet saves without the "✓ Saved" flash the other editors show.
+5. **`.71`–`.81` not yet tested on a real iPhone** (water, cardio row, NEXT UP, Home order, glasses row).
+
+🟢 Fine
+- `.71` flush on hide, blocked-upgrade messages · `.72` doses shown again (rule only where a dose is called due) · `.73`/`.75`/`.77` NEXT UP + TIME TO TAKE (one `isDue()` rule, minute redraw skipped under a sheet / editor) · `.74` water (midnight reset, goal in settings) ·
+  `.76` cardio (one-row draft entry, minutes needed to tick, no PR, no rest timer) · `.78`/`.79` Home tiles (7-day look-ahead, shared picture layout) · `.80` order · `.81` glasses row.
+- CLAUDE.md rules: status bar untouched, fixed IDs unchanged, only transform / opacity animate, one glowing main button per screen.
 
 ## Status of review 3
 Fixed in `.71`: 🟡1 (Personal info saves on `pagehide` / hidden), 🟡2 (a dose before the med was added is not due), 🟡3 (`onblocked` / `onversionchange`: plain messages). `.72`: 🟡2 was too wide (it hid the doses from TODAY); it now applies only to the NOW card.
