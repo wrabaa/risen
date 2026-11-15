@@ -5,6 +5,9 @@ Review-only passes over the commits. No code is changed by a review; findings ar
 
 **Last reviewed: `16b9b21` — release 2026-11-14.81**
 
+## Status of review 4
+Fixed in `.82`: 🟡1 (minute timer: only clock tiles that changed, never the top bar / profile photo), 🟡2 (`--chip`), 🟡3 (date for a class a week away), 🟡4 ("Delete a glass", cardio target never below 0, "✓ Saved" on the water goal sheet). 🟡5 stays open (iPhone test).
+
 ## Review 4 — 15 Nov 2026 — commits `.71` → `.81` (`a3b2ad2` … `16b9b21`)
 Method: read the code changes since `.70` (`10d0110`); nothing was run on an iPhone. No code changed.
 

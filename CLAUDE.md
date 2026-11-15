@@ -43,7 +43,7 @@ Supporting colours (named on `:root` in `styles.css`, use the names, never raw c
 `--danger` #FF6B6B (delete/reset ONLY — the one exception to "one accent") · `--field` #0F0F0F
 (inputs) · `--press` #202020 · `--dash` #3A3A3A · `--mid` #4A4A4A · `--dim` #5A5A5A ·
 `--faint` #6A6A6A · `--off` #2A2A2A · `--soft` #C9C9C9 · `--soft2` #D6D6D6 · `--volt-press` #B8E600 ·
-tab bar glass: `--glass` rgba(26,26,26,.84) (`.58`; it was .62 and let lime show through bright) · `--glass-hi` rgba(255,255,255,.1) (the pill behind the active tab) ·
+tab bar glass: `--glass` rgba(26,26,26,.84) (`.58`; it was .62 and let lime show through bright) · `--glass-hi` rgba(255,255,255,.1) (the pill behind the active tab) · `--chip` rgba(11,11,11,.55) (small label chips that sit on a photo, `.82`) ·
 depth (`.54`): `--bg-top` #141414 + `--glow` (≤4% lime) = the background gradient `--bg-grad` · `--hairline` white 8% (card edge) ·
 `--hilite` white 6% (light along a card's top) · Home (`.57`): `--glass-tile` (frosted tile, no blur) · `--volt-tint` / `--volt-edge`
 (lime tint and edge of the 01 TRAINING tile) · motion (`.56`): `--volt-flash` (lime flash on a ticked set row) · `--ease` / `--spring` (curves) · `--shadow` · `--glass-sheet` · `--glass-bar` · `--glass-solid` (fallback when the
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-14.81)
+## Status (release 2026-11-15.82)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -198,6 +198,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.81` WATER tile look (nothing it does changed): litres as the big number with a small L, "6 of 10 glasses" on the same line pushed to the right, and under it one small glass (22 × 30 px, 6 px apart, rounded-bottom shape, thin `--line` outline,
   filled `--volt` when drunk) per glass of the goal. Too many for one line = evenly filled rows (never narrower than 22 px); over the goal the row stays at the goal and a lime "+2" ends it (room is kept for it). The round − now sits in the
   tile's top corner next to the gear (so the glasses can use the full width; 10 fit on one line on iPhone 13 and SE). Class names: `.wbody` / `.wline` / `.wcount` / `.wglasses` / `.wgrow` / `.wg` (not `.wmain`, which the Gym lists use). iPhone test pending.
+- `.82` review 4 fixes (`REVIEW.md`): the minute timer on Home (`tickHome()` in `app.js`) only looks at the clock tiles (SUPPLEMENTS, CLASSES, WATER) and redraws one only when what it SAYS changed (`tileText`); a new day redraws the
+  greeting and tiles (`drawHome()`); the timer never touches the top bar or the profile photo, and `Profile.avatars()` no longer rebuilds an unchanged photo / letter (`avSig`). New named colour `--chip` (label chips on a photo). CLASSES tile day
+  label: Tomorrow, the weekday for 2-6 days ahead, the date ("Sat 22 Nov") from 7 days. Water − label "Delete a glass"; a cardio target typed below 0 is kept as 0; the water goal sheet shows "✓ Saved". iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

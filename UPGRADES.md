@@ -330,6 +330,7 @@ Siza's order. Each item: built? tested on iPhone? release number.
 - `.79` Home tiles with a picture: one shared layout (rounded square image on the left, text right, 72 px); the SUPPLEMENTS tile shows only the next dose (thumb row removed). iPhone test pending.
 - `.80` Home: NOW card removed (duplicate of the tiles); tile order Training · Supplements · Water · Classes · This week · Streak · Week summary, renumbered 01-07. iPhone test pending.
 - `.81` Water tile: litres + "N of G glasses" on one line and a row of glasses (lime = drunk, +N when over the goal); the − moved to the tile's top corner. iPhone test pending.
+- `.82` Review 4 fixes: Home's minute timer redraws only clock tiles that really changed (never the top bar / profile photo); named colour `--chip`; Classes tile shows the date for a class a week away; small wording / clamp / saved-flash fixes. iPhone test pending.
 
 ## Parking lot
 - (new ideas go here)

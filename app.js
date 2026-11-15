@@ -59,7 +59,7 @@
   // The goal sheet (the small gear on the WATER card): glasses per day with − / +, saved at once in the settings record; DONE closes it
   const paintGoal=()=>{ const g=waterGoal(); $('wgN').textContent=g; $('wgL').textContent='= '+litres(g*GLASS_L)+' L a day'; $('wgMinus').disabled=g<=1; $('wgPlus').disabled=g>=30; };
   function openWaterGoal(){ paintGoal(); $('waterSheet').hidden=false; }
-  function stepGoal(d){ const g=Math.max(1,Math.min(30,waterGoal()+d)); S.settings.waterGoal=g; RisenDB.setSetting('waterGoal',g).catch(e=>toast('Could not save: '+e.message)); paintGoal(); }
+  function stepGoal(d){ const g=Math.max(1,Math.min(30,waterGoal()+d)); S.settings.waterGoal=g; RisenDB.setSetting('waterGoal',g).then(()=>savedFlash('wgSaved')).catch(e=>toast('Could not save: '+e.message)); paintGoal(); }
   $('wgMinus').onclick=()=>stepGoal(-1); $('wgPlus').onclick=()=>stepGoal(1);
   $('wgDone').onclick=()=>{ $('waterSheet').hidden=true; renderHome(); };
 
@@ -98,7 +98,7 @@
       const cap=Math.max(1,Math.floor((($('tiles').clientWidth||335)-40-(extra?40:0)+6)/28)),       // (room kept for the +N)
          rows=Math.ceil(goal/cap), per=Math.ceil(goal/rows);
       let glasses=''; for(let r=0;r<rows;r++){ let cells=''; for(let k=r*per;k<Math.min(goal,(r+1)*per);k++) cells+=`<svg class="wg${k<shown?' on':''}" viewBox="0 0 22 30" aria-hidden="true"><path d="M2 2.5h18l-2.2 21a4 4 0 0 1-4 3.5H8.2a4 4 0 0 1-4-3.5z"/></svg>`; if(r===rows-1&&extra) cells+=`<span class="wover">+${extra}</span>`; glasses+=`<div class="wgrow">${cells}</div>`; }
-      return `<div class="wtools"><button type="button" class="wminus" data-water="minus" aria-label="Remove a glass"${g?'':' disabled'}>&minus;</button><button type="button" class="wgear" data-water="goal" aria-label="Water goal"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
+      return `<div class="wtools"><button type="button" class="wminus" data-water="minus" aria-label="Delete a glass"${g?'':' disabled'}>&minus;</button><button type="button" class="wgear" data-water="goal" aria-label="Water goal"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
         <div class="wbody"><div class="wline"><div class="big"><span data-count="${L}" data-dec="2">${litres(L)}</span><small> L</small></div><div class="wcount">${g} of ${goal} glasses</div></div>
         <div class="wglasses" role="img" aria-label="${g} of ${goal} glasses">${glasses}</div></div>`;
     }},
@@ -109,7 +109,8 @@
       if(n.none) return `<div><div class="wname">${n.none==='today'?'No classes today':'No more classes today'}</div></div>`;
       const star=n.star?`<span class="tstar" aria-label="My class">${ICONS.star}</span>`:'', who=esc(n.i?n.i.name.split(' ')[0]:'TBA');
       if(n.dayOffset){                                   // nothing left today: the next class on the next day that has one, with its day in front
-        const day=n.dayOffset===1?'Tomorrow':DAYS[n.day-1];
+        const when=new Date(); when.setDate(when.getDate()+n.dayOffset);              // Tomorrow, then the weekday for the next five days, then the date (so "Sat" never reads as today)
+        const day=n.dayOffset===1?'Tomorrow':n.dayOffset<=6?DAYS[n.day-1]:when.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}).replace(',','');
         return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${day} · ${esc(n.c.name)} · ${esc(n.c.time)}</div><div class="sub">${who}</div>`);
       }
       return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${who}</div>`);
@@ -151,20 +152,37 @@
     el.innerHTML=(days==null?'No backup yet':`Last backup: ${days} days ago`)+' · <u>Back up</u>';
   }
   let homeDrawn=false, homeDay=dayKey(new Date());
-  function renderHome(){
+  const tileText=html=>html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();       // what a tile SAYS (to tell whether it really changed)
+  const tileSaid={};
+  function drawHome(){                               // the greeting, the date and every tile (never the top bar or the profile photo)
     renderBackupLine();
     $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
-    if(typeof Profile!=='undefined') Profile.avatars();
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     homeDay=dayKey(new Date());
     $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
-    $('tiles').innerHTML=TILES.map((t,i)=>`<article class="tile${t.title==='Training'?' train':''}${t.cls?' '+t.cls:''}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
-      <div class="tile-body${t.stack?' stack':''}">${t.html()}</div></article>`).join('');
+    $('tiles').innerHTML=TILES.map((t,i)=>{ const html=t.html(); tileSaid[t.title]=tileText(html);
+      return `<article class="tile${t.title==='Training'?' train':''}${t.cls?' '+t.cls:''}" data-tile="${t.title}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}><div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>
+      <div class="tile-body${t.stack?' stack':''}">${html}</div></article>`; }).join('');
     if(typeof Meds!=='undefined') Meds.loadThumbs($('tiles'));                                  // the box photos on the SUPPLEMENTS tile (same loader as the Supps tab)
   }
+  function renderHome(){
+    if(typeof Profile!=='undefined') Profile.avatars();
+    drawHome();
+  }
+  // The minute timer: only the tiles that depend on the clock (SUPPLEMENTS, CLASSES, WATER) are looked at, and one is redrawn only when what it says has really
+  // changed. A new day redraws the greeting and the tiles. It never touches the top bar or the profile photo.
+  const CLOCK_TILES=['Supplements','Classes','Water'];
+  function tickHome(){
+    if(dayKey(new Date())!==homeDay) return drawHome();
+    for(const name of CLOCK_TILES){
+      const t=TILES.find(x=>x.title===name), body=document.querySelector('#tiles [data-tile="'+name+'"] .tile-body'); if(!t||!body) continue;
+      const html=t.html(), said=tileText(html); if(said===tileSaid[name]) continue;
+      tileSaid[name]=said; body.innerHTML=html; if(name==='Supplements'&&typeof Meds!=='undefined') Meds.loadThumbs(body);
+    }
+  }
 
-  // every minute while Home is open: the time moves on (a dose becomes due, a class gets close, a new day starts at midnight)
-  setInterval(()=>{ if(loaded&&!app.classList.contains('hidden')&&!$('view-home').hidden&&!document.querySelector('.sheet-wrap:not([hidden])')) renderHome(); },60000);
+  // every minute while Home is open: the time moves on (a dose becomes due, a class gets close, a new day starts at midnight); see tickHome()
+  setInterval(()=>{ if(loaded&&!app.classList.contains('hidden')&&!$('view-home').hidden&&!document.querySelector('.sheet-wrap:not([hidden])')) tickHome(); },60000);
 
   // ---- Tabs ----
   const TAB_TITLES={home:'Home',gym:'Gym',meals:'Meals',meds:'Supplements',classes:'Classes'};

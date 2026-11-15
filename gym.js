@@ -263,7 +263,7 @@ const Gym = (() => {
   $('exBody').addEventListener('input', e => {
     const t = e.target, w = curDay != null && dayRec(curDay); if (!w || curEx == null) return;
     const it = w.exercises[curEx];
-    if (t.dataset.t && isCardio(it.exerciseId)) { it[t.dataset.t] = num(t.value); saveDay(); }         // blank = left empty (null)
+    if (t.dataset.t && isCardio(it.exerciseId)) { const v = num(t.value); it[t.dataset.t] = v == null ? null : Math.max(0, v); saveDay(); }         // blank = left empty (null); never below 0, like the steppers
     else if (t.dataset.t) {
       let v = num(t.value) ?? 0;
       if (t.dataset.t === 'sets') v = Math.min(20, Math.max(1, Math.round(v) || 1));     // sets: a whole number from 1 to 20
@@ -272,7 +272,9 @@ const Gym = (() => {
     else if (t.id === 'exNotes') setNote(it.exerciseId, t.value);
   });
   $('exBody').addEventListener('change', e => {      // leaving the sets field: show the number that was kept (e.g. 25 -> 20)
-    const t = e.target, w = curDay != null && dayRec(curDay); if (!w || curEx == null || t.dataset.t !== 'sets') return;
+    const t = e.target, w = curDay != null && dayRec(curDay); if (!w || curEx == null || !t.dataset.t) return;
+    if (isCardio(w.exercises[curEx].exerciseId)) { t.value = fmtN(w.exercises[curEx][t.dataset.t]); return; }      // a typed negative shows the 0 that was kept
+    if (t.dataset.t !== 'sets') return;
     t.value = fmtN(w.exercises[curEx].sets);
   });
   $('exBody').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); e.target.blur(); } });

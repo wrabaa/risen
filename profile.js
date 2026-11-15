@@ -40,12 +40,16 @@ const Profile = (() => {
   }
 
   // ---------- the round button (on every tab page) ----------
-  let avUrl = null;
+  let avUrl = null, avSig = null;      // avSig: which photo / letter the button shows now, so an unchanged one is never rebuilt (no flicker)
   async function avatars() {
-    let url = null;
-    try { const p = await RisenDB.getPhoto('profile'); if (p && p.blob) { const u = URL.createObjectURL(p.blob); if (avUrl) URL.revokeObjectURL(avUrl); avUrl = u; url = u; } } catch (e) {}
-    if (!url && avUrl) { URL.revokeObjectURL(avUrl); avUrl = null; }
+    let url = null, ph = null;
+    try { ph = await RisenDB.getPhoto('profile'); } catch (e) {}
     const name = (S.settings.name || '').trim(), letter = name ? [...name][0].toUpperCase() : '';
+    const sig = (ph && ph.blob ? 'p' + (ph.updated || '') + ':' + ph.blob.size : 'n') + '|' + letter;
+    if (sig === avSig && [...document.querySelectorAll('.profbtn')].every(b => b.firstChild)) return;
+    avSig = sig;
+    if (ph && ph.blob) { const u = URL.createObjectURL(ph.blob); if (avUrl) URL.revokeObjectURL(avUrl); avUrl = u; url = u; }
+    if (!url && avUrl) { URL.revokeObjectURL(avUrl); avUrl = null; }
     for (const b of document.querySelectorAll('.profbtn')) {
       b.innerHTML = url ? `<img alt="" src="${url}">` : letter ? `<span class="pfl">${esc(letter)}</span>` : PERSON;
       b.classList.toggle('photo', !!url);
