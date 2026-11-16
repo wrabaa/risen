@@ -341,6 +341,28 @@ const Gym = (() => {
       <input class="num" data-f="${f}" inputmode="${mode}" enterkeyhint="${f === 'incline' ? 'done' : 'next'}" autocomplete="off" value="${esc(s[f])}" placeholder="–" aria-label="${esc(name)} ${l}">
       <button type="button" class="sbtn" data-step="+" data-f="${f}" aria-label="${l} plus">+</button></div></div>`).join('')}
     <button class="tick" data-tick aria-label="Confirm ${esc(name)}">${I.check}</button></div>`;
+  // The rows of one strength set, the rows of one exercise, and its "+ Add set / − Remove set" buttons. Kept separate so adding or removing a
+  // set redraws only that exercise (the pictures and the scroll position stay as they are).
+  const strengthRow = (e, i, j, s) => {
+    const pr = s.done && beats(e.last, s);
+    return `<div class="setrow${s.done ? ' done' : ''}${pr ? ' pr' : ''}" data-ex="${i}" data-set="${j}"><span class="n">${j + 1}</span>
+      <div class="step"><button type="button" class="sbtn" data-step="-" data-f="kg" aria-label="Set ${j + 1} kg minus">&minus;</button>
+        <input class="num" data-f="kg" inputmode="decimal" enterkeyhint="next" autocomplete="off" value="${esc(s.kg)}" placeholder="0" aria-label="Set ${j + 1} kg">
+        <button type="button" class="sbtn" data-step="+" data-f="kg" aria-label="Set ${j + 1} kg plus">+</button></div>
+      <div class="step"><button type="button" class="sbtn" data-step="-" data-f="reps" aria-label="Set ${j + 1} reps minus">&minus;</button>
+        <input class="num" data-f="reps" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" autocomplete="off" value="${esc(s.reps)}" placeholder="0" aria-label="Set ${j + 1} reps">
+        <button type="button" class="sbtn" data-step="+" data-f="reps" aria-label="Set ${j + 1} reps plus">+</button></div>
+      <button class="tick" data-tick aria-label="Confirm set ${j + 1}">${I.check}</button>${pr ? '<span class="prbadge">▲ PR</span>' : ''}</div>`;
+  };
+  const setsHtml = (e, i) => (e.cardio ? '' : '<div class="setrow sethead"><span>KG</span><span>REPS</span><span></span></div>')
+    + e.sets.map((s, j) => e.cardio ? cardioRow(i, j, s, exerciseInfo(e.exerciseId).name) : strengthRow(e, i, j, s)).join('');
+  const setBtnsHtml = (e, i) => e.cardio ? '' : `<div class="setbtns"><button class="dashed addset" data-addset="${i}">+ Add set</button>
+    <button class="dashed addset" data-rmset="${i}"${e.sets.length <= 1 ? ' disabled' : ''}>&minus; Remove set</button></div>`;
+  function refreshSets(i) {
+    const e = draft().exercises[i], card = $('gymLog').querySelectorAll('.card.ex')[i]; if (!card) return;
+    card.querySelector('.sets').innerHTML = setsHtml(e, i);
+    const b = card.querySelector('.setbtns'); if (b) b.outerHTML = setBtnsHtml(e, i);
+  }
   function renderLog(el, d) {
     let h = `<div class="subline"><span class="meta sname">${esc(d.name)}</span><span class="meta elapsed" id="elapsed">${fmtClock(Date.now() - new Date(d.startedAt))}</span></div><div class="gstack">`;
     d.exercises.forEach((e, i) => {
@@ -349,20 +371,7 @@ const Gym = (() => {
         <div class="tools"><button data-rmex="${i}" aria-label="Delete from this workout">${I.trash}</button></div></div>
         <div class="last">${e.last ? `Last time: <b>${e.cardio ? esc(cardioText(e.last)) : fmtN(e.last.kg) + ' kg × ' + fmtN(e.last.reps)}</b>` : 'First time'}</div>
         <div data-photo="${esc(e.exerciseId)}"></div>
-        <div class="sets">${e.cardio ? '' : '<div class="setrow sethead"><span>KG</span><span>REPS</span><span></span></div>'}`;
-      e.sets.forEach((s, j) => {
-        if (e.cardio) { h += cardioRow(i, j, s, x.name); return; }
-        const pr = s.done && beats(e.last, s);
-        h += `<div class="setrow${s.done ? ' done' : ''}${pr ? ' pr' : ''}" data-ex="${i}" data-set="${j}"><span class="n">${j + 1}</span>
-          <div class="step"><button type="button" class="sbtn" data-step="-" data-f="kg" aria-label="Set ${j + 1} kg minus">&minus;</button>
-            <input class="num" data-f="kg" inputmode="decimal" enterkeyhint="next" autocomplete="off" value="${esc(s.kg)}" placeholder="0" aria-label="Set ${j + 1} kg">
-            <button type="button" class="sbtn" data-step="+" data-f="kg" aria-label="Set ${j + 1} kg plus">+</button></div>
-          <div class="step"><button type="button" class="sbtn" data-step="-" data-f="reps" aria-label="Set ${j + 1} reps minus">&minus;</button>
-            <input class="num" data-f="reps" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" autocomplete="off" value="${esc(s.reps)}" placeholder="0" aria-label="Set ${j + 1} reps">
-            <button type="button" class="sbtn" data-step="+" data-f="reps" aria-label="Set ${j + 1} reps plus">+</button></div>
-          <button class="tick" data-tick aria-label="Confirm set ${j + 1}">${I.check}</button>${pr ? '<span class="prbadge">▲ PR</span>' : ''}</div>`;
-      });
-      h += e.cardio ? '</div></div>' : `</div><button class="dashed addset" data-addset="${i}">+ Add set</button></div>`;
+        <div class="sets">${setsHtml(e, i)}</div>${setBtnsHtml(e, i)}</div>`;
     });
     h += `<button class="dashed" data-act="addex">+ Add exercise</button></div>
       <button class="primary finish" data-act="finish">FINISH WORKOUT</button>
@@ -429,8 +438,14 @@ const Gym = (() => {
       row.classList.toggle('done', s.done); if (s.done) Motion.pop(row.querySelector('.tick'), row); syncPr(row); saveDraft(); return;
     }
     if (t.dataset.addset != null) {
-      const sets = d.exercises[t.dataset.addset].sets, p = sets[sets.length - 1] || { kg: '', reps: '' };
-      sets.push({ kg: p.kg, reps: p.reps, done: false }); saveDraft(); renderGym(); return;
+      const i = +t.dataset.addset, sets = d.exercises[i].sets, p = sets[sets.length - 1] || { kg: '', reps: '' };
+      sets.push({ kg: p.kg, reps: p.reps, done: false }); saveDraft(); refreshSets(i); return;
+    }
+    if (t.dataset.rmset != null) {        // takes the LAST set of this exercise out of this workout (the plan doesn't change); one set always stays
+      const i = +t.dataset.rmset, ent = d.exercises[i], n = ent.sets.length; if (n <= 1) return;
+      if (ent.sets[n - 1].done && !(await ask({ title: `Remove set ${n}?`, text: "It is already ticked, so it won't be saved.", ok: 'REMOVE', danger: true }))) return;
+      if (ent.sets.length > 1) { ent.sets.pop(); saveDraft(); refreshSets(i); }
+      return;
     }
     if (t.dataset.rmex != null) {
       if (!(await ask({ title: 'Delete from this workout?', text: `${exerciseInfo(d.exercises[t.dataset.rmex].exerciseId).name} is taken out of this workout only. Your program doesn't change.`, ok: 'DELETE', danger: true }))) return;

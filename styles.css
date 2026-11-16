@@ -237,6 +237,9 @@
   .setrow.done .num{border-color:rgba(204,255,0,.35)}
   .setrow.done .n{color:var(--volt)}
   .addset{margin-top:10px;min-height:44px}
+  .setbtns{display:flex;gap:10px;margin-top:10px}
+  .setbtns .addset{margin-top:0;flex:1 1 0;width:auto;min-width:0}
+  .setbtns .addset:disabled{opacity:.35;pointer-events:none}
   .ex .pslot-add{height:56px}
   .ex .pslot-img img,.ex .pslot-img video{max-height:200px}
   .exbar{display:flex;justify-content:space-between;align-items:center;margin-top:10px}

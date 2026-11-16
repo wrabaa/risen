@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.91)
+## Status (release 2026-11-16.92)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -240,6 +240,10 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   overwritten, kept when the pack is deleted from Settings); an untouched one follows the pack (corrections arrive, a recipe taken out of the pack goes). The pictures are fetched only on YES and shown when the recipe has no photo of the user's own (cards, category covers, recipe page with
   "+ Use my own photo"; `PhotoSlot.mount(..., {builtIn})` is now how a slot gets the app's own picture, exercises use it too). The recipe page shows "180 kcal per serving · Serves 2" and the health line when a recipe has them (`.rfacts`; not editable yet). The pack starts EMPTY
   (`"recipes": []`): the planner adds Siza's recipes there when he says push. iPhone test pending.
+- `.92` GYM log fixes from Siza's real use: a **"− Remove set"** button next to "+ Add set" (takes the LAST set out of the running workout only, the program doesn't change; one set always stays, the button is greyed at one; a
+  set that is already ticked asks first). "+ Add set" / "− Remove set" now redraw only that exercise's rows (`strengthRow()` / `setsHtml()` / `setBtnsHtml()` / `refreshSets()` in `gym.js`, `.setbtns` in `styles.css`): the page no longer
+  jumps back to the top and the exercise pictures are not reloaded. The cardio card has no set buttons. Siza also reported that the treadmill ✓ could not be pressed: it could NOT be reproduced (it ticks with minutes typed or stepped, with a
+  photo on the card, and a blank MIN answers "Enter the minutes first"); waiting for what he sees when he taps it. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
