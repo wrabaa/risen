@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.93)
+## Status (release 2026-11-16.94)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -248,6 +248,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   (type a kg, then press + Add set / − Remove set / the bin) leaves the iPhone keyboard half open and the page nudged, and every tap lands off the finger. `leaveField()` in `gym.js` lets go of the field before any redraw of the log, and a small block in
   `app.js` (next to the typing sync) puts the window back at the origin whenever NO field is focused (focusout, taps, `visualViewport` resize / scroll, `scroll`): the app never scrolls the window itself, so this is safe, and it leaves the page alone
   while a field is focused. If it still happens: next suspect is the fade `mask-image` on `.view` (`styles.css`), a known cause of wrong touch positions on iPhone; replace it by a fade overlay on `.tbar`. iPhone test pending.
+- `.94` REST TIMER "PONG": a soft bell plays at the moment the rest time ends (with the lime flash). `Pong` in `gym.js` makes it with the phone's own Web Audio (a note + two overtones, ~1 s; no sound file, works offline). iPhone only allows sound after a tap, so the
+  audio is switched on by the tap that starts or changes the timer (the ✓, ±15). It plays only at the moment it ends (reopening the app to a timer that ran out long ago stays quiet; Skip makes no sound) and follows the ringer switch (silent mode = no pong; it does not
+  interrupt music). No setting for it yet. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -359,7 +362,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   intro and opens directly; sets are whole numbers 1–20; a failed FINISH keeps the workout open.
 - Big − / + steppers on kg (±2.5) and reps (±1) in the log (`.68`); a ticked set that beats "Last time" gets ▲ PR (stored as `prs` on the finished session, shown as "PR today").
 - Reps required to tick a set; empty kg = 0 (bodyweight). No sets ticked → offer discard.
-- Rest timer starts automatically on ✓, default from Settings (1:30), ±15 s, flashes lime at 0.
+- Rest timer starts automatically on ✓, default from Settings (1:30), ±15 s, flashes lime at 0 and plays a soft "pong" (`.94`).
 - One photo per exercise, linked to exercise ID, shown everywhere; addable in the gym too.
 - Exercise library = Siza's real gym (62 in `.47`, 82 in `.48`, `EXERCISES.md`), replaced the 66 generic ones through
   `aliases` / `retired` so plans, history and photos followed. Every exercise has `muscle` (library group, day title)

@@ -540,6 +540,25 @@ const Gym = (() => {
   });
 
   // ================= Rest timer =================
+  // The "pong" when the rest time is over: a soft bell made with the phone's own audio (no sound file, so it works offline).
+  // iPhone only lets a page make sound after a tap, so the audio is switched on by the tap that starts or changes the timer (the ✓, ±15).
+  // It follows the ringer switch like any web page sound (silent mode = no pong) and does not interrupt music.
+  const Pong = (() => {
+    let ctx = null;
+    function prime() { try { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; ctx = ctx || new AC(); if (ctx.state !== 'running') ctx.resume(); } catch (e) { /* no sound, the lime flash still shows */ } }
+    function play() {
+      try {
+        if (!ctx) return; if (ctx.state !== 'running') ctx.resume();
+        const t = ctx.currentTime, out = ctx.createGain(); out.gain.value = 0.9; out.connect(ctx.destination);
+        for (const [freq, vol, len] of [[784, .5, 1.1], [1568, .16, .55], [392, .22, 1.3]]) {          // the note, an overtone above and one below
+          const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = freq;
+          g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .012); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+          o.connect(g); g.connect(out); o.start(t); o.stop(t + len + .05);
+        }
+      } catch (e) { /* no sound */ }
+    }
+    return { prime, play };
+  })();
   const Rest = (() => {
     let end = 0, iv = null, hideT = null;
     const bar = $('restbar');
@@ -547,11 +566,14 @@ const Gym = (() => {
       const left = end - Date.now();
       if (left > 0) { bar.classList.remove('zero'); $('restCd').textContent = fmtClock(left + 999); return; }
       $('restCd').textContent = '0:00';
-      if (!bar.classList.contains('zero')) { bar.classList.add('zero'); clearInterval(iv); iv = null; hideT = setTimeout(stop, 5000); }
+      if (!bar.classList.contains('zero')) {
+        bar.classList.add('zero'); clearInterval(iv); iv = null; hideT = setTimeout(stop, 5000);
+        if (Date.now() - end < 3000) Pong.play();                   // only the moment it ends: coming back to a timer that ran out long ago stays quiet
+      }
     }
     function run() { clearTimeout(hideT); bar.classList.add('show'); app.classList.add('resting'); if (!iv) iv = setInterval(paint, 250); paint(); }
-    function start() { end = Date.now() + (S.settings.restSec || 90) * 1000; bar.classList.remove('zero'); run(); }
-    function adjust(sec) { end = Math.max(Date.now(), end) + sec * 1000; if (sec > 0) bar.classList.remove('zero'); run(); }
+    function start() { Pong.prime(); end = Date.now() + (S.settings.restSec || 90) * 1000; bar.classList.remove('zero'); run(); }
+    function adjust(sec) { Pong.prime(); end = Math.max(Date.now(), end) + sec * 1000; if (sec > 0) bar.classList.remove('zero'); run(); }
     function stop() { clearInterval(iv); iv = null; clearTimeout(hideT); bar.classList.remove('show', 'zero'); app.classList.remove('resting'); }
     bar.onclick = e => { const b = e.target.closest('[data-rest]'); if (!b) return; b.dataset.rest === 'skip' ? stop() : adjust(+b.dataset.rest); };
     return { start, stop };
