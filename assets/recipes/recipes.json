@@ -204,6 +204,177 @@
         "1/4 tsp salt, black pepper"
       ],
       "method": "1. Heat the oven to 200°C.\n2. In a baking dish mix the onion, garlic, tomatoes, chickpeas, cumin, salt, pepper and 1 tbsp of the olive oil.\n3. Bake 15 minutes.\n4. Lay the fish on top, drizzle with the rest of the olive oil and bake 12–15 minutes more, until it flakes easily.\n5. Scatter with parsley and serve with the lemon wedges."
+    },
+    {
+      "id": "strawberry-yoghurt-shake",
+      "category": "shakes",
+      "name": "Strawberry Yoghurt Shake",
+      "serves": 1,
+      "kcal": 305,
+      "health": "About 25 g protein and close to a full day of vitamin C from the strawberries. Almonds add vitamin E and unsaturated fats. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "150 g strawberries, fresh or frozen",
+        "150 g plain Greek yoghurt, 0% fat",
+        "200 ml low-fat milk",
+        "10 raw almonds (about 14 g)",
+        "3 ice cubes"
+      ],
+      "method": "1. Put the milk, yoghurt and almonds in the blender and blend 30 seconds.\n2. Add the strawberries and ice.\n3. Blend 1 minute, until smooth. Drink at once."
+    },
+    {
+      "id": "cucumber-mint-ayran",
+      "category": "shakes",
+      "name": "Cucumber Mint Ayran",
+      "serves": 1,
+      "kcal": 135,
+      "health": "About 20 g protein for only 135 kcal, plus calcium. A traditional Lebanese yoghurt drink: light, cooling, no sugar. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "200 g plain Greek yoghurt, 0% fat",
+        "150 ml cold water",
+        "1/2 cucumber (100 g), peeled and chopped",
+        "10 fresh mint leaves",
+        "1 pinch of salt",
+        "4 ice cubes"
+      ],
+      "method": "1. Put the yoghurt, water, cucumber, mint and salt in the blender.\n2. Blend 30 seconds, until smooth.\n3. Pour over the ice and drink cold."
+    },
+    {
+      "id": "spinach-tomato-omelette",
+      "category": "breakfast",
+      "name": "Spinach & Tomato Omelette",
+      "serves": 1,
+      "kcal": 220,
+      "health": "About 15 g protein. Eggs give vitamin B12, vitamin D and choline; spinach adds folate and vitamin K. Cooked with a little olive oil, not butter. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "2 eggs",
+        "60 g baby spinach",
+        "1 small tomato (120 g), diced",
+        "1 tsp olive oil",
+        "1 pinch of salt, black pepper"
+      ],
+      "method": "1. Heat the olive oil in a non-stick pan on medium heat. Add the spinach and tomato and cook 2 minutes, until the spinach wilts.\n2. Beat the eggs with the salt and pepper and pour them over the vegetables.\n3. Cook 2 minutes without stirring, fold in half and serve."
+    },
+    {
+      "id": "warm-oat-porridge-apple",
+      "category": "breakfast",
+      "name": "Warm Oat Porridge with Apple & Walnuts",
+      "serves": 1,
+      "kcal": 510,
+      "health": "About 18 g protein and 9 g fibre. Oats bring beta-glucan: the US FDA links 3 g a day to lower cholesterol, and this bowl gives about two thirds of that. Walnuts add plant omega-3. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "50 g rolled oats (about 1/2 cup)",
+        "250 ml low-fat milk",
+        "1 small apple (150 g), diced",
+        "20 g walnuts, chopped",
+        "1/2 tsp cinnamon"
+      ],
+      "method": "1. Put the oats and milk in a small pot and cook on medium heat 5 minutes, stirring, until thick.\n2. Stir in the apple and cinnamon and cook 1 more minute.\n3. Pour into a bowl and top with the walnuts."
+    },
+    {
+      "id": "tuna-white-bean-salad",
+      "category": "lunch",
+      "name": "Tuna & White Bean Salad",
+      "serves": 2,
+      "kcal": 415,
+      "health": "About 28 g protein and 11 g fibre per serving. Tuna is rich in vitamin B12 and selenium, and the American Heart Association recommends fish twice a week. White beans add slow-release carbs. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "160 g canned tuna in water, drained (about 2 small tins)",
+        "240 g cooked white beans (one tin, drained)",
+        "200 g cherry tomatoes, halved",
+        "1/2 small red onion (50 g), thinly sliced",
+        "2 tbsp chopped parsley",
+        "2 tbsp olive oil",
+        "juice of 1 lemon",
+        "1/4 tsp salt, black pepper"
+      ],
+      "method": "1. Put the beans, tomatoes, onion and parsley in a bowl.\n2. Flake the tuna over the top.\n3. Dress with the olive oil, lemon juice, salt and pepper. Toss gently and serve."
+    },
+    {
+      "id": "mujaddara-cucumber-yoghurt",
+      "category": "lunch",
+      "name": "Mujaddara with Cucumber Yoghurt",
+      "serves": 3,
+      "kcal": 345,
+      "health": "About 15 g protein and 13 g fibre per serving. Lentils plus a grain make a complete plant protein; legumes are a staple in the AUB Food-Based Dietary Guidelines for Lebanon. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "100 g dry green or brown lentils",
+        "60 g coarse bulgur",
+        "2 large onions (300 g), sliced",
+        "2 tbsp olive oil",
+        "1 tsp ground cumin",
+        "1/2 tsp salt",
+        "Salad: 200 g cucumber, diced",
+        "150 g plain Greek yoghurt, 0% fat"
+      ],
+      "method": "1. Boil the lentils in 500 ml water for 15 minutes. Add the bulgur, cumin and salt, cover and cook on low for 15 minutes, until all the water is absorbed.\n2. Meanwhile cook the onions in the olive oil on medium-low heat for 20 minutes, stirring, until deep golden.\n3. Mix the cucumber into the yoghurt.\n4. Serve the lentils and bulgur topped with the onions, with the cucumber yoghurt beside it."
+    },
+    {
+      "id": "roasted-spiced-chickpeas",
+      "category": "snacks",
+      "name": "Roasted Spiced Chickpeas",
+      "serves": 3,
+      "kcal": 175,
+      "health": "About 7 g plant protein and 6 g fibre per serving: a crunchy snack with no added sugar. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "240 g cooked chickpeas (one tin, drained)",
+        "1 tbsp olive oil",
+        "1 tsp ground cumin",
+        "1/2 tsp paprika",
+        "1/4 tsp salt"
+      ],
+      "method": "1. Heat the oven to 200°C.\n2. Dry the chickpeas very well with a clean towel.\n3. Mix them with the olive oil, cumin, paprika and salt and spread on a baking tray.\n4. Roast 25–30 minutes, shaking the tray twice, until golden and crunchy. Eat the same day."
+    },
+    {
+      "id": "yoghurt-walnut-pomegranate",
+      "category": "snacks",
+      "name": "Yoghurt, Walnut & Pomegranate Cup",
+      "serves": 1,
+      "kcal": 300,
+      "health": "About 22 g protein. Walnuts carry a US FDA qualified health claim for heart health (about 43 g a day; this cup has about half), and pomegranate adds vitamin C. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "200 g plain Greek yoghurt, 0% fat",
+        "20 g walnuts, roughly chopped",
+        "60 g pomegranate seeds (about 1/3 of a pomegranate)",
+        "1/4 tsp cinnamon"
+      ],
+      "method": "1. Spoon the yoghurt into a glass or bowl.\n2. Top with the walnuts and pomegranate seeds.\n3. Sprinkle with the cinnamon."
+    },
+    {
+      "id": "lemon-garlic-chicken-zucchini",
+      "category": "dinner",
+      "name": "Lemon Garlic Chicken with Roasted Zucchini",
+      "serves": 2,
+      "kcal": 405,
+      "health": "About 45 g protein per serving for 405 kcal. Chicken breast is a lean protein; zucchini adds vitamin C and potassium for very few calories. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "400 g chicken breast, cut in 4 pieces",
+        "400 g zucchini, cut in thick half-moons",
+        "2 tbsp olive oil",
+        "3 garlic cloves, crushed",
+        "juice of 1 lemon",
+        "1/2 tsp salt, black pepper",
+        "2 tbsp chopped parsley"
+      ],
+      "method": "1. Heat the oven to 200°C.\n2. Mix the olive oil, garlic, lemon juice, salt and pepper. Coat the chicken in half of it and the zucchini in the rest.\n3. Spread both on a baking tray, chicken in the middle.\n4. Bake 25 minutes, until the chicken is cooked through (no pink inside).\n5. Sprinkle with the parsley and serve."
+    },
+    {
+      "id": "baked-musaqaa",
+      "category": "dinner",
+      "name": "Baked Musaqa'a",
+      "serves": 3,
+      "kcal": 300,
+      "health": "About 7 g plant protein and 13 g fibre per serving. A Lebanese eggplant, tomato and chickpea stew, baked instead of fried. Tomatoes add lycopene. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "2 medium eggplants (500 g), cut in thick rounds",
+        "240 g cooked chickpeas (one tin, drained)",
+        "400 g tomatoes, chopped",
+        "1 medium onion, sliced",
+        "3 garlic cloves, sliced",
+        "2 tbsp olive oil",
+        "1 tsp ground cumin",
+        "1/2 tsp salt"
+      ],
+      "method": "1. Heat the oven to 220°C. Brush the eggplant rounds with 1 tbsp of the olive oil and bake on a tray 20 minutes, until soft and golden.\n2. Meanwhile cook the onion and garlic in the other tbsp of oil for 5 minutes. Add the tomatoes, cumin and salt and simmer 10 minutes.\n3. Stir the chickpeas into the sauce.\n4. In a baking dish layer the eggplant and the sauce. Bake 15 minutes and serve."
     }
   ]
 }
