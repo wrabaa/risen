@@ -32,8 +32,9 @@ const Meals = (() => {
   let packImgs = new Set();                        // pack ids whose picture is on this phone
   const pictured = r => hasPhoto.has(r.id) || !!(r.pack && packImgs.has(r.pack));
   async function refreshKeys() {
-    hasPhoto.clear();
-    try { (await RisenDB.photoKeys()).forEach(k => { k = String(k); if (k.startsWith('recipe-')) hasPhoto.add(k.slice(7)); }); } catch (e) { /* no photos then */ }
+    const got = new Set();                         // filled first, swapped in one go: a screen drawn meanwhile never sees an empty list
+    try { (await RisenDB.photoKeys()).forEach(k => { k = String(k); if (k.startsWith('recipe-')) got.add(k.slice(7)); }); } catch (e) { /* no photos then */ }
+    hasPhoto.clear(); got.forEach(k => hasPhoto.add(k));
     try { packImgs = await RecipePack.images(); } catch (e) { packImgs = new Set(); }
   }
   async function loadUrls(ids) {                  // true when something new was loaded (the screen then redraws once)
@@ -129,7 +130,10 @@ const Meals = (() => {
     offering = false;
     if (yes) { await packOn(); toast('Recipes loaded'); } else await setting('recipePack', 'no');
   }
-  RecipePack.onChange = key => { if (key === null) applyPack().then(() => { if (S.settings.recipePack === 'yes') redraw(); if (!$('view-meals').hidden) offerPack(); tryPrep().then(ok => { if (ok) dispatchEvent(new Event('risen-try')); }); }); };
+  RecipePack.onChange = key => {
+    if (key && key.startsWith('img/')) { const id = 'pack-' + key.slice(4); if (packUrl.has(id)) dropUrl(id); tryFollow(id); return; }      // a picture arrived or was replaced: the old one is let go, the screens load the new one (.99)
+    if (key === null) applyPack().then(() => { if (S.settings.recipePack === 'yes') redraw(); if (!$('view-meals').hidden) offerPack(); tryPrep().then(ok => { if (ok) dispatchEvent(new Event('risen-try')); }); });
+  };
   // Settings row "RISEN recipes"
   async function packSettings() {
     const pack = await RecipePack.list(), n = pack ? pack.length : 0, on = S.settings.recipePack === 'yes';
@@ -187,7 +191,12 @@ const Meals = (() => {
       <button class="ghost" id="rMove" type="button" style="width:100%;margin-top:22px">MOVE TO…</button>
       <button class="quiet danger" id="rDelete" type="button">Delete recipe</button>`;
     // a RISEN recipe that gets a photo of HIS OWN is his from then on (`edited`, set by saveRec), so the pack never takes the recipe and his photo away (.96)
-    const mine = rec.pack ? (id => async () => { if (rec && rec.id === id && await RisenDB.getPhoto('recipe-' + id)) saveRec(); })(rec.id) : undefined;
+    const mine = rec.pack ? (id => async () => {
+      if (!(await RisenDB.getPhoto('recipe-' + id))) return;
+      if (rec && rec.id === id) return saveRec();
+      const r = S.recipes.find(x => x.id === id);                                  // the page was closed while the photo was being stored (.99): mark it all the same
+      if (r && r.pack && !r.edited) { r.edited = true; RisenDB.saveRecipe(r).catch(() => {}); }
+    })(rec.id) : undefined;
     PhotoSlot.mount($('rPhoto'), 'recipe-' + rec.id, { editable: true, swap: true, onChange: mine, builtIn: rec.pack ? (p => () => RecipePack.image(p))(rec.pack) : null });
     openPage('recipePage'); $('recipeBody').querySelectorAll('textarea.grow').forEach(grow);
     onClose.recipePage = () => finishRecipe();
@@ -250,12 +259,18 @@ const Meals = (() => {
   addEventListener('pagehide', flush);
   // ================= TRY TODAY: the card on Home (.98, app.js) =================
   // One recipe that has a picture is picked when the app opens (never the one shown last time) and stays for the whole opening: Home redraws all day, the card must not flip while you look at it.
-  // The picture URL is its own (an own photo gets a separate object URL), so leaving the Meals tab never breaks the card.
-  let tryId = null, tryUrl = null, tryBusy = false;
+  // The picture URL is the card's own (made from the photo's or the pack picture's bytes, freed when the card goes), so nothing the Meals tab or the pack does can break it.
+  let tryId = null, tryUrl = null, tryPack = false, tryBusy = false;       // tryPack: the picture is the pack's (it follows when the pack's picture is replaced)
+  const tryDrop = () => { if (tryUrl) URL.revokeObjectURL(tryUrl); tryId = null; tryUrl = null; tryPack = false; };
   function tryInfo() {                            // null = no card (no recipe with a picture yet, or the picked one was deleted)
     const r = tryId && S.recipes.find(x => x.id === tryId);
-    if (!r || !tryUrl) { tryId = null; tryUrl = null; return null; }
+    if (!r || !tryUrl) { tryDrop(); return null; }
     return { id: r.id, name: r.name, cat: cat(r.category).label, kcal: r.kcal || 0, url: tryUrl };
+  }
+  async function tryPicture(r) {                  // { url, pack } made for the card alone, or null
+    if (hasPhoto.has(r.id)) { const p = await RisenDB.getPhoto('recipe-' + r.id); if (p) return { url: URL.createObjectURL(p.blob), pack: false }; }
+    const b = r.pack ? await RecipePack.imageBlob(r.pack) : null;
+    return b ? { url: URL.createObjectURL(b), pack: true } : null;
   }
   async function tryPrep() {                      // true when the card has just become ready (the caller redraws Home)
     if (tryBusy || tryInfo()) return false; tryBusy = true;
@@ -263,17 +278,21 @@ const Meals = (() => {
       await refreshKeys();
       const pool = S.recipes.filter(r => (r.name || '').trim() && pictured(r)), fresh = pool.filter(r => r.id !== S.settings.tryLast), list = fresh.length ? fresh : pool;
       if (!list.length) return false;
-      const r = list[Math.floor(Math.random() * list.length)]; let url = null;
-      if (hasPhoto.has(r.id)) { const p = await RisenDB.getPhoto('recipe-' + r.id); if (p) url = URL.createObjectURL(p.blob); }
-      if (!url && r.pack) { const b = await RecipePack.image(r.pack); if (b) url = b.url; }
-      if (!url) return false;
-      tryId = r.id; tryUrl = url; setting('tryLast', r.id);
+      const r = list[Math.floor(Math.random() * list.length)], pic = await tryPicture(r);
+      if (!pic) return false;
+      tryId = r.id; tryUrl = pic.url; tryPack = pic.pack; setting('tryLast', r.id);
       return true;
     } catch (e) { return false; } finally { tryBusy = false; }
   }
+  async function tryFollow(id) {                  // the pack's picture of the card's recipe was replaced: the card shows the new one
+    if (id !== tryId || !tryPack) return;
+    const r = S.recipes.find(x => x.id === id), b = r && r.pack ? await RecipePack.imageBlob(r.pack) : null;
+    if (!b || id !== tryId) return;
+    URL.revokeObjectURL(tryUrl); tryUrl = URL.createObjectURL(b); dispatchEvent(new Event('risen-try'));
+  }
   function openTry() { const t = tryInfo(); if (!t) return; open(); openRecipe(t.id); }      // the Meals tab opens, with this recipe on top (back = the Meals tab)
 
-  function reset() { closeAll(); closeSheet(); curCat = null; rec = null; clearUrls(); hasPhoto.clear(); packImgs = new Set(); tryId = null; tryUrl = null; }
+  function reset() { closeAll(); closeSheet(); curCat = null; rec = null; clearUrls(); hasPhoto.clear(); packImgs = new Set(); tryDrop(); }
 
   return { open, flush, reset, applyPack, packSettings, tryInfo, tryPrep, openTry };
 })();

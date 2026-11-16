@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.98)
+## Status (release 2026-11-16.99)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -263,12 +263,20 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   chip under the top bar says PULL TO REFRESH → RELEASE TO REFRESH (lime) → UPDATING (spinner) → ✓ UPDATED (lime), or NO INTERNET offline. It asks GitHub about both folders NOW without the 10-minute wait (`RepoNow()` = `ExMedia.sync(mine, true)` + `RecipePack.sync(true)`;
   `ExMedia.sync` got the same `force` argument), asks the service worker to look for a new release (a release still loads by the usual quiet-Home rule), and redraws Home; Meals / Gym follow by their own `onChange`. SOFT: the page is never reloaded, nothing can be lost. Never starts: on inputs,
   while typing, under a sheet / sub-page / photo viewer, in a running workout, or when the page is not at the top; a sideways or upward move steps aside (tab swipe, swipe back and the Classes chips are untouched). Max 12 s wait. Only transform and opacity move; reduced motion = no spin. No blur on the chip.
-  Tested at iPhone 13 and SE size with synthetic touches (Home, Meals, Gym, offline, sheet open, scrolled, diagonal, up, tab swipe). iPhone test pending. Reviews: `.96` and `.97` are not reviewed yet (`REVIEW.md` last reviewed `.95`).
+  Tested at iPhone 13 and SE size with synthetic touches (Home, Meals, Gym, offline, sheet open, scrolled, diagonal, up, tab swipe). iPhone test pending.
 
 - `.98` TRY TODAY card on Home (Siza's idea, planner chat; `meals.js` `tryInfo()` / `tryPrep()` / `openTry()`, tile in `app.js`, `.tile.tryit` in `styles.css`): tile 05, between COFFEE and CLASSES (the numbers after it moved up by one: CLASSES 06, THIS WEEK 07, STREAK 08, WEEK SUMMARY 09).
   A big picture card like the Meals covers: the recipe's picture fills the card under a dark fade, "05 TRY TODAY" on top, the recipe name (Oswald, 2 lines) and "Lunch · 380 kcal" at the bottom, a small lime outline "TRY IT" pill (no glow). The recipe is picked ONCE per app opening
   from the recipes that have a picture on the phone (own photo or the pack's picture), never the same one as last time (setting `tryLast`), and stays for the whole opening (Home redraws all day). The whole card opens the Meals tab with THAT recipe's page on top (back = the Meals tab).
   No recipe with a picture yet = no card, and the numbers close up (a tile may have `show()` in `TILES`; `tileNo()`); it appears by itself when recipes arrive (`risen-try` event) or on a pull-down refresh. Its picture URL is its own, so leaving the Meals tab never breaks it. iPhone test pending.
+
+- `.99` review 7 fixes (`REVIEW.md`; `.96`–`.98` reviewed): **a replaced picture or recipes.json could stay OLD on a phone for good.** GitHub lists the new file at once, the site serves it a minute or two later; a phone that looked
+  in between stored the old file under the new `sha`. Now every downloaded file is CHECKED against the `sha` GitHub listed (`same()` in `media.js`: git's SHA-1 of the file); a file that is still the old one is not stored and is asked
+  for again in 2 minutes (a pull down asks at once). Records carry `v` (checked) and `at` (when stored); a file stored before `.99` is checked once and fetched again if it is wrong, so phones that are stuck heal by themselves.
+  Safety valve: a file that never matches for 20 minutes is taken as it is (`u`) and looked at again once a day, so content can never get stuck. One download round at a time; a pull down during a round waits for that round.
+  When a pack picture is replaced, the Meals screens let go of the old one (`RecipePack.onChange` with the file's key) and the TRY TODAY card follows (`tryFollow()`). The card's picture URL is always its own
+  (`RecipePack.imageBlob()`), freed when the card goes. Its recipe deleted = a new pick the next time Home is shown. The card's picture no longer fades in again at every redraw of Home (a glass of water, a coffee);
+  its number is readable on the photo. A RISEN recipe given an own photo is marked his even when the page is closed at that very moment. Recipe photo list is swapped in one go (`refreshKeys()`). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

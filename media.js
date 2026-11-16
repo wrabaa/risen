@@ -15,8 +15,21 @@ function RepoFolder({ dir, cache: CACHE, pick }) {
   const INDEX = 'm/index.json', EVERY = 10 * 60 * 1000;                   // GitHub is asked at most every 10 minutes
   const ok = typeof caches !== 'undefined';
   let idx = null;                          // { checked: time, files: { key: { name, sha, type } } } = what is ON this phone
-  const urls = new Map();                  // key -> { url, type, sha } (object URLs, made once)
-  let onChange = null, busy = false;
+  const urls = new Map();                  // key -> { url, type, stamp } (object URLs, made once)
+  let onChange = null, running = null;
+  const DAY = 24 * 60 * 60 * 1000, GIVE_UP = 20 * 60 * 1000;
+  // Is this file really the one GitHub listed? (.99) The list comes from GitHub at once, the file from the site, which follows a minute or two
+  // later: a REPLACED file (same name) would otherwise be stored in its OLD form under the new `sha` and never looked at again.
+  // `sha` is git's: SHA-1 of "blob <bytes>\0" + the file. Where the browser cannot hash, the file is taken as it is.
+  async function same(b, sha) {
+    try {
+      if (typeof crypto === 'undefined' || !crypto.subtle) return true;
+      const body = new Uint8Array(await b.arrayBuffer()), head = new TextEncoder().encode('blob ' + body.length + '\0'), all = new Uint8Array(head.length + body.length);
+      all.set(head); all.set(body, head.length);
+      return [...new Uint8Array(await crypto.subtle.digest('SHA-1', all))].map(x => x.toString(16).padStart(2, '0')).join('') === sha;
+    } catch (e) { return true; }
+  }
+  const stamp = r => r.sha + ':' + (r.at || 0);                // changes whenever the stored file changes
 
   async function load() {
     if (idx) return idx;
@@ -35,45 +48,60 @@ function RepoFolder({ dir, cache: CACHE, pick }) {
   async function get(key) {                // { url, type } to show it, or null
     if (!ok || !key) return null;
     const rec = (await load()).files[key]; if (!rec) return null;
-    const have = urls.get(key); if (have && have.sha === rec.sha) return have;
+    const have = urls.get(key); if (have && have.stamp === stamp(rec)) return have;
     const b = await blob(key); if (!b) return null;
     if (have) URL.revokeObjectURL(have.url);
-    const u = { url: URL.createObjectURL(b), type: rec.type, sha: rec.sha }; urls.set(key, u); return u;
+    const u = { url: URL.createObjectURL(b), type: rec.type, stamp: stamp(rec) }; urls.set(key, u); return u;
   }
   const keys = async () => Object.keys((await load()).files);
-  const sha = async key => { const r = (await load()).files[key]; return r ? r.sha : null; };
+  const sig = async key => { const r = (await load()).files[key]; return r ? stamp(r) : null; };
 
   // Ask GitHub what is in the folder and bring this phone in line with it. Quiet: no network, no answer or a busy GitHub = nothing changes.
   //   first: keys to fetch before the others · force: do not wait for the 10 minutes (the user just asked for it)
-  async function sync(first = [], force = false) {
-    if (!ok || busy || !navigator.onLine) return;
+  function sync(first = [], force = false) {
+    if (running) return running;                                    // one round at a time: a second ask (pull down) waits for the same round
+    return running = round(first, force).finally(() => { running = null; });
+  }
+  async function round(first, force) {
+    if (!ok || !navigator.onLine) return;
     await load(); if (!force && Date.now() - idx.checked < EVERY) return;
-    busy = true;
     try {
       const res = await fetch(API, { cache: 'no-store', headers: { accept: 'application/vnd.github+json' } }); if (!res.ok) return;
       const rows = await res.json(); if (!Array.isArray(rows)) return;
       const want = pick(rows.filter(r => r && r.type === 'file')) || {};          // key -> { name, sha, type }
-      const c = await caches.open(CACHE); let changed = false, complete = true;
+      const c = await caches.open(CACHE), miss = idx.miss || (idx.miss = {}); let changed = false, complete = true;
       for (const k of Object.keys(idx.files)) if (!want[k]) { await c.delete('m/' + k); delete idx.files[k]; changed = true; }      // taken out of the folder (or no longer wanted)
+      for (const k of Object.keys(miss)) if (!want[k] || want[k].sha !== miss[k].sha) delete miss[k];
       const front = new Set(first), order = Object.keys(want).sort((a, b) => front.has(b) - front.has(a));
       for (const k of order) {
-        const w = want[k], have = idx.files[k];
-        if (have && have.sha === w.sha && await c.match('m/' + k)) continue;
+        const w = want[k], have = idx.files[k], kept = have && have.sha === w.sha ? await c.match('m/' + k) : null;
+        if (kept && (have.v || Date.now() - (have.u || 0) < DAY)) continue;       // on the phone and checked (or taken unchecked less than a day ago)
+        if (kept && !have.u && await same(await kept.blob(), w.sha)) { have.v = 1; continue; }      // stored before .99: checked once, it is the right file
         try {
           const r = await fetch(DIR + encodeURIComponent(w.name) + '?v=' + w.sha.slice(0, 8), { cache: 'no-store' });
           if (!r.ok) { complete = false; continue; }                  // the site is a minute behind the folder: next time
-          await c.put('m/' + k, new Response(await r.blob(), { headers: { 'content-type': w.type } }));
-          idx.files[k] = w; changed = true; await save();
+          const b = await r.blob(), rec = { name: w.name, sha: w.sha, type: w.type, at: Date.now() };
+          if (await same(b, w.sha)) rec.v = 1;
+          else {                                                      // the site still serves the file as it was BEFORE: not stored, asked again in 2 minutes
+            const m = miss[k] || (miss[k] = { sha: w.sha, t: Date.now() });
+            if (Date.now() - m.t < GIVE_UP) { complete = false; continue; }
+            delete miss[k];                                           // never the right one for 20 minutes: taken as it is, so content cannot get stuck; looked at again once a day
+            if (kept) { have.u = Date.now(); continue; }              // (what is on the phone is those same bytes: it stays)
+            rec.u = Date.now();
+          }
+          delete miss[k];
+          await c.put('m/' + k, new Response(b, { headers: { 'content-type': w.type } }));
+          idx.files[k] = rec; changed = true; await save();
           if (onChange) onChange(k);
         } catch (e) { complete = false; break; }                       // connection lost: the rest next time
       }
       idx.checked = complete ? Date.now() : Date.now() - EVERY + 2 * 60 * 1000;      // something did not download: try again in 2 minutes, not at every return to the app (.96; GitHub allows 60 asks an hour per network)
       await save();
       if (changed && onChange) onChange(null);
-    } catch (e) { /* nothing changes */ } finally { busy = false; }
+    } catch (e) { /* nothing changes */ }
   }
 
-  return { get, blob, keys, sha, sync, set onChange(fn) { onChange = fn; } };
+  return { get, blob, keys, sig, sync, set onChange(fn) { onChange = fn; } };
 }
 
 const MEDIA_TYPES = { mp4: 'video/mp4', mov: 'video/quicktime', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif' };
@@ -120,7 +148,7 @@ const RecipePack = (() => {
   let parsed = null, parsedSha = null;
   // The recipes of the pack as last downloaded: a clean list (bad entries are dropped), or null when there is no file yet
   async function list() {
-    const s = await F.sha('recipes.json'); if (!s) return null;
+    const s = await F.sig('recipes.json'); if (!s) return null;
     if (parsed && parsedSha === s) return parsed;
     try {
       const j = JSON.parse(await (await F.blob('recipes.json')).text()), seen = new Set(), out = [];
@@ -138,8 +166,9 @@ const RecipePack = (() => {
     } catch (e) { return null; }
   }
   const image = id => F.get('img/' + id);                                             // { url, type } or null
+  const imageBlob = id => F.blob('img/' + id);                                        // the picture's bytes (the TRY TODAY card makes its own URL from them)
   const images = async () => new Set((await F.keys()).filter(k => k.startsWith('img/')).map(k => k.slice(4)));
-  return { list, image, images, sync: force => F.sync([], force), set onChange(fn) { F.onChange = fn; } };
+  return { list, image, imageBlob, images, sync: force => F.sync([], force), set onChange(fn) { F.onChange = fn; } };
 })();
 
 // When: a few seconds after the app opens and every time it comes back to the front or online (never more often than every 10 minutes).

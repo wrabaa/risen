@@ -132,7 +132,7 @@
     }},
     {title:'Try today', tap:'try', cls:'tryit', show(){ return typeof Meals!=='undefined'&&!!Meals.tryInfo(); }, html(){      // one recipe with a picture, picked when the app opens; the whole card opens it (meals.js: tryInfo / openTry)
       const t=Meals.tryInfo(); if(!t) return '';
-      return `<img class="tryimg" alt="" src="${esc(t.url)}"><div class="trytxt"><div class="trynm">${esc(t.name)}</div><div class="sub">${esc(t.cat)}${t.kcal?' · '+t.kcal+' kcal':''}</div></div><span class="trygo">TRY IT</span>`;
+      return `<img class="tryimg" alt="" decoding="sync" src="${esc(t.url)}"><div class="trytxt"><div class="trynm">${esc(t.name)}</div><div class="sub">${esc(t.cat)}${t.kcal?' · '+t.kcal+' kcal':''}</div></div><span class="trygo">TRY IT</span>`;
     }},
     {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
       if(typeof Classes==='undefined') return '';
@@ -235,7 +235,7 @@
     document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+view);
     if(changed&&!tabSlide){ const v=$('view-'+view); v.classList.remove('enter'); void v.offsetWidth; v.classList.add('enter'); setTimeout(()=>v.classList.remove('enter'),400); }   // page change: slide + fade
     if(view!=='classes') $('clsSheet').hidden=true; // the Classes question belongs to the Classes tab only
-    if(view==='home'&&!wasHome){ renderHome(); Motion.count($('tiles')); }       // the numbers count up when Home opens
+    if(view==='home'&&!wasHome){ renderHome(); Motion.count($('tiles')); if(loaded) tryStart(); }       // the numbers count up when Home opens (TRY TODAY: only picks when there is no card, e.g. its recipe was just deleted)
     if(view==='home') applyUpdate(); // a new release that arrived while you were busy loads now
     $('tbTitle').textContent=TAB_TITLES[view]||'';                                                  // the shared top bar shows the page title
     const tabs=[...document.querySelectorAll('.tab')]; tabs.forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));

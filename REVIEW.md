@@ -3,7 +3,37 @@
 Review-only passes over the commits. No code is changed by a review; findings are listed here and fixed
 (or not) on Siza's go. Each review starts from the "last reviewed" commit below.
 
-**Last reviewed: `a21c4d3` — release 2026-11-16.95**
+**Last reviewed: release 2026-11-16.98 (`ada4a53`); its fixes are release `.99`**
+
+## Review 7 — 16 Nov 2026 — releases `.96` → `.98` (fixed in `.99`)
+Method: read the code of `.96` (recipe pack fixes), `.97` (pull down to refresh) and `.98` (TRY TODAY card), then ran it in Chrome at iPhone 13 and SE size with a
+pretend GitHub and synthetic touches. This time the fixes were made in the same pass (Siza asked). Nothing was run on a real iPhone.
+
+🔴 Fixed
+1. **A replaced picture or recipe text could stay OLD on a phone for good.** GitHub lists a changed file at once; the site hands it out a minute or two later. A phone
+   that looked in between (easy since pull down exists) stored the OLD file under the NEW mark and never looked again. Now each downloaded file is checked against
+   GitHub's mark; a file that is still the old one is asked for again in 2 minutes. Phones already stuck check what they hold once and heal by themselves. (`media.js`)
+
+🟡 Fixed
+2. A replaced pack picture could leave the TRY TODAY card or a Meals cover on a dead picture: the card's picture is now its own and follows the new one. (`meals.js`, `media.js`)
+3. The TRY TODAY picture faded in again at every redraw of Home (each glass of water or coffee). Once only now. (`styles.css`)
+4. The card's recipe deleted = no card until the next opening. Now a new one is picked when Home is shown again. (`app.js`)
+5. A pull down while a download round was already running said "✓ UPDATED" at once. It now waits for that round. (`media.js`)
+6. A RISEN recipe given an own photo, page closed in the same instant: it was not always marked as his. (`meals.js`)
+7. Small: the card's object URL is freed; the photo list is swapped in one go; the card's number is readable on the photo.
+
+🟢 Checked and fine
+- Pull down: arms at 90 px, UPDATING → ✓ UPDATED, NO INTERNET offline; never on a scrolled page, a sub-page, under a sheet, while typing, in a running workout, on a
+  sideways / diagonal / upward move. Tab swipe, swipe back and the Classes chips work as before. Only transform and opacity move; no blur on the chip; no glow on the card.
+- TRY TODAY: no card and the numbers close up without recipes; the pick changes at every opening, never twice in a row, the same all through one opening; a tap opens that recipe.
+- `.96`: a `recipes.json` without a `recipes` list changes nothing; a failed round is tried again in 2 minutes.
+
+Left as it is (on purpose)
+- "✓ UPDATED" also shows when GitHub was reached but refused (it allows 60 asks an hour per network, 2 per pull): nothing is lost, the next ask works. Not worth a new message.
+- The dark fades on the TRY TODAY card and the Meals covers use raw `rgba(11,11,11,…)` (same as the covers since `.91`); naming them is for the design pass.
+- On a real iPhone the page may bounce a little under the finger while pulling: cannot be seen in Chrome; to judge on the phone.
+- The same "old file under a new mark" can no longer happen for exercise clips either (same engine); the Gym screens pick up a healed clip the next time they are drawn.
+
 
 ## Status of review 6
 Fixed in `.96`: 🟡1 (own photo makes a RISEN recipe his), 🟡2 (wrong-shaped `recipes.json` changes nothing), 🟡3 (2-minute wait after a failed round). 🟡4 and 🟡5 stay rules of use.

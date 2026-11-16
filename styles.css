@@ -879,6 +879,7 @@
   .tile.tryit::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(11,11,11,.55) 0%,rgba(11,11,11,.05) 38%,rgba(11,11,11,.86) 100%);pointer-events:none}
   .tile.tryit .tile-head{position:relative;z-index:2}                  /* (the body stays static: the picture inside it is positioned against the whole card) */
   .tile.tryit .tile-head{text-shadow:0 1px 8px rgba(0,0,0,.6)}
+  .tile.tryit .tile-head b{color:var(--soft)}                           /* the number stays readable on a photo */
   .tile.tryit .tile-body{margin-top:auto;padding-top:40px;align-items:flex-end}
   .tile.tryit .tryimg{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;animation:fade .5s ease both}
   .tile.tryit .trytxt{position:relative;z-index:2;flex:1;min-width:0}
@@ -886,4 +887,5 @@
   .tile.tryit .sub{margin-top:4px;color:var(--soft2)}
   .tile.tryit .trygo{position:relative;z-index:2;flex:none;padding:8px 14px;border-radius:999px;border:1px solid var(--volt);background:var(--chip);color:var(--volt);font:600 12px Oswald,sans-serif;letter-spacing:.14em}
   .tile.tryit[data-tap]:active{background:var(--card);filter:brightness(1.12)}
+  .tiles.still .tile.tryit .tryimg{animation:none}                    /* the picture fades in once, not at every redraw of Home (a glass of water, the minute timer) */
   @media (prefers-reduced-motion: reduce){ .tile.tryit .tryimg{animation:none} }
