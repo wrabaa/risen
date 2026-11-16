@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.92)
+## Status (release 2026-11-16.93)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -244,6 +244,10 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   set that is already ticked asks first). "+ Add set" / "− Remove set" now redraw only that exercise's rows (`strengthRow()` / `setsHtml()` / `setBtnsHtml()` / `refreshSets()` in `gym.js`, `.setbtns` in `styles.css`): the page no longer
   jumps back to the top and the exercise pictures are not reloaded. The cardio card has no set buttons. Siza also reported that the treadmill ✓ could not be pressed: it could NOT be reproduced (it ticks with minutes typed or stepped, with a
   photo on the card, and a blank MIN answers "Enter the minutes first"); waiting for what he sees when he taps it. iPhone test pending.
+- `.93` taps landing a row off (Siza: pressing a set's ✓ marked the one BELOW; the treadmill ✓ could not be pressed): not reproducible without an iPhone, so the likely cause is fixed. A field that is redrawn away while it still has the focus
+  (type a kg, then press + Add set / − Remove set / the bin) leaves the iPhone keyboard half open and the page nudged, and every tap lands off the finger. `leaveField()` in `gym.js` lets go of the field before any redraw of the log, and a small block in
+  `app.js` (next to the typing sync) puts the window back at the origin whenever NO field is focused (focusout, taps, `visualViewport` resize / scroll, `scroll`): the app never scrolls the window itself, so this is safe, and it leaves the page alone
+  while a field is focused. If it still happens: next suspect is the fade `mask-image` on `.view` (`styles.css`), a known cause of wrong touch positions on iPhone; replace it by a fade overlay on `.tbar`. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

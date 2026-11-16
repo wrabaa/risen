@@ -358,12 +358,17 @@ const Gym = (() => {
     + e.sets.map((s, j) => e.cardio ? cardioRow(i, j, s, exerciseInfo(e.exerciseId).name) : strengthRow(e, i, j, s)).join('');
   const setBtnsHtml = (e, i) => e.cardio ? '' : `<div class="setbtns"><button class="dashed addset" data-addset="${i}">+ Add set</button>
     <button class="dashed addset" data-rmset="${i}"${e.sets.length <= 1 ? ' disabled' : ''}>&minus; Remove set</button></div>`;
+  // A field that is redrawn away while it still has the focus leaves iPhone's keyboard half open and the page nudged, so the next taps land
+  // off target. Let go of it first (the ✓ already does this).
+  const leaveField = root => { const a = document.activeElement; if (a && root && root.contains(a) && a.blur) a.blur(); };
   function refreshSets(i) {
     const e = draft().exercises[i], card = $('gymLog').querySelectorAll('.card.ex')[i]; if (!card) return;
+    leaveField(card);
     card.querySelector('.sets').innerHTML = setsHtml(e, i);
     const b = card.querySelector('.setbtns'); if (b) b.outerHTML = setBtnsHtml(e, i);
   }
   function renderLog(el, d) {
+    leaveField(el);
     let h = `<div class="subline"><span class="meta sname">${esc(d.name)}</span><span class="meta elapsed" id="elapsed">${fmtClock(Date.now() - new Date(d.startedAt))}</span></div><div class="gstack">`;
     d.exercises.forEach((e, i) => {
       const x = exerciseInfo(e.exerciseId);

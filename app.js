@@ -244,6 +244,16 @@
     for(const ev of ['click','touchend']) document.addEventListener(ev,()=>setTimeout(sync,60),{capture:true,passive:true});
     new MutationObserver(soon).observe(document.body,{childList:true,subtree:true});      // any redraw
     document.addEventListener('visibilitychange',sync); }
+  // iPhone keeps the page nudged after the keyboard closes (or after the field it was typing in is redrawn away): every tap then lands a row
+  // above or below the finger. This app never scrolls the window itself, so whenever no field is focused the window is put back at the origin.
+  { const FIELD='input:not([type=file]):not([type=checkbox]):not([type=radio]):not([type=button]),textarea,select';
+    const settle=()=>{ const a=document.activeElement; if(a&&a.matches&&a.matches(FIELD)&&a.isConnected) return;
+      const vv=window.visualViewport, off=(window.scrollY||0)+(document.scrollingElement?document.scrollingElement.scrollTop:0)+(vv?Math.abs(vv.offsetTop||0)+Math.abs(vv.offsetLeft||0):0);
+      if(off>0.5) window.scrollTo(0,0); };
+    document.addEventListener('focusout',()=>{ setTimeout(settle,80); setTimeout(settle,400); });
+    for(const ev of ['click','touchend']) document.addEventListener(ev,()=>setTimeout(settle,120),{capture:true,passive:true});
+    if(window.visualViewport){ visualViewport.addEventListener('resize',()=>setTimeout(settle,60)); visualViewport.addEventListener('scroll',()=>setTimeout(settle,60)); }
+    window.addEventListener('scroll',()=>setTimeout(settle,60),{passive:true}); }
   // ---- Swipe between tabs (.62) ----
   // On a TAB page a clear sideways swipe moves to the neighbour tab, in tab-bar order (swipe left = the tab to the right, swipe right = the
   // tab to the left; not past Home or Classes). It runs the tab's own opener (the same as a tap on the tab bar) and slides the two pages.
