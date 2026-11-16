@@ -3,7 +3,21 @@
 Review-only passes over the commits. No code is changed by a review; findings are listed here and fixed
 (or not) on Siza's go. Each review starts from the "last reviewed" commit below.
 
-**Last reviewed: `16b9b21` — release 2026-11-14.81**
+**Last reviewed: `1dd0fdf` — release 2026-11-15.86**
+
+## Review 5 — 16 Nov 2026 — commits `.82` → `.86` (`75b86f2` … `1dd0fdf`)
+Method: read the code diff since `.81` (`16b9b21`); nothing was run on an iPhone. No code changed.
+
+🔴 Must fix
+- None found. `coffeelogs` (DB 8) only adds a store and is in Export / Import / Reset; animated photos keep their `type` through backup and restore.
+
+🟡 Should fix
+1. **`assets/coffee.png` is not in the `ASSETS` list in `sw.js`.** It is only kept after it was seen online, and that copy is thrown away at every release: open the app offline right after an update and the COFFEE card shows the cup icon. Fix: add `'assets/coffee.png': 1` to `ASSETS`.
+2. **Many big GIFs make the backup heavy.** Each one may be 5 MB and goes into the backup file as text (a third bigger). A handful is fine; dozens could make Export fail on the phone. Keep own GIFs few and small (the built-in clips are planned as MP4 files, outside the backup).
+3. **`.82`–`.86` not yet tested on a real iPhone.**
+
+🟢 Fine
+- `.82` minute timer (only changed clock tiles, top bar untouched) · `.83` coffee (price stored with each drink) · `.84` / `.86` photo rows · `.85` animated pictures (5 MB cap, toast instead of `alert()`).
 
 ## Status of review 4
 Fixed in `.82`: 🟡1 (minute timer: only clock tiles that changed, never the top bar / profile photo), 🟡2 (`--chip`), 🟡3 (date for a class a week away), 🟡4 ("Delete a glass", cardio target never below 0, "✓ Saved" on the water goal sheet). 🟡5 stays open (iPhone test).
