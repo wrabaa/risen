@@ -98,8 +98,17 @@ const PhotoSlot = (() => {
   const TRASH = ICONS.trash;
   const CAMERA = '<svg class="icon" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
 
-  async function mount(el, exerciseId, { editable = false, onChange, video = false } = {}) {          // video:true (exercises) = a short clip may be chosen instead of a photo
+  async function mount(el, exerciseId, { editable = false, onChange, video = false, swap = false } = {}) {          // video:true (exercises) = a short clip may be chosen instead of a photo
     const p = await RisenDB.getPhoto(exerciseId);
+    let built = null;
+    const again = () => mount(el, exerciseId, { editable, onChange, video, swap });
+    async function pick(e) {                          // a file was chosen: store it, then draw the slot again
+      const f = e.target.files[0]; if (!f) return;
+      const s = el.querySelector('span'); if (s) s.textContent = 'Saving…';
+      try { const r = await prepare(f, { video }); await RisenDB.setPhoto(exerciseId, r.blob, r.width, r.height); }
+      catch (err) { toast(err.message || 'Could not read that photo'); }
+      await again(); if (onChange) onChange();
+    }
     el.classList.add('pslot');
     if (p) {
       el.innerHTML = `<button class="pslot-img" aria-label="${isVideo(p.type) ? 'View video' : 'View photo'}">${media(urlFor(exerciseId, p.blob), p.type)}</button>` +
@@ -108,17 +117,18 @@ const PhotoSlot = (() => {
       el.querySelector('.pslot-img').onclick = () => openViewer(urls.get(exerciseId), p.type);
       if (editable) el.querySelector('.pslot-del').onclick = async () => {
         if (!(await ask({ title: 'Delete this photo?', ok: 'DELETE', danger: true }))) return;
-        await RisenDB.deletePhoto(exerciseId); await mount(el, exerciseId, { editable, onChange, video }); if (onChange) onChange();
+        await RisenDB.deletePhoto(exerciseId); await again(); if (onChange) onChange();
       };
+    } else if (video && typeof ExMedia !== 'undefined' && (built = await ExMedia.get(exerciseId))) {
+      // an exercise with no photo of the user's own: the BUILT-IN picture / clip (assets/exercises/, media.js). `swap` (exercise page) adds a quiet way to put his own over it
+      el.innerHTML = `<button class="pslot-img" aria-label="${isVideo(built.type) ? 'View video' : 'View photo'}">${media(built.url, built.type)}</button>` +
+        (editable && swap ? `<label class="pslot-own">+ Use my own photo or video<input type="file" accept="image/*,video/mp4,video/quicktime" hidden></label>` : '');
+      kick(el);
+      el.querySelector('.pslot-img').onclick = () => openViewer(built.url, built.type);
+      const inp = el.querySelector('input'); if (inp) inp.onchange = pick;
     } else if (editable) {
       el.innerHTML = `<label class="pslot-add">${CAMERA}<span>${video ? '+ Add photo or video' : '+ Add photo'}</span><input type="file" accept="${video ? 'image/*,video/mp4,video/quicktime' : 'image/*'}" hidden></label>`;
-      el.querySelector('input').onchange = async e => {
-        const f = e.target.files[0]; if (!f) return;
-        el.querySelector('span').textContent = 'Saving…';
-        try { const r = await prepare(f, { video }); await RisenDB.setPhoto(exerciseId, r.blob, r.width, r.height); }
-        catch (err) { toast(err.message || 'Could not read that photo'); }
-        await mount(el, exerciseId, { editable, onChange, video }); if (onChange) onChange();
-      };
+      el.querySelector('input').onchange = pick;
     } else {
       el.innerHTML = ''; el.classList.remove('pslot');
     }

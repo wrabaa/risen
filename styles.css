@@ -845,3 +845,6 @@
   /* Gym day (.89): + ADD EXERCISE and START WORKOUT side by side, equal halves */
   .daybtns{display:flex;gap:10px;margin:6px 0 14px}
   .daybtns .primary{flex:1 1 0;min-width:0;margin:0;padding-left:6px;padding-right:6px;font-size:15px;letter-spacing:.1em;white-space:nowrap}
+  /* Built-in exercise picture / clip (.90): the quiet "use my own" line under it on the exercise page */
+  .pslot-own{display:block;margin-top:8px;padding:8px 2px;color:var(--muted);font:500 13px Inter,sans-serif;text-align:center;cursor:pointer}
+  .pslot-own:active{color:var(--text)}

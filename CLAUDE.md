@@ -8,7 +8,7 @@ Rule of thumb: **one screen, one job, one big button. No manual needed.**
 
 ## How it runs
 - Files: `index.html` (markup only) · `styles.css` · `shared.js` (helpers every tab uses) ·
-  `app.js` (Home, tabs, Settings, backup, updates) · `profile.js` (profile button, Personal info) · one file per tab. A new file must be
+  `app.js` (Home, tabs, Settings, backup, updates) · `profile.js` (profile button, Personal info) · `media.js` (built-in exercise pictures / clips, `.90`) · one file per tab. A new file must be
   added to `CORE` in `sw.js` or it will not work offline.
 - Plain HTML/CSS/JS PWA, no build step, no framework. Hosted on GitHub Pages:
   https://wrabaa.github.io/risen/ (repo `wrabaa/risen`, branch `main`).
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.89)
+## Status (release 2026-11-16.90)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -227,6 +227,12 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   A live class gets a red rectangle "LIVE" in white (`.livetag`, colour `--live`; since `.89` at the right end of the tile's head line, not on the photo) and its name alone (no "Now:"); it goes away by itself when the class ends (minute timer). The Classes tab is unchanged (lime LIVE NOW). iPhone test pending.
 - `.89` Gym day page (planner chat): when today's workout can be started, "+ ADD EXERCISE" and "START WORKOUT" sit SIDE BY SIDE (`.daybtns`, equal halves, 15 px text; START is the glowing one, on the right); they used to be stacked and touching since `.84` took the heading
   between them away. On any other day, or once the workout is done / skipped, ADD is alone at full width with 14 px under it. Home CLASSES tile: the red LIVE tag moved off the photo to the right end of the "05 CLASSES" line. iPhone test pending.
+- `.90` BUILT-IN EXERCISE PICTURES / CLIPS (planner chat; `media.js`, `ExMedia`): a file in the repo folder `assets/exercises/` named after an exercise's `file` in `library.js` (`chest-press.mp4`, `leg-curl.jpg`; the 82 names are in `assets/exercises/README.md`) belongs to that
+  exercise. NOTHING in the code lists the files and NO release is needed to add one: when the app is open and online (3 s after opening, on returning to the front, at most every 10 minutes) it asks GitHub's public API what is in the folder
+  (`api.github.com/repos/wrabaa/risen/contents/assets/exercises`; this is the app's ONE call outside its own site, it sends nothing about the user), downloads new or changed files (by `sha`; the program's exercises first; over 8 MB skipped; a clip wins over a picture) into its own
+  cache `risen.exmedia` (index in `m/index.json`), and deletes what left the folder. Offline it shows what it has. `sw.js` lets `assets/exercises/` requests pass (no second copy) and these files are NOT in `ASSETS`. Shown where the exercise photo sits (gym day rows, exercise page, workout log)
+  ONLY when the user has no photo / clip of his own for that exercise (his own always wins; deleting it brings the built-in back). On the exercise page a quiet "+ Use my own photo or video" sits under a built-in one (`swap:true`). App content, not user data: not in Export / Import / Reset.
+  Custom exercises have none. If GitHub cannot be reached, nothing changes. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

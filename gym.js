@@ -169,14 +169,24 @@ const Gym = (() => {
   const thumbs = new Map();            // exerciseId -> object URL, or null when there is no photo
   const thumbKind = new Map();         // exerciseId -> the stored type (a video clip plays in the row, silent and looping)
   const thumbHtml = id => thumbs.get(id) ? PhotoSlot.media(thumbs.get(id), thumbKind.get(id)) : I.bar;
-  function dropThumb(id) { if (thumbs.get(id)) URL.revokeObjectURL(thumbs.get(id)); thumbs.delete(id); thumbKind.delete(id); }
+  const thumbBuiltIn = new Set();      // ids whose row shows the BUILT-IN picture / clip (media.js owns that URL: never revoked here)
+  function dropThumb(id) { if (thumbs.get(id) && !thumbBuiltIn.has(id)) URL.revokeObjectURL(thumbs.get(id)); thumbs.delete(id); thumbKind.delete(id); thumbBuiltIn.delete(id); }
   function clearThumbs() { for (const id of [...thumbs.keys()]) dropThumb(id); }
   async function loadThumbs() {
     const els = [...document.querySelectorAll('#gymPageBody [data-xph]')];
-    for (const el of els) { const id = el.dataset.xph; if (thumbs.has(id)) continue; const p = await RisenDB.getPhoto(id); thumbs.set(id, p ? URL.createObjectURL(p.blob) : null); if (p) thumbKind.set(id, p.type); }
+    for (const el of els) { const id = el.dataset.xph; if (thumbs.has(id)) continue; const p = await RisenDB.getPhoto(id);
+      if (p) { thumbs.set(id, URL.createObjectURL(p.blob)); thumbKind.set(id, p.type); continue; }
+      const b = await ExMedia.get(id);                 // no photo of his own: the built-in picture / clip from assets/exercises/, when there is one
+      thumbs.set(id, b ? b.url : null); if (b) { thumbKind.set(id, b.type); thumbBuiltIn.add(id); } }
     for (const el of els) { const u = thumbs.get(el.dataset.xph); if (u && !el.querySelector('img,video')) el.innerHTML = thumbHtml(el.dataset.xph); }
     PhotoSlot.kick($('gymPageBody'));
   }
+
+  // A built-in picture / clip just arrived (or changed): rows still showing the icon, or an older built-in, pick it up
+  ExMedia.onChange = () => {
+    for (const id of [...thumbs.keys()]) if (!thumbs.get(id) || thumbBuiltIn.has(id)) dropThumb(id);
+    if (!$('gymPage').hidden && curDay != null) { document.querySelectorAll('#gymPageBody [data-xph]').forEach(el => { if (!thumbs.has(el.dataset.xph)) el.innerHTML = I.bar; }); loadThumbs(); }
+  };
 
   function openDay(d) {
     curDay = d; clearThumbs(); $('gymPage').classList.add('editing'); $('gymPageTitle').textContent = DAYNAMES[d - 1];
@@ -254,7 +264,7 @@ const Gym = (() => {
       <div class="last" id="exLast" style="margin-top:12px"></div>
       <div class="label">Notes</div><textarea class="field" id="exNotes" rows="2" maxlength="300" placeholder="Seat, machine, settings…">${esc(x.notes || '')}</textarea>
       ${x.custom ? `<div class="label">Muscle group</div><div class="chips" style="margin-top:0" id="exMuscle">${LIBRARY.groups.map(g => `<button type="button" data-xm="${g}" aria-pressed="${x.muscle === g}">${g}</button>`).join('')}</div>` : ''}`;
-    PhotoSlot.mount($('exPhoto'), it.exerciseId, { editable: true, video: true });
+    PhotoSlot.mount($('exPhoto'), it.exerciseId, { editable: true, video: true, swap: true, onChange: () => dropThumb(it.exerciseId) });
     const idx = curEx;
     RisenDB.historyOf(it.exerciseId).then(hs => {
       const cardio = isCardio(it.exerciseId), l = cardio ? cardioLastOf(hs) : hs.find(h => h.sets && h.sets.length), el = $('exLast'); if (!el || curEx !== idx) return;
