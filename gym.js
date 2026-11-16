@@ -167,13 +167,15 @@ const Gym = (() => {
 
   // ================= LEVEL 2: THE DAY =================
   const thumbs = new Map();            // exerciseId -> object URL, or null when there is no photo
-  const thumbHtml = id => thumbs.get(id) ? `<img alt="" src="${thumbs.get(id)}">` : I.bar;
-  function dropThumb(id) { if (thumbs.get(id)) URL.revokeObjectURL(thumbs.get(id)); thumbs.delete(id); }
+  const thumbKind = new Map();         // exerciseId -> the stored type (a video clip plays in the row, silent and looping)
+  const thumbHtml = id => thumbs.get(id) ? PhotoSlot.media(thumbs.get(id), thumbKind.get(id)) : I.bar;
+  function dropThumb(id) { if (thumbs.get(id)) URL.revokeObjectURL(thumbs.get(id)); thumbs.delete(id); thumbKind.delete(id); }
   function clearThumbs() { for (const id of [...thumbs.keys()]) dropThumb(id); }
   async function loadThumbs() {
     const els = [...document.querySelectorAll('#gymPageBody [data-xph]')];
-    for (const el of els) { const id = el.dataset.xph; if (thumbs.has(id)) continue; const p = await RisenDB.getPhoto(id); thumbs.set(id, p ? URL.createObjectURL(p.blob) : null); }
-    for (const el of els) { const u = thumbs.get(el.dataset.xph); if (u && !el.querySelector('img')) el.innerHTML = `<img alt="" src="${u}">`; }
+    for (const el of els) { const id = el.dataset.xph; if (thumbs.has(id)) continue; const p = await RisenDB.getPhoto(id); thumbs.set(id, p ? URL.createObjectURL(p.blob) : null); if (p) thumbKind.set(id, p.type); }
+    for (const el of els) { const u = thumbs.get(el.dataset.xph); if (u && !el.querySelector('img,video')) el.innerHTML = thumbHtml(el.dataset.xph); }
+    PhotoSlot.kick($('gymPageBody'));
   }
 
   function openDay(d) {
@@ -251,7 +253,7 @@ const Gym = (() => {
       <div class="last" id="exLast" style="margin-top:12px"></div>
       <div class="label">Notes</div><textarea class="field" id="exNotes" rows="2" maxlength="300" placeholder="Seat, machine, settings…">${esc(x.notes || '')}</textarea>
       ${x.custom ? `<div class="label">Muscle group</div><div class="chips" style="margin-top:0" id="exMuscle">${LIBRARY.groups.map(g => `<button type="button" data-xm="${g}" aria-pressed="${x.muscle === g}">${g}</button>`).join('')}</div>` : ''}`;
-    PhotoSlot.mount($('exPhoto'), it.exerciseId, { editable: true });
+    PhotoSlot.mount($('exPhoto'), it.exerciseId, { editable: true, video: true });
     const idx = curEx;
     RisenDB.historyOf(it.exerciseId).then(hs => {
       const cardio = isCardio(it.exerciseId), l = cardio ? cardioLastOf(hs) : hs.find(h => h.sets && h.sets.length), el = $('exLast'); if (!el || curEx !== idx) return;
@@ -355,7 +357,7 @@ const Gym = (() => {
       <button class="primary finish" data-act="finish">FINISH WORKOUT</button>
       <button class="quiet" data-act="discard">Discard workout</button>`;
     el.innerHTML = h;
-    el.querySelectorAll('[data-photo]').forEach(p => PhotoSlot.mount(p, p.dataset.photo, { editable: true }));
+    el.querySelectorAll('[data-photo]').forEach(p => PhotoSlot.mount(p, p.dataset.photo, { editable: true, video: true }));
   }
   setInterval(() => { const e = $('elapsed'), d = draft(); if (e && d) e.textContent = fmtClock(Date.now() - new Date(d.startedAt)); }, 1000);
 

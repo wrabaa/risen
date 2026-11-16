@@ -5,6 +5,9 @@ Review-only passes over the commits. No code is changed by a review; findings ar
 
 **Last reviewed: `1dd0fdf` — release 2026-11-15.86**
 
+## Status of review 5
+Fixed in `.87`: 🟡1 (`assets/coffee.png` is in `ASSETS`). 🟡2 stays a rule of use (few, small clips). 🟡3 stays open (iPhone test).
+
 ## Review 5 — 16 Nov 2026 — commits `.82` → `.86` (`75b86f2` … `1dd0fdf`)
 Method: read the code diff since `.81` (`16b9b21`); nothing was run on an iPhone. No code changed.
 

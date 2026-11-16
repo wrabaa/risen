@@ -1,6 +1,6 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of the APP files (pages, code, data) and delete the old one.
-const VERSION = '2026-11-15.86';
+const VERSION = '2026-11-16.87';
 const CACHE = 'risen-' + VERSION;
 
 // APP FILES: small, change often. All of them are downloaded again on every release, all or nothing.
@@ -20,6 +20,7 @@ const ASSETS = {
   'assets/icon-180.png': 1,
   'assets/icon-192.png': 1,
   'assets/icon-512.png': 1,
+  'assets/coffee.png': 1,
   'assets/fonts/inter.woff2': 1,
   'assets/fonts/oswald.woff2': 1,
   'assets/instructors/bader.jpg': 2,

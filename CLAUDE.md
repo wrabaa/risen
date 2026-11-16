@@ -16,7 +16,7 @@ Rule of thumb: **one screen, one job, one big button. No manual needed.**
 - Fully offline, no accounts, no server, no analytics. Each phone keeps its own data.
 - Data: IndexedDB (`db.js`) with a versioned schema — never lose user data on update.
   Every new store goes into Export / Import / Reset.
-- Photos: `photo.js` (resize ≤1000px JPEG, stored in IndexedDB, included in backup; a GIF / WebP is kept as it is, up to 5 MB, so it stays animated).
+- Photos: `photo.js` (resize ≤1000px JPEG, stored in IndexedDB, included in backup; a GIF / WebP is kept as it is, up to 5 MB, so it stays animated; on an EXERCISE a short video clip, MP4 or MOV up to 8 MB, may be chosen instead and plays silent and looping, `.87`).
 - Service worker `sw.js` — bump `VERSION` on every release (format `YYYY-MM-DD.N`).
   App files (pages, code, `data/`) are re-downloaded on every release. Images and fonts live
   in their own cache that survives releases, driven by the `ASSETS` list at the top of `sw.js`:
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-15.86)
+## Status (release 2026-11-16.87)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -218,6 +218,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   never stretched), the class name (2 lines then an ellipsis), time, LIVE NOW / Starts in, studio tag + instructor beside it, the > and the star on the right; every row 120 px (the ✓ ATTENDED button sits under it on today). No photo (Cesar) or no instructor (TBA) =
   the initial / TBA centred on a plain card-coloured square of the same size. Tapping the photo still opens the instructor page. The WEEK list's day rows have no photo, and the round `.avatar` is unchanged everywhere else (instructor lists / pages, profile button). The lime "mine" edge
   is not drawn on these rows (the photo covers it; the star shows it). iPhone test pending.
+- `.87` VIDEO CLIPS on exercises (built by the planner chat, not Claude Code): the exercise photo slot (`PhotoSlot.mount(..., {video:true})`, exercise page and workout log only) says "+ Add photo or video" and also takes a video (`video/mp4`, and the `video/quicktime` MOV an
+  iPhone hands over from Photos). The file is stored EXACTLY as chosen in the same `photos` store with its `type` (so Export / Import carry it), up to 8 MB ("That video is too big — keep it under 8 MB (3–5 seconds)"). `PhotoSlot.media(url, type)` is the ONE way to draw it:
+  a clip = `<video muted loop autoplay playsinline>` (no controls), anything else = `<img>`; `PhotoSlot.kick(root)` starts the clips after a draw and when the app returns to the front. Shown in the gym day rows (`thumbHtml()` + `thumbKind` in `gym.js`), on the exercise page,
+  in the workout log and in the full-screen viewer; the size label reads "VIDEO · 1.2 MB". Supps, recipes, profile and instructor photos still take pictures only (a video there is refused: "A video only works on an exercise"). `assets/coffee.png` is now in `ASSETS` (review 5).
+  Known limits: in iPhone Low Power Mode clips do not start by themselves (first frame shows); many big clips make the backup heavy. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
