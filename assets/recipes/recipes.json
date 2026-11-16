@@ -109,6 +109,101 @@
         "20 g sesame seeds"
       ],
       "method": "1. Mix everything in a jar. No salt, no sugar.\n2. Keep it closed in a cool, dry place.\n3. One handful (about 36 g) a day. The jar lasts a week."
+    },
+    {
+      "id": "blueberry-oat-shake",
+      "category": "shakes",
+      "name": "Blueberry Oat Shake",
+      "serves": 1,
+      "kcal": 415,
+      "health": "About 25 g protein and 8 g fibre. Oats bring beta-glucan, the fibre the US FDA links to lower cholesterol (3 g a day); this glass gives about half of that. Blueberries add vitamin C. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "40 g rolled oats (about 1/2 cup)",
+        "150 g blueberries, fresh or frozen",
+        "150 g plain Greek yoghurt, 0% fat",
+        "200 ml low-fat milk",
+        "1/2 tsp cinnamon"
+      ],
+      "method": "1. Put the milk, yoghurt and oats in the blender and leave 5 minutes so the oats soften.\n2. Add the blueberries and cinnamon.\n3. Blend for 1 minute, until smooth. Drink at once."
+    },
+    {
+      "id": "foul-moudammas",
+      "category": "breakfast",
+      "name": "Foul Moudammas",
+      "serves": 2,
+      "kcal": 360,
+      "health": "About 20 g plant protein and 17 g fibre per serving, with iron and folate. Fava beans are a staple legume in the AUB Food-Based Dietary Guidelines for Lebanon. Their fibre slows the rise in blood sugar. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "400 g cooked fava beans (one tin, drained)",
+        "2 garlic cloves, crushed",
+        "juice of 1 lemon",
+        "2 tbsp olive oil",
+        "1 tsp ground cumin",
+        "1 medium tomato, diced",
+        "2 tbsp chopped parsley",
+        "1/4 tsp salt"
+      ],
+      "method": "1. Warm the fava beans in a small pan with a splash of their water for 5 minutes.\n2. Mash roughly with a fork, leaving some beans whole.\n3. Stir in the garlic, lemon juice, cumin and salt.\n4. Serve in a bowl, topped with the tomato, parsley and the olive oil."
+    },
+    {
+      "id": "chickpea-tabbouleh",
+      "category": "lunch",
+      "name": "Chickpea Tabbouleh",
+      "serves": 2,
+      "kcal": 500,
+      "health": "About 17 g plant protein and 14 g fibre per serving. Parsley is very rich in vitamin K and vitamin C, chickpeas add protein and slow-release carbs, olive oil gives the heart-friendly fats. Nutrition: USDA FoodData Central; legumes as in the AUB Food-Based Dietary Guidelines.",
+      "ingredients": [
+        "2 big bunches fresh parsley (about 120 g leaves), very finely chopped",
+        "300 g tomatoes, finely diced",
+        "40 g fine bulgur, soaked in water 15 minutes and drained",
+        "240 g cooked chickpeas (one tin, drained)",
+        "3 spring onions, sliced",
+        "3 tbsp olive oil",
+        "juice of 2 lemons",
+        "1/4 tsp salt"
+      ],
+      "method": "1. Put the soaked, drained bulgur in a large bowl.\n2. Add the parsley, tomatoes, spring onions and chickpeas.\n3. Dress with the lemon juice, olive oil and salt. Mix well.\n4. Leave 10 minutes so the bulgur takes the flavour, then serve."
+    },
+    {
+      "id": "hummus-veggie-sticks",
+      "category": "snacks",
+      "name": "Hummus with Veggie Sticks",
+      "serves": 4,
+      "kcal": 205,
+      "health": "About 8 g plant protein and 7 g fibre per serving. Chickpeas and sesame (tahini) give protein, fibre and unsaturated fats, and the raw vegetables add crunch for almost no calories. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "240 g cooked chickpeas (one tin, drained)",
+        "2 tbsp tahini (30 g)",
+        "juice of 1 lemon",
+        "1 garlic clove",
+        "1 tbsp olive oil",
+        "3 tbsp cold water",
+        "1/4 tsp salt",
+        "2 carrots, cut in sticks (200 g)",
+        "1 cucumber, cut in sticks (200 g)"
+      ],
+      "method": "1. Blend the chickpeas, tahini, lemon juice, garlic, salt and water until completely smooth. Add a little more water if it is too thick.\n2. Spoon into a bowl and drizzle with the olive oil.\n3. Serve with the carrot and cucumber sticks. Keeps 4 days in the fridge."
+    },
+    {
+      "id": "fish-chickpea-tomato-bake",
+      "category": "dinner",
+      "name": "Fish & Chickpea Tomato Bake",
+      "serves": 2,
+      "kcal": 510,
+      "health": "About 45 g protein and 12 g fibre per serving. White fish is lean protein and a source of vitamin B12 and selenium; the American Heart Association recommends fish at least twice a week. Chickpeas and tomatoes add fibre and lycopene. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "2 white fish fillets, 150 g each (cod or sea bream)",
+        "240 g cooked chickpeas (one tin, drained)",
+        "400 g tomatoes, chopped",
+        "1 medium onion, sliced",
+        "3 garlic cloves, sliced",
+        "2 tbsp olive oil",
+        "1 tsp ground cumin",
+        "2 tbsp chopped parsley",
+        "1 lemon, cut in wedges",
+        "1/4 tsp salt, black pepper"
+      ],
+      "method": "1. Heat the oven to 200°C.\n2. In a baking dish mix the onion, garlic, tomatoes, chickpeas, cumin, salt, pepper and 1 tbsp of the olive oil.\n3. Bake 15 minutes.\n4. Lay the fish on top, drizzle with the rest of the olive oil and bake 12–15 minutes more, until it flakes easily.\n5. Scatter with parsley and serve with the lemon wedges."
     }
   ]
 }
