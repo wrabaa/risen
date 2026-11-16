@@ -3,7 +3,24 @@
 Review-only passes over the commits. No code is changed by a review; findings are listed here and fixed
 (or not) on Siza's go. Each review starts from the "last reviewed" commit below.
 
-**Last reviewed: `1dd0fdf` — release 2026-11-15.86**
+**Last reviewed: `a21c4d3` — release 2026-11-16.95**
+
+## Review 6 — 16 Nov 2026 — commits `.87` → `.95` (`df90293` … `a21c4d3`)
+Method: read the code diff since `.86` (`1dd0fdf`) and compared the old and new class schedule by id; `.92`–`.95` were used by Siza on his iPhone at the gym, the recipe pack has not run on a phone yet (it is empty). No code changed.
+
+🔴 Must fix
+- None found. No new store, no DB change. `media.js` is in `CORE`; the two repo folders bypass the service worker and keep their own caches (`risen.exmedia`, `risen.recipes`), which a release does not delete. New schedule (v3): no class id reused or changed, 10 retired, 6 new, every instructor id exists.
+
+🟡 Should fix
+1. **A photo added to a RISEN recipe does not make it "his".** Only a text change sets `edited`. If he only adds his own photo, and the recipe is later taken out of the pack (or "Delete RISEN recipes" is used), the recipe and his photo go together. Fix: adding or deleting a photo on a pack recipe sets `edited` too. (`meals.js` openRecipe → PhotoSlot `onChange`)
+2. **A wrong-shaped `recipes.json` empties the phones.** Broken JSON changes nothing (good), but valid JSON with no `recipes` list reads as "the pack is empty": untouched RISEN recipes disappear until the file is fixed (they come back; edited ones and the user's own are never touched). Rule of use: check the file before every push. A cheap guard: ignore a list that is empty while the phone has pack recipes.
+3. **A file that keeps failing is asked for at every return to the app.** `idx.checked` is only set when everything downloaded, so one bad file removes the 10-minute wait and GitHub is asked each time the app comes to the front (GitHub allows 60 asks an hour per network). Nothing breaks; the folder just stops updating for the hour. Fix: set `checked` also after a failed round. (`media.js` sync)
+4. **Own video clips make the backup heavy.** A clip the user adds himself (up to 8 MB) goes into the backup as text, like the GIFs of review 5. One or two are fine; many could make Export fail. The built-in clips in `assets/exercises/` are outside the backup, so this only matters for own clips.
+5. **The new schedule does not arrive by itself.** A phone that already loaded the classes gets v3 only through Settings → Reload gym schedule. Not a bug, a thing to tell friends.
+
+🟢 Fine
+- `.87` video clips (silent, looping, 8 MB cap, toast on error) · `.88`/`.89` LIVE tag and side-by-side day buttons · `.90` built-in exercise media (user's own always wins, built-in URL never revoked by the rows) · `.91` recipe pack (asked once, deleted stays deleted, open recipe never overwritten) · `.92` remove set (asks when ticked, one set always stays, plan untouched) · `.93` page put back after the keyboard · `.94` pong (no file, works offline, quiet when coming back late) · `.95` schedule.
+
 
 ## Status of review 5
 Fixed in `.87`: 🟡1 (`assets/coffee.png` is in `ASSETS`). 🟡2 stays a rule of use (few, small clips). 🟡3 stays open (iPhone test).
