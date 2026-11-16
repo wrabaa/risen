@@ -40,7 +40,7 @@ Background #0B0B0B · cards #1A1A1A · borders #262626 · text #F2F2F2 · muted 
 ONE accent volt #CCFF00 (buttons, active, highlights, done). Oswald (headlines, uppercase,
 big numbers) + Inter (body). 20px rounded cards (since `.54`, see `DESIGN.md`), pill buttons, simple line icons.
 Supporting colours (named on `:root` in `styles.css`, use the names, never raw codes):
-`--danger` #FF6B6B (delete/reset ONLY — the one exception to "one accent") · `--field` #0F0F0F
+`--danger` #FF6B6B (delete/reset ONLY — the one exception to "one accent") · `--live` #E5252A (the red LIVE tag on Home's CLASSES tile ONLY, white text; Siza asked for red, `.88`) · `--field` #0F0F0F
 (inputs) · `--press` #202020 · `--dash` #3A3A3A · `--mid` #4A4A4A · `--dim` #5A5A5A ·
 `--faint` #6A6A6A · `--off` #2A2A2A · `--soft` #C9C9C9 · `--soft2` #D6D6D6 · `--volt-press` #B8E600 ·
 tab bar glass: `--glass` rgba(26,26,26,.84) (`.58`; it was .62 and let lime show through bright) · `--glass-hi` rgba(255,255,255,.1) (the pill behind the active tab) · `--chip` rgba(11,11,11,.55) (small label chips that sit on a photo, `.82`) ·
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.87)
+## Status (release 2026-11-16.88)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -223,6 +223,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   a clip = `<video muted loop autoplay playsinline>` (no controls), anything else = `<img>`; `PhotoSlot.kick(root)` starts the clips after a draw and when the app returns to the front. Shown in the gym day rows (`thumbHtml()` + `thumbKind` in `gym.js`), on the exercise page,
   in the workout log and in the full-screen viewer; the size label reads "VIDEO · 1.2 MB". Supps, recipes, profile and instructor photos still take pictures only (a video there is refused: "A video only works on an exercise"). `assets/coffee.png` is now in `ASSETS` (review 5).
   Known limits: in iPhone Low Power Mode clips do not start by themselves (first frame shows); many big clips make the backup heavy. iPhone test pending.
+- `.88` Home CLASSES tile shows a class that is running NOW (planner chat): `Classes.next()` picks a live class first (a starred live one before the others), then the next starred, then the next of any kind (before, a starred class later today hid the one running now).
+  A live class gets a red rectangle "LIVE" in white on the top-left corner of the photo (`.livetag`, colour `--live`) and its name alone (no "Now:"); it goes away by itself when the class ends (minute timer). The Classes tab is unchanged (lime LIVE NOW). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

@@ -141,7 +141,8 @@
         const day=n.dayOffset===1?'Tomorrow':n.dayOffset<=6?DAYS[n.day-1]:when.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}).replace(',','');
         return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${esc(n.c.name)}</div><div class="sub">${day} · ${esc(n.c.time)} · ${who}</div>`);       // the day first on the small line, so a long class name keeps its two lines
       }
-      return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${n.now?'Now':'Next'}: ${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${who}</div>`);
+      // a class running now: a red LIVE tag on the photo's corner and the name alone (no "Now:"); otherwise "Next: NAME"
+      return picRow(`<div class="tpic">${Classes.avatar(n.i)}${n.now?'<span class="livetag">LIVE</span>':''}</div>`,`<div class="wname">${star}${n.now?'':'Next: '}${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${who}</div>`);
     }},
     {title:'This week', stack:true, html(){
       const days=weekDays(), today=dayKey(new Date());

@@ -8,6 +8,7 @@
     --glass:rgba(26,26,26,.84);--glass-hi:rgba(255,255,255,.1);   /* tab bar: dark enough that a lime button scrolling under it only shows as a faint hint */
     /* Supporting colours (not brand colours: greys for depth, and one red for destructive actions only) */
     --danger:#FF6B6B;     /* delete / reset */
+    --live:#E5252A;       /* the LIVE tag on Home's CLASSES tile only (.88) */
     --field:#0F0F0F;      /* inputs and inset boxes */
     --press:#202020;      /* a card while it is pressed */
     --dash:#3A3A3A;       /* dashed and quiet borders */
@@ -770,6 +771,8 @@
   .tile.pic .tpic{flex:none;width:134px;height:auto;border-radius:0;overflow:hidden;background:var(--field);display:grid;place-items:center;color:var(--dim)}
   .tpic img{display:block;width:100%;height:100%;object-fit:cover}
   .tpic .icon{width:34px;height:34px}
+  .tile.pic .tpic{position:relative}
+  .livetag{position:absolute;top:8px;left:8px;padding:3px 8px;border-radius:5px;background:var(--live);color:var(--text);font:700 12px Oswald,sans-serif;letter-spacing:.14em;line-height:1.2}
   .tpic .avatar{width:100%;height:100%;border:0;border-radius:0}
   .tpic .avatar img{object-position:50% 22%}
   .tile.pic .tcol{flex:1;min-width:0;display:flex;flex-direction:column;padding:15px 16px 12px 16px}

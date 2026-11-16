@@ -35,7 +35,8 @@ const Classes = (() => {
     const now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes(), k = dayKey(now), att = attMap();
     const today = S.classes.filter(c => c.day === isoDay(now)).sort(byTime);
     const left = today.filter(x => !att.has(attId(x.id, k)) && toMin(x.time) + (x.duration || 60) > nowMin);
-    const c = left.find(x => x.star) || left[0];
+    const live = left.filter(x => toMin(x.time) <= nowMin);                    // a class running NOW comes first (a starred one before the others), then the next starred, then the next of any kind
+    const c = live.find(x => x.star) || live[0] || left.find(x => x.star) || left[0];
     if (c) return { c, i: inst(c.instructorId), now: toMin(c.time) <= nowMin, star: !!c.star };
     // Nothing left today: look ahead up to 7 days for the next day that has a class (the first class of that day). Used by Home only; the Classes tab does not call next().
     for (let off = 1; off <= 7; off++) {
