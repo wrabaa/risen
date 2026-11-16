@@ -873,3 +873,17 @@
   .ptr[data-s="done"] .ptrs,.ptr[data-s="off"] .ptrs{display:none}
   @keyframes ptrspin{to{transform:rotate(360deg)}}
   @media (prefers-reduced-motion: reduce){ .ptr .ptra{transition:none} .ptr[data-s="busy"] .ptrs{animation:none} .ptr.snap{transition:opacity .2s ease} }
+  /* TRY TODAY (.98): a big picture card on Home, like the Meals category covers: the recipe's picture fills the card under a dark fade, the head on top, the name and
+     "Lunch · 380 kcal" at the bottom, and a small TRY IT pill. No glow (the glow belongs to the one main button on Home). The picture fades in. */
+  .tile.tryit{display:flex;flex-direction:column;min-height:224px;overflow:hidden;border-color:transparent;background:var(--card)}
+  .tile.tryit::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(11,11,11,.55) 0%,rgba(11,11,11,.05) 38%,rgba(11,11,11,.86) 100%);pointer-events:none}
+  .tile.tryit .tile-head{position:relative;z-index:2}                  /* (the body stays static: the picture inside it is positioned against the whole card) */
+  .tile.tryit .tile-head{text-shadow:0 1px 8px rgba(0,0,0,.6)}
+  .tile.tryit .tile-body{margin-top:auto;padding-top:40px;align-items:flex-end}
+  .tile.tryit .tryimg{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;animation:fade .5s ease both}
+  .tile.tryit .trytxt{position:relative;z-index:2;flex:1;min-width:0}
+  .tile.tryit .trynm{font-family:Oswald,sans-serif;font-weight:700;font-size:28px;line-height:1.05;text-transform:uppercase;letter-spacing:.04em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .tile.tryit .sub{margin-top:4px;color:var(--soft2)}
+  .tile.tryit .trygo{position:relative;z-index:2;flex:none;padding:8px 14px;border-radius:999px;border:1px solid var(--volt);background:var(--chip);color:var(--volt);font:600 12px Oswald,sans-serif;letter-spacing:.14em}
+  .tile.tryit[data-tap]:active{background:var(--card);filter:brightness(1.12)}
+  @media (prefers-reduced-motion: reduce){ .tile.tryit .tryimg{animation:none} }

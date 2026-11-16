@@ -56,7 +56,7 @@ No dot-matrix font. Intro = Siza's photo + logo + "STRONGER EVERY DAY" + no ENTE
 ## Structure
 Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · MEALS · SUPPS · CLASSES**. A round profile button (top right of the shared top bar) opens the profile page: SETTINGS · PERSONAL INFO.
 - **HOME** (`app.js`): Hello [name], tiles 01 TRAINING (shortcut to today's gym day),
-  02 SUPPLEMENTS, 03 WATER, 04 COFFEE, 05 CLASSES, 06 THIS WEEK, 07 STREAK, 08 WEEK SUMMARY (four small rings: workouts · supplements taken/due ·
+  02 SUPPLEMENTS, 03 WATER, 04 COFFEE, 05 TRY TODAY (a recipe card, `.98`), 06 CLASSES, 07 THIS WEEK, 08 STREAK, 09 WEEK SUMMARY (four small rings: workouts · supplements taken/due ·
   classes attended · water), backup reminder line.
 - **GYM** (`gym.js`, `library.js`): Week (Mon–Sun, today lime) → Day (+ ADD EXERCISE,
   list, Copy to…, START WORKOUT on today) → Exercise (photo, sets/kg/reps, notes,
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.97)
+## Status (release 2026-11-16.98)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -264,6 +264,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   `ExMedia.sync` got the same `force` argument), asks the service worker to look for a new release (a release still loads by the usual quiet-Home rule), and redraws Home; Meals / Gym follow by their own `onChange`. SOFT: the page is never reloaded, nothing can be lost. Never starts: on inputs,
   while typing, under a sheet / sub-page / photo viewer, in a running workout, or when the page is not at the top; a sideways or upward move steps aside (tab swipe, swipe back and the Classes chips are untouched). Max 12 s wait. Only transform and opacity move; reduced motion = no spin. No blur on the chip.
   Tested at iPhone 13 and SE size with synthetic touches (Home, Meals, Gym, offline, sheet open, scrolled, diagonal, up, tab swipe). iPhone test pending. Reviews: `.96` and `.97` are not reviewed yet (`REVIEW.md` last reviewed `.95`).
+
+- `.98` TRY TODAY card on Home (Siza's idea, planner chat; `meals.js` `tryInfo()` / `tryPrep()` / `openTry()`, tile in `app.js`, `.tile.tryit` in `styles.css`): tile 05, between COFFEE and CLASSES (the numbers after it moved up by one: CLASSES 06, THIS WEEK 07, STREAK 08, WEEK SUMMARY 09).
+  A big picture card like the Meals covers: the recipe's picture fills the card under a dark fade, "05 TRY TODAY" on top, the recipe name (Oswald, 2 lines) and "Lunch · 380 kcal" at the bottom, a small lime outline "TRY IT" pill (no glow). The recipe is picked ONCE per app opening
+  from the recipes that have a picture on the phone (own photo or the pack's picture), never the same one as last time (setting `tryLast`), and stays for the whole opening (Home redraws all day). The whole card opens the Meals tab with THAT recipe's page on top (back = the Meals tab).
+  No recipe with a picture yet = no card, and the numbers close up (a tile may have `show()` in `TILES`; `tileNo()`); it appears by itself when recipes arrive (`risen-try` event) or on a pull-down refresh. Its picture URL is its own, so leaving the Meals tab never breaks it. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

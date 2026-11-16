@@ -130,6 +130,10 @@
       const pic=`<div class="tpic">${coffeePic?'<img alt="" src="assets/coffee.png">':'<svg class="icon" viewBox="0 0 24 24"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3v2M12 3v2"/></svg>'}</div>`;
       return picRow(pic,`<div class="big">$<span data-count="${total}" data-dec="2" data-fix="2">${total.toFixed(2)}</span></div><div class="sub">${list.length} ${list.length===1?'cup':'cups'} · ${month}</div>`,'',`<div class="wtools"><button type="button" class="wminus" data-coffee="minus" aria-label="Delete the last drink"${list.length?'':' disabled'}>&minus;</button><button type="button" class="wgear" data-coffee="goal" aria-label="Coffee name and price"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>`);
     }},
+    {title:'Try today', tap:'try', cls:'tryit', show(){ return typeof Meals!=='undefined'&&!!Meals.tryInfo(); }, html(){      // one recipe with a picture, picked when the app opens; the whole card opens it (meals.js: tryInfo / openTry)
+      const t=Meals.tryInfo(); if(!t) return '';
+      return `<img class="tryimg" alt="" src="${esc(t.url)}"><div class="trytxt"><div class="trynm">${esc(t.name)}</div><div class="sub">${esc(t.cat)}${t.kcal?' · '+t.kcal+' kcal':''}</div></div><span class="trygo">TRY IT</span>`;
+    }},
     {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
       if(typeof Classes==='undefined') return '';
       if(!S.classes.length) return `<div><div class="wname">No classes yet</div><div class="sub">Add them in Classes</div></div>`;
@@ -183,8 +187,10 @@
   let homeDrawn=false, homeDay=dayKey(new Date());
   const tileText=html=>html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();       // what a tile SAYS (to tell whether it really changed)
   const tileSaid={};
+  const shown=t=>!t.show||t.show();                   // a tile with a `show()` appears only while it says so (the numbers then close up)
+  const tileNo=i=>1+TILES.slice(0,i).filter(shown).length;
   function tileHtml(t,i){                            // one tile; a picture tile has the image flush left over the tile's full height, the head and the text to its right
-    const h=t.html(), pic=h&&h.__pic, head=`<div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}${pic&&h.tag||''}</div>`;
+    const h=t.html(), pic=h&&h.__pic, head=`<div class="tile-head"><b>${String(tileNo(i)).padStart(2,'0')}</b>${t.title}${pic&&h.tag||''}</div>`;
     const cls=`tile${pic?' pic':''}${t.title==='Training'?' train':''}${t.cls?' '+t.cls:''}`, attrs=`data-tile="${t.title}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}`;
     const html=pic?`<article class="${cls}" ${attrs}>${h.pic}<div class="tcol">${head}<div class="tile-body"><div class="ttxt">${h.text}</div>${h.extra||''}</div></div>${h.tools||''}</article>`
       :`<article class="${cls}" ${attrs}>${head}<div class="tile-body${t.stack?' stack':''}">${h}</div></article>`;
@@ -196,7 +202,7 @@
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     homeDay=dayKey(new Date());
     $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
-    $('tiles').innerHTML=TILES.map(tileHtml).join('');
+    $('tiles').innerHTML=TILES.map((t,i)=>shown(t)?tileHtml(t,i):'').join('');
     if(typeof Meds!=='undefined') Meds.loadThumbs($('tiles'));                                  // the box photos on the SUPPLEMENTS tile (same loader as the Supps tab)
   }
   function renderHome(){
@@ -215,6 +221,9 @@
     }
   }
 
+  // TRY TODAY (.98): the recipe of this opening is picked as soon as the data is loaded, and again when recipes arrive later (meals.js sends `risen-try`)
+  const tryReady=()=>{ if(!app.classList.contains('hidden')&&!$('view-home').hidden) drawHome(); };       // (also under a pop-up: it only draws the tiles behind it)
+  addEventListener('risen-try',tryReady);
   // every minute while Home is open: the time moves on (a dose becomes due, a class gets close, a new day starts at midnight); see tickHome()
   setInterval(()=>{ if(loaded&&!app.classList.contains('hidden')&&!$('view-home').hidden&&!document.querySelector('.sheet-wrap:not([hidden])')) tickHome(); },60000);
 
@@ -358,6 +367,7 @@
       if(window.RepoNow) jobs.push(window.RepoNow());
       if('serviceWorker' in navigator) jobs.push(navigator.serviceWorker.getRegistration().then(r=>r&&r.update()));
       await Promise.race([Promise.allSettled(jobs),new Promise(r=>setTimeout(r,12000))]);
+      if(typeof Meals!=='undefined') await Meals.tryPrep();
       if(!$('view-home').hidden) drawHome();
       return true;
     }
@@ -375,6 +385,7 @@
     if(e.target.closest('[data-tap="coffee"]')){ addCoffee(); renderHome(); Motion.count(document.querySelector('.tile.coffee'),380); return; }
     if(e.target.closest('[data-tap="water"]')){ setWaterToday(waterToday()+1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); return; }
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
+    if(e.target.closest('[data-tap="try"]')) return Meals.openTry();
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();
     if(e.target.closest('[data-tap="classes"]')) Classes.openToday();
     if(e.target.closest('[data-tap="meds"]')) Meds.open();
@@ -404,11 +415,14 @@
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible'&&loaded&&!app.classList.contains('hidden')&&!$('view-home').hidden) renderHome();
   });
+  // TRY TODAY: this opening's recipe is picked once the data is loaded AND every script has run (meals.js comes after this file); asking again is harmless
+  const tryStart=()=>{ if(typeof Meals!=='undefined') Meals.tryPrep().then(ok=>{ if(ok) tryReady(); }); };
+  ready.then(()=>{ if(document.readyState==='complete') tryStart(); else addEventListener('load',tryStart,{once:true}); });
   // Tap ANYWHERE on the intro enters (the glass ENTER pill is only the hint; it is a real button too, so it works with a keyboard / VoiceOver)
   let entering=false;
   intro.onclick=async()=>{
     if(entering) return; entering=true;
-    try{ await ready; renderHome(); show('home');
+    try{ await ready; tryStart(); renderHome(); show('home');
     intro.classList.add('hidden'); app.classList.remove('hidden'); Motion.count($('tiles'));
     backupPrompt();
     }finally{ entering=false; }

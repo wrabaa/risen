@@ -129,7 +129,7 @@ const Meals = (() => {
     offering = false;
     if (yes) { await packOn(); toast('Recipes loaded'); } else await setting('recipePack', 'no');
   }
-  RecipePack.onChange = key => { if (key === null) applyPack().then(() => { if (S.settings.recipePack === 'yes') redraw(); if (!$('view-meals').hidden) offerPack(); }); };
+  RecipePack.onChange = key => { if (key === null) applyPack().then(() => { if (S.settings.recipePack === 'yes') redraw(); if (!$('view-meals').hidden) offerPack(); tryPrep().then(ok => { if (ok) dispatchEvent(new Event('risen-try')); }); }); };
   // Settings row "RISEN recipes"
   async function packSettings() {
     const pack = await RecipePack.list(), n = pack ? pack.length : 0, on = S.settings.recipePack === 'yes';
@@ -248,7 +248,32 @@ const Meals = (() => {
   const flush = () => saveRec.flush().catch(err => toast(err.message));
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
   addEventListener('pagehide', flush);
-  function reset() { closeAll(); closeSheet(); curCat = null; rec = null; clearUrls(); hasPhoto.clear(); packImgs = new Set(); }
+  // ================= TRY TODAY: the card on Home (.98, app.js) =================
+  // One recipe that has a picture is picked when the app opens (never the one shown last time) and stays for the whole opening: Home redraws all day, the card must not flip while you look at it.
+  // The picture URL is its own (an own photo gets a separate object URL), so leaving the Meals tab never breaks the card.
+  let tryId = null, tryUrl = null, tryBusy = false;
+  function tryInfo() {                            // null = no card (no recipe with a picture yet, or the picked one was deleted)
+    const r = tryId && S.recipes.find(x => x.id === tryId);
+    if (!r || !tryUrl) { tryId = null; tryUrl = null; return null; }
+    return { id: r.id, name: r.name, cat: cat(r.category).label, kcal: r.kcal || 0, url: tryUrl };
+  }
+  async function tryPrep() {                      // true when the card has just become ready (the caller redraws Home)
+    if (tryBusy || tryInfo()) return false; tryBusy = true;
+    try {
+      await refreshKeys();
+      const pool = S.recipes.filter(r => (r.name || '').trim() && pictured(r)), fresh = pool.filter(r => r.id !== S.settings.tryLast), list = fresh.length ? fresh : pool;
+      if (!list.length) return false;
+      const r = list[Math.floor(Math.random() * list.length)]; let url = null;
+      if (hasPhoto.has(r.id)) { const p = await RisenDB.getPhoto('recipe-' + r.id); if (p) url = URL.createObjectURL(p.blob); }
+      if (!url && r.pack) { const b = await RecipePack.image(r.pack); if (b) url = b.url; }
+      if (!url) return false;
+      tryId = r.id; tryUrl = url; setting('tryLast', r.id);
+      return true;
+    } catch (e) { return false; } finally { tryBusy = false; }
+  }
+  function openTry() { const t = tryInfo(); if (!t) return; open(); openRecipe(t.id); }      // the Meals tab opens, with this recipe on top (back = the Meals tab)
 
-  return { open, flush, reset, applyPack, packSettings };
+  function reset() { closeAll(); closeSheet(); curCat = null; rec = null; clearUrls(); hasPhoto.clear(); packImgs = new Set(); tryId = null; tryUrl = null; }
+
+  return { open, flush, reset, applyPack, packSettings, tryInfo, tryPrep, openTry };
 })();
