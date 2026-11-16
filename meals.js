@@ -186,7 +186,9 @@ const Meals = (() => {
       <div class="label">How to make it (optional)</div><textarea class="field grow" id="rMethod" rows="4" placeholder="Steps, tips…">${esc(rec.method)}</textarea>
       <button class="ghost" id="rMove" type="button" style="width:100%;margin-top:22px">MOVE TO…</button>
       <button class="quiet danger" id="rDelete" type="button">Delete recipe</button>`;
-    PhotoSlot.mount($('rPhoto'), 'recipe-' + rec.id, { editable: true, swap: true, builtIn: rec.pack ? (p => () => RecipePack.image(p))(rec.pack) : null });
+    // a RISEN recipe that gets a photo of HIS OWN is his from then on (`edited`, set by saveRec), so the pack never takes the recipe and his photo away (.96)
+    const mine = rec.pack ? (id => async () => { if (rec && rec.id === id && await RisenDB.getPhoto('recipe-' + id)) saveRec(); })(rec.id) : undefined;
+    PhotoSlot.mount($('rPhoto'), 'recipe-' + rec.id, { editable: true, swap: true, onChange: mine, builtIn: rec.pack ? (p => () => RecipePack.image(p))(rec.pack) : null });
     openPage('recipePage'); $('recipeBody').querySelectorAll('textarea.grow').forEach(grow);
     onClose.recipePage = () => finishRecipe();
     if (!ex) setTimeout(() => $('rName').focus(), 320);

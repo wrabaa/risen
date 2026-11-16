@@ -67,7 +67,7 @@ function RepoFolder({ dir, cache: CACHE, pick }) {
           if (onChange) onChange(k);
         } catch (e) { complete = false; break; }                       // connection lost: the rest next time
       }
-      if (complete) idx.checked = Date.now();
+      idx.checked = complete ? Date.now() : Date.now() - EVERY + 2 * 60 * 1000;      // something did not download: try again in 2 minutes, not at every return to the app (.96; GitHub allows 60 asks an hour per network)
       await save();
       if (changed && onChange) onChange(null);
     } catch (e) { /* nothing changes */ } finally { busy = false; }
@@ -124,7 +124,8 @@ const RecipePack = (() => {
     if (parsed && parsedSha === s) return parsed;
     try {
       const j = JSON.parse(await (await F.blob('recipes.json')).text()), seen = new Set(), out = [];
-      for (const r of (j && Array.isArray(j.recipes) ? j.recipes : [])) {
+      if (!j || !Array.isArray(j.recipes)) return null;               // a wrong-shaped file is treated like a broken one: nothing changes on the phone (.96). Only a real, empty "recipes": [] empties the pack
+      for (const r of j.recipes) {
         if (!r || typeof r.id !== 'string' || !/^[a-z0-9][a-z0-9-]*$/.test(r.id) || seen.has(r.id) || typeof r.name !== 'string' || !r.name.trim()) continue;
         seen.add(r.id);
         out.push({ id: r.id, category: String(r.category || '').toLowerCase(), name: r.name.trim().slice(0, 60),

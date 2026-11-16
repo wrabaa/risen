@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.95)
+## Status (release 2026-11-16.96)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -256,6 +256,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   19:00 Spinning (Hassan Katiba). New ids `fz-c38`–`fz-c43`; retired, never reused: `fz-c02, c06, c07, c15, c16, c17, c26, c29, c30, c36`; next free `fz-c44`. Two new instructors without a photo (Hanin, Hassan); "Mjay" is now "Mijay Jawad", "Cesar" is "Cesar Ghanem"; Patricia, Jad and Bahaa
   stay in the instructor list with no class. The new file gave no studio: kept for classes that stayed, guessed for the six new ones (Spinning = Power, Belly Dance = Balance, the rest = Energy). Class names keep the app's wording (the gym's app shortens: B.Pump, RPM, Yoga, Six Pax).
   Phones take it with Settings → Reload gym schedule. iPhone test pending.
+- `.96` review 6 fixes (`REVIEW.md`, planner chat): a RISEN recipe that gets a photo of the user's OWN is marked `edited` (his: never taken away with the pack; `meals.js`, the photo slot's `onChange`); a `recipes.json` with no `recipes` list is treated like a
+  broken file (nothing changes on the phones; only a real empty list empties the pack; `RecipePack.list()` in `media.js`); after a round where a file did not download, GitHub is asked again in 2 minutes, not at every return to the app (`RepoFolder.sync()`). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

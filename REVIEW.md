@@ -5,6 +5,9 @@ Review-only passes over the commits. No code is changed by a review; findings ar
 
 **Last reviewed: `a21c4d3` — release 2026-11-16.95**
 
+## Status of review 6
+Fixed in `.96`: 🟡1 (own photo makes a RISEN recipe his), 🟡2 (wrong-shaped `recipes.json` changes nothing), 🟡3 (2-minute wait after a failed round). 🟡4 and 🟡5 stay rules of use.
+
 ## Review 6 — 16 Nov 2026 — commits `.87` → `.95` (`df90293` … `a21c4d3`)
 Method: read the code diff since `.86` (`1dd0fdf`) and compared the old and new class schedule by id; `.92`–`.95` were used by Siza on his iPhone at the gym, the recipe pack has not run on a phone yet (it is empty). No code changed.
 
