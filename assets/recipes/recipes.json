@@ -19,6 +19,96 @@
         "1.5 litres water"
       ],
       "method": "1. Rinse the lentils. Boil them in the water for 30 minutes, until almost soft.\n2. Meanwhile cook the onions and garlic in the olive oil for about 10 minutes, until golden.\n3. Add the onions, cumin and salt to the lentils.\n4. Add the chard and simmer 20 minutes.\n5. Stir in the lemon juice, simmer 5 minutes, taste, and serve hot."
+    },
+    {
+      "id": "green-protein-smoothie",
+      "category": "shakes",
+      "name": "Green Protein Smoothie",
+      "serves": 1,
+      "kcal": 245,
+      "health": "About 20 g protein, 6 g fibre, and more than a full day of vitamin K from the spinach. Greek yoghurt gives the protein, flax adds fibre and plant omega-3. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "1 medium banana",
+        "60 g baby spinach (two big handfuls)",
+        "150 g plain Greek yoghurt, 0% fat",
+        "1 tbsp ground flaxseed",
+        "200 ml cold water",
+        "4 ice cubes"
+      ],
+      "method": "1. Put the water, yoghurt and spinach in the blender first, then the banana, flaxseed and ice.\n2. Blend for 1 minute, until completely smooth.\n3. Drink at once, or within 30 minutes."
+    },
+    {
+      "id": "overnight-oats-chia-walnut",
+      "category": "breakfast",
+      "name": "Overnight Oats with Chia & Walnuts",
+      "serves": 1,
+      "kcal": 580,
+      "health": "About 31 g protein and 13 g fibre. Oat beta-glucan (about 2 g here) is the fibre that lowers LDL cholesterol; the US FDA accepts this claim at 3 g a day. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "50 g rolled oats",
+        "1 tbsp chia seeds",
+        "200 ml low-fat milk",
+        "100 g plain Greek yoghurt, 0% fat",
+        "80 g blueberries (fresh or frozen)",
+        "20 g walnuts, roughly chopped",
+        "1/2 tsp cinnamon"
+      ],
+      "method": "1. In a jar, mix the oats, chia, milk, yoghurt and cinnamon.\n2. Close the jar and leave it in the fridge overnight, at least 6 hours.\n3. In the morning, stir. Add a splash of milk if it is too thick.\n4. Top with the blueberries and walnuts. Eat cold."
+    },
+    {
+      "id": "chicken-quinoa-bowl",
+      "category": "lunch",
+      "name": "Chicken & Quinoa Bowl",
+      "serves": 2,
+      "kcal": 590,
+      "health": "About 55 g protein and 6 g fibre per bowl, for muscle repair after training. Quinoa gives slow carbs and fibre; olive oil and lemon make the dressing. Source: AUB Food-Based Dietary Guidelines. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "400 g chicken breast, skinless",
+        "100 g quinoa, dry",
+        "2 tbsp olive oil",
+        "1 tsp cumin",
+        "1 tsp salt",
+        "200 g cucumber, diced",
+        "200 g tomatoes, diced",
+        "60 g baby spinach",
+        "Juice of 1 lemon",
+        "2 garlic cloves, crushed"
+      ],
+      "method": "1. Rinse the quinoa. Boil it in 250 ml water for 15 minutes, until the water is gone. Cover and rest 5 minutes.\n2. Rub the chicken with half the oil, the cumin and half the salt.\n3. Cook the chicken in a hot pan, 6 minutes each side, until no pink is left inside. Rest 5 minutes, then slice.\n4. Mix the lemon juice, garlic, the rest of the oil and salt for the dressing.\n5. Put quinoa, spinach, cucumber and tomatoes in two bowls. Add the chicken and pour the dressing on top."
+    },
+    {
+      "id": "baked-salmon-lemon-broccoli",
+      "category": "dinner",
+      "name": "Baked Salmon with Lemon & Broccoli",
+      "serves": 2,
+      "kcal": 425,
+      "health": "About 34 g protein and 3 g omega-3 (EPA and DHA) per serving. The American Heart Association advises fish twice a week for a healthy heart. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "2 salmon fillets, 150 g each",
+        "250 g broccoli, cut into florets",
+        "1 tbsp olive oil",
+        "2 garlic cloves, sliced",
+        "1 lemon (juice of half, the rest in slices)",
+        "1/2 tsp salt",
+        "Black pepper"
+      ],
+      "method": "1. Heat the oven to 200°C.\n2. Put the broccoli on a tray with half the oil, the garlic and a pinch of salt. Bake 10 minutes.\n3. Push the broccoli aside. Add the salmon, skin down. Season with salt, pepper, the rest of the oil and the lemon juice. Lay the lemon slices on top.\n4. Bake 12 minutes more, until the salmon flakes easily with a fork. Serve at once."
+    },
+    {
+      "id": "heart-nut-seed-mix",
+      "category": "snacks",
+      "name": "Heart Nut & Seed Mix",
+      "serves": 7,
+      "kcal": 217,
+      "health": "A 36 g handful gives about 7 g protein and 3 g fibre. The US FDA allows the claim that 1.5 oz (42 g) of nuts a day, in a low-saturated-fat diet, may reduce heart disease risk. Nutrition: USDA FoodData Central.",
+      "ingredients": [
+        "70 g raw walnuts",
+        "70 g raw almonds",
+        "50 g hazelnuts",
+        "40 g raw pumpkin seeds",
+        "20 g sesame seeds"
+      ],
+      "method": "1. Mix everything in a jar. No salt, no sugar.\n2. Keep it closed in a cool, dry place.\n3. One handful (about 36 g) a day. The jar lasts a week."
     }
   ]
 }
