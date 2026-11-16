@@ -1,3 +1,24 @@
 {
-  "recipes": []
+  "recipes": [
+    {
+      "id": "lentil-chard-soup",
+      "category": "lunch",
+      "name": "Lentil & Chard Soup",
+      "serves": 4,
+      "kcal": 380,
+      "health": "22 g plant protein, 11 g fibre and 7 mg iron per bowl. The lemon helps your body absorb the iron. Source: AUB Food-Based Dietary Guidelines, guideline 6.",
+      "ingredients": [
+        "300 g green lentils",
+        "2 tbsp olive oil",
+        "2 onions, chopped",
+        "3 garlic cloves, chopped",
+        "500 g Swiss chard (or spinach), chopped with the stems",
+        "1 tsp cumin",
+        "1 tsp salt",
+        "Juice of 2 lemons",
+        "1.5 litres water"
+      ],
+      "method": "1. Rinse the lentils. Boil them in the water for 30 minutes, until almost soft.\n2. Meanwhile cook the onions and garlic in the olive oil for about 10 minutes, until golden.\n3. Add the onions, cumin and salt to the lentils.\n4. Add the chard and simmer 20 minutes.\n5. Stir in the lemon juice, simmer 5 minutes, taste, and serve hot."
+    }
+  ]
 }
