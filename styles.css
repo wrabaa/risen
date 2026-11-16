@@ -855,3 +855,21 @@
   .rfacts{margin-top:14px;padding:12px 14px;border:1px solid var(--hairline);border-radius:14px;background:var(--card);color:var(--muted);font:500 14px Inter,sans-serif}
   .rfacts b{color:var(--volt);font-weight:600}
   .rfacts p{margin:6px 0 0;color:var(--soft);line-height:1.45}
+  /* Pull down to refresh (.97): a small card-coloured chip under the top bar (no blur: the tab bar and one sheet already are the two blurred layers) */
+  .ptr{position:absolute;z-index:5;top:calc(var(--topb) + 4px);left:50%;display:flex;align-items:center;gap:8px;height:36px;padding:0 16px 0 12px;border-radius:999px;
+    background:var(--card);border:1px solid var(--hairline);box-shadow:var(--card-depth);color:var(--muted);pointer-events:none;white-space:nowrap;
+    transform:translate(-50%,calc(var(--py,0px) - 52px));opacity:var(--po,0)}
+  .ptr.snap{transition:transform .3s var(--ease),opacity .3s var(--ease)}
+  .ptr .ptrt{font:600 12px Oswald,sans-serif;letter-spacing:.1em;text-transform:uppercase}
+  .ptr .ptra,.ptr .ptrs{flex:none}
+  .ptr .ptra{transition:transform .2s var(--ease)}
+  .ptr .ptrs{display:none}
+  .ptr[data-s="arm"]{color:var(--volt)}
+  .ptr[data-s="arm"] .ptra{transform:rotate(180deg)}
+  .ptr[data-s="busy"] .ptra,.ptr[data-s="done"] .ptra,.ptr[data-s="off"] .ptra{display:none}
+  .ptr[data-s="busy"] .ptrs{display:block;animation:ptrspin .8s linear infinite}
+  .ptr[data-s="busy"]{color:var(--text)}
+  .ptr[data-s="done"]{color:var(--volt)}
+  .ptr[data-s="done"] .ptrs,.ptr[data-s="off"] .ptrs{display:none}
+  @keyframes ptrspin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion: reduce){ .ptr .ptra{transition:none} .ptr[data-s="busy"] .ptrs{animation:none} .ptr.snap{transition:opacity .2s ease} }

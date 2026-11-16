@@ -95,7 +95,7 @@ const ExMedia = (() => {
   const fileOf = id => { const x = typeof LIBRARY !== 'undefined' && LIBRARY.byId[id]; return x && x.file || null; };
   // The built-in picture / clip of an exercise: { url, type } or null (none in the folder, not downloaded yet, or a custom exercise)
   const get = exerciseId => F.get(fileOf(exerciseId));
-  const sync = (first = []) => F.sync(first.map(fileOf).filter(Boolean));
+  const sync = (first = [], force = false) => F.sync(first.map(fileOf).filter(Boolean), force);
   return { get, sync, fileOf, set onChange(fn) { F.onChange = fn; } };
 })();
 
@@ -147,6 +147,8 @@ const RecipePack = (() => {
 (() => {
   const mine = () => { try { return [...new Set(S.workouts.flatMap(w => (w.exercises || []).map(e => e.exerciseId)))]; } catch (e) { return []; } };
   const go = () => { if (!document.hidden) { ExMedia.sync(mine()); RecipePack.sync(); } };
+  // Pull down to refresh (.97, app.js): ask GitHub about both folders NOW, without the 10-minute wait
+  window.RepoNow = () => Promise.all([ExMedia.sync(mine(), true), RecipePack.sync(true)]);
   setTimeout(go, 3000);
   document.addEventListener('visibilitychange', go);
   window.addEventListener('online', go);

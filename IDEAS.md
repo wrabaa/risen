@@ -54,8 +54,8 @@ Planning notes only. Each idea is discussed with the planner first, then built a
 - **One NOW card on Home:** the single next thing — workout, next dose, or next class (with instructor face) — with one big button.
 - **Character empty states:** rest day / nothing added yet shows the RISEN character (Siza) in a matching image, not just text.
 
-## 7. Pull down to refresh, whole app — AFTER ALL THE RECIPES ARE DONE (Siza, 16 Nov 2026)
-Not built. Siza decided: do it only when the recipe work (Meals) is finished.
+## 7. Pull down to refresh, whole app — BUILT in `.97` (Siza, 16 Nov 2026)
+Siza first said "after the recipes", then moved it up at once: waiting for the 10-minute check while testing recipes was the problem.
 - Pull down from the very top of any tab page and let go = refresh. It replaces the earlier idea of "check on every open".
 - It does three things: asks GitHub for new recipes / pictures / exercise pictures right away (skips the 10-minute wait of `RepoFolder`),
   checks for a new app version, and redraws the screen that is open.

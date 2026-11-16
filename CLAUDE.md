@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.96)
+## Status (release 2026-11-16.97)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -258,6 +258,12 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   Phones take it with Settings → Reload gym schedule. iPhone test pending.
 - `.96` review 6 fixes (`REVIEW.md`, planner chat): a RISEN recipe that gets a photo of the user's OWN is marked `edited` (his: never taken away with the pack; `meals.js`, the photo slot's `onChange`); a `recipes.json` with no `recipes` list is treated like a
   broken file (nothing changes on the phones; only a real empty list empties the pack; `RecipePack.list()` in `media.js`); after a round where a file did not download, GitHub is asked again in 2 minutes, not at every return to the app (`RepoFolder.sync()`). iPhone test pending.
+
+- `.97` PULL DOWN TO REFRESH (Siza asked, planner chat; `Pull` in `app.js`, `.ptr` in `styles.css`, `#ptr` in `index.html`, `window.RepoNow` in `media.js`): on a tab page scrolled to the very top, a clear pull DOWN (armed at 90 px of finger) and release = refresh. A small card-coloured
+  chip under the top bar says PULL TO REFRESH → RELEASE TO REFRESH (lime) → UPDATING (spinner) → ✓ UPDATED (lime), or NO INTERNET offline. It asks GitHub about both folders NOW without the 10-minute wait (`RepoNow()` = `ExMedia.sync(mine, true)` + `RecipePack.sync(true)`;
+  `ExMedia.sync` got the same `force` argument), asks the service worker to look for a new release (a release still loads by the usual quiet-Home rule), and redraws Home; Meals / Gym follow by their own `onChange`. SOFT: the page is never reloaded, nothing can be lost. Never starts: on inputs,
+  while typing, under a sheet / sub-page / photo viewer, in a running workout, or when the page is not at the top; a sideways or upward move steps aside (tab swipe, swipe back and the Classes chips are untouched). Max 12 s wait. Only transform and opacity move; reduced motion = no spin. No blur on the chip.
+  Tested at iPhone 13 and SE size with synthetic touches (Home, Meals, Gym, offline, sheet open, scrolled, diagonal, up, tab swipe). iPhone test pending. Reviews: `.96` and `.97` are not reviewed yet (`REVIEW.md` last reviewed `.95`).
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

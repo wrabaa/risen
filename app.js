@@ -308,6 +308,65 @@
     });
     return {go};
   })();
+  // ---- Pull down to refresh (.97) ----
+  // On a TAB page, scrolled to the very top, a clear pull DOWN and let go = refresh: GitHub is asked about the recipes and exercise pictures right now
+  // (no 10-minute wait), the app checks for a new release, and Home is redrawn. The page is NOT reloaded, so nothing can be lost.
+  // It never starts: on inputs, while typing, under a sheet / sub-page / photo viewer, in a running workout, or when the page is not at the top;
+  // a sideways move steps aside (tab swipe, swipe back and the Classes chips are untouched). Only transform and opacity move.
+  const Pull=(()=>{
+    const LOCK=8, ARM=90, MAXY=64, HOLD=44, BLOCK='input,textarea,select,[contenteditable],[data-noswipe]';
+    const el=$('ptr'), txt=el.querySelector('.ptrt'), SAY={pull:'Pull to refresh',arm:'Release to refresh',busy:'Updating',done:'\u2713 Updated',off:'No internet'};
+    let st=null, busy=false, timer=0;
+    const put=s=>{ el.dataset.s=s; txt.textContent=SAY[s]; };
+    const place=(y,o)=>{ el.style.setProperty('--py',y+'px'); el.style.setProperty('--po',o); };
+    const typing=()=>{ const a=document.activeElement; return document.body.classList.contains('typing')||!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); };
+    const overlay=()=>!!document.querySelector('.subpage.open,#settings.open,.sheet-wrap:not([hidden]),.pviewer.open');
+    const hide=()=>{ el.classList.add('snap'); place(0,0); clearTimeout(timer); timer=setTimeout(()=>{ el.classList.remove('snap'); if(!busy) put('pull'); },320); };
+    function start(e){
+      st=null; if(busy||e.touches.length!==1||app.classList.contains('hidden')) return;
+      const view=e.currentTarget;
+      if(view.hidden||view.scrollTop>0||e.target.closest(BLOCK)||typing()||overlay()) return;
+      if(view.id==='view-gym'&&!$('gymLog').hidden) return;                                   // a running workout is never disturbed
+      st={view,x0:e.touches[0].clientX,y0:e.touches[0].clientY,locked:false,dy:0};
+    }
+    function move(e){
+      if(!st) return;
+      if(e.touches.length!==1||st.view.scrollTop>0){ st=null; hide(); return; }
+      const t=e.touches[0], dx=t.clientX-st.x0, dy=t.clientY-st.y0;
+      if(!st.locked){
+        if(dy<-LOCK||(Math.abs(dx)>LOCK&&Math.abs(dx)>Math.abs(dy))){ st=null; return; }       // up, or sideways: not ours
+        if(dy>LOCK&&dy>Math.abs(dx)*1.5){ st.locked=true; el.classList.remove('snap'); clearTimeout(timer); } else return;
+      }
+      if(e.cancelable) e.preventDefault();
+      st.dy=Math.max(0,dy); const y=Math.min(MAXY,st.dy*.5);
+      place(y,Math.min(1,y/24)); put(st.dy>=ARM?'arm':'pull');
+    }
+    async function end(e){
+      if(!st) return; const s=st; st=null; if(!s.locked) return;
+      if(e.type!=='touchend'||s.dy<ARM){ hide(); return; }
+      busy=true; el.classList.add('snap'); place(HOLD,1); put('busy');
+      const t0=Date.now(); let ok=true;
+      try{ ok=await refresh(); }catch(_){ ok=true; }
+      await new Promise(r=>setTimeout(r,Math.max(0,700-(Date.now()-t0))));                  // never a flash too short to read
+      put(ok?'done':'off'); await new Promise(r=>setTimeout(r,900));
+      busy=false; hide();
+    }
+    // GitHub (recipes + exercise pictures) now, a look for a new release, then Home is redrawn; never waits longer than 12 s
+    async function refresh(){
+      if(!navigator.onLine) return false;
+      const jobs=[];
+      if(window.RepoNow) jobs.push(window.RepoNow());
+      if('serviceWorker' in navigator) jobs.push(navigator.serviceWorker.getRegistration().then(r=>r&&r.update()));
+      await Promise.race([Promise.allSettled(jobs),new Promise(r=>setTimeout(r,12000))]);
+      if(!$('view-home').hidden) drawHome();
+      return true;
+    }
+    document.querySelectorAll('.view').forEach(v=>{
+      v.addEventListener('touchstart',start,{passive:true}); v.addEventListener('touchmove',move,{passive:false});
+      v.addEventListener('touchend',end,{passive:true}); v.addEventListener('touchcancel',end,{passive:true});
+    });
+    return {refresh};
+  })();
   $('tiles').onclick=e=>{
     const w=e.target.closest('[data-water]');                                        // the − and the gear never add a glass
     if(w){ if(w.dataset.water==='minus'&&waterToday()>0){ setWaterToday(waterToday()-1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); } else if(w.dataset.water==='goal') openWaterGoal(); return; }
