@@ -1,6 +1,6 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of the APP files (pages, code, data) and delete the old one.
-const VERSION = '2026-11-16.90';
+const VERSION = '2026-11-16.91';
 const CACHE = 'risen-' + VERSION;
 
 // APP FILES: small, change often. All of them are downloaded again on every release, all or nothing.
@@ -101,7 +101,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
   const rel = req.url.split(/[?#]/)[0].slice(SCOPE.length);
-  if (rel.startsWith('assets/exercises/')) return;      // built-in exercise pictures / clips: media.js downloads and keeps them itself (cache `risen.exmedia`), never a second copy here
+  if (rel.startsWith('assets/exercises/') || rel.startsWith('assets/recipes/')) return;      // exercise pictures / clips and the recipe pack: media.js downloads and keeps them itself (caches `risen.exmedia`, `risen.recipes`), never a second copy here
   if (ASSETS[rel] != null) {
     e.respondWith(caches.open(ASSET_CACHE).then(c => c.match(abs(rel)).then(hit => hit || fetch(req).then(res => {
       if (res.ok) c.put(abs(rel), res.clone());   // missed at install (weak connection): kept from the first time it is shown

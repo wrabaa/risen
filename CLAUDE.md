@@ -8,7 +8,7 @@ Rule of thumb: **one screen, one job, one big button. No manual needed.**
 
 ## How it runs
 - Files: `index.html` (markup only) · `styles.css` · `shared.js` (helpers every tab uses) ·
-  `app.js` (Home, tabs, Settings, backup, updates) · `profile.js` (profile button, Personal info) · `media.js` (built-in exercise pictures / clips, `.90`) · one file per tab. A new file must be
+  `app.js` (Home, tabs, Settings, backup, updates) · `profile.js` (profile button, Personal info) · `media.js` (content that comes from repo folders by itself: exercise pictures / clips `.90`, recipe pack `.91`) · one file per tab. A new file must be
   added to `CORE` in `sw.js` or it will not work offline.
 - Plain HTML/CSS/JS PWA, no build step, no framework. Hosted on GitHub Pages:
   https://wrabaa.github.io/risen/ (repo `wrabaa/risen`, branch `main`).
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.90)
+## Status (release 2026-11-16.91)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -233,6 +233,13 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   cache `risen.exmedia` (index in `m/index.json`), and deletes what left the folder. Offline it shows what it has. `sw.js` lets `assets/exercises/` requests pass (no second copy) and these files are NOT in `ASSETS`. Shown where the exercise photo sits (gym day rows, exercise page, workout log)
   ONLY when the user has no photo / clip of his own for that exercise (his own always wins; deleting it brings the built-in back). On the exercise page a quiet "+ Use my own photo or video" sits under a built-in one (`swap:true`). App content, not user data: not in Export / Import / Reset.
   Custom exercises have none. If GitHub cannot be reached, nothing changes. iPhone test pending.
+- `.91` RISEN RECIPE PACK (planner chat). `media.js` is now ONE engine, `RepoFolder` (asks GitHub what is in a repo folder, keeps the files in its own cache, follows changes by `sha`), used twice: `ExMedia` (`assets/exercises/`, behaves exactly as in `.90`; exercises are NOT a choice:
+  pick an exercise and its clip is there) and `RecipePack` (`assets/recipes/`: `recipes.json` = the text, one picture per recipe named after its `id`; format and rules in `assets/recipes/README.md`). So a recipe is added, corrected or removed by changing that folder: no release.
+  The pack IS a choice: opening Meals asks once "Load RISEN recipes?" (YES, LOAD THEM / Start empty; only when the pack really has recipes), setting `recipePack` = 'yes' / 'no'; Settings > Data > "RISEN recipes" loads them later or deletes them again. On YES each pack recipe becomes a normal
+  recipe in the `recipes` store (id `pack-<id>`, plus `pack`, `packSig`, and `kcal` / `serves` / `health`), free to edit, move, delete (`applyPack()` in `meals.js`). Three rules: a recipe the user DELETED stays deleted (`recipePackGone`); one he EDITED is his (`edited:true`, never
+  overwritten, kept when the pack is deleted from Settings); an untouched one follows the pack (corrections arrive, a recipe taken out of the pack goes). The pictures are fetched only on YES and shown when the recipe has no photo of the user's own (cards, category covers, recipe page with
+  "+ Use my own photo"; `PhotoSlot.mount(..., {builtIn})` is now how a slot gets the app's own picture, exercises use it too). The recipe page shows "180 kcal per serving · Serves 2" and the health line when a recipe has them (`.rfacts`; not editable yet). The pack starts EMPTY
+  (`"recipes": []`): the planner adds Siza's recipes there when he says push. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

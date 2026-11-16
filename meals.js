@@ -27,23 +27,29 @@ const Meals = (() => {
 
   // ================= Photos =================
   // Which recipes have a photo is known from the photo keys; the pictures themselves are only read when a screen needs them.
-  const hasPhoto = new Set(), urls = new Map();
+  // A recipe from the RISEN pack (r.pack = its id in the pack) with no photo of the user's own shows the pack's picture (media.js owns that URL: never revoked here).
+  const hasPhoto = new Set(), urls = new Map(), packUrl = new Set();
+  let packImgs = new Set();                        // pack ids whose picture is on this phone
+  const pictured = r => hasPhoto.has(r.id) || !!(r.pack && packImgs.has(r.pack));
   async function refreshKeys() {
     hasPhoto.clear();
     try { (await RisenDB.photoKeys()).forEach(k => { k = String(k); if (k.startsWith('recipe-')) hasPhoto.add(k.slice(7)); }); } catch (e) { /* no photos then */ }
+    try { packImgs = await RecipePack.images(); } catch (e) { packImgs = new Set(); }
   }
   async function loadUrls(ids) {                  // true when something new was loaded (the screen then redraws once)
     let added = false;
     for (const id of ids) {
-      if (urls.has(id) || !hasPhoto.has(id)) continue;
-      const p = await RisenDB.getPhoto('recipe-' + id); if (p) { urls.set(id, URL.createObjectURL(p.blob)); added = true; }
+      if (urls.has(id)) continue;
+      if (hasPhoto.has(id)) { const p = await RisenDB.getPhoto('recipe-' + id); if (p) { urls.set(id, URL.createObjectURL(p.blob)); added = true; } continue; }
+      const r = S.recipes.find(x => x.id === id), b = r && r.pack ? await RecipePack.image(r.pack) : null;
+      if (b) { urls.set(id, b.url); packUrl.add(id); added = true; }
     }
     return added;
   }
-  const dropUrl = id => { if (urls.get(id)) URL.revokeObjectURL(urls.get(id)); urls.delete(id); };
+  const dropUrl = id => { if (urls.get(id) && !packUrl.has(id)) URL.revokeObjectURL(urls.get(id)); urls.delete(id); packUrl.delete(id); };
   const clearUrls = () => { for (const id of [...urls.keys()]) dropUrl(id); };
   function latestWithPhoto(catId) {               // the newest recipe of the category that has a photo
-    return inCat(catId).filter(r => hasPhoto.has(r.id)).sort((a, b) => (b.created || '').localeCompare(a.created || ''))[0] || null;
+    return inCat(catId).filter(pictured).sort((a, b) => (b.created || '').localeCompare(a.created || ''))[0] || null;
   }
 
   // ================= Pages and the move sheet =================
@@ -66,6 +72,71 @@ const Meals = (() => {
   function open() {
     closeAll(); clearUrls(); show('meals'); renderCats(); $('view-meals').scrollTop = 0;
     refreshKeys().then(() => loadUrls(CATS.map(c => (latestWithPhoto(c.id) || {}).id).filter(Boolean))).then(() => { if (!$('view-meals').hidden && !curCat) renderCats(); });
+    offerPack();
+  }
+
+  // ================= The RISEN recipe pack (media.js: RecipePack; the text and pictures live in the repo folder assets/recipes/) =================
+  // Setting `recipePack`: not set = not asked yet · 'yes' = wanted · 'no' = not wanted. Setting `recipePackGone` = pack ids this user deleted (they never come back by themselves).
+  // A loaded recipe is a normal recipe in the `recipes` store with `pack` (its pack id) and `packSig` (the pack text it was made from):
+  //   - untouched: it follows the pack (a correction arrives by itself; taken out of the pack = it goes);
+  //   - edited by the user (`edited`): it is his, the pack never touches it again;
+  //   - deleted by the user: its id goes to `recipePackGone`.
+  const setting = (k, v) => { S.settings[k] = v; return RisenDB.setSetting(k, v).catch(e => toast('Could not save: ' + e.message)); };
+  let applying = false;
+  async function applyPack() {
+    if (applying || S.settings.recipePack !== 'yes') return;
+    applying = true;
+    try {
+      const pack = await RecipePack.list(); if (!pack) return;
+      const gone = new Set(S.settings.recipePackGone || []), ids = new Set(); let changed = false;
+      for (const p of pack) {
+        const id = 'pack-' + p.id; ids.add(id);
+        if (gone.has(p.id) || (rec && rec.id === id)) continue;            // deleted by the user, or open in the editor right now
+        const sig = JSON.stringify(p), have = S.recipes.find(r => r.id === id);
+        if (have && (have.edited || have.packSig === sig)) continue;
+        const now = new Date().toISOString();
+        const out = { id, category: CATS.some(c => c.id === p.category) ? p.category : 'lunch', name: p.name, ingredients: p.ingredients.map(text => ({ text })), method: p.method,
+          kcal: p.kcal, serves: p.serves, health: p.health, pack: p.id, packSig: sig, created: have ? have.created : now, updated: now };
+        await RisenDB.saveRecipe(out); changed = true;
+        S.recipes = have ? S.recipes.map(x => x.id === id ? out : x) : [...S.recipes, out];
+      }
+      for (const r of S.recipes.filter(r => r.pack && !r.edited && !ids.has(r.id) && !(rec && rec.id === r.id))) {      // taken out of the pack: an untouched copy goes
+        await RisenDB.deleteRecipe(r.id); S.recipes = S.recipes.filter(x => x.id !== r.id); dropUrl(r.id); changed = true;
+      }
+      if (changed) redraw();
+    } catch (e) { /* next time */ } finally { applying = false; }
+  }
+  async function redraw() {                        // the pack brought something: the open Meals screens follow
+    await refreshKeys();
+    if (curCat && !rec) { renderCat(); loadUrls(inCat(curCat).map(r => r.id)).then(a => { if (a && curCat && !rec) renderCat(); }); }
+    if (!$('view-meals').hidden) { await loadUrls(CATS.map(c => (latestWithPhoto(c.id) || {}).id).filter(Boolean)); if (!curCat) renderCats(); }
+  }
+  async function packOn() {                        // YES: remember it, fill in the recipes now (from what is on the phone), then fetch the pictures
+    await setting('recipePack', 'yes'); await setting('recipePackGone', []);
+    await applyPack(); RecipePack.sync(true);
+  }
+  async function packOff() {                       // the untouched RISEN recipes go; the user's own and the ones he edited stay
+    await setting('recipePack', 'no');
+    for (const r of S.recipes.filter(r => r.pack && !r.edited)) { await RisenDB.deleteRecipe(r.id); S.recipes = S.recipes.filter(x => x.id !== r.id); dropUrl(r.id); }
+    RecipePack.sync(true); redraw();                // (the pictures leave the phone too)
+  }
+  let offering = false;
+  async function offerPack() {                     // opening Meals: asked once, and only when there really are recipes to load
+    if (offering || S.settings.recipePack !== undefined) return applyPack();
+    const pack = await RecipePack.list(); if (!pack || !pack.length || $('view-meals').hidden) return;
+    offering = true;
+    const yes = await ask({ title: 'Load RISEN recipes?', text: `${pack.length} ready recipe${pack.length === 1 ? '' : 's'} with pictures. You can edit or delete any of them, and add your own.\nYou can change this later in Settings.`, ok: 'YES, LOAD THEM', cancel: 'Start empty' });
+    offering = false;
+    if (yes) { await packOn(); toast('Recipes loaded'); } else await setting('recipePack', 'no');
+  }
+  RecipePack.onChange = key => { if (key === null) applyPack().then(() => { if (S.settings.recipePack === 'yes') redraw(); if (!$('view-meals').hidden) offerPack(); }); };
+  // Settings row "RISEN recipes"
+  async function packSettings() {
+    const pack = await RecipePack.list(), n = pack ? pack.length : 0, on = S.settings.recipePack === 'yes';
+    if (on) {
+      if (await ask({ title: 'Delete RISEN recipes?', text: 'The RISEN recipes are deleted from this phone. Recipes you added yourself, and RISEN recipes you changed, are kept.', ok: 'DELETE', danger: true })) { await packOff(); toast('RISEN recipes deleted'); }
+    } else if (!n) toast(navigator.onLine ? 'No RISEN recipes yet' : 'No internet: try again later');
+    else if (await ask({ title: 'Load RISEN recipes?', text: `${n} ready recipe${n === 1 ? '' : 's'} with pictures. You can edit or delete any of them, and add your own.`, ok: 'YES, LOAD THEM' })) { await packOn(); toast('Recipes loaded'); }
   }
 
   // ================= LEVEL 2: A CATEGORY =================
@@ -94,6 +165,8 @@ const Meals = (() => {
     try {
       const out = { id: rec.id, category: rec.category, name: rec.name.trim(), ingredients: ingredientsFrom(rec.ingText, rec.ingredients),
         method: rec.method.replace(/\s+$/, ''), created: rec.created, updated: new Date().toISOString() };
+      for (const k of ['kcal', 'serves', 'health']) if (rec[k]) out[k] = rec[k];
+      if (rec.pack) { out.pack = rec.pack; out.packSig = rec.packSig; out.edited = rec.edited = true; }       // a RISEN recipe he changed is his now: the pack never touches it again
       await RisenDB.saveRecipe(out); persisted = true; rec.ingredients = out.ingredients;
       S.recipes = S.recipes.some(x => x.id === out.id) ? S.recipes.map(x => x.id === out.id ? out : x) : [...S.recipes, out];
       flashSaved();
@@ -108,11 +181,12 @@ const Meals = (() => {
     $('recipeTitle').textContent = ex ? 'Recipe' : 'New recipe';
     $('recipeBody').innerHTML = `<div id="rPhoto"></div>
       <div class="label">Name</div><input class="field" id="rName" type="text" maxlength="60" autocapitalize="sentences" autocomplete="off" enterkeyhint="done" placeholder="e.g. Protein pancakes" value="${esc(rec.name)}">
+      ${rec.kcal || rec.serves || rec.health ? `<div class="rfacts">${[rec.kcal ? `<b>${rec.kcal} kcal</b> per serving` : '', rec.serves ? `Serves ${rec.serves}` : ''].filter(Boolean).join(' · ')}${rec.health ? `<p>${esc(rec.health)}</p>` : ''}</div>` : ''}
       <div class="label">Ingredients</div><textarea class="field grow" id="rIng" rows="5" placeholder="One ingredient per line">${esc(rec.ingText)}</textarea>
       <div class="label">How to make it (optional)</div><textarea class="field grow" id="rMethod" rows="4" placeholder="Steps, tips…">${esc(rec.method)}</textarea>
       <button class="ghost" id="rMove" type="button" style="width:100%;margin-top:22px">MOVE TO…</button>
       <button class="quiet danger" id="rDelete" type="button">Delete recipe</button>`;
-    PhotoSlot.mount($('rPhoto'), 'recipe-' + rec.id, { editable: true });
+    PhotoSlot.mount($('rPhoto'), 'recipe-' + rec.id, { editable: true, swap: true, builtIn: rec.pack ? (p => () => RecipePack.image(p))(rec.pack) : null });
     openPage('recipePage'); $('recipeBody').querySelectorAll('textarea.grow').forEach(grow);
     onClose.recipePage = () => finishRecipe();
     if (!ex) setTimeout(() => $('rName').focus(), 320);
@@ -138,7 +212,8 @@ const Meals = (() => {
     }
     if (t.id === 'rDelete') {
       if (!(await ask({ title: 'Delete recipe?', text: `“${rec.name.trim() || 'This recipe'}” and its photo are deleted.`, ok: 'DELETE', danger: true }))) return;
-      const id = rec.id, was = persisted; rec = null; onClose.recipePage = null;          // a waiting auto-save then does nothing
+      const id = rec.id, was = persisted, pk = rec.pack; rec = null; onClose.recipePage = null;          // a waiting auto-save then does nothing
+      if (pk) await setting('recipePackGone', [...new Set([...(S.settings.recipePackGone || []), pk])]);     // a deleted RISEN recipe stays deleted
       if (was) { await RisenDB.deleteRecipe(id); S.recipes = S.recipes.filter(r => r.id !== id); } else await RisenDB.deletePhoto('recipe-' + id);
       hasPhoto.delete(id); dropUrl(id); closePage('recipePage'); if (curCat) renderCat(); renderCats();
     }
@@ -171,7 +246,7 @@ const Meals = (() => {
   const flush = () => saveRec.flush().catch(err => toast(err.message));
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
   addEventListener('pagehide', flush);
-  function reset() { closeAll(); closeSheet(); curCat = null; rec = null; clearUrls(); hasPhoto.clear(); }
+  function reset() { closeAll(); closeSheet(); curCat = null; rec = null; clearUrls(); hasPhoto.clear(); packImgs = new Set(); }
 
-  return { open, flush, reset };
+  return { open, flush, reset, applyPack, packSettings };
 })();

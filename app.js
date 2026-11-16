@@ -377,6 +377,7 @@
     const extra=[r.added?r.added+' new':'', r.removed?r.removed+' removed':''].filter(Boolean).join(', ');
     toast('Schedule reloaded: '+r.total+' classes'+(extra?' ('+extra+')':''));
   };
+  $('recipePackBtn').onclick=()=>Meals.packSettings();          // RISEN recipes: load them, or delete them again (meals.js)
   $('clearClasses').onclick=async()=>{
     if(!(await ask({title:'Delete all classes?',text:'Deletes all classes, instructors and attendance. Use this when you change gym. Your workouts are not affected.',ok:'DELETE ALL CLASSES',danger:true}))) return;
     try{ await RisenDB.clearClasses(); }catch(e){ toast('Could not clear: '+e.message); return; }

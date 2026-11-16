@@ -848,3 +848,7 @@
   /* Built-in exercise picture / clip (.90): the quiet "use my own" line under it on the exercise page */
   .pslot-own{display:block;margin-top:8px;padding:8px 2px;color:var(--muted);font:500 13px Inter,sans-serif;text-align:center;cursor:pointer}
   .pslot-own:active{color:var(--text)}
+  /* Recipe page (.91): calories / servings and the health line of a recipe that has them (RISEN recipes) */
+  .rfacts{margin-top:14px;padding:12px 14px;border:1px solid var(--hairline);border-radius:14px;background:var(--card);color:var(--muted);font:500 14px Inter,sans-serif}
+  .rfacts b{color:var(--volt);font-weight:600}
+  .rfacts p{margin:6px 0 0;color:var(--soft);line-height:1.45}
