@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.88)
+## Status (release 2026-11-16.89)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -224,7 +224,9 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   in the workout log and in the full-screen viewer; the size label reads "VIDEO · 1.2 MB". Supps, recipes, profile and instructor photos still take pictures only (a video there is refused: "A video only works on an exercise"). `assets/coffee.png` is now in `ASSETS` (review 5).
   Known limits: in iPhone Low Power Mode clips do not start by themselves (first frame shows); many big clips make the backup heavy. iPhone test pending.
 - `.88` Home CLASSES tile shows a class that is running NOW (planner chat): `Classes.next()` picks a live class first (a starred live one before the others), then the next starred, then the next of any kind (before, a starred class later today hid the one running now).
-  A live class gets a red rectangle "LIVE" in white on the top-left corner of the photo (`.livetag`, colour `--live`) and its name alone (no "Now:"); it goes away by itself when the class ends (minute timer). The Classes tab is unchanged (lime LIVE NOW). iPhone test pending.
+  A live class gets a red rectangle "LIVE" in white (`.livetag`, colour `--live`; since `.89` at the right end of the tile's head line, not on the photo) and its name alone (no "Now:"); it goes away by itself when the class ends (minute timer). The Classes tab is unchanged (lime LIVE NOW). iPhone test pending.
+- `.89` Gym day page (planner chat): when today's workout can be started, "+ ADD EXERCISE" and "START WORKOUT" sit SIDE BY SIDE (`.daybtns`, equal halves, 15 px text; START is the glowing one, on the right); they used to be stacked and touching since `.84` took the heading
+  between them away. On any other day, or once the workout is done / skipped, ADD is alone at full width with 14 px under it. Home CLASSES tile: the red LIVE tag moved off the photo to the right end of the "05 CLASSES" line. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

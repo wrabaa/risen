@@ -187,12 +187,13 @@ const Gym = (() => {
     const d = curDay, w = dayRec(d), list = w ? w.exercises : [], n = list.length;
     const canStart = d === isoDay(new Date()) && n && !doneIds(new Date()).has(w.id) && !skippedIds(new Date()).has(w.id);   // START WORKOUT is the main button then
     $('gymPageCount').textContent = n ? `${n} exercise${n === 1 ? '' : 's'}` : 'Rest day';       // the count lives on the day title's line (no big muscle-group heading any more)
-    let h = `<button class="primary${canStart ? ' nogl' : ''}" data-act="addex" style="margin-top:6px">+ ADD EXERCISE</button>`;
+    // with a workout to start: the two buttons sit side by side (ADD on the left, START, the main glowing one, on the right); otherwise ADD alone, full width
+    let h = canStart ? `<div class="daybtns"><button class="primary nogl" data-act="addex">+ ADD EXERCISE</button><button class="primary" data-act="startw">START WORKOUT</button></div>`
+      : `<button class="primary" data-act="addex" style="margin:6px 0 14px">+ ADD EXERCISE</button>`;
     if (d === isoDay(new Date()) && n) {              // starting is only possible on today's day
       const today = new Date();
       if (doneIds(today).has(w.id)) h += `<div class="card" style="margin-bottom:14px"><div class="wrow"><div><div class="t">Workout done</div></div><span class="status ok">DONE ✓</span></div></div>`;
       else if (skippedIds(today).has(w.id)) h += `<div class="card" style="margin-bottom:14px"><div class="wrow"><div><div class="t">Skipped today</div><div class="s">${esc(S.sessions.find(x => x.date === dayKey(today) && x.skipped && x.workoutId === w.id).reason)}</div></div><span class="status">SKIPPED</span></div></div>`;
-      else h += `<button class="primary big" data-act="startw" style="margin:0 0 14px">START WORKOUT</button>`;
     }
     h += `<div class="gstack">${list.map((it, i) => {
       const x = exInfo(it.exerciseId);

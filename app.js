@@ -64,7 +64,7 @@
   $('wgDone').onclick=()=>{ $('waterSheet').hidden=true; renderHome(); };
 
   // ONE layout for every tile with a picture (SUPPLEMENTS, CLASSES, COFFEE): a square image flush with the tile's left, top and bottom edges (the tile's corners round it), the head and the text to its right
-  const picRow=(pic,text,extra='',tools='')=>({__pic:true,pic,text,extra,tools});      // (a picture tile: drawn by tileHtml(); the picture is a square flush with the tile's left edge, filling its full height)
+  const picRow=(pic,text,extra='',tools='',tag='')=>({__pic:true,pic,text,extra,tools,tag});      // (a picture tile: drawn by tileHtml(); the picture is a square flush with the tile's left edge, filling its full height)
 
   // ---- Coffee (Home only): one record per drink bought {id, date, price} in `coffeelogs`; the month's total is for the current calendar month (it starts again on the 1st, older months stay in the data) ----
   const coffeePrice=()=>Math.max(0,Math.round((Number(S.settings.coffeePrice)||0)*100)/100), coffeeName=()=>String(S.settings.coffeeName||'').trim()||'Coffee';
@@ -141,8 +141,8 @@
         const day=n.dayOffset===1?'Tomorrow':n.dayOffset<=6?DAYS[n.day-1]:when.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}).replace(',','');
         return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${esc(n.c.name)}</div><div class="sub">${day} · ${esc(n.c.time)} · ${who}</div>`);       // the day first on the small line, so a long class name keeps its two lines
       }
-      // a class running now: a red LIVE tag on the photo's corner and the name alone (no "Now:"); otherwise "Next: NAME"
-      return picRow(`<div class="tpic">${Classes.avatar(n.i)}${n.now?'<span class="livetag">LIVE</span>':''}</div>`,`<div class="wname">${star}${n.now?'':'Next: '}${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${who}</div>`);
+      // a class running now: a red LIVE tag at the right end of the tile's head line (not on the photo) and the name alone (no "Now:"); otherwise "Next: NAME"
+      return picRow(`<div class="tpic">${Classes.avatar(n.i)}</div>`,`<div class="wname">${star}${n.now?'':'Next: '}${esc(n.c.name)}</div><div class="sub">${esc(n.c.time)} · ${who}</div>`,'','',n.now?'<span class="livetag">LIVE</span>':'');
     }},
     {title:'This week', stack:true, html(){
       const days=weekDays(), today=dayKey(new Date());
@@ -184,7 +184,7 @@
   const tileText=html=>html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();       // what a tile SAYS (to tell whether it really changed)
   const tileSaid={};
   function tileHtml(t,i){                            // one tile; a picture tile has the image flush left over the tile's full height, the head and the text to its right
-    const h=t.html(), pic=h&&h.__pic, head=`<div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}</div>`;
+    const h=t.html(), pic=h&&h.__pic, head=`<div class="tile-head"><b>${String(i+1).padStart(2,'0')}</b>${t.title}${pic&&h.tag||''}</div>`;
     const cls=`tile${pic?' pic':''}${t.title==='Training'?' train':''}${t.cls?' '+t.cls:''}`, attrs=`data-tile="${t.title}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}`;
     const html=pic?`<article class="${cls}" ${attrs}>${h.pic}<div class="tcol">${head}<div class="tile-body"><div class="ttxt">${h.text}</div>${h.extra||''}</div></div>${h.tools||''}</article>`
       :`<article class="${cls}" ${attrs}>${head}<div class="tile-body${t.stack?' stack':''}">${h}</div></article>`;
