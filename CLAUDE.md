@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-16.94)
+## Status (release 2026-11-16.95)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -251,6 +251,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.94` REST TIMER "PONG": a soft bell plays at the moment the rest time ends (with the lime flash). `Pong` in `gym.js` makes it with the phone's own Web Audio (a note + two overtones, ~1 s; no sound file, works offline). iPhone only allows sound after a tap, so the
   audio is switched on by the tap that starts or changes the timer (the ✓, ±15). It plays only at the moment it ends (reopening the app to a timer that ran out long ago stays quiet; Skip makes no sound) and follows the ringer switch (silent mode = no pong; it does not
   interrupt music). No setting for it yet. iPhone test pending.
+- `.95` NEW GYM SCHEDULE (planner chat; `data/gym-classes.json` version 3, from the gym's app, week of 16 Nov 2026): 33 classes. Changed: Mon 10:00 Tabata → Spinning (Bader) · Tue 10:00 Iron Core → BootyCore Blaster (Mijay) · Tue 19:00 Circuit Training → Shape Up (Mira) ·
+  Tue 19:00 Stretch is Ghada's (was Patricia) · NEW Tue 20:00 Belly Dance (Hanin Abdallah) · Wed 19:00 Stretch n Roll gone (the Rouane clash is solved) · Thu 18:00 Yoga, 19:00 RPM, 19:30 Zumba gone · Fri 17:30 Pound, 18:00 Sixpax, 19:00 BodyBalance gone, NEW Fri 18:00 Tabata and
+  19:00 Spinning (Hassan Katiba). New ids `fz-c38`–`fz-c43`; retired, never reused: `fz-c02, c06, c07, c15, c16, c17, c26, c29, c30, c36`; next free `fz-c44`. Two new instructors without a photo (Hanin, Hassan); "Mjay" is now "Mijay Jawad", "Cesar" is "Cesar Ghanem"; Patricia, Jad and Bahaa
+  stay in the instructor list with no class. The new file gave no studio: kept for classes that stayed, guessed for the six new ones (Spinning = Power, Belly Dance = Balance, the rest = Energy). Class names keep the app's wording (the gym's app shortens: B.Pump, RPM, Yoga, Six Pax).
+  Phones take it with Settings → Reload gym schedule. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
@@ -380,7 +385,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - No notifications: ON HOLD until the native Apple app (Capacitor). Do not build in the web app.
 
 **CLASSES**
-- Gym = Fitness Zone; 3 studios: Energy, Balance, Power. 37 classes, 15 instructors
+- Gym = Fitness Zone; 3 studios: Energy, Balance, Power. 33 classes, 17 instructors since `.95` (was 37 / 15)
   (Cesar has no photo; Zumba Thu 19:30 instructor unknown = TBA).
   Fri Pound time set to 17:30 (not labeled on the board — Siza's call). Since `.58`: Sixpax (Fri 18:00, Sat 09:30) and Fri Pound
   (17:30–18:00) last 30 minutes; every other class 60.

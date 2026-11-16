@@ -1,7 +1,7 @@
 {
  "gym": "Fitness Zone",
- "version": 2,
- "note": "Seed data. Every class has a fixed id: it never changes and is never reused (attendance is linked to it). A new class gets the next free number. Loaded on the user's YES; editable after.",
+ "version": 3,
+ "note": "Seed data. Every class has a fixed id: it never changes and is never reused (attendance is linked to it). A new class gets the next free number. Loaded on the user's YES; editable after. Schedule of 16 Nov 2026 (the gym's app): ids fz-c02, c06, c07, c15, c16, c17, c26, c29, c30, c36 are retired and never reused; next free id = fz-c44.",
  "studios": [
   "Energy",
   "Balance",
@@ -10,7 +10,7 @@
  "instructors": [
   {
    "id": "mjay",
-   "name": "Mjay",
+   "name": "Mijay Jawad",
    "photo": "assets/instructors/mjay.jpg"
   },
   {
@@ -80,7 +80,17 @@
   },
   {
    "id": "cesar",
-   "name": "Cesar",
+   "name": "Cesar Ghanem",
+   "photo": null
+  },
+  {
+   "id": "hanin",
+   "name": "Hanin Abdallah",
+   "photo": null
+  },
+  {
+   "id": "hassan",
+   "name": "Hassan Katiba",
    "photo": null
   }
  ],
@@ -91,15 +101,6 @@
    "day": 1,
    "time": "09:00",
    "name": "Circuit Training",
-   "instructor": "bader",
-   "duration": 60
-  },
-  {
-   "id": "fz-c02",
-   "studio": "Energy",
-   "day": 1,
-   "time": "10:00",
-   "name": "Tabata",
    "instructor": "bader",
    "duration": 60
   },
@@ -128,24 +129,6 @@
    "time": "09:00",
    "name": "Sweat",
    "instructor": "mjay",
-   "duration": 60
-  },
-  {
-   "id": "fz-c06",
-   "studio": "Energy",
-   "day": 2,
-   "time": "10:00",
-   "name": "Iron Core",
-   "instructor": "mjay",
-   "duration": 60
-  },
-  {
-   "id": "fz-c07",
-   "studio": "Energy",
-   "day": 2,
-   "time": "19:00",
-   "name": "Circuit Training",
-   "instructor": "mira",
    "duration": 60
   },
   {
@@ -212,33 +195,6 @@
    "duration": 60
   },
   {
-   "id": "fz-c15",
-   "studio": "Energy",
-   "day": 5,
-   "time": "17:30",
-   "name": "Pound",
-   "instructor": "jad",
-   "duration": 30
-  },
-  {
-   "id": "fz-c16",
-   "studio": "Energy",
-   "day": 5,
-   "time": "18:00",
-   "name": "Sixpax",
-   "instructor": "jad",
-   "duration": 30
-  },
-  {
-   "id": "fz-c17",
-   "studio": "Energy",
-   "day": 5,
-   "time": "19:00",
-   "name": "Les Mills BodyBalance",
-   "instructor": "jad",
-   "duration": 60
-  },
-  {
    "id": "fz-c18",
    "studio": "Energy",
    "day": 6,
@@ -289,7 +245,7 @@
    "day": 2,
    "time": "19:00",
    "name": "Stretch",
-   "instructor": "patricia",
+   "instructor": "ghada",
    "duration": 60
   },
   {
@@ -311,15 +267,6 @@
    "duration": 60
   },
   {
-   "id": "fz-c26",
-   "studio": "Balance",
-   "day": 3,
-   "time": "19:00",
-   "name": "Stretch n Roll",
-   "instructor": "rouane",
-   "duration": 60
-  },
-  {
    "id": "fz-c27",
    "studio": "Balance",
    "day": 4,
@@ -335,24 +282,6 @@
    "time": "12:00",
    "name": "Stretch",
    "instructor": "ghada",
-   "duration": 60
-  },
-  {
-   "id": "fz-c29",
-   "studio": "Balance",
-   "day": 4,
-   "time": "18:00",
-   "name": "Yoga",
-   "instructor": "bahaa",
-   "duration": 60
-  },
-  {
-   "id": "fz-c30",
-   "studio": "Balance",
-   "day": 4,
-   "time": "19:30",
-   "name": "Zumba",
-   "instructor": null,
    "duration": 60
   },
   {
@@ -401,21 +330,66 @@
    "duration": 60
   },
   {
-   "id": "fz-c36",
-   "studio": "Power",
-   "day": 4,
-   "time": "19:00",
-   "name": "Les Mills RPM",
-   "instructor": "bader",
-   "duration": 60
-  },
-  {
    "id": "fz-c37",
    "studio": "Power",
    "day": 6,
    "time": "11:00",
    "name": "Spinning",
    "instructor": "mjay",
+   "duration": 60
+  },
+  {
+   "id": "fz-c38",
+   "studio": "Power",
+   "day": 1,
+   "time": "10:00",
+   "name": "Spinning",
+   "instructor": "bader",
+   "duration": 60
+  },
+  {
+   "id": "fz-c39",
+   "studio": "Energy",
+   "day": 2,
+   "time": "10:00",
+   "name": "BootyCore Blaster",
+   "instructor": "mjay",
+   "duration": 60
+  },
+  {
+   "id": "fz-c40",
+   "studio": "Energy",
+   "day": 2,
+   "time": "19:00",
+   "name": "Shape Up",
+   "instructor": "mira",
+   "duration": 60
+  },
+  {
+   "id": "fz-c41",
+   "studio": "Balance",
+   "day": 2,
+   "time": "20:00",
+   "name": "Belly Dance",
+   "instructor": "hanin",
+   "duration": 60
+  },
+  {
+   "id": "fz-c42",
+   "studio": "Energy",
+   "day": 5,
+   "time": "18:00",
+   "name": "Tabata",
+   "instructor": "hassan",
+   "duration": 60
+  },
+  {
+   "id": "fz-c43",
+   "studio": "Power",
+   "day": 5,
+   "time": "19:00",
+   "name": "Spinning",
+   "instructor": "hassan",
    "duration": 60
   }
  ]
