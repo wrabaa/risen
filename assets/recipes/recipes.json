@@ -35,7 +35,7 @@
     "200 ml cold water",
     "4 ice cubes"
    ],
-   "method": "1. Put the water, yoghurt and spinach in the blender first, then the banana, flaxseed and ice.\n2. Blend for 1 minute, until completely smooth.\n3. Drink at once, or within 30 minutes."
+   "method": "1. Wash the spinach. Put the water, yoghurt and spinach in the blender first, then the banana, flaxseed and ice.\n2. Blend for 1 minute, until completely smooth.\n3. Drink at once, or within 30 minutes."
   },
   {
    "id": "overnight-oats-chia-walnut",
@@ -53,7 +53,7 @@
     "20 g walnuts, roughly chopped",
     "1/2 tsp cinnamon"
    ],
-   "method": "1. In a jar, mix the oats, chia, milk, yoghurt and cinnamon.\n2. Close the jar and leave it in the fridge overnight, at least 6 hours.\n3. In the morning, stir. Add a splash of milk if it is too thick.\n4. Top with the blueberries and walnuts. Eat cold."
+   "method": "1. In a jar, mix the oats, chia, milk, yoghurt and cinnamon.\n2. Close the jar and leave it in the fridge overnight, at least 6 hours.\n3. In the morning, stir. Add a splash of milk if it is too thick.\n4. Top with the blueberries and walnuts. Eat cold.\n5. Make it fresh each night; keep it cold and eat within 2 days."
   },
   {
    "id": "chicken-quinoa-bowl",
@@ -74,7 +74,7 @@
     "Juice of 1 lemon",
     "2 garlic cloves, crushed"
    ],
-   "method": "1. Rinse the quinoa. Boil it in 250 ml water for 15 minutes, until the water is gone. Cover and rest 5 minutes.\n2. Rub the chicken with half the oil, the cumin and half the salt.\n3. Cook the chicken in a hot pan, 6 minutes each side, until no pink is left inside. Rest 5 minutes, then slice.\n4. Mix the lemon juice, garlic, the rest of the oil and salt for the dressing.\n5. Put quinoa, spinach, cucumber and tomatoes in two bowls. Add the chicken and pour the dressing on top."
+   "method": "1. Rinse the quinoa. Boil it in 250 ml water for 15 minutes, until the water is gone. Cover and rest 5 minutes.\n2. Cut each chicken breast in half through the thickness so it cooks evenly. Rub with half the oil, the cumin and half the salt.\n3. Cook in a hot pan, about 5 minutes each side, until the middle reaches 74°C and no pink is left. Rest 5 minutes, then slice.\n4. Mix the lemon juice, garlic, the rest of the oil and salt for the dressing.\n5. Put quinoa, spinach, cucumber and tomatoes in two bowls. Add the chicken and pour the dressing on top.\n6. Wash your hands, knife and board after touching the raw chicken. Keep leftovers in the fridge and eat within 2 days."
   },
   {
    "id": "baked-salmon-lemon-broccoli",
@@ -92,7 +92,7 @@
     "1/2 tsp salt",
     "Black pepper"
    ],
-   "method": "1. Heat the oven to 200°C.\n2. Put the broccoli on a tray with half the oil, the garlic and a pinch of salt. Bake 10 minutes.\n3. Push the broccoli aside. Add the salmon, skin down. Season with salt, pepper, the rest of the oil and the lemon juice. Lay the lemon slices on top.\n4. Bake 12 minutes more, until the salmon flakes easily with a fork. Serve at once."
+   "method": "1. Heat the oven to 200°C.\n2. Put the broccoli on a tray with half the oil, the garlic and a pinch of salt. Bake 10 minutes.\n3. Push the broccoli aside. Add the salmon, skin down. Season with salt, pepper, the rest of the oil and the lemon juice. Lay the lemon slices on top.\n4. Bake 12 minutes more, until the salmon flakes easily with a fork and the middle reaches 63°C. Serve at once.\n5. Keep leftovers in the fridge and eat within 1 day."
   },
   {
    "id": "heart-nut-seed-mix",
@@ -162,7 +162,7 @@
     "juice of 2 lemons",
     "1/4 tsp salt"
    ],
-   "method": "1. Put the soaked, drained bulgur in a large bowl.\n2. Add the parsley, tomatoes, spring onions and chickpeas.\n3. Dress with the lemon juice, olive oil and salt. Mix well.\n4. Leave 10 minutes so the bulgur takes the flavour, then serve."
+   "method": "1. Wash the parsley, tomatoes and spring onions well. Put the soaked, drained bulgur in a large bowl.\n2. Add the parsley, tomatoes, spring onions and chickpeas.\n3. Dress with the lemon juice, olive oil and salt. Mix well.\n4. Leave 10 minutes so the bulgur takes the flavour, then serve.\n5. Keep in the fridge and eat within 1 day."
   },
   {
    "id": "hummus-veggie-sticks",
@@ -203,7 +203,7 @@
     "1 lemon, cut in wedges",
     "1/4 tsp salt, black pepper"
    ],
-   "method": "1. Heat the oven to 200°C.\n2. In a baking dish mix the onion, garlic, tomatoes, chickpeas, cumin, salt, pepper and 1 tbsp of the olive oil.\n3. Bake 15 minutes.\n4. Lay the fish on top, drizzle with the rest of the olive oil and bake 12–15 minutes more, until it flakes easily.\n5. Scatter with parsley and serve with the lemon wedges."
+   "method": "1. Heat the oven to 200°C.\n2. In a baking dish mix the onion, garlic, tomatoes, chickpeas, cumin, salt, pepper and 1 tbsp of the olive oil.\n3. Bake 15 minutes.\n4. Lay the fish on top, drizzle with the rest of the olive oil and bake 12–15 minutes more, until it flakes easily and the middle reaches 63°C.\n5. Scatter with parsley and serve with the lemon wedges.\n6. Keep leftovers in the fridge and eat within 1 day."
   },
   {
    "id": "strawberry-yoghurt-shake",
@@ -252,7 +252,7 @@
     "1 tsp olive oil",
     "1 pinch of salt, black pepper"
    ],
-   "method": "1. Heat the olive oil in a non-stick pan on medium heat. Add the spinach and tomato and cook 2 minutes, until the spinach wilts.\n2. Beat the eggs with the salt and pepper and pour them over the vegetables.\n3. Cook 2 minutes without stirring, fold in half and serve."
+   "method": "1. Heat the olive oil in a non-stick pan on medium heat. Add the spinach and tomato and cook 2 minutes, until the spinach wilts.\n2. Beat the eggs with the salt and pepper and pour them over the vegetables.\n3. Cook 2 to 3 minutes without stirring, until no liquid egg is left. Fold in half and serve."
   },
   {
    "id": "warm-oat-porridge-apple",
@@ -287,7 +287,7 @@
     "juice of 1 lemon",
     "1/4 tsp salt, black pepper"
    ],
-   "method": "1. Put the beans, tomatoes, onion and parsley in a bowl.\n2. Flake the tuna over the top.\n3. Dress with the olive oil, lemon juice, salt and pepper. Toss gently and serve."
+   "method": "1. Put the beans, tomatoes, onion and parsley in a bowl.\n2. Flake the tuna over the top.\n3. Dress with the olive oil, lemon juice, salt and pepper. Toss gently and serve.\n4. Keep in the fridge and eat within 1 day."
   },
   {
    "id": "mujaddara-cucumber-yoghurt",
@@ -355,7 +355,7 @@
     "1/2 tsp salt, black pepper",
     "2 tbsp chopped parsley"
    ],
-   "method": "1. Heat the oven to 200°C.\n2. Mix the olive oil, garlic, lemon juice, salt and pepper. Coat the chicken in half of it and the zucchini in the rest.\n3. Spread both on a baking tray, chicken in the middle.\n4. Bake 25 minutes, until the chicken is cooked through (no pink inside).\n5. Sprinkle with the parsley and serve."
+   "method": "1. Heat the oven to 200°C.\n2. Mix the olive oil, garlic, lemon juice, salt and pepper. Split it into two bowls: coat the chicken in one and the zucchini in the other, so the raw chicken never touches the vegetables.\n3. Spread both on a baking tray, chicken in the middle.\n4. Bake 25 minutes, until the thickest piece reaches 74°C and no pink is left.\n5. Sprinkle with the parsley and serve.\n6. Wash your hands, knife and board after touching the raw chicken. Keep leftovers in the fridge and eat within 2 days."
   },
   {
    "id": "baked-musaqaa",
@@ -427,7 +427,7 @@
     "1 tsp ground cumin",
     "1/4 tsp salt"
    ],
-   "method": "1. Heat the olive oil in a wide pan. Cook the onion and pepper 6 minutes.\n2. Add the garlic and cumin, stir 30 seconds, then add the tomatoes and salt. Simmer 10 minutes until thick.\n3. Make four small wells in the sauce and crack an egg into each.\n4. Cover and cook 5 to 7 minutes, until the whites are set. Serve from the pan."
+   "method": "1. Heat the olive oil in a wide pan. Cook the onion and pepper 6 minutes.\n2. Add the garlic and cumin, stir 30 seconds, then add the tomatoes and salt. Simmer 10 minutes until thick.\n3. Make four small wells in the sauce and crack an egg into each.\n4. Cover and cook 5 to 7 minutes, until the whites are completely set (no clear egg left). Cook 2 minutes longer for a firm yolk. Serve from the pan."
   },
   {
    "id": "banana-oat-pancakes",
@@ -443,7 +443,7 @@
     "1 tsp cinnamon",
     "1 tsp olive oil, for the pan"
    ],
-   "method": "1. Blend the bananas, oats, eggs and cinnamon into a thick batter. Rest 5 minutes.\n2. Heat a non-stick pan with a little of the oil on medium heat.\n3. Pour small rounds, about 3 tbsp each. Cook 2 to 3 minutes per side until golden.\n4. Serve warm."
+   "method": "1. Blend the bananas, oats, eggs and cinnamon into a thick batter. Rest 5 minutes.\n2. Heat a non-stick pan with a little of the oil on medium heat.\n3. Pour small rounds, about 3 tbsp each. Cook 2 to 3 minutes per side until golden.\n4. Serve warm.\n5. Do not taste the raw batter, it has raw egg. Cook every pancake until firm in the middle."
   },
   {
    "id": "lentil-spinach-feta-salad",
@@ -461,7 +461,7 @@
     "Juice of 1 lemon",
     "1/4 tsp salt"
    ],
-   "method": "1. Mix the olive oil, lemon juice and salt in a large bowl.\n2. Add the lentils, spinach and tomatoes and toss.\n3. Top with the feta and serve."
+   "method": "1. Wash the spinach and tomatoes. Mix the olive oil, lemon juice and salt in a large bowl.\n2. Add the lentils, spinach and tomatoes and toss.\n3. Top with the feta and serve.\n4. Keep cooked lentils in the fridge and use within 3 days."
   },
   {
    "id": "chicken-hummus-wrap",
@@ -472,13 +472,13 @@
    "health": "About 41 g protein per serving. Whole-wheat bread and hummus add fibre; chickpeas and sesame in the hummus give plant protein. Nutrition: USDA FoodData Central.",
    "ingredients": [
     "2 whole-wheat flatbreads (60 g each)",
-    "200 g cooked chicken breast, sliced",
+    "200 g cooked chicken breast, sliced (cooked until 74°C inside, then cooled)",
     "100 g hummus",
     "100 g cucumber, sliced",
     "100 g tomato, sliced",
     "A handful of lettuce"
    ],
-   "method": "1. Spread the hummus over the two flatbreads.\n2. Add the chicken, cucumber, tomato and lettuce.\n3. Roll tight, cut in half and serve."
+   "method": "1. Spread the hummus over the two flatbreads.\n2. Add the chicken, cucumber, tomato and lettuce.\n3. Roll tight, cut in half and serve.\n4. Cooked chicken keeps 2 days in the fridge. Eat the wrap within a few hours, or keep it chilled."
   },
   {
    "id": "carrot-tahini-sticks",
@@ -495,7 +495,7 @@
     "1 small garlic clove, crushed",
     "Pinch of salt"
    ],
-   "method": "1. Stir the tahini, lemon juice, water, garlic and salt until smooth and pourable.\n2. Serve the carrot sticks with the dip."
+   "method": "1. Wash and peel the carrots. Stir the tahini, lemon juice, water, garlic and salt until smooth and pourable.\n2. Serve the carrot sticks with the dip."
   },
   {
    "id": "apple-almond-butter",
@@ -509,7 +509,7 @@
     "1 tbsp natural almond butter (no added sugar)",
     "Pinch of cinnamon"
    ],
-   "method": "1. Slice the apple into wedges.\n2. Spread or dip with the almond butter and sprinkle the cinnamon."
+   "method": "1. Wash the apple. Slice the apple into wedges.\n2. Spread or dip with the almond butter and sprinkle the cinnamon."
   },
   {
    "id": "chicken-kafta-tray-bake",
@@ -528,7 +528,7 @@
     "200 g tomatoes, quartered",
     "2 tbsp olive oil"
    ],
-   "method": "1. Heat the oven to 220°C.\n2. Mix the chicken, onion, parsley, baharat and salt. Shape into 9 finger-shaped kaftas.\n3. Toss the zucchini and tomatoes with the olive oil on a large tray and add the kaftas.\n4. Bake 20 to 25 minutes, turning the kaftas once, until cooked through and golden."
+   "method": "1. Heat the oven to 220°C.\n2. Mix the chicken, onion, parsley, baharat and salt. Shape into 9 finger-shaped kaftas.\n3. Toss the zucchini and tomatoes with the olive oil on a large tray and add the kaftas.\n4. Bake 20 to 25 minutes, turning the kaftas once, until golden and the middle of a kafta reaches 74°C, with no pink left.\n5. Wash your hands, bowl and board after touching the raw chicken. Keep leftovers in the fridge and eat within 2 days."
   },
   {
    "id": "spinach-chickpea-stew",
