@@ -1,380 +1,553 @@
 {
-  "recipes": [
-    {
-      "id": "lentil-chard-soup",
-      "category": "lunch",
-      "name": "Lentil & Chard Soup",
-      "serves": 4,
-      "kcal": 380,
-      "health": "22 g plant protein, 11 g fibre and 7 mg iron per bowl. The lemon helps your body absorb the iron. Source: AUB Food-Based Dietary Guidelines, guideline 6.",
-      "ingredients": [
-        "300 g green lentils",
-        "2 tbsp olive oil",
-        "2 onions, chopped",
-        "3 garlic cloves, chopped",
-        "500 g Swiss chard (or spinach), chopped with the stems",
-        "1 tsp cumin",
-        "1 tsp salt",
-        "Juice of 2 lemons",
-        "1.5 litres water"
-      ],
-      "method": "1. Rinse the lentils. Boil them in the water for 30 minutes, until almost soft.\n2. Meanwhile cook the onions and garlic in the olive oil for about 10 minutes, until golden.\n3. Add the onions, cumin and salt to the lentils.\n4. Add the chard and simmer 20 minutes.\n5. Stir in the lemon juice, simmer 5 minutes, taste, and serve hot."
-    },
-    {
-      "id": "green-protein-smoothie",
-      "category": "shakes",
-      "name": "Green Protein Smoothie",
-      "serves": 1,
-      "kcal": 245,
-      "health": "About 20 g protein, 6 g fibre, and more than a full day of vitamin K from the spinach. Greek yoghurt gives the protein, flax adds fibre and plant omega-3. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "1 medium banana",
-        "60 g baby spinach (two big handfuls)",
-        "150 g plain Greek yoghurt, 0% fat",
-        "1 tbsp ground flaxseed",
-        "200 ml cold water",
-        "4 ice cubes"
-      ],
-      "method": "1. Put the water, yoghurt and spinach in the blender first, then the banana, flaxseed and ice.\n2. Blend for 1 minute, until completely smooth.\n3. Drink at once, or within 30 minutes."
-    },
-    {
-      "id": "overnight-oats-chia-walnut",
-      "category": "breakfast",
-      "name": "Overnight Oats with Chia & Walnuts",
-      "serves": 1,
-      "kcal": 580,
-      "health": "About 31 g protein and 13 g fibre. Oat beta-glucan (about 2 g here) is the fibre that lowers LDL cholesterol; the US FDA accepts this claim at 3 g a day. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "50 g rolled oats",
-        "1 tbsp chia seeds",
-        "200 ml low-fat milk",
-        "100 g plain Greek yoghurt, 0% fat",
-        "80 g blueberries (fresh or frozen)",
-        "20 g walnuts, roughly chopped",
-        "1/2 tsp cinnamon"
-      ],
-      "method": "1. In a jar, mix the oats, chia, milk, yoghurt and cinnamon.\n2. Close the jar and leave it in the fridge overnight, at least 6 hours.\n3. In the morning, stir. Add a splash of milk if it is too thick.\n4. Top with the blueberries and walnuts. Eat cold."
-    },
-    {
-      "id": "chicken-quinoa-bowl",
-      "category": "lunch",
-      "name": "Chicken & Quinoa Bowl",
-      "serves": 2,
-      "kcal": 590,
-      "health": "About 55 g protein and 6 g fibre per bowl, for muscle repair after training. Quinoa gives slow carbs and fibre; olive oil and lemon make the dressing. Source: AUB Food-Based Dietary Guidelines. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "400 g chicken breast, skinless",
-        "100 g quinoa, dry",
-        "2 tbsp olive oil",
-        "1 tsp cumin",
-        "1 tsp salt",
-        "200 g cucumber, diced",
-        "200 g tomatoes, diced",
-        "60 g baby spinach",
-        "Juice of 1 lemon",
-        "2 garlic cloves, crushed"
-      ],
-      "method": "1. Rinse the quinoa. Boil it in 250 ml water for 15 minutes, until the water is gone. Cover and rest 5 minutes.\n2. Rub the chicken with half the oil, the cumin and half the salt.\n3. Cook the chicken in a hot pan, 6 minutes each side, until no pink is left inside. Rest 5 minutes, then slice.\n4. Mix the lemon juice, garlic, the rest of the oil and salt for the dressing.\n5. Put quinoa, spinach, cucumber and tomatoes in two bowls. Add the chicken and pour the dressing on top."
-    },
-    {
-      "id": "baked-salmon-lemon-broccoli",
-      "category": "dinner",
-      "name": "Baked Salmon with Lemon & Broccoli",
-      "serves": 2,
-      "kcal": 425,
-      "health": "About 34 g protein and 3 g omega-3 (EPA and DHA) per serving. The American Heart Association advises fish twice a week for a healthy heart. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "2 salmon fillets, 150 g each",
-        "250 g broccoli, cut into florets",
-        "1 tbsp olive oil",
-        "2 garlic cloves, sliced",
-        "1 lemon (juice of half, the rest in slices)",
-        "1/2 tsp salt",
-        "Black pepper"
-      ],
-      "method": "1. Heat the oven to 200°C.\n2. Put the broccoli on a tray with half the oil, the garlic and a pinch of salt. Bake 10 minutes.\n3. Push the broccoli aside. Add the salmon, skin down. Season with salt, pepper, the rest of the oil and the lemon juice. Lay the lemon slices on top.\n4. Bake 12 minutes more, until the salmon flakes easily with a fork. Serve at once."
-    },
-    {
-      "id": "heart-nut-seed-mix",
-      "category": "snacks",
-      "name": "Heart Nut & Seed Mix",
-      "serves": 7,
-      "kcal": 217,
-      "health": "A 36 g handful gives about 7 g protein and 3 g fibre. The US FDA allows the claim that 1.5 oz (42 g) of nuts a day, in a low-saturated-fat diet, may reduce heart disease risk. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "70 g raw walnuts",
-        "70 g raw almonds",
-        "50 g hazelnuts",
-        "40 g raw pumpkin seeds",
-        "20 g sesame seeds"
-      ],
-      "method": "1. Mix everything in a jar. No salt, no sugar.\n2. Keep it closed in a cool, dry place.\n3. One handful (about 36 g) a day. The jar lasts a week."
-    },
-    {
-      "id": "blueberry-oat-shake",
-      "category": "shakes",
-      "name": "Blueberry Oat Shake",
-      "serves": 1,
-      "kcal": 415,
-      "health": "About 25 g protein and 8 g fibre. Oats bring beta-glucan, the fibre the US FDA links to lower cholesterol (3 g a day); this glass gives about half of that. Blueberries add vitamin C. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "40 g rolled oats (about 1/2 cup)",
-        "150 g blueberries, fresh or frozen",
-        "150 g plain Greek yoghurt, 0% fat",
-        "200 ml low-fat milk",
-        "1/2 tsp cinnamon"
-      ],
-      "method": "1. Put the milk, yoghurt and oats in the blender and leave 5 minutes so the oats soften.\n2. Add the blueberries and cinnamon.\n3. Blend for 1 minute, until smooth. Drink at once."
-    },
-    {
-      "id": "foul-moudammas",
-      "category": "breakfast",
-      "name": "Foul Moudammas",
-      "serves": 2,
-      "kcal": 360,
-      "health": "About 20 g plant protein and 17 g fibre per serving, with iron and folate. Fava beans are a staple legume in the AUB Food-Based Dietary Guidelines for Lebanon. Their fibre slows the rise in blood sugar. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "400 g cooked fava beans (one tin, drained)",
-        "2 garlic cloves, crushed",
-        "juice of 1 lemon",
-        "2 tbsp olive oil",
-        "1 tsp ground cumin",
-        "1 medium tomato, diced",
-        "2 tbsp chopped parsley",
-        "1/4 tsp salt"
-      ],
-      "method": "1. Warm the fava beans in a small pan with a splash of their water for 5 minutes.\n2. Mash roughly with a fork, leaving some beans whole.\n3. Stir in the garlic, lemon juice, cumin and salt.\n4. Serve in a bowl, topped with the tomato, parsley and the olive oil."
-    },
-    {
-      "id": "chickpea-tabbouleh",
-      "category": "lunch",
-      "name": "Chickpea Tabbouleh",
-      "serves": 2,
-      "kcal": 500,
-      "health": "About 17 g plant protein and 14 g fibre per serving. Parsley is very rich in vitamin K and vitamin C, chickpeas add protein and slow-release carbs, olive oil gives the heart-friendly fats. Nutrition: USDA FoodData Central; legumes as in the AUB Food-Based Dietary Guidelines.",
-      "ingredients": [
-        "2 big bunches fresh parsley (about 120 g leaves), very finely chopped",
-        "300 g tomatoes, finely diced",
-        "40 g fine bulgur, soaked in water 15 minutes and drained",
-        "240 g cooked chickpeas (one tin, drained)",
-        "3 spring onions, sliced",
-        "3 tbsp olive oil",
-        "juice of 2 lemons",
-        "1/4 tsp salt"
-      ],
-      "method": "1. Put the soaked, drained bulgur in a large bowl.\n2. Add the parsley, tomatoes, spring onions and chickpeas.\n3. Dress with the lemon juice, olive oil and salt. Mix well.\n4. Leave 10 minutes so the bulgur takes the flavour, then serve."
-    },
-    {
-      "id": "hummus-veggie-sticks",
-      "category": "snacks",
-      "name": "Hummus with Veggie Sticks",
-      "serves": 4,
-      "kcal": 205,
-      "health": "About 8 g plant protein and 7 g fibre per serving. Chickpeas and sesame (tahini) give protein, fibre and unsaturated fats, and the raw vegetables add crunch for almost no calories. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "240 g cooked chickpeas (one tin, drained)",
-        "2 tbsp tahini (30 g)",
-        "juice of 1 lemon",
-        "1 garlic clove",
-        "1 tbsp olive oil",
-        "3 tbsp cold water",
-        "1/4 tsp salt",
-        "2 carrots, cut in sticks (200 g)",
-        "1 cucumber, cut in sticks (200 g)"
-      ],
-      "method": "1. Blend the chickpeas, tahini, lemon juice, garlic, salt and water until completely smooth. Add a little more water if it is too thick.\n2. Spoon into a bowl and drizzle with the olive oil.\n3. Serve with the carrot and cucumber sticks. Keeps 4 days in the fridge."
-    },
-    {
-      "id": "fish-chickpea-tomato-bake",
-      "category": "dinner",
-      "name": "Fish & Chickpea Tomato Bake",
-      "serves": 2,
-      "kcal": 510,
-      "health": "About 45 g protein and 12 g fibre per serving. White fish is lean protein and a source of vitamin B12 and selenium; the American Heart Association recommends fish at least twice a week. Chickpeas and tomatoes add fibre and lycopene. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "2 white fish fillets, 150 g each (cod or sea bream)",
-        "240 g cooked chickpeas (one tin, drained)",
-        "400 g tomatoes, chopped",
-        "1 medium onion, sliced",
-        "3 garlic cloves, sliced",
-        "2 tbsp olive oil",
-        "1 tsp ground cumin",
-        "2 tbsp chopped parsley",
-        "1 lemon, cut in wedges",
-        "1/4 tsp salt, black pepper"
-      ],
-      "method": "1. Heat the oven to 200°C.\n2. In a baking dish mix the onion, garlic, tomatoes, chickpeas, cumin, salt, pepper and 1 tbsp of the olive oil.\n3. Bake 15 minutes.\n4. Lay the fish on top, drizzle with the rest of the olive oil and bake 12–15 minutes more, until it flakes easily.\n5. Scatter with parsley and serve with the lemon wedges."
-    },
-    {
-      "id": "strawberry-yoghurt-shake",
-      "category": "shakes",
-      "name": "Strawberry Yoghurt Shake",
-      "serves": 1,
-      "kcal": 305,
-      "health": "About 25 g protein and close to a full day of vitamin C from the strawberries. Almonds add vitamin E and unsaturated fats. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "150 g strawberries, fresh or frozen",
-        "150 g plain Greek yoghurt, 0% fat",
-        "200 ml low-fat milk",
-        "10 raw almonds (about 14 g)",
-        "3 ice cubes"
-      ],
-      "method": "1. Put the milk, yoghurt and almonds in the blender and blend 30 seconds.\n2. Add the strawberries and ice.\n3. Blend 1 minute, until smooth. Drink at once."
-    },
-    {
-      "id": "cucumber-mint-ayran",
-      "category": "shakes",
-      "name": "Cucumber Mint Ayran",
-      "serves": 1,
-      "kcal": 135,
-      "health": "About 20 g protein for only 135 kcal, plus calcium. A traditional Lebanese yoghurt drink: light, cooling, no sugar. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "200 g plain Greek yoghurt, 0% fat",
-        "150 ml cold water",
-        "1/2 cucumber (100 g), peeled and chopped",
-        "10 fresh mint leaves",
-        "1 pinch of salt",
-        "4 ice cubes"
-      ],
-      "method": "1. Put the yoghurt, water, cucumber, mint and salt in the blender.\n2. Blend 30 seconds, until smooth.\n3. Pour over the ice and drink cold."
-    },
-    {
-      "id": "spinach-tomato-omelette",
-      "category": "breakfast",
-      "name": "Spinach & Tomato Omelette",
-      "serves": 1,
-      "kcal": 220,
-      "health": "About 15 g protein. Eggs give vitamin B12, vitamin D and choline; spinach adds folate and vitamin K. Cooked with a little olive oil, not butter. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "2 eggs",
-        "60 g baby spinach",
-        "1 small tomato (120 g), diced",
-        "1 tsp olive oil",
-        "1 pinch of salt, black pepper"
-      ],
-      "method": "1. Heat the olive oil in a non-stick pan on medium heat. Add the spinach and tomato and cook 2 minutes, until the spinach wilts.\n2. Beat the eggs with the salt and pepper and pour them over the vegetables.\n3. Cook 2 minutes without stirring, fold in half and serve."
-    },
-    {
-      "id": "warm-oat-porridge-apple",
-      "category": "breakfast",
-      "name": "Warm Oat Porridge with Apple & Walnuts",
-      "serves": 1,
-      "kcal": 510,
-      "health": "About 18 g protein and 9 g fibre. Oats bring beta-glucan: the US FDA links 3 g a day to lower cholesterol, and this bowl gives about two thirds of that. Walnuts add plant omega-3. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "50 g rolled oats (about 1/2 cup)",
-        "250 ml low-fat milk",
-        "1 small apple (150 g), diced",
-        "20 g walnuts, chopped",
-        "1/2 tsp cinnamon"
-      ],
-      "method": "1. Put the oats and milk in a small pot and cook on medium heat 5 minutes, stirring, until thick.\n2. Stir in the apple and cinnamon and cook 1 more minute.\n3. Pour into a bowl and top with the walnuts."
-    },
-    {
-      "id": "tuna-white-bean-salad",
-      "category": "lunch",
-      "name": "Tuna & White Bean Salad",
-      "serves": 2,
-      "kcal": 415,
-      "health": "About 28 g protein and 11 g fibre per serving. Tuna is rich in vitamin B12 and selenium, and the American Heart Association recommends fish twice a week. White beans add slow-release carbs. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "160 g canned tuna in water, drained (about 2 small tins)",
-        "240 g cooked white beans (one tin, drained)",
-        "200 g cherry tomatoes, halved",
-        "1/2 small red onion (50 g), thinly sliced",
-        "2 tbsp chopped parsley",
-        "2 tbsp olive oil",
-        "juice of 1 lemon",
-        "1/4 tsp salt, black pepper"
-      ],
-      "method": "1. Put the beans, tomatoes, onion and parsley in a bowl.\n2. Flake the tuna over the top.\n3. Dress with the olive oil, lemon juice, salt and pepper. Toss gently and serve."
-    },
-    {
-      "id": "mujaddara-cucumber-yoghurt",
-      "category": "lunch",
-      "name": "Mujaddara with Cucumber Yoghurt",
-      "serves": 3,
-      "kcal": 345,
-      "health": "About 15 g protein and 13 g fibre per serving. Lentils plus a grain make a complete plant protein; legumes are a staple in the AUB Food-Based Dietary Guidelines for Lebanon. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "100 g dry green or brown lentils",
-        "60 g coarse bulgur",
-        "2 large onions (300 g), sliced",
-        "2 tbsp olive oil",
-        "1 tsp ground cumin",
-        "1/2 tsp salt",
-        "Salad: 200 g cucumber, diced",
-        "150 g plain Greek yoghurt, 0% fat"
-      ],
-      "method": "1. Boil the lentils in 500 ml water for 15 minutes. Add the bulgur, cumin and salt, cover and cook on low for 15 minutes, until all the water is absorbed.\n2. Meanwhile cook the onions in the olive oil on medium-low heat for 20 minutes, stirring, until deep golden.\n3. Mix the cucumber into the yoghurt.\n4. Serve the lentils and bulgur topped with the onions, with the cucumber yoghurt beside it."
-    },
-    {
-      "id": "roasted-spiced-chickpeas",
-      "category": "snacks",
-      "name": "Roasted Spiced Chickpeas",
-      "serves": 3,
-      "kcal": 175,
-      "health": "About 7 g plant protein and 6 g fibre per serving: a crunchy snack with no added sugar. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "240 g cooked chickpeas (one tin, drained)",
-        "1 tbsp olive oil",
-        "1 tsp ground cumin",
-        "1/2 tsp paprika",
-        "1/4 tsp salt"
-      ],
-      "method": "1. Heat the oven to 200°C.\n2. Dry the chickpeas very well with a clean towel.\n3. Mix them with the olive oil, cumin, paprika and salt and spread on a baking tray.\n4. Roast 25–30 minutes, shaking the tray twice, until golden and crunchy. Eat the same day."
-    },
-    {
-      "id": "yoghurt-walnut-pomegranate",
-      "category": "snacks",
-      "name": "Yoghurt, Walnut & Pomegranate Cup",
-      "serves": 1,
-      "kcal": 300,
-      "health": "About 22 g protein. Walnuts carry a US FDA qualified health claim for heart health (about 43 g a day; this cup has about half), and pomegranate adds vitamin C. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "200 g plain Greek yoghurt, 0% fat",
-        "20 g walnuts, roughly chopped",
-        "60 g pomegranate seeds (about 1/3 of a pomegranate)",
-        "1/4 tsp cinnamon"
-      ],
-      "method": "1. Spoon the yoghurt into a glass or bowl.\n2. Top with the walnuts and pomegranate seeds.\n3. Sprinkle with the cinnamon."
-    },
-    {
-      "id": "lemon-garlic-chicken-zucchini",
-      "category": "dinner",
-      "name": "Lemon Garlic Chicken with Roasted Zucchini",
-      "serves": 2,
-      "kcal": 405,
-      "health": "About 45 g protein per serving for 405 kcal. Chicken breast is a lean protein; zucchini adds vitamin C and potassium for very few calories. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "400 g chicken breast, cut in 4 pieces",
-        "400 g zucchini, cut in thick half-moons",
-        "2 tbsp olive oil",
-        "3 garlic cloves, crushed",
-        "juice of 1 lemon",
-        "1/2 tsp salt, black pepper",
-        "2 tbsp chopped parsley"
-      ],
-      "method": "1. Heat the oven to 200°C.\n2. Mix the olive oil, garlic, lemon juice, salt and pepper. Coat the chicken in half of it and the zucchini in the rest.\n3. Spread both on a baking tray, chicken in the middle.\n4. Bake 25 minutes, until the chicken is cooked through (no pink inside).\n5. Sprinkle with the parsley and serve."
-    },
-    {
-      "id": "baked-musaqaa",
-      "category": "dinner",
-      "name": "Baked Musaqa'a",
-      "serves": 3,
-      "kcal": 300,
-      "health": "About 7 g plant protein and 13 g fibre per serving. A Lebanese eggplant, tomato and chickpea stew, baked instead of fried. Tomatoes add lycopene. Nutrition: USDA FoodData Central.",
-      "ingredients": [
-        "2 medium eggplants (500 g), cut in thick rounds",
-        "240 g cooked chickpeas (one tin, drained)",
-        "400 g tomatoes, chopped",
-        "1 medium onion, sliced",
-        "3 garlic cloves, sliced",
-        "2 tbsp olive oil",
-        "1 tsp ground cumin",
-        "1/2 tsp salt"
-      ],
-      "method": "1. Heat the oven to 220°C. Brush the eggplant rounds with 1 tbsp of the olive oil and bake on a tray 20 minutes, until soft and golden.\n2. Meanwhile cook the onion and garlic in the other tbsp of oil for 5 minutes. Add the tomatoes, cumin and salt and simmer 10 minutes.\n3. Stir the chickpeas into the sauce.\n4. In a baking dish layer the eggplant and the sauce. Bake 15 minutes and serve."
-    }
-  ]
+ "recipes": [
+  {
+   "id": "lentil-chard-soup",
+   "category": "lunch",
+   "name": "Lentil & Chard Soup",
+   "serves": 4,
+   "kcal": 380,
+   "health": "22 g plant protein, 11 g fibre and 7 mg iron per bowl. The lemon helps your body absorb the iron. Source: AUB Food-Based Dietary Guidelines, guideline 6.",
+   "ingredients": [
+    "300 g green lentils",
+    "2 tbsp olive oil",
+    "2 onions, chopped",
+    "3 garlic cloves, chopped",
+    "500 g Swiss chard (or spinach), chopped with the stems",
+    "1 tsp cumin",
+    "1 tsp salt",
+    "Juice of 2 lemons",
+    "1.5 litres water"
+   ],
+   "method": "1. Rinse the lentils. Boil them in the water for 30 minutes, until almost soft.\n2. Meanwhile cook the onions and garlic in the olive oil for about 10 minutes, until golden.\n3. Add the onions, cumin and salt to the lentils.\n4. Add the chard and simmer 20 minutes.\n5. Stir in the lemon juice, simmer 5 minutes, taste, and serve hot."
+  },
+  {
+   "id": "green-protein-smoothie",
+   "category": "shakes",
+   "name": "Green Protein Smoothie",
+   "serves": 1,
+   "kcal": 245,
+   "health": "About 20 g protein, 6 g fibre, and more than a full day of vitamin K from the spinach. Greek yoghurt gives the protein, flax adds fibre and plant omega-3. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "1 medium banana",
+    "60 g baby spinach (two big handfuls)",
+    "150 g plain Greek yoghurt, 0% fat",
+    "1 tbsp ground flaxseed",
+    "200 ml cold water",
+    "4 ice cubes"
+   ],
+   "method": "1. Put the water, yoghurt and spinach in the blender first, then the banana, flaxseed and ice.\n2. Blend for 1 minute, until completely smooth.\n3. Drink at once, or within 30 minutes."
+  },
+  {
+   "id": "overnight-oats-chia-walnut",
+   "category": "breakfast",
+   "name": "Overnight Oats with Chia & Walnuts",
+   "serves": 1,
+   "kcal": 580,
+   "health": "About 31 g protein and 13 g fibre. Oat beta-glucan (about 2 g here) is the fibre that lowers LDL cholesterol; the US FDA accepts this claim at 3 g a day. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "50 g rolled oats",
+    "1 tbsp chia seeds",
+    "200 ml low-fat milk",
+    "100 g plain Greek yoghurt, 0% fat",
+    "80 g blueberries (fresh or frozen)",
+    "20 g walnuts, roughly chopped",
+    "1/2 tsp cinnamon"
+   ],
+   "method": "1. In a jar, mix the oats, chia, milk, yoghurt and cinnamon.\n2. Close the jar and leave it in the fridge overnight, at least 6 hours.\n3. In the morning, stir. Add a splash of milk if it is too thick.\n4. Top with the blueberries and walnuts. Eat cold."
+  },
+  {
+   "id": "chicken-quinoa-bowl",
+   "category": "lunch",
+   "name": "Chicken & Quinoa Bowl",
+   "serves": 2,
+   "kcal": 590,
+   "health": "About 55 g protein and 6 g fibre per bowl, for muscle repair after training. Quinoa gives slow carbs and fibre; olive oil and lemon make the dressing. Source: AUB Food-Based Dietary Guidelines. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "400 g chicken breast, skinless",
+    "100 g quinoa, dry",
+    "2 tbsp olive oil",
+    "1 tsp cumin",
+    "1 tsp salt",
+    "200 g cucumber, diced",
+    "200 g tomatoes, diced",
+    "60 g baby spinach",
+    "Juice of 1 lemon",
+    "2 garlic cloves, crushed"
+   ],
+   "method": "1. Rinse the quinoa. Boil it in 250 ml water for 15 minutes, until the water is gone. Cover and rest 5 minutes.\n2. Rub the chicken with half the oil, the cumin and half the salt.\n3. Cook the chicken in a hot pan, 6 minutes each side, until no pink is left inside. Rest 5 minutes, then slice.\n4. Mix the lemon juice, garlic, the rest of the oil and salt for the dressing.\n5. Put quinoa, spinach, cucumber and tomatoes in two bowls. Add the chicken and pour the dressing on top."
+  },
+  {
+   "id": "baked-salmon-lemon-broccoli",
+   "category": "dinner",
+   "name": "Baked Salmon with Lemon & Broccoli",
+   "serves": 2,
+   "kcal": 425,
+   "health": "About 34 g protein and 3 g omega-3 (EPA and DHA) per serving. The American Heart Association advises fish twice a week for a healthy heart. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "2 salmon fillets, 150 g each",
+    "250 g broccoli, cut into florets",
+    "1 tbsp olive oil",
+    "2 garlic cloves, sliced",
+    "1 lemon (juice of half, the rest in slices)",
+    "1/2 tsp salt",
+    "Black pepper"
+   ],
+   "method": "1. Heat the oven to 200°C.\n2. Put the broccoli on a tray with half the oil, the garlic and a pinch of salt. Bake 10 minutes.\n3. Push the broccoli aside. Add the salmon, skin down. Season with salt, pepper, the rest of the oil and the lemon juice. Lay the lemon slices on top.\n4. Bake 12 minutes more, until the salmon flakes easily with a fork. Serve at once."
+  },
+  {
+   "id": "heart-nut-seed-mix",
+   "category": "snacks",
+   "name": "Heart Nut & Seed Mix",
+   "serves": 7,
+   "kcal": 217,
+   "health": "A 36 g handful gives about 7 g protein and 3 g fibre. The US FDA allows the claim that 1.5 oz (42 g) of nuts a day, in a low-saturated-fat diet, may reduce heart disease risk. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "70 g raw walnuts",
+    "70 g raw almonds",
+    "50 g hazelnuts",
+    "40 g raw pumpkin seeds",
+    "20 g sesame seeds"
+   ],
+   "method": "1. Mix everything in a jar. No salt, no sugar.\n2. Keep it closed in a cool, dry place.\n3. One handful (about 36 g) a day. The jar lasts a week."
+  },
+  {
+   "id": "blueberry-oat-shake",
+   "category": "shakes",
+   "name": "Blueberry Oat Shake",
+   "serves": 1,
+   "kcal": 415,
+   "health": "About 25 g protein and 8 g fibre. Oats bring beta-glucan, the fibre the US FDA links to lower cholesterol (3 g a day); this glass gives about half of that. Blueberries add vitamin C. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "40 g rolled oats (about 1/2 cup)",
+    "150 g blueberries, fresh or frozen",
+    "150 g plain Greek yoghurt, 0% fat",
+    "200 ml low-fat milk",
+    "1/2 tsp cinnamon"
+   ],
+   "method": "1. Put the milk, yoghurt and oats in the blender and leave 5 minutes so the oats soften.\n2. Add the blueberries and cinnamon.\n3. Blend for 1 minute, until smooth. Drink at once."
+  },
+  {
+   "id": "foul-moudammas",
+   "category": "breakfast",
+   "name": "Foul Moudammas",
+   "serves": 2,
+   "kcal": 360,
+   "health": "About 20 g plant protein and 17 g fibre per serving, with iron and folate. Fava beans are a staple legume in the AUB Food-Based Dietary Guidelines for Lebanon. Their fibre slows the rise in blood sugar. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "400 g cooked fava beans (one tin, drained)",
+    "2 garlic cloves, crushed",
+    "juice of 1 lemon",
+    "2 tbsp olive oil",
+    "1 tsp ground cumin",
+    "1 medium tomato, diced",
+    "2 tbsp chopped parsley",
+    "1/4 tsp salt"
+   ],
+   "method": "1. Warm the fava beans in a small pan with a splash of their water for 5 minutes.\n2. Mash roughly with a fork, leaving some beans whole.\n3. Stir in the garlic, lemon juice, cumin and salt.\n4. Serve in a bowl, topped with the tomato, parsley and the olive oil."
+  },
+  {
+   "id": "chickpea-tabbouleh",
+   "category": "lunch",
+   "name": "Chickpea Tabbouleh",
+   "serves": 2,
+   "kcal": 500,
+   "health": "About 17 g plant protein and 14 g fibre per serving. Parsley is very rich in vitamin K and vitamin C, chickpeas add protein and slow-release carbs, olive oil gives the heart-friendly fats. Nutrition: USDA FoodData Central; legumes as in the AUB Food-Based Dietary Guidelines.",
+   "ingredients": [
+    "2 big bunches fresh parsley (about 120 g leaves), very finely chopped",
+    "300 g tomatoes, finely diced",
+    "40 g fine bulgur, soaked in water 15 minutes and drained",
+    "240 g cooked chickpeas (one tin, drained)",
+    "3 spring onions, sliced",
+    "3 tbsp olive oil",
+    "juice of 2 lemons",
+    "1/4 tsp salt"
+   ],
+   "method": "1. Put the soaked, drained bulgur in a large bowl.\n2. Add the parsley, tomatoes, spring onions and chickpeas.\n3. Dress with the lemon juice, olive oil and salt. Mix well.\n4. Leave 10 minutes so the bulgur takes the flavour, then serve."
+  },
+  {
+   "id": "hummus-veggie-sticks",
+   "category": "snacks",
+   "name": "Hummus with Veggie Sticks",
+   "serves": 4,
+   "kcal": 205,
+   "health": "About 8 g plant protein and 7 g fibre per serving. Chickpeas and sesame (tahini) give protein, fibre and unsaturated fats, and the raw vegetables add crunch for almost no calories. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "240 g cooked chickpeas (one tin, drained)",
+    "2 tbsp tahini (30 g)",
+    "juice of 1 lemon",
+    "1 garlic clove",
+    "1 tbsp olive oil",
+    "3 tbsp cold water",
+    "1/4 tsp salt",
+    "2 carrots, cut in sticks (200 g)",
+    "1 cucumber, cut in sticks (200 g)"
+   ],
+   "method": "1. Blend the chickpeas, tahini, lemon juice, garlic, salt and water until completely smooth. Add a little more water if it is too thick.\n2. Spoon into a bowl and drizzle with the olive oil.\n3. Serve with the carrot and cucumber sticks. Keeps 4 days in the fridge."
+  },
+  {
+   "id": "fish-chickpea-tomato-bake",
+   "category": "dinner",
+   "name": "Fish & Chickpea Tomato Bake",
+   "serves": 2,
+   "kcal": 510,
+   "health": "About 45 g protein and 12 g fibre per serving. White fish is lean protein and a source of vitamin B12 and selenium; the American Heart Association recommends fish at least twice a week. Chickpeas and tomatoes add fibre and lycopene. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "2 white fish fillets, 150 g each (cod or sea bream)",
+    "240 g cooked chickpeas (one tin, drained)",
+    "400 g tomatoes, chopped",
+    "1 medium onion, sliced",
+    "3 garlic cloves, sliced",
+    "2 tbsp olive oil",
+    "1 tsp ground cumin",
+    "2 tbsp chopped parsley",
+    "1 lemon, cut in wedges",
+    "1/4 tsp salt, black pepper"
+   ],
+   "method": "1. Heat the oven to 200°C.\n2. In a baking dish mix the onion, garlic, tomatoes, chickpeas, cumin, salt, pepper and 1 tbsp of the olive oil.\n3. Bake 15 minutes.\n4. Lay the fish on top, drizzle with the rest of the olive oil and bake 12–15 minutes more, until it flakes easily.\n5. Scatter with parsley and serve with the lemon wedges."
+  },
+  {
+   "id": "strawberry-yoghurt-shake",
+   "category": "shakes",
+   "name": "Strawberry Yoghurt Shake",
+   "serves": 1,
+   "kcal": 305,
+   "health": "About 25 g protein and close to a full day of vitamin C from the strawberries. Almonds add vitamin E and unsaturated fats. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "150 g strawberries, fresh or frozen",
+    "150 g plain Greek yoghurt, 0% fat",
+    "200 ml low-fat milk",
+    "10 raw almonds (about 14 g)",
+    "3 ice cubes"
+   ],
+   "method": "1. Put the milk, yoghurt and almonds in the blender and blend 30 seconds.\n2. Add the strawberries and ice.\n3. Blend 1 minute, until smooth. Drink at once."
+  },
+  {
+   "id": "cucumber-mint-ayran",
+   "category": "shakes",
+   "name": "Cucumber Mint Ayran",
+   "serves": 1,
+   "kcal": 135,
+   "health": "About 20 g protein for only 135 kcal, plus calcium. A traditional Lebanese yoghurt drink: light, cooling, no sugar. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "200 g plain Greek yoghurt, 0% fat",
+    "150 ml cold water",
+    "1/2 cucumber (100 g), peeled and chopped",
+    "10 fresh mint leaves",
+    "1 pinch of salt",
+    "4 ice cubes"
+   ],
+   "method": "1. Put the yoghurt, water, cucumber, mint and salt in the blender.\n2. Blend 30 seconds, until smooth.\n3. Pour over the ice and drink cold."
+  },
+  {
+   "id": "spinach-tomato-omelette",
+   "category": "breakfast",
+   "name": "Spinach & Tomato Omelette",
+   "serves": 1,
+   "kcal": 220,
+   "health": "About 15 g protein. Eggs give vitamin B12, vitamin D and choline; spinach adds folate and vitamin K. Cooked with a little olive oil, not butter. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "2 eggs",
+    "60 g baby spinach",
+    "1 small tomato (120 g), diced",
+    "1 tsp olive oil",
+    "1 pinch of salt, black pepper"
+   ],
+   "method": "1. Heat the olive oil in a non-stick pan on medium heat. Add the spinach and tomato and cook 2 minutes, until the spinach wilts.\n2. Beat the eggs with the salt and pepper and pour them over the vegetables.\n3. Cook 2 minutes without stirring, fold in half and serve."
+  },
+  {
+   "id": "warm-oat-porridge-apple",
+   "category": "breakfast",
+   "name": "Warm Oat Porridge with Apple & Walnuts",
+   "serves": 1,
+   "kcal": 510,
+   "health": "About 18 g protein and 9 g fibre. Oats bring beta-glucan: the US FDA links 3 g a day to lower cholesterol, and this bowl gives about two thirds of that. Walnuts add plant omega-3. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "50 g rolled oats (about 1/2 cup)",
+    "250 ml low-fat milk",
+    "1 small apple (150 g), diced",
+    "20 g walnuts, chopped",
+    "1/2 tsp cinnamon"
+   ],
+   "method": "1. Put the oats and milk in a small pot and cook on medium heat 5 minutes, stirring, until thick.\n2. Stir in the apple and cinnamon and cook 1 more minute.\n3. Pour into a bowl and top with the walnuts."
+  },
+  {
+   "id": "tuna-white-bean-salad",
+   "category": "lunch",
+   "name": "Tuna & White Bean Salad",
+   "serves": 2,
+   "kcal": 415,
+   "health": "About 28 g protein and 11 g fibre per serving. Tuna is rich in vitamin B12 and selenium, and the American Heart Association recommends fish twice a week. White beans add slow-release carbs. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "160 g canned tuna in water, drained (about 2 small tins)",
+    "240 g cooked white beans (one tin, drained)",
+    "200 g cherry tomatoes, halved",
+    "1/2 small red onion (50 g), thinly sliced",
+    "2 tbsp chopped parsley",
+    "2 tbsp olive oil",
+    "juice of 1 lemon",
+    "1/4 tsp salt, black pepper"
+   ],
+   "method": "1. Put the beans, tomatoes, onion and parsley in a bowl.\n2. Flake the tuna over the top.\n3. Dress with the olive oil, lemon juice, salt and pepper. Toss gently and serve."
+  },
+  {
+   "id": "mujaddara-cucumber-yoghurt",
+   "category": "lunch",
+   "name": "Mujaddara with Cucumber Yoghurt",
+   "serves": 3,
+   "kcal": 345,
+   "health": "About 15 g protein and 13 g fibre per serving. Lentils plus a grain make a complete plant protein; legumes are a staple in the AUB Food-Based Dietary Guidelines for Lebanon. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "100 g dry green or brown lentils",
+    "60 g coarse bulgur",
+    "2 large onions (300 g), sliced",
+    "2 tbsp olive oil",
+    "1 tsp ground cumin",
+    "1/2 tsp salt",
+    "Salad: 200 g cucumber, diced",
+    "150 g plain Greek yoghurt, 0% fat"
+   ],
+   "method": "1. Boil the lentils in 500 ml water for 15 minutes. Add the bulgur, cumin and salt, cover and cook on low for 15 minutes, until all the water is absorbed.\n2. Meanwhile cook the onions in the olive oil on medium-low heat for 20 minutes, stirring, until deep golden.\n3. Mix the cucumber into the yoghurt.\n4. Serve the lentils and bulgur topped with the onions, with the cucumber yoghurt beside it."
+  },
+  {
+   "id": "roasted-spiced-chickpeas",
+   "category": "snacks",
+   "name": "Roasted Spiced Chickpeas",
+   "serves": 3,
+   "kcal": 175,
+   "health": "About 7 g plant protein and 6 g fibre per serving: a crunchy snack with no added sugar. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "240 g cooked chickpeas (one tin, drained)",
+    "1 tbsp olive oil",
+    "1 tsp ground cumin",
+    "1/2 tsp paprika",
+    "1/4 tsp salt"
+   ],
+   "method": "1. Heat the oven to 200°C.\n2. Dry the chickpeas very well with a clean towel.\n3. Mix them with the olive oil, cumin, paprika and salt and spread on a baking tray.\n4. Roast 25–30 minutes, shaking the tray twice, until golden and crunchy. Eat the same day."
+  },
+  {
+   "id": "yoghurt-walnut-pomegranate",
+   "category": "snacks",
+   "name": "Yoghurt, Walnut & Pomegranate Cup",
+   "serves": 1,
+   "kcal": 300,
+   "health": "About 22 g protein. Walnuts carry a US FDA qualified health claim for heart health (about 43 g a day; this cup has about half), and pomegranate adds vitamin C. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "200 g plain Greek yoghurt, 0% fat",
+    "20 g walnuts, roughly chopped",
+    "60 g pomegranate seeds (about 1/3 of a pomegranate)",
+    "1/4 tsp cinnamon"
+   ],
+   "method": "1. Spoon the yoghurt into a glass or bowl.\n2. Top with the walnuts and pomegranate seeds.\n3. Sprinkle with the cinnamon."
+  },
+  {
+   "id": "lemon-garlic-chicken-zucchini",
+   "category": "dinner",
+   "name": "Lemon Garlic Chicken with Roasted Zucchini",
+   "serves": 2,
+   "kcal": 405,
+   "health": "About 45 g protein per serving for 405 kcal. Chicken breast is a lean protein; zucchini adds vitamin C and potassium for very few calories. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "400 g chicken breast, cut in 4 pieces",
+    "400 g zucchini, cut in thick half-moons",
+    "2 tbsp olive oil",
+    "3 garlic cloves, crushed",
+    "juice of 1 lemon",
+    "1/2 tsp salt, black pepper",
+    "2 tbsp chopped parsley"
+   ],
+   "method": "1. Heat the oven to 200°C.\n2. Mix the olive oil, garlic, lemon juice, salt and pepper. Coat the chicken in half of it and the zucchini in the rest.\n3. Spread both on a baking tray, chicken in the middle.\n4. Bake 25 minutes, until the chicken is cooked through (no pink inside).\n5. Sprinkle with the parsley and serve."
+  },
+  {
+   "id": "baked-musaqaa",
+   "category": "dinner",
+   "name": "Baked Musaqa'a",
+   "serves": 3,
+   "kcal": 300,
+   "health": "About 7 g plant protein and 13 g fibre per serving. A Lebanese eggplant, tomato and chickpea stew, baked instead of fried. Tomatoes add lycopene. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "2 medium eggplants (500 g), cut in thick rounds",
+    "240 g cooked chickpeas (one tin, drained)",
+    "400 g tomatoes, chopped",
+    "1 medium onion, sliced",
+    "3 garlic cloves, sliced",
+    "2 tbsp olive oil",
+    "1 tsp ground cumin",
+    "1/2 tsp salt"
+   ],
+   "method": "1. Heat the oven to 220°C. Brush the eggplant rounds with 1 tbsp of the olive oil and bake on a tray 20 minutes, until soft and golden.\n2. Meanwhile cook the onion and garlic in the other tbsp of oil for 5 minutes. Add the tomatoes, cumin and salt and simmer 10 minutes.\n3. Stir the chickpeas into the sauce.\n4. In a baking dish layer the eggplant and the sauce. Bake 15 minutes and serve."
+  },
+  {
+   "id": "banana-oat-peanut-shake",
+   "category": "shakes",
+   "name": "Banana Oat Peanut Shake",
+   "serves": 1,
+   "kcal": 435,
+   "health": "About 19 g protein and 5 g fibre. Oats bring beta-glucan, the fibre the US FDA links to lower cholesterol. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "1 ripe banana",
+    "30 g rolled oats (3 tbsp)",
+    "1 tbsp natural peanut butter (no added sugar)",
+    "250 ml semi-skimmed milk",
+    "1/2 tsp cinnamon",
+    "3 ice cubes"
+   ],
+   "method": "1. Put everything in a blender.\n2. Blend 45 seconds until smooth.\n3. Drink at once."
+  },
+  {
+   "id": "cocoa-banana-yoghurt-shake",
+   "category": "shakes",
+   "name": "Cocoa Banana Yoghurt Shake",
+   "serves": 1,
+   "kcal": 380,
+   "health": "About 23 g protein from yoghurt and milk. Ground flaxseed adds omega-3 (ALA) and fibre. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "200 g plain low-fat yoghurt",
+    "200 ml semi-skimmed milk",
+    "1 ripe banana",
+    "1 tbsp unsweetened cocoa powder",
+    "1 tbsp ground flaxseed (7 g)",
+    "3 ice cubes"
+   ],
+   "method": "1. Put everything in a blender.\n2. Blend 45 seconds until smooth.\n3. Drink at once."
+  },
+  {
+   "id": "tomato-pepper-shakshuka",
+   "category": "breakfast",
+   "name": "Tomato Pepper Shakshuka",
+   "serves": 2,
+   "kcal": 260,
+   "health": "About 12 g protein per serving from the eggs, with lycopene from cooked tomatoes and vitamin C from the pepper. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "4 eggs",
+    "400 g tomatoes, chopped",
+    "1 red pepper (120 g), diced",
+    "1/2 onion (55 g), diced",
+    "2 garlic cloves, sliced",
+    "1 tbsp olive oil",
+    "1 tsp ground cumin",
+    "1/4 tsp salt"
+   ],
+   "method": "1. Heat the olive oil in a wide pan. Cook the onion and pepper 6 minutes.\n2. Add the garlic and cumin, stir 30 seconds, then add the tomatoes and salt. Simmer 10 minutes until thick.\n3. Make four small wells in the sauce and crack an egg into each.\n4. Cover and cook 5 to 7 minutes, until the whites are set. Serve from the pan."
+  },
+  {
+   "id": "banana-oat-pancakes",
+   "category": "breakfast",
+   "name": "Banana Oat Pancakes",
+   "serves": 2,
+   "kcal": 360,
+   "health": "No flour and no added sugar. The oats give beta-glucan fibre (US FDA heart-health claim) and the eggs add about 10 g protein per serving. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "2 ripe bananas",
+    "80 g rolled oats (8 tbsp)",
+    "2 eggs",
+    "1 tsp cinnamon",
+    "1 tsp olive oil, for the pan"
+   ],
+   "method": "1. Blend the bananas, oats, eggs and cinnamon into a thick batter. Rest 5 minutes.\n2. Heat a non-stick pan with a little of the oil on medium heat.\n3. Pour small rounds, about 3 tbsp each. Cook 2 to 3 minutes per side until golden.\n4. Serve warm."
+  },
+  {
+   "id": "lentil-spinach-feta-salad",
+   "category": "lunch",
+   "name": "Lentil Spinach Feta Salad",
+   "serves": 2,
+   "kcal": 405,
+   "health": "About 20 g protein and 12 g fibre per serving. Lentils and spinach bring iron and folate; olive oil is the AUB Mediterranean-pattern fat. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "300 g cooked lentils (green or brown)",
+    "150 g baby spinach",
+    "150 g cherry tomatoes, halved",
+    "60 g feta, crumbled",
+    "2 tbsp olive oil",
+    "Juice of 1 lemon",
+    "1/4 tsp salt"
+   ],
+   "method": "1. Mix the olive oil, lemon juice and salt in a large bowl.\n2. Add the lentils, spinach and tomatoes and toss.\n3. Top with the feta and serve."
+  },
+  {
+   "id": "chicken-hummus-wrap",
+   "category": "lunch",
+   "name": "Chicken Hummus Wrap",
+   "serves": 2,
+   "kcal": 415,
+   "health": "About 41 g protein per serving. Whole-wheat bread and hummus add fibre; chickpeas and sesame in the hummus give plant protein. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "2 whole-wheat flatbreads (60 g each)",
+    "200 g cooked chicken breast, sliced",
+    "100 g hummus",
+    "100 g cucumber, sliced",
+    "100 g tomato, sliced",
+    "A handful of lettuce"
+   ],
+   "method": "1. Spread the hummus over the two flatbreads.\n2. Add the chicken, cucumber, tomato and lettuce.\n3. Roll tight, cut in half and serve."
+  },
+  {
+   "id": "carrot-tahini-sticks",
+   "category": "snacks",
+   "name": "Carrot Sticks with Tahini Dip",
+   "serves": 2,
+   "kcal": 150,
+   "health": "Carrots are rich in beta-carotene (vitamin A) and tahini adds calcium and sesame protein. A crunchy snack with no added sugar. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "300 g carrots, cut in sticks",
+    "2 tbsp tahini (30 g)",
+    "2 tbsp lemon juice",
+    "2 tbsp water",
+    "1 small garlic clove, crushed",
+    "Pinch of salt"
+   ],
+   "method": "1. Stir the tahini, lemon juice, water, garlic and salt until smooth and pourable.\n2. Serve the carrot sticks with the dip."
+  },
+  {
+   "id": "apple-almond-butter",
+   "category": "snacks",
+   "name": "Apple with Almond Butter",
+   "serves": 1,
+   "kcal": 195,
+   "health": "About 4 g fibre from the apple and healthy fats from the almonds. A slow-release snack that keeps blood sugar steadier than a sweet. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "1 medium apple, sliced",
+    "1 tbsp natural almond butter (no added sugar)",
+    "Pinch of cinnamon"
+   ],
+   "method": "1. Slice the apple into wedges.\n2. Spread or dip with the almond butter and sprinkle the cinnamon."
+  },
+  {
+   "id": "chicken-kafta-tray-bake",
+   "category": "dinner",
+   "name": "Chicken Kafta Tray Bake",
+   "serves": 3,
+   "kcal": 260,
+   "health": "About 25 g lean protein per serving. Ground chicken keeps saturated fat low; parsley and the vegetables add vitamin K and C. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "400 g ground chicken",
+    "1 small onion, grated",
+    "1 bunch flat parsley (30 g), chopped",
+    "1 tsp baharat (Lebanese seven spice)",
+    "1/2 tsp salt",
+    "300 g zucchini, sliced thick",
+    "200 g tomatoes, quartered",
+    "2 tbsp olive oil"
+   ],
+   "method": "1. Heat the oven to 220°C.\n2. Mix the chicken, onion, parsley, baharat and salt. Shape into 9 finger-shaped kaftas.\n3. Toss the zucchini and tomatoes with the olive oil on a large tray and add the kaftas.\n4. Bake 20 to 25 minutes, turning the kaftas once, until cooked through and golden."
+  },
+  {
+   "id": "spinach-chickpea-stew",
+   "category": "dinner",
+   "name": "Spinach Chickpea Stew",
+   "serves": 3,
+   "kcal": 275,
+   "health": "About 11 g plant protein and 10 g fibre per serving. Chickpeas and spinach bring iron, folate and magnesium. Nutrition: USDA FoodData Central.",
+   "ingredients": [
+    "240 g cooked chickpeas (one tin, drained)",
+    "300 g fresh spinach",
+    "1 small onion (110 g), chopped",
+    "3 garlic cloves, sliced",
+    "400 g tomatoes, chopped",
+    "2 tbsp olive oil",
+    "1 tsp ground cumin",
+    "1/2 tsp salt"
+   ],
+   "method": "1. Cook the onion in the olive oil 5 minutes. Add the garlic and cumin and stir 30 seconds.\n2. Add the tomatoes and salt and simmer 10 minutes.\n3. Stir in the chickpeas and the spinach in handfuls until it wilts, about 3 minutes.\n4. Serve hot."
+  }
+ ]
 }
