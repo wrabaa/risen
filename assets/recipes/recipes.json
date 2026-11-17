@@ -5,20 +5,18 @@
    "category": "lunch",
    "name": "Lentil & Chard Soup",
    "serves": 4,
-   "kcal": 380,
-   "health": "22 g plant protein, 11 g fibre and 7 mg iron per bowl. The lemon helps your body absorb the iron. Source: AUB Food-Based Dietary Guidelines, guideline 6.",
+   "kcal": 335,
+   "health": "About 14 g plant protein, 10 g fibre and 5 mg iron per bowl. The lemon helps your body absorb the iron. Recipe after Lentil Soup with Swiss Chard (Adass bel-Hamud) in The Taste of Beirut, with less oil in the pesto. Source: AUB Food-Based Dietary Guidelines, guideline 6. Nutrition: USDA FoodData Central.",
    "ingredients": [
-    "300 g green lentils",
-    "2 tbsp olive oil",
-    "2 onions, chopped",
-    "3 garlic cloves, chopped",
-    "500 g Swiss chard (or spinach), chopped with the stems",
-    "1 tsp cumin",
-    "1 tsp salt",
-    "Juice of 2 lemons",
-    "1.5 litres water"
+    "200 g green lentils",
+    "1 large onion (150 g), chopped",
+    "3 tbsp olive oil",
+    "1.5 litres water",
+    "1 bunch Swiss chard (about 300 g, or spinach), chopped",
+    "Cilantro pesto: 1 tbsp olive oil, 1 bunch cilantro leaves (about 30 g), 8 garlic cloves pounded to a paste with 1 tsp salt",
+    "Juice of 2 lemons, plus 1 lemon cut in quarters to serve"
    ],
-   "method": "1. Rinse the lentils. Boil them in the water for 30 minutes, until almost soft.\n2. Meanwhile cook the onions and garlic in the olive oil for about 10 minutes, until golden.\n3. Add the onions, cumin and salt to the lentils.\n4. Add the chard and simmer 20 minutes.\n5. Stir in the lemon juice, simmer 5 minutes, taste, and serve hot."
+   "method": "1. Heat the 3 tbsp olive oil in a soup pot and cook the onion until golden, about 8 minutes.\n2. Add the rinsed lentils and the water. Simmer 45 minutes, until the lentils are soft.\n3. Add the chard and simmer 10 minutes more.\n4. Make the pesto: heat 1 tbsp oil in a small pan for 1 minute, add the chopped cilantro and the garlic paste and stir for a few seconds until it smells strong. Stir it into the soup for the last 3 minutes.\n5. Add the lemon juice, taste, and serve warm with the lemon quarters to squeeze in."
   },
   {
    "id": "green-protein-smoothie",
@@ -132,18 +130,18 @@
    "name": "Foul Moudammas",
    "serves": 2,
    "kcal": 360,
-   "health": "About 20 g plant protein and 17 g fibre per serving, with iron and folate. Fava beans are a staple legume in the AUB Food-Based Dietary Guidelines for Lebanon. Their fibre slows the rise in blood sugar. Nutrition: USDA FoodData Central.",
+   "health": "About 20 g plant protein and 17 g fibre per serving, with iron and folate. Fava beans are a staple legume in the AUB Food-Based Dietary Guidelines for Lebanon. Their fibre slows the rise in blood sugar. Recipe after Fava Bean Soup (Ful Mudammas) in The Taste of Beirut, with much less oil. Nutrition: USDA FoodData Central.",
    "ingredients": [
     "400 g cooked fava beans (one tin, drained)",
-    "2 garlic cloves, crushed",
-    "juice of 1 lemon",
+    "200 ml fresh water",
+    "2 garlic cloves, pounded to a paste with the salt",
+    "1/4 tsp salt",
+    "Juice of 1 lemon",
     "2 tbsp olive oil",
-    "1 tsp ground cumin",
     "1 medium tomato, diced",
-    "2 tbsp chopped parsley",
-    "1/4 tsp salt"
+    "2 tbsp chopped parsley"
    ],
-   "method": "1. Warm the fava beans in a small pan with a splash of their water for 5 minutes.\n2. Mash roughly with a fork, leaving some beans whole.\n3. Stir in the garlic, lemon juice, cumin and salt.\n4. Serve in a bowl, topped with the tomato, parsley and the olive oil."
+   "method": "1. Drain the fava beans and put them in a pan with the fresh water. Cook 15 minutes on low to medium heat.\n2. Mash about one third of the beans with a fork and cook a few minutes more, until it is very thick.\n3. Stir in the garlic paste, lemon juice, olive oil and parsley. Taste and adjust.\n4. Serve in a bowl topped with the diced tomato."
   },
   {
    "id": "chickpea-tabbouleh",
@@ -151,18 +149,20 @@
    "name": "Chickpea Tabbouleh",
    "serves": 2,
    "kcal": 500,
-   "health": "About 17 g plant protein and 14 g fibre per serving. Parsley is very rich in vitamin K and vitamin C, chickpeas add protein and slow-release carbs, olive oil gives the heart-friendly fats. Nutrition: USDA FoodData Central; legumes as in the AUB Food-Based Dietary Guidelines.",
+   "health": "About 17 g plant protein and 14 g fibre per serving. Parsley is very rich in vitamin K and vitamin C, chickpeas add protein and slow-release carbs, olive oil gives the heart-friendly fats. Recipe after Classic Tabbouleh in The Taste of Beirut; we add chickpeas for protein. Nutrition: USDA FoodData Central; legumes as in the AUB Food-Based Dietary Guidelines.",
    "ingredients": [
-    "2 big bunches fresh parsley (about 120 g leaves), very finely chopped",
-    "300 g tomatoes, finely diced",
-    "40 g fine bulgur, soaked in water 15 minutes and drained",
+    "2 big bunches fresh parsley (about 120 g leaves)",
+    "1 small bunch fresh mint (20 g leaves)",
+    "300 g tomatoes, diced (keep the juice)",
+    "40 g fine bulgur",
     "240 g cooked chickpeas (one tin, drained)",
     "3 spring onions, sliced",
     "3 tbsp olive oil",
-    "juice of 2 lemons",
-    "1/4 tsp salt"
+    "Juice of 2 lemons",
+    "1/4 tsp salt",
+    "1 pinch of allspice"
    ],
-   "method": "1. Wash the parsley, tomatoes and spring onions well. Put the soaked, drained bulgur in a large bowl.\n2. Add the parsley, tomatoes, spring onions and chickpeas.\n3. Dress with the lemon juice, olive oil and salt. Mix well.\n4. Leave 10 minutes so the bulgur takes the flavour, then serve.\n5. Keep in the fridge and eat within 1 day."
+   "method": "1. Wash and dry the parsley, mint, tomatoes and spring onions well. Pick the leaves and chop the parsley and mint very fine.\n2. Dice the tomatoes and keep their juice. Soak the bulgur in the tomato juice for 20 minutes, then drain and squeeze it.\n3. Mix the parsley, mint, tomatoes, spring onions, bulgur and chickpeas in a large bowl.\n4. Whisk the lemon juice, olive oil, salt and allspice. Pour over just before serving so the herbs stay fresh, and toss.\n5. Keep in the fridge and eat within 1 day."
   },
   {
    "id": "hummus-veggie-sticks",
@@ -170,19 +170,20 @@
    "name": "Hummus with Veggie Sticks",
    "serves": 4,
    "kcal": 205,
-   "health": "About 8 g plant protein and 7 g fibre per serving. Chickpeas and sesame (tahini) give protein, fibre and unsaturated fats, and the raw vegetables add crunch for almost no calories. Nutrition: USDA FoodData Central.",
+   "health": "About 8 g plant protein and 7 g fibre per serving. Chickpeas and sesame (tahini) give protein, fibre and unsaturated fats, and the raw vegetables add crunch for almost no calories. Recipe after Classic Hummus (Hummus M'tabbal) in The Taste of Beirut. Nutrition: USDA FoodData Central.",
    "ingredients": [
     "240 g cooked chickpeas (one tin, drained)",
     "2 tbsp tahini (30 g)",
-    "juice of 1 lemon",
-    "1 garlic clove",
-    "1 tbsp olive oil",
-    "3 tbsp cold water",
+    "Juice of 1 lemon",
+    "1 garlic clove, pounded to a paste with the salt",
     "1/4 tsp salt",
+    "3 tbsp cold water",
+    "1 tbsp olive oil",
+    "1/4 tsp paprika",
     "2 carrots, cut in sticks (200 g)",
     "1 cucumber, cut in sticks (200 g)"
    ],
-   "method": "1. Blend the chickpeas, tahini, lemon juice, garlic, salt and water until completely smooth. Add a little more water if it is too thick.\n2. Spoon into a bowl and drizzle with the olive oil.\n3. Serve with the carrot and cucumber sticks. Keeps 4 days in the fridge."
+   "method": "1. Keep 2 tbsp of the chickpeas aside for the garnish. Stir the tahini well in its jar.\n2. Blend the rest of the chickpeas with the tahini, lemon juice, garlic paste and water until completely smooth. If it is too thick add a little water from the tin.\n3. Spoon into a bowl, pour the olive oil in a ring on top, sprinkle the paprika and add the whole chickpeas.\n4. Serve with the carrot and cucumber sticks. Keep in the fridge and eat within 4 days."
   },
   {
    "id": "fish-chickpea-tomato-bake",
@@ -296,18 +297,18 @@
    "name": "Mujaddara with Cucumber Yoghurt",
    "serves": 3,
    "kcal": 345,
-   "health": "About 15 g protein and 13 g fibre per serving. Lentils plus a grain make a complete plant protein; legumes are a staple in the AUB Food-Based Dietary Guidelines for Lebanon. Nutrition: USDA FoodData Central.",
+   "health": "About 15 g protein and 13 g fibre per serving. Lentils plus a grain make a complete plant protein; legumes are a staple in the AUB Food-Based Dietary Guidelines for Lebanon. Recipe after Mujaddara Hamra in The Taste of Beirut, with the onions browned in a little oil instead of deep-fried. Nutrition: USDA FoodData Central.",
    "ingredients": [
     "100 g dry green or brown lentils",
     "60 g coarse bulgur",
-    "2 large onions (300 g), sliced",
+    "2 large onions (300 g): 1 chopped fine, 1 sliced in rings",
     "2 tbsp olive oil",
     "1 tsp ground cumin",
     "1/2 tsp salt",
-    "Salad: 200 g cucumber, diced",
-    "150 g plain Greek yoghurt, 0% fat"
+    "Salad: 200 g cucumber, diced | 150 g plain Greek yoghurt, 0% fat",
+    "Radishes, to serve"
    ],
-   "method": "1. Boil the lentils in 500 ml water for 15 minutes. Add the bulgur, cumin and salt, cover and cook on low for 15 minutes, until all the water is absorbed.\n2. Meanwhile cook the onions in the olive oil on medium-low heat for 20 minutes, stirring, until deep golden.\n3. Mix the cucumber into the yoghurt.\n4. Serve the lentils and bulgur topped with the onions, with the cucumber yoghurt beside it."
+   "method": "1. Simmer the lentils in 500 ml water for 20 minutes.\n2. Cook the chopped onion in 1 tbsp of the olive oil until golden brown and add it to the lentils.\n3. Add the bulgur and cook about 20 minutes, until the lentils and bulgur are soft and the water is gone. Add the cumin and salt 10 minutes before the end. If it is still hard, add a splash of water.\n4. Cook the onion rings in the other tbsp of oil on medium-low heat for 15 to 20 minutes, stirring, until deep golden.\n5. Mix the cucumber into the yoghurt.\n6. Top the lentils with the onion rings and serve with the cucumber yoghurt and radishes."
   },
   {
    "id": "roasted-spiced-chickpeas",
@@ -347,17 +348,18 @@
    "name": "Lemon Garlic Chicken with Roasted Zucchini",
    "serves": 2,
    "kcal": 405,
-   "health": "About 45 g protein per serving for 405 kcal. Chicken breast is a lean protein; zucchini adds vitamin C and potassium for very few calories. Nutrition: USDA FoodData Central.",
+   "health": "About 45 g protein per serving for 405 kcal. Chicken breast is a lean protein; zucchini adds vitamin C and potassium for very few calories. Sauce and method after Lemon Chicken (Djaj be Hamoud) in Everyday Lebanese Cooking (Hamadeh), with chicken breast and zucchini instead of a whole chicken and potatoes. Nutrition: USDA FoodData Central.",
    "ingredients": [
     "400 g chicken breast, cut in 4 pieces",
     "400 g zucchini, cut in thick half-moons",
     "2 tbsp olive oil",
-    "3 garlic cloves, crushed",
-    "juice of 1 lemon",
-    "1/2 tsp salt, black pepper",
-    "2 tbsp chopped parsley"
+    "2 garlic cloves, chopped",
+    "50 ml lemon juice (about 1 lemon)",
+    "40 g fresh coriander, chopped",
+    "1/2 tsp salt",
+    "Black pepper"
    ],
-   "method": "1. Heat the oven to 200°C.\n2. Mix the olive oil, garlic, lemon juice, salt and pepper. Split it into two bowls: coat the chicken in one and the zucchini in the other, so the raw chicken never touches the vegetables.\n3. Spread both on a baking tray, chicken in the middle.\n4. Bake 25 minutes, until the thickest piece reaches 74°C and no pink is left.\n5. Sprinkle with the parsley and serve.\n6. Wash your hands, knife and board after touching the raw chicken. Keep leftovers in the fridge and eat within 2 days."
+   "method": "1. Heat the oven to 200°C.\n2. Brush the chicken with 1/2 tbsp of the oil in one bowl and toss the zucchini with 1/2 tbsp in another, so the raw chicken never touches the vegetables. Spread both on a baking tray and bake 15 minutes.\n3. Meanwhile mix the coriander, garlic, lemon juice, the remaining 1 tbsp oil, the salt and pepper.\n4. Spoon the sauce over the chicken and zucchini, cover the tray with foil and bake 15 minutes more, until the thickest piece reaches 74°C and no pink is left.\n5. Serve hot.\n6. Wash your hands, knife and board after touching the raw chicken. Keep leftovers in the fridge and eat within 2 days."
   },
   {
    "id": "baked-musaqaa",
@@ -418,18 +420,17 @@
    "name": "Tomato Pepper Shakshuka",
    "serves": 2,
    "kcal": 260,
-   "health": "About 12 g protein per serving from the eggs, with lycopene from cooked tomatoes and vitamin C from the pepper. Nutrition: USDA FoodData Central.",
+   "health": "About 12 g protein per serving from the eggs, with lycopene from cooked tomatoes and vitamin C from the pepper. Method after Eggs Poached in Tomato Stew in The Taste of Beirut (we add a red pepper). Nutrition: USDA FoodData Central.",
    "ingredients": [
     "4 eggs",
-    "400 g tomatoes, chopped",
+    "400 g tomatoes, chopped (keep the juice)",
     "1 red pepper (120 g), diced",
     "1/2 onion (55 g), diced",
-    "2 garlic cloves, sliced",
-    "1 tbsp olive oil",
-    "1 tsp ground cumin",
-    "1/4 tsp salt"
+    "2 garlic cloves, pounded to a paste with the salt",
+    "1/4 tsp salt",
+    "1 tbsp olive oil"
    ],
-   "method": "1. Heat the olive oil in a wide pan. Cook the onion and pepper 6 minutes.\n2. Add the garlic and cumin, stir 30 seconds, then add the tomatoes and salt. Simmer 10 minutes until thick.\n3. Make four small wells in the sauce and crack an egg into each.\n4. Cover and cook 5 to 7 minutes, until the whites are completely set (no clear egg left). Cook 2 minutes longer for a firm yolk. Serve from the pan."
+   "method": "1. Heat the olive oil in a wide pan. Cook the onion and pepper about 15 minutes, until soft and golden.\n2. Add the tomatoes with their juice and heat gently 10 minutes.\n3. Stir in the garlic paste and heat 5 minutes more.\n4. Make four small wells in the sauce and crack an egg into each.\n5. Cover and cook 5 to 7 minutes, until the whites are completely set (no clear egg left). Cook 2 minutes longer for a firm yolk. Serve from the pan."
   },
   {
    "id": "banana-oat-pancakes",
@@ -470,17 +471,18 @@
    "category": "lunch",
    "name": "Chicken Hummus Wrap",
    "serves": 2,
-   "kcal": 415,
-   "health": "About 41 g protein per serving. Whole-wheat bread and hummus add fibre; chickpeas and sesame in the hummus give plant protein. Nutrition: USDA FoodData Central.",
+   "kcal": 455,
+   "health": "About 41 g protein per serving. Whole-wheat bread and hummus add fibre; chickpeas and sesame in the hummus give plant protein. Marinade after Grilled Chicken Sandwich (Sheesh Tawook) in The Taste of Beirut, with hummus in place of garlic cream. Nutrition: USDA FoodData Central.",
    "ingredients": [
+    "250 g chicken breast, cut in chunks (about 200 g cooked)",
+    "Marinade: 2 tbsp lemon juice, 2 tsp olive oil, 1 garlic clove pounded to a paste with a pinch of salt, 1/2 tsp paprika, 1/4 tsp salt, black pepper",
     "2 whole-wheat flatbreads (60 g each)",
-    "200 g cooked chicken breast, sliced (cooked until 74°C inside, then cooled)",
     "100 g hummus",
     "100 g cucumber, sliced",
     "100 g tomato, sliced",
     "A handful of lettuce"
    ],
-   "method": "1. Spread the hummus over the two flatbreads.\n2. Add the chicken, cucumber, tomato and lettuce.\n3. Roll tight, cut in half and serve.\n4. Cooked chicken keeps 2 days in the fridge. Eat the wrap within a few hours, or keep it chilled."
+   "method": "1. Mix the chicken with the marinade. Cover and keep in the fridge at least 30 minutes (overnight is even better).\n2. Cook the chicken in a hot pan or on the grill, 5 to 6 minutes on each side, until the middle reaches 74°C and no pink is left. Let it cool a few minutes.\n3. Spread the hummus over the two flatbreads and add the chicken, cucumber, tomato and lettuce. Roll tight and cut in half.\n4. Wash your hands, knife and board after touching the raw chicken. Eat the wrap within a few hours or keep it chilled. Cooked chicken keeps 2 days in the fridge."
   },
   {
    "id": "carrot-tahini-sticks",
@@ -540,18 +542,18 @@
    "name": "Spinach Chickpea Stew",
    "serves": 3,
    "kcal": 275,
-   "health": "About 11 g plant protein and 10 g fibre per serving. Chickpeas and spinach bring iron, folate and magnesium. Nutrition: USDA FoodData Central.",
+   "health": "About 11 g plant protein and 10 g fibre per serving. Chickpeas and spinach bring iron, folate and magnesium. Garlic and coriander paste as in Spinach Stew in Lebanese Home Cooking (Mouzawak). Nutrition: USDA FoodData Central.",
    "ingredients": [
     "240 g cooked chickpeas (one tin, drained)",
     "300 g fresh spinach",
     "1 small onion (110 g), chopped",
-    "3 garlic cloves, sliced",
     "400 g tomatoes, chopped",
     "2 tbsp olive oil",
-    "1 tsp ground cumin",
+    "3 garlic cloves",
+    "30 g fresh coriander (1 small bunch), chopped",
     "1/2 tsp salt"
    ],
-   "method": "1. Cook the onion in the olive oil 5 minutes. Add the garlic and cumin and stir 30 seconds.\n2. Add the tomatoes and salt and simmer 10 minutes.\n3. Stir in the chickpeas and the spinach in handfuls until it wilts, about 3 minutes.\n4. Serve hot."
+   "method": "1. Cook the onion in the olive oil about 5 minutes, until soft and translucent.\n2. Add the tomatoes and simmer 10 minutes.\n3. Add the chickpeas, then the spinach in handfuls. It melts in a few minutes in its own water. Cook until the stew is as thick as you like.\n4. Pound the garlic with the salt, add the coriander and pound to a coarse paste. Stir it into the stew, taste and serve hot."
   }
  ]
 }
