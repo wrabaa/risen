@@ -43,7 +43,7 @@
    "name": "Overnight Oats with Chia & Walnuts",
    "serves": 1,
    "kcal": 580,
-   "health": "About 31 g protein and 13 g fibre. Oat beta-glucan (about 2 g here) is the fibre that lowers LDL cholesterol; the US FDA accepts this claim at 3 g a day. Nutrition: USDA FoodData Central.",
+   "health": "About 31 g protein and 13 g fibre. Oat beta-glucan (about 2 g here) is the fibre that lowers LDL cholesterol; the US FDA accepts this claim at 3 g a day. Soak-in-the-fridge method as in the Peach Muesli of 365 Days of Healthy Eating. Nutrition: USDA FoodData Central.",
    "ingredients": [
     "50 g rolled oats",
     "1 tbsp chia seeds",
@@ -53,7 +53,7 @@
     "20 g walnuts, roughly chopped",
     "1/2 tsp cinnamon"
    ],
-   "method": "1. In a jar, mix the oats, chia, milk, yoghurt and cinnamon.\n2. Close the jar and leave it in the fridge overnight, at least 6 hours.\n3. In the morning, stir. Add a splash of milk if it is too thick.\n4. Top with the blueberries and walnuts. Eat cold.\n5. Make it fresh each night; keep it cold and eat within 2 days."
+   "method": "1. In a jar, mix the oats, chia, milk, yoghurt and cinnamon.\n2. Close the jar and leave it in the fridge overnight, at least 6 hours.\n3. In the morning, stir. Add a splash of milk if it is too thick.\n4. Top with the blueberries and walnuts. Eat cold.\n5. Keep it cold. It keeps up to 3 days in the fridge."
   },
   {
    "id": "chicken-quinoa-bowl",
@@ -190,7 +190,7 @@
    "name": "Fish & Chickpea Tomato Bake",
    "serves": 2,
    "kcal": 510,
-   "health": "About 45 g protein and 12 g fibre per serving. White fish is lean protein and a source of vitamin B12 and selenium; the American Heart Association recommends fish at least twice a week. Chickpeas and tomatoes add fibre and lycopene. Nutrition: USDA FoodData Central.",
+   "health": "About 45 g protein and 12 g fibre per serving. White fish is lean protein and a source of vitamin B12 and selenium; the American Heart Association recommends fish at least twice a week. Chickpeas and tomatoes add fibre and lycopene. Beirut-style flavours (cumin, garlic, cilantro, lemon) from Spiced Fish in The Taste of Beirut, baked instead of fried. Nutrition: USDA FoodData Central.",
    "ingredients": [
     "2 white fish fillets, 150 g each (cod or sea bream)",
     "240 g cooked chickpeas (one tin, drained)",
@@ -199,11 +199,12 @@
     "3 garlic cloves, sliced",
     "2 tbsp olive oil",
     "1 tsp ground cumin",
-    "2 tbsp chopped parsley",
+    "2 tbsp chopped cilantro",
+    "1/4 tsp chilli powder (optional)",
     "1 lemon, cut in wedges",
     "1/4 tsp salt, black pepper"
    ],
-   "method": "1. Heat the oven to 200°C.\n2. In a baking dish mix the onion, garlic, tomatoes, chickpeas, cumin, salt, pepper and 1 tbsp of the olive oil.\n3. Bake 15 minutes.\n4. Lay the fish on top, drizzle with the rest of the olive oil and bake 12–15 minutes more, until it flakes easily and the middle reaches 63°C.\n5. Scatter with parsley and serve with the lemon wedges.\n6. Keep leftovers in the fridge and eat within 1 day."
+   "method": "1. Heat the oven to 200°C.\n2. In a baking dish mix the onion, garlic, tomatoes, chickpeas, cumin, chilli, salt, pepper and 1 tbsp of the olive oil.\n3. Bake 15 minutes.\n4. Lay the fish on top, drizzle with the rest of the olive oil and bake 12–15 minutes more, until it flakes easily and the middle reaches 63°C.\n5. Scatter with cilantro and serve with the lemon wedges.\n6. Keep leftovers in the fridge and eat within 1 day."
   },
   {
    "id": "strawberry-yoghurt-shake",
@@ -314,15 +315,16 @@
    "name": "Roasted Spiced Chickpeas",
    "serves": 3,
    "kcal": 175,
-   "health": "About 7 g plant protein and 6 g fibre per serving: a crunchy snack with no added sugar. Nutrition: USDA FoodData Central.",
+   "health": "About 7 g plant protein and 6 g fibre per serving: a crunchy snack with no added sugar. Low and slow method as in Cooking Light Annual Recipes 2013 (Crunchy Chickpeas). Nutrition: USDA FoodData Central.",
    "ingredients": [
     "240 g cooked chickpeas (one tin, drained)",
     "1 tbsp olive oil",
     "1 tsp ground cumin",
     "1/2 tsp paprika",
+    "1 garlic clove, minced",
     "1/4 tsp salt"
    ],
-   "method": "1. Heat the oven to 200°C.\n2. Dry the chickpeas very well with a clean towel.\n3. Mix them with the olive oil, cumin, paprika and salt and spread on a baking tray.\n4. Roast 25–30 minutes, shaking the tray twice, until golden and crunchy. Eat the same day."
+   "method": "1. Heat the oven to 150°C.\n2. Wrap the chickpeas in a clean towel and roll them lightly to loosen the skins. Pick out and throw away the skins.\n3. Mix the chickpeas with the olive oil, cumin, paprika, garlic and salt and spread on a baking tray.\n4. Bake 1 hour 40 minutes, stirring every 20 minutes, until dry and crunchy.\n5. Let them cool on the tray. Eat the same day: in a closed jar they go soft."
   },
   {
    "id": "yoghurt-walnut-pomegranate",
@@ -486,7 +488,7 @@
    "name": "Carrot Sticks with Tahini Dip",
    "serves": 2,
    "kcal": 150,
-   "health": "Carrots are rich in beta-carotene (vitamin A) and tahini adds calcium and sesame protein. A crunchy snack with no added sugar. Nutrition: USDA FoodData Central.",
+   "health": "Carrots are rich in beta-carotene (vitamin A) and tahini adds calcium and sesame protein. A crunchy snack with no added sugar. Tahini and lemon in the proportion of the citrus-tahini sauce in The Taste of Beirut. Nutrition: USDA FoodData Central.",
    "ingredients": [
     "300 g carrots, cut in sticks",
     "2 tbsp tahini (30 g)",
@@ -517,18 +519,20 @@
    "name": "Chicken Kafta Tray Bake",
    "serves": 3,
    "kcal": 260,
-   "health": "About 25 g lean protein per serving. Ground chicken keeps saturated fat low; parsley and the vegetables add vitamin K and C. Nutrition: USDA FoodData Central.",
+   "health": "About 25 g lean protein per serving. Ground chicken keeps saturated fat low; parsley and the vegetables add vitamin K and C. Kafta paste and spices as in The Taste of Beirut (Accad), made with chicken instead of beef. Nutrition: USDA FoodData Central.",
    "ingredients": [
     "400 g ground chicken",
-    "1 small onion, grated",
-    "1 bunch flat parsley (30 g), chopped",
-    "1 tsp baharat (Lebanese seven spice)",
+    "1 small onion, quartered",
+    "20 g flat parsley (a small bunch), roughly chopped",
     "1/2 tsp salt",
+    "1/4 tsp allspice",
+    "1/4 tsp cinnamon",
+    "1/2 tsp paprika or mild Aleppo pepper",
     "300 g zucchini, sliced thick",
     "200 g tomatoes, quartered",
     "2 tbsp olive oil"
    ],
-   "method": "1. Heat the oven to 220°C.\n2. Mix the chicken, onion, parsley, baharat and salt. Shape into 9 finger-shaped kaftas.\n3. Toss the zucchini and tomatoes with the olive oil on a large tray and add the kaftas.\n4. Bake 20 to 25 minutes, turning the kaftas once, until golden and the middle of a kafta reaches 74°C, with no pink left.\n5. Wash your hands, bowl and board after touching the raw chicken. Keep leftovers in the fridge and eat within 2 days."
+   "method": "1. Heat the oven to 220°C.\n2. Pulse the onion in a food processor until very fine. Add the parsley, chicken, salt, allspice, cinnamon and paprika and process to a smooth paste.\n3. Chill the paste 20 minutes, then shape into 9 finger-shaped kaftas.\n4. Toss the zucchini and tomatoes with the olive oil on a large tray and add the kaftas.\n5. Bake 20 to 25 minutes, turning the kaftas once, until golden and the middle of a kafta reaches 74°C, with no pink left.\n6. Wash your hands, bowl and board after touching the raw chicken. Keep leftovers in the fridge and eat within 2 days."
   },
   {
    "id": "spinach-chickpea-stew",
