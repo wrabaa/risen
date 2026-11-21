@@ -23,7 +23,7 @@
   const wTitle=w=>typeof workoutTitle==='function'?workoutTitle(w):w.name;   // "Chest · Triceps" (gym.js)
   function plannedOn(d){ // workouts scheduled that day, earliest first (a day's plan only counts from the date it got exercises)
     const r=routineOn(d), k=dayKey(d); if(!r) return [];
-    return S.workouts.filter(w=>w.routineId===r.id&&(w.days||[]).includes(isoDay(d))&&(w.exercises||[]).length&&(!w.since||w.since<=k))
+    return S.workouts.filter(w=>w.routineId===r.id&&(w.days||[]).includes(isoDay(d))&&(w.exercises||[]).length&&!(typeof onlyDayOff==='function'&&onlyDayOff(w))&&(!w.since||w.since<=k))
       .sort((a,b)=>(a.time||'99').localeCompare(b.time||'99')||(a.order||0)-(b.order||0));
   }
   const doneIds=d=>new Set(S.sessions.filter(x=>x.date===dayKey(d)&&x.finishedAt&&!x.extra).map(x=>x.workoutId));
@@ -97,7 +97,7 @@
       if(S.settings.activeSession) return `<div>${day}<div class="sub">Workout in progress</div></div>${go}`;
       if(!activeRoutine()) return `<div>${day}<div class="sub">No program yet · tap to build it</div></div>`;
       const list=plannedOn(today), ids=doneIds(today), sk=skippedIds(today);
-      if(!list.length) return `<div>${day}<div class="sub">Rest day</div></div>`;
+      if(!list.length) return `<div>${day}<div class="sub">${S.workouts.some(w=>w.routineId===activeRoutine().id&&(w.days||[]).includes(isoDay(today))&&typeof onlyDayOff==='function'&&onlyDayOff(w))?'Day off':'Rest day'}</div></div>`;
       const w=list.find(x=>!ids.has(x.id)&&!sk.has(x.id));
       if(!w){ const doneL=list.filter(x=>ids.has(x.id));
         return `<div>${day}<div class="sub">${doneL.length?'Done today ✓ · '+doneL.map(x=>esc(wTitle(x))).join(' · '):'Skipped today'}</div></div>`; }

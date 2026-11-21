@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-21.3)
+## Status (release 2026-11-21.4)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -282,6 +282,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 
 - `.101` DAY OFF (Siza): a new built-in exercise `lib-fz-day-off` "Day Off" in a new library group "Rest" (library = 83), file name `day-off` (put `day-off.mp4` / `.jpg` in `assets/exercises/` like any other clip). On a day, its target line reads "Rest and enjoy it" (`targetText()` in `gym.js`); a day with only Day Off is titled "Rest". 
 - `.102` Day Off has NO exercise page: a tap on its row opens the picture / clip FULL SCREEN (`openDayOff()` in `gym.js` → `PhotoSlot.view(url, type, {cover, placeholder})`, `.pviewer.cover` in `styles.css`; his own photo first, else `assets/exercises/day-off.*`; `object-fit: cover` so a vertical 9:16 fills the phone); with no picture yet a plain lime "DAY OFF" screen on black. Tap anywhere or × closes. iPhone test pending.
+
+- `.103` a day whose only content is Day Off is a REST day, not a workout (`onlyDayOff(w)` in `gym.js`): the Gym week row says "Day off · Rest and enjoy it" (no "1 exercise"), the day page says "Day off" and has no START WORKOUT, it is not in `plannedOn()` (so THIS WEEK, streak, SKIP TODAY and "missed" ignore it) and Home's TRAINING tile says "Day off". Day Off mixed with real exercises is just an exercise (title unchanged). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

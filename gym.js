@@ -8,9 +8,13 @@ function exerciseInfo(id) {
   if (base) return rec && rec.notes ? { ...base, notes: rec.notes } : base;       // notes on a library exercise live in a small record of their own
   return rec && rec.name ? rec : { ...(rec || {}), id, name: 'Unknown exercise', muscle: '' };   // a record with only notes has no name of its own
 }
+function onlyDayOff(w) {            // a day whose only content is "Day Off" (group Rest): it is a rest day, not a workout (no START, not planned, not counted)
+  const l = (w && w.exercises) || []; return l.length > 0 && l.every(it => exerciseInfo(it.exerciseId).muscle === 'Rest');
+}
 function workoutTitle(w) {          // "Chest · Triceps": the muscle groups of the exercises, in order
   const seen = [];
   for (const it of w.exercises || []) { const m = exerciseInfo(it.exerciseId).muscle; if (m && m !== 'Custom' && !seen.includes(m)) seen.push(m); }
+  if (onlyDayOff(w)) return 'Day off';
   return seen.length ? seen.join(' · ') : ((w.exercises || []).length ? 'Workout' : (w.name || ''));
 }
 
@@ -127,9 +131,9 @@ const Gym = (() => {
     for (let d = 1; d <= 7; d++) {
       const w = dayRec(d), n = w ? w.exercises.length : 0, isToday = d === tIso;
       let stat = '';
-      if (isToday && n) { if (ids.has(w.id)) stat = '<span class="status ok">DONE ✓</span>'; else if (sk.has(w.id)) stat = '<span class="status">SKIPPED</span>'; else pending = true; }
+      if (isToday && n && !onlyDayOff(w)) { if (ids.has(w.id)) stat = '<span class="status ok">DONE ✓</span>'; else if (sk.has(w.id)) stat = '<span class="status">SKIPPED</span>'; else pending = true; }
       h += `<button class="card dayrow${isToday ? ' today' : ''}" data-day="${d}"><div class="wrow"><span class="wdn">${DAYS[d - 1].toUpperCase()}</span>
-        <div class="wdm">${n ? `<div class="m">${esc(workoutTitle(w))}</div><div class="s">${n} exercise${n === 1 ? '' : 's'}</div>` : '<div class="s">Rest</div>'}</div>${stat}${I.chev}</div></button>`;
+        <div class="wdm">${n && onlyDayOff(w) ? `<div class="m">Day off</div><div class="s">Rest and enjoy it</div>` : n ? `<div class="m">${esc(workoutTitle(w))}</div><div class="s">${n} exercise${n === 1 ? '' : 's'}</div>` : '<div class="s">Rest</div>'}</div>${stat}${I.chev}</div></button>`;
     }
     h += '</div>';
     const extras = S.sessions.filter(x => x.date === dayKey(today) && x.extra && x.finishedAt);
@@ -195,8 +199,8 @@ const Gym = (() => {
   }
   function renderDay() {
     const d = curDay, w = dayRec(d), list = w ? w.exercises : [], n = list.length;
-    const canStart = d === isoDay(new Date()) && n && !doneIds(new Date()).has(w.id) && !skippedIds(new Date()).has(w.id);   // START WORKOUT is the main button then
-    $('gymPageCount').textContent = n ? `${n} exercise${n === 1 ? '' : 's'}` : 'Rest day';       // the count lives on the day title's line (no big muscle-group heading any more)
+    const canStart = d === isoDay(new Date()) && n && !onlyDayOff(w) && !doneIds(new Date()).has(w.id) && !skippedIds(new Date()).has(w.id);   // START WORKOUT is the main button then
+    $('gymPageCount').textContent = n && onlyDayOff(w) ? 'Day off' : n ? `${n} exercise${n === 1 ? '' : 's'}` : 'Rest day';       // the count lives on the day title's line (no big muscle-group heading any more)
     // with a workout to start: the two buttons sit side by side (ADD on the left, START, the main glowing one, on the right); otherwise ADD alone, full width
     let h = canStart ? `<div class="daybtns"><button class="primary nogl" data-act="addex">+ ADD EXERCISE</button><button class="primary" data-act="startw">START WORKOUT</button></div>`
       : `<button class="primary" data-act="addex" style="margin:6px 0 14px">+ ADD EXERCISE</button>`;
