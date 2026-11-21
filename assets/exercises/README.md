@@ -12,7 +12,7 @@ Put ONE file per exercise in this folder, with the exact name from the list belo
 - A photo or clip someone adds on their own phone still wins over the one here, on that phone only.
 - This repo is public: anyone can see these files.
 
-## The 82 names
+## The 83 names
 
 Add `.mp4` for a clip or `.jpg` for a picture.
 
@@ -142,3 +142,9 @@ Add `.mp4` for a clip or `.jpg` for a picture.
 | Exercise | File name |
 |---|---|
 | Posterior Flexibility Stretch | `flexibility-stretch` |
+
+### Rest (1)
+
+| Exercise | File name |
+|---|---|
+| Day Off | `day-off` |

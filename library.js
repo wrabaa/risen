@@ -110,8 +110,10 @@ const LIBRARY = (() => {
     { id: 'lib-fz-bike', name: 'Indoor Cycling Bike', muscle: 'Cardio', equipment: 'Cardio', file: 'bike' },
     // Flexibility
     { id: 'lib-fz-flexibility-stretch', name: 'Posterior Flexibility Stretch', muscle: 'Flexibility', equipment: 'Machine', file: 'flexibility-stretch' },
+    // Rest (.101): a "day" to put on a rest day, with its own picture or clip (assets/exercises/day-off.mp4 or .jpg)
+    { id: 'lib-fz-day-off', name: 'Day Off', muscle: 'Rest', equipment: 'Bodyweight', file: 'day-off' },
   ];
-  const groups = ['Chest', 'Back', 'Shoulders', 'Legs', 'Glutes', 'Arms', 'Core', 'Cardio', 'Flexibility'];          // order of the groups on screen
+  const groups = ['Chest', 'Back', 'Shoulders', 'Legs', 'Glutes', 'Arms', 'Core', 'Cardio', 'Flexibility', 'Rest'];          // order of the groups on screen
   // Old (generic, pre-.47) exercise -> the same movement in the new list. Plans, history, notes and photos follow.
   const aliases = {
     'lib-bench-press': 'lib-fz-bench-press',   // Bench press -> Bench Press

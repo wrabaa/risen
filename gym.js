@@ -34,7 +34,7 @@ const Gym = (() => {
   const cardioText = o => [pos(o.min) != null ? `${fmtN(pos(o.min))} min` : '', pos(o.speed) != null ? `${pos(o.speed).toFixed(1)} km/h` : '', pos(o.incline) != null ? `${fmtN(pos(o.incline))}%` : ''].filter(Boolean).join(' · ');
   const cardioLastOf = hs => hs.find(h => pos(h.min) != null);                          // newest history entry that has minutes
   const CARDIO_FIELDS = [['min', 'MIN', 'numeric'], ['speed', 'SPEED KM/H', 'decimal'], ['incline', 'INCLINE %', 'decimal']];
-  const targetText = it => isCardio(it.exerciseId) ? (cardioText(it) || 'No target yet') : `${it.sets ?? 3} × ${fmtN(it.reps ?? 10)}${num(it.kg) > 0 ? ' · ' + fmtN(it.kg) + ' kg' : ''}`;
+  const targetText = it => exerciseInfo(it.exerciseId).muscle === 'Rest' ? 'Rest and enjoy it' : isCardio(it.exerciseId) ? (cardioText(it) || 'No target yet') : `${it.sets ?? 3} × ${fmtN(it.reps ?? 10)}${num(it.kg) > 0 ? ' · ' + fmtN(it.kg) + ' kg' : ''}`;
   function fmtClock(ms) { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = String(s % 60).padStart(2, '0'); return h ? `${h}:${String(m).padStart(2, '0')}:${x}` : `${m}:${x}`; }
   function fmtDur(ms) { const m = Math.max(1, Math.round(ms / 60000)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`; }
 
