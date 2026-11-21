@@ -84,15 +84,14 @@ const PhotoSlot = (() => {
 
   // Full-screen viewer (one shared overlay)
   let viewer;
-  function openViewer(url, type, { cover = false, placeholder = '' } = {}) {          // cover: fill the whole screen (a vertical picture / clip, Day Off) · placeholder: text shown when there is no picture yet
+  function openViewer(url, type) {
     if (!viewer) {
       viewer = document.createElement('div'); viewer.className = 'pviewer';
       viewer.innerHTML = '<div class="pviewer-m"></div><button class="pviewer-x" aria-label="Close"><svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>';
       viewer.onclick = () => { viewer.classList.remove('open'); const v = viewer.querySelector('video'); if (v) v.pause(); };
       document.body.appendChild(viewer);
     }
-    viewer.classList.toggle('cover', !!cover);
-    const m = viewer.querySelector('.pviewer-m'); m.innerHTML = url ? media(url, type) : `<div class="pviewer-ph"><b>${placeholder}</b></div>`; kick(m);
+    const m = viewer.querySelector('.pviewer-m'); m.innerHTML = media(url, type); kick(m);
     requestAnimationFrame(() => viewer.classList.add('open'));
   }
 
@@ -135,5 +134,5 @@ const PhotoSlot = (() => {
     }
   }
 
-  return { mount, resize, prepare, media, kick, isVideo, view: openViewer };
+  return { mount, resize, prepare, media, kick, isVideo };
 })();

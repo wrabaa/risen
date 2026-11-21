@@ -172,6 +172,7 @@ const Gym = (() => {
   // ================= LEVEL 2: THE DAY =================
   const thumbs = new Map();            // exerciseId -> object URL, or null when there is no photo
   const thumbKind = new Map();         // exerciseId -> the stored type (a video clip plays in the row, silent and looping)
+  const DAYOFF_PH = '<div class="pviewer-ph"><b>Day off</b></div>';       // shown until there is a picture / clip for Day Off
   const thumbHtml = id => thumbs.get(id) ? PhotoSlot.media(thumbs.get(id), thumbKind.get(id)) : I.bar;
   const thumbBuiltIn = new Set();      // ids whose row shows the BUILT-IN picture / clip (media.js owns that URL: never revoked here)
   function dropThumb(id) { if (thumbs.get(id) && !thumbBuiltIn.has(id)) URL.revokeObjectURL(thumbs.get(id)); thumbs.delete(id); thumbKind.delete(id); thumbBuiltIn.delete(id); }
@@ -183,6 +184,7 @@ const Gym = (() => {
       const b = await ExMedia.get(id);                 // no photo of his own: the built-in picture / clip from assets/exercises/, when there is one
       thumbs.set(id, b ? b.url : null); if (b) { thumbKind.set(id, b.type); thumbBuiltIn.add(id); } }
     for (const el of els) { const u = thumbs.get(el.dataset.xph); if (u && !el.querySelector('img,video')) el.innerHTML = thumbHtml(el.dataset.xph); }
+    document.querySelectorAll('#gymPageBody .dayoffm').forEach(el => { if (!el.querySelector('img,video')) el.innerHTML = DAYOFF_PH; });
     PhotoSlot.kick($('gymPageBody'));
   }
 
@@ -208,6 +210,10 @@ const Gym = (() => {
       const today = new Date();
       if (doneIds(today).has(w.id)) h += `<div class="card" style="margin-bottom:14px"><div class="wrow"><div><div class="t">Workout done</div></div><span class="status ok">DONE ✓</span></div></div>`;
       else if (skippedIds(today).has(w.id)) h += `<div class="card" style="margin-bottom:14px"><div class="wrow"><div><div class="t">Skipped today</div><div class="s">${esc(S.sessions.find(x => x.date === dayKey(today) && x.skipped && x.workoutId === w.id).reason)}</div></div><span class="status">SKIPPED</span></div></div>`;
+    }
+    if (n && onlyDayOff(w)) {                         // Day Off: the day page IS the picture / clip (his own first, else assets/exercises/day-off.*), vertical, nothing to open or fill in; swipe right = back like any day
+      h += `<div class="dayoff"><div class="dayoffm" data-xph="${esc(list[0].exerciseId)}">${DAYOFF_PH}</div><button class="dayoff-del" data-del="0" aria-label="Delete">${I.trash}</button></div>`;
+      $('gymPageBody').innerHTML = h; loadThumbs(); return;
     }
     h += `<div class="gstack">${list.map((it, i) => {
       const x = exInfo(it.exerciseId);
@@ -251,13 +257,8 @@ const Gym = (() => {
   }
 
   // ================= LEVEL 3: THE EXERCISE =================
-  async function openDayOff(id) {      // Day Off (group "Rest"): no sets, nothing to fill in. A tap shows its picture / clip full screen (his own first, else assets/exercises/day-off.*), or a plain "Day off" screen until there is one
-    const p = await RisenDB.getPhoto(id), m = p ? { url: URL.createObjectURL(p.blob), type: p.type } : await ExMedia.get(id);
-    PhotoSlot.view(m && m.url, m && m.type, { cover: true, placeholder: 'Day off' });
-  }
   function openExercise(i) {
     curEx = i; const it = dayRec(curDay).exercises[i];
-    if (exInfo(it.exerciseId).muscle === 'Rest') { curEx = null; openDayOff(it.exerciseId); return; }
     renderExercise(); openPage('exPage');
     onClose.exPage = async () => { await flush(); dropThumb(it.exerciseId); curEx = null; renderDay(); };
   }

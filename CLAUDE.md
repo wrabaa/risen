@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-21.4)
+## Status (release 2026-11-21.5)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -281,9 +281,10 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.100` ANIMATED INTRO (Siza's clip): the intro picture is now a 4 s looping, silent video `assets/bg.mp4` (480×852, from OpenArt; audio track removed) with `assets/bg.jpg` (its first frame) as poster / fallback (Low Power Mode shows the still). `<video class="photo" autoplay muted loop playsinline>` in `index.html`; it plays only while the intro is on screen (`introPlay()` in `app.js`). Both are in `ASSETS` (`bg.jpg` 3, `bg.mp4` 1). `sw.js` now answers a `Range` request from the cached copy with a 206 slice (iPhone Safari always asks for video in slices; without this a cached video does not play) and only stores a full 200. Tested in the browser (plays, pauses on enter). iPhone test pending.
 
 - `.101` DAY OFF (Siza): a new built-in exercise `lib-fz-day-off` "Day Off" in a new library group "Rest" (library = 83), file name `day-off` (put `day-off.mp4` / `.jpg` in `assets/exercises/` like any other clip). On a day, its target line reads "Rest and enjoy it" (`targetText()` in `gym.js`); a day with only Day Off is titled "Rest". 
-- `.102` Day Off has NO exercise page: a tap on its row opens the picture / clip FULL SCREEN (`openDayOff()` in `gym.js` → `PhotoSlot.view(url, type, {cover, placeholder})`, `.pviewer.cover` in `styles.css`; his own photo first, else `assets/exercises/day-off.*`; `object-fit: cover` so a vertical 9:16 fills the phone); with no picture yet a plain lime "DAY OFF" screen on black. Tap anywhere or × closes. iPhone test pending.
-
+- `.102` (replaced by `.104`) Day Off first opened a full-screen viewer; `PhotoSlot.view` was removed again.
 - `.103` a day whose only content is Day Off is a REST day, not a workout (`onlyDayOff(w)` in `gym.js`): the Gym week row says "Day off · Rest and enjoy it" (no "1 exercise"), the day page says "Day off" and has no START WORKOUT, it is not in `plannedOn()` (so THIS WEEK, streak, SKIP TODAY and "missed" ignore it) and Home's TRAINING tile says "Day off". Day Off mixed with real exercises is just an exercise (title unchanged). iPhone test pending.
+
+- `.104` a day with only Day Off shows the picture / clip ON THE DAY PAGE itself, vertical 9:16 under the ADD EXERCISE button (`.dayoff` / `.dayoffm` / `.dayoff-del` in `styles.css`, `renderDay()` in `gym.js`): his own photo first, else `assets/exercises/day-off.*`, else a black block with a lime "DAY OFF" (`DAYOFF_PH`, `.pviewer-ph`). No exercise card, nothing to open, no sets; a small bin in the corner takes Day Off away; swipe right = back (it is a normal sub-page). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
