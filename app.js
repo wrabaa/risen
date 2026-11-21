@@ -418,6 +418,11 @@
   // TRY TODAY: this opening's recipe is picked once the data is loaded AND every script has run (meals.js comes after this file); asking again is harmless
   const tryStart=()=>{ if(typeof Meals!=='undefined') Meals.tryPrep().then(ok=>{ if(ok) tryReady(); }); };
   ready.then(()=>{ if(document.readyState==='complete') tryStart(); else addEventListener('load',tryStart,{once:true}); });
+  // The intro picture is a short looping clip (assets/bg.mp4, the still bg.jpg shows first / in Low Power Mode): it plays only while the intro is on screen
+  const introVid=intro.querySelector('video');
+  const introPlay=()=>{ if(!introVid) return; if(intro.classList.contains('hidden')||document.hidden) introVid.pause(); else { const p=introVid.play(); if(p&&p.catch) p.catch(()=>{}); } };
+  new MutationObserver(introPlay).observe(intro,{attributes:true,attributeFilter:['class']});
+  document.addEventListener('visibilitychange',introPlay); introPlay();
   // Tap ANYWHERE on the intro enters (the glass ENTER pill is only the hint; it is a real button too, so it works with a keyboard / VoiceOver)
   let entering=false;
   intro.onclick=async()=>{

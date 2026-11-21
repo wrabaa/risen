@@ -1,6 +1,6 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of the APP files (pages, code, data) and delete the old one.
-const VERSION = '2026-11-16.99';
+const VERSION = '2026-11-21.1';
 const CACHE = 'risen-' + VERSION;
 
 // APP FILES: small, change often. All of them are downloaded again on every release, all or nothing.
@@ -15,7 +15,8 @@ const CORE = ['./', 'index.html', 'styles.css', 'shared.js', 'app.js', 'db.js', 
 // One image that fails to download never blocks an update: it is fetched the first time it is shown, and tried again
 // at the next release.
 const ASSETS = {
-  'assets/bg.jpg': 2,
+  'assets/bg.jpg': 3,
+  'assets/bg.mp4': 1,
   'assets/mark.png': 1,
   'assets/icon-180.png': 1,
   'assets/icon-192.png': 1,
@@ -103,10 +104,22 @@ self.addEventListener('fetch', e => {
   const rel = req.url.split(/[?#]/)[0].slice(SCOPE.length);
   if (rel.startsWith('assets/exercises/') || rel.startsWith('assets/recipes/')) return;      // exercise pictures / clips and the recipe pack: media.js downloads and keeps them itself (caches `risen.exmedia`, `risen.recipes`), never a second copy here
   if (ASSETS[rel] != null) {
-    e.respondWith(caches.open(ASSET_CACHE).then(c => c.match(abs(rel)).then(hit => hit || fetch(req).then(res => {
-      if (res.ok) c.put(abs(rel), res.clone());   // missed at install (weak connection): kept from the first time it is shown
-      return res;
-    }))));
+    e.respondWith(caches.open(ASSET_CACHE).then(c => c.match(abs(rel)).then(async hit => {
+      if (hit && req.headers.has('range')) {      // a video asks for a slice (iPhone always does): answer with just that slice, or it will not play
+        const m = /bytes=(\d*)-(\d*)/.exec(req.headers.get('range') || '');
+        if (m) {
+          const blob = await hit.blob(), size = blob.size;
+          let a = m[1] === '' ? Math.max(0, size - Number(m[2])) : Number(m[1]);
+          let b = m[1] === '' || m[2] === '' ? size - 1 : Math.min(Number(m[2]), size - 1);
+          if (a > b || a >= size) return new Response(null, { status: 416, headers: { 'Content-Range': 'bytes */' + size } });
+          return new Response(blob.slice(a, b + 1), { status: 206, headers: { 'Content-Type': hit.headers.get('Content-Type') || 'video/mp4', 'Content-Range': 'bytes ' + a + '-' + b + '/' + size, 'Content-Length': String(b - a + 1) } });
+        }
+      }
+      return hit || fetch(req).then(res => {
+        if (res.status === 200) c.put(abs(rel), res.clone());   // missed at install (weak connection): kept from the first time it is shown
+        return res;
+      });
+    })));
     return;
   }
   e.respondWith(caches.match(req, { cacheName: CACHE, ignoreSearch: req.mode === 'navigate' }).then(hit => hit || fetch(req).then(res => {
