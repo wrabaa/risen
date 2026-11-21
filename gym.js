@@ -247,8 +247,13 @@ const Gym = (() => {
   }
 
   // ================= LEVEL 3: THE EXERCISE =================
+  async function openDayOff(id) {      // Day Off (group "Rest"): no sets, nothing to fill in. A tap shows its picture / clip full screen (his own first, else assets/exercises/day-off.*), or a plain "Day off" screen until there is one
+    const p = await RisenDB.getPhoto(id), m = p ? { url: URL.createObjectURL(p.blob), type: p.type } : await ExMedia.get(id);
+    PhotoSlot.view(m && m.url, m && m.type, { cover: true, placeholder: 'Day off' });
+  }
   function openExercise(i) {
     curEx = i; const it = dayRec(curDay).exercises[i];
+    if (exInfo(it.exerciseId).muscle === 'Rest') { curEx = null; openDayOff(it.exerciseId); return; }
     renderExercise(); openPage('exPage');
     onClose.exPage = async () => { await flush(); dropThumb(it.exerciseId); curEx = null; renderDay(); };
   }
