@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-22.3)
+## Status (release 2026-11-22.4)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -292,6 +292,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.107` TWO HOMES (Siza; `me.html`, `make-me.sh`, `manifest-me.json`, `app.js`, `sw.js`): the app has ONE code base and two entry pages. `index.html` = the friends' Home (https://wrabaa.github.io/risen/), `me.html` = Siza's own Home (https://wrabaa.github.io/risen/me.html). Everything inside (Gym, Meals, Supps, Classes, clips, recipes, intro) is the same code and the same content; only the Home tiles can differ.
   **me.html is GENERATED: after ANY change to `index.html` run `./make-me.sh` (it copies index.html and changes only the manifest link and adds `window.RISEN_HOME='me'`), and commit both.** Never edit me.html by hand. `manifest-me.json` = the same manifest with `start_url` / `id` = `me.html`, so the icon added from his link opens his Home. Both pages and the manifest are in `CORE` in `sw.js`; the offline safety net opens `me.html` for a `me.html` request. In `app.js` a Home tile with `only:'me'` shows only on me.html (`HOME_VARIANT`, `shown()`); the numbers close up as with `show()`. Step 1 only: the two Homes are IDENTICAL for now; his extra cards come one at a time, as he sends them. Tested: both pages load with the same tiles, the right manifest, me.html works offline. Install only the me.html link as the app on his phone (an installed app and a Safari tab keep separate data on iPhone). iPhone test pending.
 
+
+- `.108` PRAYER card on Siza's Home only (`prayer.js` = `Prayer`, tile `{title:'Prayer', only:'me'}` right under 01 TRAINING in `app.js`, `#prayerSheet` in `index.html`, `.prayer` / `.pcol` / `.prrow` in `styles.css`; `prayer.js` is in `CORE`). Calculated offline on the phone (Muslim World League: Fajr 18°, Isha 17°, Asr standard), place Baabda by default (or "Use my location"), the phone's own time zone / summer time. Card: next prayer big (Sunrise is shown but never counted to; after Isha it counts to tomorrow's Fajr), "2 h 33 min to go", the six times in a row, the Islamic date (changes at Maghrib; ±1 day adjuster because Lebanon often sights the moon). Gear sheet: − / + per time = ONE minute per tap (hold repeats, ±120), auto-saved with "✓ Saved" (settings `prayerOffsets`, `prayerHijri`, `prayerLat` / `prayerLon`). No sound / notifications (waits for the native app). Friends' index.html shows no prayer card (sheet markup is there but unused); tile numbers shift only on me.html. Tested at 390 and 375 width. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

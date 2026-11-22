@@ -63,6 +63,33 @@
   $('wgMinus').onclick=()=>stepGoal(-1); $('wgPlus').onclick=()=>stepGoal(1);
   $('wgDone').onclick=()=>{ $('waterSheet').hidden=true; renderHome(); };
 
+
+  // ---- Prayer times (.108, me.html only): the settings are `prayerOffsets` {fajr:+2,…} (minutes, any number), `prayerHijri` (±days), `prayerLat` / `prayerLon` (default Baabda) ----
+  const prayerOffs=()=>S.settings.prayerOffsets||{};
+  const prayerPlace=()=>({lat:S.settings.prayerLat!=null?S.settings.prayerLat:Prayer.DEF.lat,lon:S.settings.prayerLon!=null?S.settings.prayerLon:Prayer.DEF.lon});
+  const savePrayer=(k,v)=>{ S.settings[k]=v; RisenDB.setSetting(k,v).then(()=>savedFlash('prSaved')).catch(e=>toast('Could not save: '+e.message)); };
+  function paintPrayer(){
+    const o=prayerOffs(), t=Prayer.times(new Date(),prayerPlace(),o);
+    $('prList').innerHTML=Prayer.NAMES.map(n=>{ const v=Number(o[n])||0; return `<div class="prrow"><div class="prname"><b>${Prayer.LABEL[n]}</b><span>${Prayer.clock(t[n])}</span></div><button type="button" class="stepbtn sm" data-pr="${n}" data-d="-1" aria-label="${Prayer.LABEL[n]} one minute earlier">&minus;</button><div class="prval${v?' on':''}">${v>0?'+':''}${v} min</div><button type="button" class="stepbtn sm" data-pr="${n}" data-d="1" aria-label="${Prayer.LABEL[n]} one minute later">+</button></div>`; }).join('');
+    const a=Number(S.settings.prayerHijri)||0; $('prHijri').textContent=(a>0?'+':'')+a+' day'+(Math.abs(a)===1?'':'s');
+    $('prHijriDate').textContent=Prayer.hijri(new Date(),prayerPlace(),o,a);
+    const p=prayerPlace(); $('prPlace').textContent=(S.settings.prayerLat!=null?'Your location':'Baabda, Lebanon')+' · '+p.lat.toFixed(2)+', '+p.lon.toFixed(2);
+  }
+  function stepPrayer(n,d){ const o={...prayerOffs()}, v=Math.max(-120,Math.min(120,(Number(o[n])||0)+d)); if(v) o[n]=v; else delete o[n]; S.settings.prayerOffsets=o; paintPrayer(); clearTimeout(stepPrayer.t); stepPrayer.t=setTimeout(()=>savePrayer('prayerOffsets',o),350); }
+  function openPrayer(){ paintPrayer(); $('prayerSheet').hidden=false; }
+  (function(){                                                        // − / + : one tap = one minute, hold = repeats
+    let tm=null, iv=null; const stop=()=>{ clearTimeout(tm); clearInterval(iv); tm=iv=null; };
+    const L=$('prList'); L.addEventListener('pointerdown',e=>{ const b=e.target.closest('[data-pr]'); if(!b) return; stop(); const go=()=>stepPrayer(b.dataset.pr,+b.dataset.d); go(); tm=setTimeout(()=>{ iv=setInterval(go,90); },420); });
+    ['pointerup','pointercancel','pointerleave'].forEach(ev=>L.addEventListener(ev,stop)); L.addEventListener('contextmenu',e=>e.preventDefault());
+  })();
+  $('prHMinus').onclick=()=>{ savePrayer('prayerHijri',Math.max(-3,(Number(S.settings.prayerHijri)||0)-1)); paintPrayer(); };
+  $('prHPlus').onclick=()=>{ savePrayer('prayerHijri',Math.min(3,(Number(S.settings.prayerHijri)||0)+1)); paintPrayer(); };
+  $('prGps').onclick=()=>{ if(!navigator.geolocation) return toast('This phone cannot give a location'); $('prGps').disabled=true;
+    navigator.geolocation.getCurrentPosition(p=>{ $('prGps').disabled=false; S.settings.prayerLat=p.coords.latitude; S.settings.prayerLon=p.coords.longitude; RisenDB.setSetting('prayerLat',p.coords.latitude).then(()=>RisenDB.setSetting('prayerLon',p.coords.longitude)).then(()=>savedFlash('prSaved')).catch(e=>toast('Could not save: '+e.message)); paintPrayer(); },
+      ()=>{ $('prGps').disabled=false; toast('Could not get the location (needs internet and permission)'); },{timeout:15000,maximumAge:600000}); };
+  $('prBaabda').onclick=()=>{ delete S.settings.prayerLat; delete S.settings.prayerLon; Promise.all([RisenDB.setSetting('prayerLat',null),RisenDB.setSetting('prayerLon',null)]).then(()=>savedFlash('prSaved')); paintPrayer(); };
+  $('prDone').onclick=()=>{ $('prayerSheet').hidden=true; renderHome(); };
+
   // ONE layout for every tile with a picture (SUPPLEMENTS, CLASSES, COFFEE): a square image flush with the tile's left, top and bottom edges (the tile's corners round it), the head and the text to its right
   const picRow=(pic,text,extra='',tools='',tag='')=>({__pic:true,pic,text,extra,tools,tag});      // (a picture tile: drawn by tileHtml(); the picture is a square flush with the tile's left edge, filling its full height)
 
@@ -103,6 +130,13 @@
         return `<div>${day}<div class="sub">${doneL.length?'Done today ✓ · '+doneL.map(x=>esc(wTitle(x))).join(' · '):'Skipped today'}</div></div>`; }
       const n=(w.exercises||[]).length;
       return `<div>${day}<div class="sub">${esc(wTitle(w))} · ${n} exercise${n===1?'':'s'}</div></div>${go}`;
+    }},
+    {title:'Prayer', only:'me', cls:'prayer', html(){       // .108 (Siza's Home only): the next prayer big with the minutes left, then the six times; the gear fine-tunes each time
+      const now=new Date(), place=prayerPlace(), offs=prayerOffs(), t=Prayer.times(now,place,offs), nx=Prayer.next(now,place,offs), hj=Prayer.hijri(now,place,offs,S.settings.prayerHijri);
+      const cols=Prayer.NAMES.map(n=>`<div class="pcol${n===nx.name&&!nx.tomorrow?' next':''}${n==='sunrise'?' sun':''}"><span>${Prayer.LABEL[n]}</span><b>${Prayer.clock(t[n])}</b></div>`).join('');
+      return `<div class="wtools"><button type="button" class="wgear" data-prayer="set" aria-label="Prayer times settings"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
+        <div class="pbody"><div class="pline"><div><div class="pnext">${Prayer.LABEL[nx.name]}${nx.tomorrow?' <small>tomorrow</small>':''}</div><div class="ptime">${Prayer.clock(nx.time)}</div></div><div class="pleft"><b>${Prayer.left(nx.inMin)}</b><span>to go</span></div></div>
+        <div class="prow">${cols}</div>${hj?`<div class="phij">${esc(hj)}</div>`:''}</div>`;
     }},
     {title:'Supplements', tap:'meds', html(){ // the whole tile opens the SUPPLEMENTS tab (meds.js)
       if(typeof Meds==='undefined') return '';
@@ -212,7 +246,7 @@
   }
   // The minute timer: only the tiles that depend on the clock (SUPPLEMENTS, CLASSES, WATER) are looked at, and one is redrawn only when what it says has really
   // changed. A new day redraws the greeting and the tiles. It never touches the top bar or the profile photo.
-  const CLOCK_TILES=['Supplements','Classes','Water'];
+  const CLOCK_TILES=['Supplements','Classes','Water','Prayer'];
   function tickHome(){
     if(dayKey(new Date())!==homeDay) return drawHome();
     for(const name of CLOCK_TILES){
@@ -379,6 +413,7 @@
     return {refresh};
   })();
   $('tiles').onclick=e=>{
+    if(e.target.closest('[data-prayer]')){ openPrayer(); return; }                      // the gear on the PRAYER card
     const w=e.target.closest('[data-water]');                                        // the − and the gear never add a glass
     if(w){ if(w.dataset.water==='minus'&&waterToday()>0){ setWaterToday(waterToday()-1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); } else if(w.dataset.water==='goal') openWaterGoal(); return; }
     const cf=e.target.closest('[data-coffee]');                                        // the − and the gear never add a drink

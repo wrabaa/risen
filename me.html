@@ -248,6 +248,21 @@
       <button class="primary nogl" type="button" id="wgDone">DONE</button>
     </div>
   </div>
+  <!-- Home (me.html only) > PRAYER card: fine-tune every time by any number of minutes -->
+  <div class="sheet-wrap" id="prayerSheet" hidden>
+    <div class="sheet">
+      <h2>Prayer times</h2><span class="saved" id="prSaved" aria-live="polite">✓ Saved</span>
+      <p>Tap &minus; / + to move a time by one minute (hold to go faster).</p>
+      <div id="prList"></div>
+      <div class="label" style="margin-top:14px">Islamic date</div>
+      <div class="prrow"><div class="prname"><b id="prHijriDate"></b><span>move it if your month starts a day off</span></div>
+        <button type="button" class="stepbtn sm" id="prHMinus" aria-label="One day earlier">&minus;</button><div class="prval" id="prHijri">0 days</div><button type="button" class="stepbtn sm" id="prHPlus" aria-label="One day later">+</button></div>
+      <div class="label" style="margin-top:14px">Place</div>
+      <p class="wgl" id="prPlace" style="margin:4px 0 8px"></p>
+      <div class="prbtns"><button class="ghost" type="button" id="prGps">USE MY LOCATION</button><button class="ghost" type="button" id="prBaabda">BAABDA</button></div>
+      <button class="primary nogl" type="button" id="prDone">DONE</button>
+    </div>
+  </div>
   <!-- Home > COFFEE card: the drink name and its price (the small gear on the card) -->
   <div class="sheet-wrap" id="coffeeSheet" hidden>
     <div class="sheet">
@@ -285,6 +300,7 @@
 <script src="db.js"></script>
 <script src="shared.js"></script>
 <script src="photo.js"></script>
+<script src="prayer.js"></script>
 <script src="app.js"></script>
 <script src="library.js"></script>
 <script src="media.js"></script>

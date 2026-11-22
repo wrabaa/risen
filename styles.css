@@ -895,3 +895,34 @@
   .tile.tryit[data-tap]:active{background:var(--card);filter:brightness(1.12)}
   .tiles.still .tile.tryit .tryimg{animation:none}                    /* the picture fades in once, not at every redraw of Home (a glass of water, the minute timer) */
   @media (prefers-reduced-motion: reduce){ .tile.tryit .tryimg{animation:none} }
+
+/* PRAYER card (.108, me.html only) */
+.tile.prayer{position:relative}
+.tile.prayer .tile-body{display:block;margin-top:8px}
+.tile.prayer .wtools{top:4px;right:4px}
+.pbody{width:100%}
+.pline{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.pnext{font-family:Oswald,sans-serif;font-weight:600;font-size:30px;text-transform:uppercase;line-height:1;color:var(--volt)}
+.pnext small{font-size:12px;letter-spacing:.1em;color:var(--muted);font-weight:500}
+.ptime{font-family:Oswald,sans-serif;font-weight:700;font-size:44px;line-height:1.05}
+.pleft{text-align:right;padding-bottom:4px}
+.pleft b{display:block;font-family:Oswald,sans-serif;font-weight:600;font-size:24px;line-height:1.1;white-space:nowrap}
+.pleft span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.prow{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.pcol{text-align:center;min-width:0}
+.pcol span{display:block;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.pcol b{display:block;font-family:Oswald,sans-serif;font-weight:500;font-size:15px;margin-top:2px}
+.pcol.sun{opacity:.55}
+.pcol.next span,.pcol.next b{color:var(--volt)}
+.phij{margin-top:10px;font-size:12px;color:var(--muted)}
+#prayerSheet .saved{display:block;position:absolute;top:30px;right:22px;margin:0}
+.prrow{display:flex;align-items:center;gap:8px;padding:6px 0}
+.prname{flex:1;min-width:0}
+.prname b{display:block;font-family:Oswald,sans-serif;font-weight:500;font-size:18px;text-transform:uppercase}
+.prname span{font-size:12px;color:var(--muted)}
+.prval{min-width:72px;text-align:center;font-family:Oswald,sans-serif;font-weight:500;font-size:18px;color:var(--muted)}
+.prval.on{color:var(--volt)}
+.stepbtn.sm{width:44px;height:44px;font-size:24px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.prbtns{display:flex;gap:10px;margin-bottom:6px}.prbtns .ghost{flex:1}
+#prayerSheet .primary{margin-top:14px}
+#prayerSheet .sheet{max-height:92vh;overflow-y:auto}
