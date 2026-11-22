@@ -75,7 +75,8 @@
     $('prHijriDate').textContent=Prayer.hijri(new Date(),prayerPlace(),o,a);
     const p=prayerPlace(); $('prPlace').textContent=(S.settings.prayerLat!=null?'Your location':'Baabda, Lebanon')+' · '+p.lat.toFixed(2)+', '+p.lon.toFixed(2);
   }
-  function stepPrayer(n,d){ const o={...prayerOffs()}, v=Math.max(-120,Math.min(120,(Number(o[n])||0)+d)); if(v) o[n]=v; else delete o[n]; S.settings.prayerOffsets=o; paintPrayer(); clearTimeout(stepPrayer.t); stepPrayer.t=setTimeout(()=>savePrayer('prayerOffsets',o),350); }
+  function stepPrayer(n,d){ const o={...prayerOffs()}, v=Math.max(-120,Math.min(120,(Number(o[n])||0)+d)); if(v) o[n]=v; else delete o[n]; S.settings.prayerOffsets=o; paintPrayer(); clearTimeout(stepPrayer.t); stepPrayer.pend=o; stepPrayer.t=setTimeout(flushPrayer,350); }
+  function flushPrayer(){ clearTimeout(stepPrayer.t); if(stepPrayer.pend){ const o=stepPrayer.pend; stepPrayer.pend=null; savePrayer('prayerOffsets',o); } }       // a pending minute change is saved at once when the sheet closes or the app is hidden
   function openPrayer(){ paintPrayer(); $('prayerSheet').hidden=false; }
   (function(){                                                        // − / + : one tap = one minute, hold = repeats
     let tm=null, iv=null; const stop=()=>{ clearTimeout(tm); clearInterval(iv); tm=iv=null; };
@@ -88,7 +89,8 @@
     navigator.geolocation.getCurrentPosition(p=>{ $('prGps').disabled=false; S.settings.prayerLat=p.coords.latitude; S.settings.prayerLon=p.coords.longitude; RisenDB.setSetting('prayerLat',p.coords.latitude).then(()=>RisenDB.setSetting('prayerLon',p.coords.longitude)).then(()=>savedFlash('prSaved')).catch(e=>toast('Could not save: '+e.message)); paintPrayer(); },
       ()=>{ $('prGps').disabled=false; toast('Could not get the location (needs internet and permission)'); },{timeout:15000,maximumAge:600000}); };
   $('prBaabda').onclick=()=>{ delete S.settings.prayerLat; delete S.settings.prayerLon; Promise.all([RisenDB.setSetting('prayerLat',null),RisenDB.setSetting('prayerLon',null)]).then(()=>savedFlash('prSaved')); paintPrayer(); };
-  const closePrayer=()=>{ $('prayerSheet').hidden=true; renderHome(); };
+  const closePrayer=()=>{ flushPrayer(); $('prayerSheet').hidden=true; renderHome(); };
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) flushPrayer(); }); addEventListener('pagehide',flushPrayer);
   $('prDone').onclick=closePrayer; $('prDone2').onclick=closePrayer;
   $('prayerSheet').addEventListener('click',e=>{ if(e.target===$('prayerSheet')) closePrayer(); });          // a tap on the dark area closes it too
 
@@ -108,7 +110,7 @@
     const files=[...e.target.files]; e.target.value=''; if(!files.length) return;
     toast('Adding '+files.length+' song'+(files.length===1?'':'s')+'…');
     const r=await Music.add(files); paintSongs();
-    toast(r.added+' added'+(r.skipped?' · '+r.skipped+' skipped (audio files under 30 MB only)':''));
+    toast(r.added+' added'+(r.skipped?' · '+r.skipped+' skipped (audio files under 30 MB only)':'')+(r.failed?' · '+r.failed+' could not be saved (is the phone storage full?)':''));
   };
   $('muList').onclick=async e=>{
     const b=e.target.closest('[data-mdel]'); if(!b) return; const s=Music.state().list.find(x=>x.id===b.dataset.mdel); if(!s) return;
@@ -599,7 +601,7 @@
   $('resetGo').onclick=async()=>{
     if(!(await ask({title:'Last check',text:"Delete everything on this phone? This can't be undone.",ok:'DELETE EVERYTHING',danger:true}))) return;
     try{ await RisenDB.resetAll(); }catch(e){ toast('Reset failed: '+e.message); return; }
-    $('resetSheet').hidden=true; Gym.reset(); await load(); renderHome();
+    $('resetSheet').hidden=true; Gym.reset(); if(typeof Music!=='undefined') await Music.reset(); await load(); renderHome();
     $('settings').classList.remove('open'); $('settings').setAttribute('aria-hidden','true');
     app.classList.add('hidden'); intro.classList.remove('hidden'); toast('All data deleted');
   };

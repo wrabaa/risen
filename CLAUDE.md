@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-22.14)
+## Status (release 2026-11-22.15)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -306,6 +306,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.117` PEEK on minimized Home cards (Siza; `peekOf()` in `app.js`, `.tpeek` in `styles.css`; both Homes): a minimized card shows ONE short line at the right of its title, same Oswald 16 px / lime on every card, never wraps (cut with …): Training = today's day groups (max 3, "Rest", "Done ✓", "In progress"), Prayer = "TO GO 2:29" in red, Supplements = the next one's name (or "All done ✓"), Water = "N to go" (or "Done ✓"), Coffee = month total "$84.50", Classes = the next class name, Music keeps its 3 buttons; Try today / This week / Streak / Week summary show nothing. All minimized cards are 52 px high. FIX: on the Coffee card the chevron sat under the − button (could not be tapped): slimmer title gap and a 26 px chevron there. iPhone test pending.
 
 - `.118` the red Prayer countdown on a minimized card is bigger and bolder (22 px, bold; its TO GO 13 px). iPhone test pending.
+
+- `.119` review 8 fixes (Fable's review of `.108`–`.118`, planner chat): Reset all data now also stops the music and empties the Music card (`Music.reset()`), and its warning says songs are deleted too and are not in a backup; two quick taps on Next/Back start only the last song (`startSeq` in `music.js`); a prayer minute change still waiting for its 0.35 s save is saved at once when the sheet closes or the app is hidden (`flushPrayer()`); a song that fails to save says "could not be saved (is the phone storage full?)" instead of the audio-file message; `.tpeek.red` uses only the named colour. NOT changed (to watch on the iPhone): first Play / next song after one ends wait for the database before `audio.play()` (Fable: iPhone might refuse sound with the screen locked; music works on his phone so far). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
