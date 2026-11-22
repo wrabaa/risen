@@ -33,7 +33,7 @@ const Prayer=(()=>{
     const tm=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,12), t2=times(tm,place,offs);
     return {name:'fajr',time:t2.fajr,inMin:Math.ceil(1440-nowM+t2.fajr-1e-9),tomorrow:true};
   }
-  const left=m=>m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0')+' min':'');
+  const left=m=>Math.floor(m/60)+':'+String(m%60).padStart(2,'0');            // 2:29 (hours:minutes)
   // the Islamic date: the day changes at Maghrib; `adj` = the user's ±days (Lebanon often starts a month by moon sighting)
   function hijri(now,place,offs,adj){
     let d=new Date(now.getFullYear(),now.getMonth(),now.getDate(),12);

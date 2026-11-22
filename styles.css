@@ -907,7 +907,7 @@
 .pnext small{font-size:12px;letter-spacing:.1em;color:var(--muted);font-weight:500}
 .ptime{font-family:Oswald,sans-serif;font-weight:700;font-size:44px;line-height:1.05}
 .pleft{text-align:right;min-width:0}
-.pleft span{display:block;font-family:Oswald,sans-serif;font-weight:600;font-size:30px;text-transform:uppercase;line-height:1;color:var(--muted)}
+.pleft span{display:block;font-family:Oswald,sans-serif;font-weight:600;font-size:30px;text-transform:uppercase;line-height:1;color:var(--volt)}
 .pleft b{display:block;font-family:Oswald,sans-serif;font-weight:700;font-size:44px;line-height:1.05;white-space:nowrap;color:var(--clock-red)}
 .prow{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
 .pcol{text-align:center;min-width:0}

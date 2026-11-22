@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-22.5)
+## Status (release 2026-11-22.6)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -295,6 +295,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 
 - `.108` PRAYER card on Siza's Home only (`prayer.js` = `Prayer`, tile `{title:'Prayer', only:'me'}` right under 01 TRAINING in `app.js`, `#prayerSheet` in `index.html`, `.prayer` / `.pcol` / `.prrow` in `styles.css`; `prayer.js` is in `CORE`). Calculated offline on the phone (Muslim World League: Fajr 18°, Isha 17°, Asr standard), place Baabda by default (or "Use my location"), the phone's own time zone / summer time. Card: next prayer big (Sunrise is shown but never counted to; after Isha it counts to tomorrow's Fajr), "2 h 33 min to go", the six times in a row, the Islamic date (changes at Maghrib; ±1 day adjuster because Lebanon often sights the moon). Gear sheet: − / + per time = ONE minute per tap (hold repeats, ±120), auto-saved with "✓ Saved" (settings `prayerOffsets`, `prayerHijri`, `prayerLat` / `prayerLon`). No sound / notifications (waits for the native app). Friends' index.html shows no prayer card (sheet markup is there but unused); tile numbers shift only on me.html. Tested at 390 and 375 width. iPhone test pending.
 - `.109` PRAYER card look: the right side now mirrors the left: "TO GO" (30 px, grey) on top, the minutes left under it big (44 px) in red (new named colour `--clock-red`, only for this number). Fits on SE width. iPhone test pending.
+- `.110` PRAYER card: the countdown is written as hours:minutes ("2:29", no h / min) in red, "TO GO" above it is lime. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
