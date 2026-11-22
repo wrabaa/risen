@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-22.8)
+## Status (release 2026-11-22.9)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -298,6 +298,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.110` PRAYER card: the countdown is written as hours:minutes ("2:29", no h / min) in red, "TO GO" above it is lime. iPhone test pending.
 - `.111` PRAYER settings sheet fix (Siza could not reach DONE: the sheet started 14% down and ran off the bottom): it now starts near the top, never taller than the screen, scrolls inside itself, has a lime DONE at its top right (plus the one at the bottom), and a tap on the dark area closes it. iPhone test pending.
 - `.112` MUSIC card on Siza's Home only (`music.js` = `Music`, tile `{title:'Music', only:'me'}` right under PRAYER, `#musicSheet` + hidden `#musicFile` in `index.html`; `music.js` is in `CORE`). His own songs (made in Suno): the gear / "+ ADD SONGS" opens the Files picker (audio files up to 30 MB, several at once); songs live ONLY on the phone in two new stores (DB 9): `songs` (list: id, name, size, added) and `songdata` ({id, blob}, read only when a song plays). **Both are deliberately NOT in Export / Import (heavy; a restore keeps the songs) but ARE cleared by Reset all data** (`EXTRA` in `db.js`). Card: song name (lime while playing), "N songs · Shuffle on/off", shuffle / back / big PLAY-PAUSE / next, thin progress bar with times; the play button is plain (the glow stays on TRAINING's ▶). Shuffle is the setting `musicShuffle` (default on); a finished song goes to the next; the lock-screen card uses the Media Session API. The card redraws only on player changes and its bar moves without a redraw (`redrawMusic()`). Delete = bin in the sheet (asks first). Friends' Home has none (the sheet markup is there, unused). Open question for the iPhone: does the music keep playing with the screen locked / app in the background. Tested in the browser at 390 and 375 wide (add, play, next, pause, shuffle, reload keeps songs, delete). iPhone test pending.
+- `.113` the MUSIC card now shows on BOTH Homes (friends' index.html too; Siza tested `.112` on his iPhone, works). Songs stay on each phone. PRAYER stays Siza's only.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

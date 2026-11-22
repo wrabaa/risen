@@ -164,7 +164,7 @@
         <div class="pbody"><div class="pline"><div><div class="pnext">${Prayer.LABEL[nx.name]}${nx.tomorrow?' <small>tomorrow</small>':''}</div><div class="ptime">${Prayer.clock(nx.time)}</div></div><div class="pleft"><span>to go</span><b>${Prayer.left(nx.inMin)}</b></div></div>
         <div class="prow">${cols}</div>${hj?`<div class="phij">${esc(hj)}</div>`:''}</div>`;
     }},
-    {title:'Music', only:'me', cls:'music', html(){       // .112 (Siza's Home only): his own songs; play / pause / next / back / shuffle; the gear lists the songs, adds and deletes them
+    {title:'Music', cls:'music', html(){       // .112 (both Homes since .113): his own songs; play / pause / next / back / shuffle; the gear lists the songs, adds and deletes them
       const m=Music.state(), gear=`<div class="wtools"><button type="button" class="wgear" data-music="set" aria-label="Songs"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></button></div>`;
       if(!m.ready) return gear+`<div class="mbody"><div class="sub">Loading…</div></div>`;
       if(!m.count) return gear+`<div class="mbody"><div class="mname">No songs yet</div><div class="sub">Add your songs from the Files app</div><button class="ghost madd" type="button" data-music="add">+ ADD SONGS</button></div>`;
@@ -275,7 +275,7 @@
     $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     homeDay=dayKey(new Date());
-    if(HOME_VARIANT==='me'&&!Music.state().ready) Music.load();                                 // (the songs of Siza's Home)
+    if(!Music.state().ready) Music.load();                                 // (the songs, both Homes)
     $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
     $('tiles').innerHTML=TILES.map((t,i)=>shown(t)?tileHtml(t,i):'').join('');
     if(typeof Meds!=='undefined') Meds.loadThumbs($('tiles'));                                  // the box photos on the SUPPLEMENTS tile (same loader as the Supps tab)
@@ -297,7 +297,7 @@
   }
 
   // the MUSIC card follows the player: redrawn when it changes (play / pause / song), its bar and time move on every tick without a redraw
-  function redrawMusic(){ if(HOME_VARIANT!=='me') return; const i=TILES.findIndex(x=>x.title==='Music'), art=document.querySelector('#tiles [data-tile="Music"]'); if(i<0||!art||$('view-home').hidden) return; art.outerHTML=tileHtml(TILES[i],i); if(!$('musicSheet').hidden) paintSongs(); }
+  function redrawMusic(){ const i=TILES.findIndex(x=>x.title==='Music'), art=document.querySelector('#tiles [data-tile="Music"]'); if(i<0||!art||$('view-home').hidden) return; art.outerHTML=tileHtml(TILES[i],i); if(!$('musicSheet').hidden) paintSongs(); }
   Music.on(redrawMusic);
   Music.onTick(()=>{ const m=Music.state(), i=document.querySelector('#tiles .tile.music .mbar i'); if(!i||!m.dur) return; i.style.width=Math.min(100,m.pos/m.dur*100)+'%'; const p=document.querySelector('#tiles .tile.music .mpos'); if(p) p.textContent=fmtT(m.pos); });
 
