@@ -153,7 +153,7 @@ const ExMedia = (() => {
     return F.get(dayPick);
   }
   const get = async exerciseId => fileOf(exerciseId) === 'day-off' ? dayOff() : ((await F.get(fileOf(exerciseId))) || F.get('still/' + fileOf(exerciseId)));      // the clip, else (.115) the still as the picture
-  const still = exerciseId => { const f = fileOf(exerciseId); return f ? F.get('still/' + f) : Promise.resolve(null); };         // .115: the small still of the day list
+  const still = exerciseId => { const f = fileOf(exerciseId); return f && f !== 'day-off' ? F.get('still/' + f) : Promise.resolve(null); };         // Day Off has no still: its page plays a (shuffled) clip, `.121`         // .115: the small still of the day list
   const sync = (first = [], force = false) => F.sync([].concat(first.map(fileOf).filter(Boolean).map(f => 'still/' + f), first.map(fileOf).filter(Boolean)), force);
   return { get, still, sync, fileOf, set onChange(fn) { F.onChange = fn; } };
 })();
