@@ -10,8 +10,9 @@
 //
 //   ExMedia    = built-in exercise pictures / clips: a file named after an exercise's `file` in library.js (chest-press.mp4).
 //   RecipePack = the RISEN recipes: assets/recipes/recipes.json (the text) + one picture per recipe named after its id (tabbouleh.jpg).
-function RepoFolder({ dir, cache: CACHE, pick }) {
+function RepoFolder({ dir, cache: CACHE, pick, deep = false }) {
   const API = 'https://api.github.com/repos/wrabaa/risen/contents/' + dir, DIR = dir + '/';
+  const TREE = 'https://api.github.com/repos/wrabaa/risen/git/trees/main?recursive=1';      // deep folders (.105): ONE ask lists the folder AND its subfolders
   const INDEX = 'm/index.json', EVERY = 10 * 60 * 1000;                   // GitHub is asked at most every 10 minutes
   const ok = typeof caches !== 'undefined';
   let idx = null;                          // { checked: time, files: { key: { name, sha, type } } } = what is ON this phone
@@ -66,9 +67,19 @@ function RepoFolder({ dir, cache: CACHE, pick }) {
     if (!ok || !navigator.onLine) return;
     await load(); if (!force && Date.now() - idx.checked < EVERY) return;
     try {
-      const res = await fetch(API, { cache: 'no-store', headers: { accept: 'application/vnd.github+json' } }); if (!res.ok) return;
-      const rows = await res.json(); if (!Array.isArray(rows)) return;
-      const want = pick(rows.filter(r => r && r.type === 'file')) || {};          // key -> { name, sha, type }
+      let rows = null;                                                // { type:'file', name (the file's own name), path (inside the folder, "chest/chest-press.mp4"), sha, size }
+      if (deep) {                                                     // the whole repo tree in one answer; keep what sits under this folder, however deep
+        try {
+          const t = await fetch(TREE, { cache: 'no-store', headers: { accept: 'application/vnd.github+json' } });
+          if (t.ok) { const j = await t.json(); if (j && Array.isArray(j.tree) && !j.truncated) rows = j.tree.filter(x => x && x.type === 'blob' && String(x.path).startsWith(DIR)).map(x => ({ type: 'file', path: x.path.slice(DIR.length), name: x.path.slice(x.path.lastIndexOf('/') + 1), sha: x.sha, size: x.size })); }
+        } catch (e) {}
+      }
+      if (!rows) {                                                    // flat listing of the folder itself (recipes; and the fallback when the tree could not be read)
+        const res = await fetch(API, { cache: 'no-store', headers: { accept: 'application/vnd.github+json' } }); if (!res.ok) return;
+        const flat = await res.json(); if (!Array.isArray(flat)) return;
+        rows = flat.filter(r => r && r.type === 'file').map(r => ({ type: 'file', name: r.name, path: r.name, sha: r.sha, size: r.size }));
+      }
+      const want = pick(rows) || {};          // key -> { name, path, sha, type }
       const c = await caches.open(CACHE), miss = idx.miss || (idx.miss = {}); let changed = false, complete = true;
       for (const k of Object.keys(idx.files)) if (!want[k]) { await c.delete('m/' + k); delete idx.files[k]; changed = true; }      // taken out of the folder (or no longer wanted)
       for (const k of Object.keys(miss)) if (!want[k] || want[k].sha !== miss[k].sha) delete miss[k];
@@ -78,9 +89,9 @@ function RepoFolder({ dir, cache: CACHE, pick }) {
         if (kept && (have.v || Date.now() - (have.u || 0) < DAY)) continue;       // on the phone and checked (or taken unchecked less than a day ago)
         if (kept && !have.u && await same(await kept.blob(), w.sha)) { have.v = 1; continue; }      // stored before .99: checked once, it is the right file
         try {
-          const r = await fetch(DIR + encodeURIComponent(w.name) + '?v=' + w.sha.slice(0, 8), { cache: 'no-store' });
+          const r = await fetch(DIR + (w.path || w.name).split('/').map(encodeURIComponent).join('/') + '?v=' + w.sha.slice(0, 8), { cache: 'no-store' });
           if (!r.ok) { complete = false; continue; }                  // the site is a minute behind the folder: next time
-          const b = await r.blob(), rec = { name: w.name, sha: w.sha, type: w.type, at: Date.now() };
+          const b = await r.blob(), rec = { name: w.name, path: w.path || w.name, sha: w.sha, type: w.type, at: Date.now() };
           if (await same(b, w.sha)) rec.v = 1;
           else {                                                      // the site still serves the file as it was BEFORE: not stored, asked again in 2 minutes
             const m = miss[k] || (miss[k] = { sha: w.sha, t: Date.now() });
@@ -111,18 +122,32 @@ const mediaName = n => { const m = /^(.+)\.([a-z0-9]+)$/i.exec(n); return m ? { 
 //   a clip wins over a picture of the same exercise · over 8 MB is skipped · the user's own photo / clip always wins (gym.js, photo.js)
 const ExMedia = (() => {
   const rank = n => /\.(mp4|mov)$/i.test(n) ? 0 : 1;                 // a clip before a picture
-  const F = RepoFolder({ dir: 'assets/exercises', cache: 'risen.exmedia', pick(rows) {
+  // .105: the clips sit in body-part folders (assets/exercises/chest/…, back/, shoulders/, legs/, glutes/, arms/, core/, cardio/, flexibility/, rest/).
+  // A clip is found by its FILE NAME wherever it sits (a clip in the wrong folder, or loose in assets/exercises/, still works). Day Off may have
+  // several clips: day-off, day-off-2, day-off-3 … (one is picked at random each time the app opens, `dayOff()`).
+  const F = RepoFolder({ dir: 'assets/exercises', cache: 'risen.exmedia', deep: true, pick(rows) {
     const known = new Set(LIBRARY.list.map(e => e.file)), want = {};
     for (const r of rows.sort((a, b) => rank(a.name) - rank(b.name))) {
       const n = mediaName(r.name), type = n && MEDIA_TYPES[n.ext];
-      if (!type || !known.has(n.base) || r.size > 8 * 1024 * 1024 || want[n.base]) continue;
-      want[n.base] = { name: r.name, sha: r.sha, type };
+      if (!type || !(known.has(n.base) || /^day-off-\d+$/.test(n.base)) || r.size > 8 * 1024 * 1024 || want[n.base]) continue;
+      want[n.base] = { name: r.name, path: r.path, sha: r.sha, type };
     }
     return want;
   } });
   const fileOf = id => { const x = typeof LIBRARY !== 'undefined' && LIBRARY.byId[id]; return x && x.file || null; };
   // The built-in picture / clip of an exercise: { url, type } or null (none in the folder, not downloaded yet, or a custom exercise)
-  const get = exerciseId => F.get(fileOf(exerciseId));
+  let dayPick = null;                      // the Day Off clip of this opening of the app
+  async function dayOff() {                // day-off, day-off-2, … : one at random, never the same as the last opening, the same one all through this opening
+    const ks = (await F.keys()).filter(k => /^day-off(-\d+)?$/.test(k)).sort(); if (!ks.length) return null;
+    if (!dayPick || !ks.includes(dayPick)) {
+      let last = ''; try { last = localStorage.getItem('risen.dayoff') || ''; } catch (e) {}
+      const pool = ks.length > 1 ? ks.filter(k => k !== last) : ks;
+      dayPick = pool[Math.floor(Math.random() * pool.length)];
+      try { localStorage.setItem('risen.dayoff', dayPick); } catch (e) {}
+    }
+    return F.get(dayPick);
+  }
+  const get = exerciseId => fileOf(exerciseId) === 'day-off' ? dayOff() : F.get(fileOf(exerciseId));
   const sync = (first = [], force = false) => F.sync(first.map(fileOf).filter(Boolean), force);
   return { get, sync, fileOf, set onChange(fn) { F.onChange = fn; } };
 })();

@@ -1,6 +1,6 @@
 # RISEN exercise pictures and clips
 
-Put ONE file per exercise in this folder, with the exact name from the list below. That is all: every phone shows it the next time RISEN is opened with internet (it can take a minute or two after the upload). No code change, no new release.
+Put ONE file per exercise in the folder of its body part (`chest`, `back`, `shoulders`, `legs`, `glutes`, `arms`, `core`, `cardio`, `flexibility`, `rest`), with the exact name from the list below. The app finds a clip by its NAME, wherever it sits: one in the wrong folder, or loose here, still works. That is all: every phone shows it the next time RISEN is opened with internet (it can take a minute or two after the upload). No code change, no new release.
 
 ## Rules
 
@@ -11,6 +11,10 @@ Put ONE file per exercise in this folder, with the exact name from the list belo
 - **Replace:** upload a new file with the same name. **Remove:** delete the file.
 - A photo or clip someone adds on their own phone still wins over the one here, on that phone only.
 - This repo is public: anyone can see these files.
+
+## Day Off: several clips
+
+Put `day-off.mp4`, `day-off-2.mp4`, `day-off-3.mp4` … in `rest/`. Each time the app is opened it picks one at random (never the same as last time) and keeps it until it is closed. His own photo on the day still wins.
 
 ## The 83 names
 

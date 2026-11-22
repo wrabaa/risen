@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-21.5)
+## Status (release 2026-11-22.1)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -285,6 +285,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.103` a day whose only content is Day Off is a REST day, not a workout (`onlyDayOff(w)` in `gym.js`): the Gym week row says "Day off · Rest and enjoy it" (no "1 exercise"), the day page says "Day off" and has no START WORKOUT, it is not in `plannedOn()` (so THIS WEEK, streak, SKIP TODAY and "missed" ignore it) and Home's TRAINING tile says "Day off". Day Off mixed with real exercises is just an exercise (title unchanged). iPhone test pending.
 
 - `.104` a day with only Day Off shows the picture / clip ON THE DAY PAGE itself, vertical 9:16 under the ADD EXERCISE button (`.dayoff` / `.dayoffm` / `.dayoff-del` in `styles.css`, `renderDay()` in `gym.js`): his own photo first, else `assets/exercises/day-off.*`, else a black block with a lime "DAY OFF" (`DAYOFF_PH`, `.pviewer-ph`). No exercise card, nothing to open, no sets; a small bin in the corner takes Day Off away; swipe right = back (it is a normal sub-page). iPhone test pending.
+- `.105` EXERCISE CLIPS IN BODY-PART FOLDERS + RANDOM DAY OFF (Siza, planner chat; `media.js`): the clips now sit in `assets/exercises/<chest|back|shoulders|legs|glutes|arms|core|cardio|flexibility|rest>/` (the muscle group of each exercise in `library.js`, lower case; each folder has an empty `.gitkeep` so it exists on GitHub). `RepoFolder` got `deep:true` for exercises: ONE ask to GitHub's tree API (`git/trees/main?recursive=1`) lists the folder and all subfolders (the recipes folder stays on the flat listing, which is also the fallback); each file keeps its `path`, downloaded from `assets/exercises/<path>`. A clip is matched by its FILE NAME (case-insensitive), wherever it sits, so a clip in the wrong folder or loose in `assets/exercises/` still works; the keys on the phones are unchanged, so nothing is downloaded again. The 12 existing clips were moved with `git mv` (names made lower case). DAY OFF may have several clips: `day-off`, `day-off-2`, `day-off-3`, … in `rest/`; `ExMedia.dayOff()` picks one at random each time the app is opened, never the one of the last opening (`localStorage` `risen.dayoff`, try/catch), and keeps it for that opening; his own photo on the day still wins. Tested with a mocked tree (picks vary, offline works, no flat call). iPhone test pending.
+
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
