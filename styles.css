@@ -8,6 +8,7 @@
     --glass:rgba(26,26,26,.84);--glass-hi:rgba(255,255,255,.1);   /* tab bar: dark enough that a lime button scrolling under it only shows as a faint hint */
     /* Supporting colours (not brand colours: greys for depth, and one red for destructive actions only) */
     --danger:#FF6B6B;     /* delete / reset */
+    --clock-red:#E5252A;  /* the minutes-to-go number on the PRAYER card (.109) */
     --live:#E5252A;       /* the LIVE tag on Home's CLASSES tile only (.88) */
     --field:#0F0F0F;      /* inputs and inset boxes */
     --press:#202020;      /* a card while it is pressed */
@@ -905,9 +906,9 @@
 .pnext{font-family:Oswald,sans-serif;font-weight:600;font-size:30px;text-transform:uppercase;line-height:1;color:var(--volt)}
 .pnext small{font-size:12px;letter-spacing:.1em;color:var(--muted);font-weight:500}
 .ptime{font-family:Oswald,sans-serif;font-weight:700;font-size:44px;line-height:1.05}
-.pleft{text-align:right;padding-bottom:4px}
-.pleft b{display:block;font-family:Oswald,sans-serif;font-weight:600;font-size:24px;line-height:1.1;white-space:nowrap}
-.pleft span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pleft{text-align:right;min-width:0}
+.pleft span{display:block;font-family:Oswald,sans-serif;font-weight:600;font-size:30px;text-transform:uppercase;line-height:1;color:var(--muted)}
+.pleft b{display:block;font-family:Oswald,sans-serif;font-weight:700;font-size:44px;line-height:1.05;white-space:nowrap;color:var(--clock-red)}
 .prow{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
 .pcol{text-align:center;min-width:0}
 .pcol span{display:block;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
