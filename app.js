@@ -264,10 +264,12 @@
   const shown=t=>(!t.only||t.only===HOME_VARIANT)&&(!t.show||t.show());                   // a tile with a `show()` appears only while it says so (the numbers then close up)
   const tileNo=i=>1+TILES.slice(0,i).filter(shown).length;
   const collapsed=t=>(S.settings.homeCollapsed||[]).includes(t.title);                     // .114: a card can be made small (only its title line) and back, per phone, remembered
+  const MI={prev:'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 20 9 12l10-8z" fill="currentColor"/><path d="M5 19V5"/></svg>',next:'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l10 8-10 8z" fill="currentColor"/><path d="M19 5v14"/></svg>',play:'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5 19 12 7 19.5z" fill="currentColor"/></svg>',pause:'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" stroke-width="3.2"/></svg>'};
   const CHEV='<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
   function tileHtml(t,i){                            // one tile; a picture tile has the image flush left over the tile's full height, the head and the text to its right
     const min=collapsed(t), chev=`<button type="button" class="tchev" data-chev="${t.title}" aria-label="${min?'Show':'Minimize'} ${t.title}" aria-expanded="${!min}">${CHEV}</button>`;
-    if(min){ const html=`<article class="tile min" data-tile="${t.title}"><div class="tile-head"><b>${String(tileNo(i)).padStart(2,'0')}</b>${t.title}${chev}</div></article>`; tileSaid[t.title]=tileText(html); return html; }
+    if(min){ let mini=''; if(t.title==='Music'&&typeof Music!=='undefined'){ const m=Music.state(); if(m.count) mini=`<div class="mmini"><button type="button" class="mbtn s" data-music="prev" aria-label="Previous song">${MI.prev}</button><button type="button" class="mbtn s big" data-music="play" aria-label="${m.playing?'Pause':'Play'}">${m.playing?MI.pause:MI.play}</button><button type="button" class="mbtn s" data-music="next" aria-label="Next song">${MI.next}</button></div>`; }       // .116: a minimized MUSIC card keeps back / play / next
+      const html=`<article class="tile min" data-tile="${t.title}"><div class="tile-head"><b>${String(tileNo(i)).padStart(2,'0')}</b>${t.title}${chev}${mini}</div></article>`; tileSaid[t.title]=tileText(html); return html; }
     const h=t.html(), pic=h&&h.__pic, head=`<div class="tile-head"><b>${String(tileNo(i)).padStart(2,'0')}</b>${t.title}${pic&&h.tag||''}${chev}</div>`;
     const cls=`tile${pic?' pic':''}${t.title==='Training'?' train':''}${t.cls?' '+t.cls:''}`, attrs=`data-tile="${t.title}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}`;
     const html=pic?`<article class="${cls}" ${attrs}>${h.pic}<div class="tcol">${head}<div class="tile-body"><div class="ttxt">${h.text}</div>${h.extra||''}</div></div>${h.tools||''}</article>`
@@ -471,9 +473,9 @@
   })();
   $('tiles').onclick=e=>{
     const cv=e.target.closest('[data-chev]'); if(cv){ toggleTile(cv.dataset.chev); return; }          // the chevron on a card
-    const mt=e.target.closest('.tile.min'); if(mt){ toggleTile(mt.dataset.tile); return; }        // a tap anywhere on a minimized card shows it again (never presses its buttons)
     const mu=e.target.closest('[data-music]');                                           // the buttons on the MUSIC card
     if(mu){ const c=mu.dataset.music; if(c==='play') Music.toggle(); else if(c==='next') Music.next(); else if(c==='prev') Music.prev(); else if(c==='shuffle') Music.setShuffle(!Music.state().shuffle); else if(c==='set') openSongs(); else if(c==='add'){ openSongs(); $('musicFile').click(); } return; }
+    const mt=e.target.closest('.tile.min'); if(mt){ toggleTile(mt.dataset.tile); return; }        // a tap anywhere on a minimized card shows it again (never presses its buttons)
     if(e.target.closest('[data-prayer]')){ openPrayer(); return; }                      // the gear on the PRAYER card
     const w=e.target.closest('[data-water]');                                        // the − and the gear never add a glass
     if(w){ if(w.dataset.water==='minus'&&waterToday()>0){ setWaterToday(waterToday()-1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); } else if(w.dataset.water==='goal') openWaterGoal(); return; }
