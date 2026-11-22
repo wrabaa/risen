@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-22.15)
+## Status (release 2026-11-22.16)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -308,6 +308,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.118` the red Prayer countdown on a minimized card is bigger and bolder (22 px, bold; its TO GO 13 px). iPhone test pending.
 
 - `.119` review 8 fixes (Fable's review of `.108`–`.118`, planner chat): Reset all data now also stops the music and empties the Music card (`Music.reset()`), and its warning says songs are deleted too and are not in a backup; two quick taps on Next/Back start only the last song (`startSeq` in `music.js`); a prayer minute change still waiting for its 0.35 s save is saved at once when the sheet closes or the app is hidden (`flushPrayer()`); a song that fails to save says "could not be saved (is the phone storage full?)" instead of the audio-file message; `.tpeek.red` uses only the named colour. NOT changed (to watch on the iPhone): first Play / next song after one ends wait for the database before `audio.play()` (Fable: iPhone might refuse sound with the screen locked; music works on his phone so far). iPhone test pending.
+
+- `.120` MUSIC keeps going on a LOCKED screen (Siza confirmed on his iPhone: when a song ended on the lock screen the next did not start): while a song plays, the NEXT one is already read from the database (`prefetch()` / `pre` in `music.js`); when a song ends or Next is pressed, `playUrl()` sets the source and calls `play()` at once with no waiting, which is what iPhone needs. The prepared song is dropped when the order changes (shuffle, delete, reset). Tested in the browser (Next changes song in the same tick). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

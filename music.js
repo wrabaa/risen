@@ -3,7 +3,7 @@
 const Music=(()=>{
   const MAX=30*1024*1024, EXT=/\.(mp3|m4a|aac|wav|ogg|flac|mp4)$/i;
   const audio=new Audio(); audio.preload='auto';
-  let list=[], order=[], idx=-1, url=null, ready=false, loading=false, startSeq=0, cfg={shuffle:()=>true,setShuffle:()=>{}};
+  let list=[], order=[], idx=-1, url=null, ready=false, loading=false, startSeq=0, pre=null, cfg={shuffle:()=>true,setShuffle:()=>{}};
   const subs=[], tickSubs=[];
   const emit=()=>subs.forEach(f=>{ try{f();}catch(e){} });
   const cur=()=>list.find(s=>s.id===order[idx])||null;
@@ -23,12 +23,23 @@ const Music=(()=>{
     let blob=null; try{ blob=await RisenDB.songBlob(s.id); }catch(e){}
     if(my!==startSeq) return;
     if(!blob){ emit(); return; }
-    if(url) URL.revokeObjectURL(url); url=URL.createObjectURL(blob); audio.src=url;
-    try{ await audio.play(); }catch(e){}
-    media(s); emit();
+    playUrl(s,URL.createObjectURL(blob));
+  }
+  function playUrl(s,u){                                       // everything here runs at once (no waiting): the phone only lets a locked screen go on with the next song if play() is called straight away
+    if(url) URL.revokeObjectURL(url); url=u; audio.src=u; audio.play().catch(()=>{});
+    media(s); emit(); prefetch();
+  }
+  const nextIdx=()=>order.length?(idx+1)%order.length:-1;
+  function dropPre(){ if(pre){ URL.revokeObjectURL(pre.url); pre=null; } }
+  async function prefetch(){                                   // while a song plays, the NEXT one is already read from the database
+    const ni=nextIdx(); if(ni<0) return; const id=order[ni];
+    if(pre&&pre.id===id) return; dropPre();
+    let blob=null; try{ blob=await RisenDB.songBlob(id); }catch(e){}
+    const again=nextIdx(); if(!blob||again<0||order[again]!==id) return;           // the order changed meanwhile: forget it
+    dropPre(); pre={id,url:URL.createObjectURL(blob)};
   }
   async function reset(){                                      // after "Reset all data": stop, forget the songs, read the (now empty) list
-    startSeq++; audio.pause(); audio.removeAttribute('src'); audio.load(); if(url){ URL.revokeObjectURL(url); url=null; }
+    startSeq++; dropPre(); audio.pause(); audio.removeAttribute('src'); audio.load(); if(url){ URL.revokeObjectURL(url); url=null; }
     list=[]; order=[]; idx=-1; ready=false; await load();
   }
   function media(s){                                           // the lock-screen / control-centre card (where the phone allows it)
@@ -42,9 +53,15 @@ const Music=(()=>{
     if(idx<0||!cur()){ build(); return start(); }
     if(audio.paused){ audio.play().catch(()=>{}); } else audio.pause();
   }
-  function next(){ if(!list.length) return; if(!order.length||idx<0) build(); else idx=(idx+1)%order.length; return start(); }
+  function next(){
+    if(!list.length) return;
+    if(!order.length||idx<0){ build(); return start(); }
+    const ni=nextIdx();
+    if(pre&&pre.id===order[ni]){ idx=ni; startSeq++; const u=pre.url; pre=null; playUrl(cur(),u); return; }        // the next song is ready: start it at once
+    idx=ni; return start();
+  }
   function prev(){ if(!list.length) return; if(audio.currentTime>3&&cur()){ audio.currentTime=0; return; } if(!order.length||idx<0) build(); else idx=(idx-1+order.length)%order.length; return start(); }
-  function setShuffle(on){ cfg.setShuffle(on); const c=cur(); if(c) build(c.id); emit(); }
+  function setShuffle(on){ cfg.setShuffle(on); const c=cur(); if(c){ build(c.id); dropPre(); prefetch(); } emit(); }
   async function add(files){
     let added=0, skipped=0, failed=0;
     for(const f of files){
@@ -56,7 +73,7 @@ const Music=(()=>{
   }
   async function remove(id){
     const c=cur(), wasCur=c&&c.id===id;
-    if(wasCur){ audio.pause(); audio.removeAttribute('src'); audio.load(); if(url){ URL.revokeObjectURL(url); url=null; } }
+    dropPre(); if(wasCur){ audio.pause(); audio.removeAttribute('src'); audio.load(); if(url){ URL.revokeObjectURL(url); url=null; } }
     await RisenDB.deleteSong(id); await load();
     if(wasCur){ order=[]; idx=-1; } else if(c){ build(c.id); }
     emit();
