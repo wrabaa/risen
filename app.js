@@ -92,6 +92,30 @@
   $('prDone').onclick=closePrayer; $('prDone2').onclick=closePrayer;
   $('prayerSheet').addEventListener('click',e=>{ if(e.target===$('prayerSheet')) closePrayer(); });          // a tap on the dark area closes it too
 
+  // ---- Music (.112, me.html only): player in music.js; the card redraws itself when the player changes, its bar moves without a redraw ----
+  const fmtT=s=>{ s=Math.max(0,Math.round(s||0)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+  Music.init({shuffle:()=>S.settings.musicShuffle!==false,setShuffle:v=>{ S.settings.musicShuffle=v; RisenDB.setSetting('musicShuffle',v).catch(()=>{}); }});
+  function paintSongs(){
+    const l=Music.state().list;
+    $('muList').innerHTML=l.length?l.map(s=>`<div class="murow"><div class="muname"><b>${esc(s.name)}</b><span>${(s.size/1048576).toFixed(1)} MB</span></div><button type="button" class="mudel" data-mdel="${esc(s.id)}" aria-label="Delete ${esc(s.name)}"><svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button></div>`).join(''):'<p>No songs yet.</p>';
+  }
+  const openSongs=()=>{ paintSongs(); $('musicSheet').hidden=false; };
+  const closeSongs=()=>{ $('musicSheet').hidden=true; };
+  $('muDone').onclick=closeSongs; $('muDone2').onclick=closeSongs;
+  $('musicSheet').addEventListener('click',e=>{ if(e.target===$('musicSheet')) closeSongs(); });
+  $('muAdd').onclick=()=>$('musicFile').click();
+  $('musicFile').onchange=async e=>{
+    const files=[...e.target.files]; e.target.value=''; if(!files.length) return;
+    toast('Adding '+files.length+' song'+(files.length===1?'':'s')+'…');
+    const r=await Music.add(files); paintSongs();
+    toast(r.added+' added'+(r.skipped?' · '+r.skipped+' skipped (audio files under 30 MB only)':''));
+  };
+  $('muList').onclick=async e=>{
+    const b=e.target.closest('[data-mdel]'); if(!b) return; const s=Music.state().list.find(x=>x.id===b.dataset.mdel); if(!s) return;
+    if(!(await ask({title:'Delete this song?',text:s.name+'\nIt is deleted from this phone only.',ok:'DELETE',danger:true}))) return;
+    await Music.remove(s.id); paintSongs();
+  };
+
   // ONE layout for every tile with a picture (SUPPLEMENTS, CLASSES, COFFEE): a square image flush with the tile's left, top and bottom edges (the tile's corners round it), the head and the text to its right
   const picRow=(pic,text,extra='',tools='',tag='')=>({__pic:true,pic,text,extra,tools,tag});      // (a picture tile: drawn by tileHtml(); the picture is a square flush with the tile's left edge, filling its full height)
 
@@ -139,6 +163,19 @@
       return `<div class="wtools"><button type="button" class="wgear" data-prayer="set" aria-label="Prayer times settings"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
         <div class="pbody"><div class="pline"><div><div class="pnext">${Prayer.LABEL[nx.name]}${nx.tomorrow?' <small>tomorrow</small>':''}</div><div class="ptime">${Prayer.clock(nx.time)}</div></div><div class="pleft"><span>to go</span><b>${Prayer.left(nx.inMin)}</b></div></div>
         <div class="prow">${cols}</div>${hj?`<div class="phij">${esc(hj)}</div>`:''}</div>`;
+    }},
+    {title:'Music', only:'me', cls:'music', html(){       // .112 (Siza's Home only): his own songs; play / pause / next / back / shuffle; the gear lists the songs, adds and deletes them
+      const m=Music.state(), gear=`<div class="wtools"><button type="button" class="wgear" data-music="set" aria-label="Songs"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></button></div>`;
+      if(!m.ready) return gear+`<div class="mbody"><div class="sub">Loading…</div></div>`;
+      if(!m.count) return gear+`<div class="mbody"><div class="mname">No songs yet</div><div class="sub">Add your songs from the Files app</div><button class="ghost madd" type="button" data-music="add">+ ADD SONGS</button></div>`;
+      const pct=m.dur?Math.min(100,m.pos/m.dur*100):0;
+      return gear+`<div class="mbody"><div class="mname${m.playing?' on':''}">${esc(m.active?m.name:'Your songs')}</div>
+        <div class="msub">${m.count} song${m.count===1?'':'s'} · Shuffle ${m.shuffle?'on':'off'}</div>
+        <div class="mctl"><button type="button" class="mbtn sh${m.shuffle?' on':''}" data-music="shuffle" aria-label="Shuffle"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg></button>
+          <button type="button" class="mbtn" data-music="prev" aria-label="Previous song"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 20 9 12l10-8z" fill="currentColor"/><path d="M5 19V5"/></svg></button>
+          <button type="button" class="mbtn big" data-music="play" aria-label="${m.playing?'Pause':'Play'}">${m.playing?'<svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke-width="3.2"/></svg>':'<svg class="icon" viewBox="0 0 24 24"><path d="M7 4.5 19 12 7 19.5z" fill="currentColor"/></svg>'}</button>
+          <button type="button" class="mbtn" data-music="next" aria-label="Next song"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l10 8-10 8z" fill="currentColor"/><path d="M19 5v14"/></svg></button></div>
+        <div class="mbar"><i style="width:${pct}%"></i></div><div class="mtimes"><span class="mpos">${fmtT(m.pos)}</span><span>${m.dur?fmtT(m.dur):''}</span></div></div>`;
     }},
     {title:'Supplements', tap:'meds', html(){ // the whole tile opens the SUPPLEMENTS tab (meds.js)
       if(typeof Meds==='undefined') return '';
@@ -238,6 +275,7 @@
     $('hello').textContent=S.settings.name?'Hello '+S.settings.name:'Hello';
     $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     homeDay=dayKey(new Date());
+    if(HOME_VARIANT==='me'&&!Music.state().ready) Music.load();                                 // (the songs of Siza's Home)
     $('tiles').classList.toggle('still',homeDrawn); homeDrawn=true;      // the entrance animation plays once, not at every refresh
     $('tiles').innerHTML=TILES.map((t,i)=>shown(t)?tileHtml(t,i):'').join('');
     if(typeof Meds!=='undefined') Meds.loadThumbs($('tiles'));                                  // the box photos on the SUPPLEMENTS tile (same loader as the Supps tab)
@@ -257,6 +295,11 @@
       art.outerHTML=html; if(name==='Supplements'&&typeof Meds!=='undefined') Meds.loadThumbs(document.querySelector('#tiles [data-tile="'+name+'"]'));
     }
   }
+
+  // the MUSIC card follows the player: redrawn when it changes (play / pause / song), its bar and time move on every tick without a redraw
+  function redrawMusic(){ if(HOME_VARIANT!=='me') return; const i=TILES.findIndex(x=>x.title==='Music'), art=document.querySelector('#tiles [data-tile="Music"]'); if(i<0||!art||$('view-home').hidden) return; art.outerHTML=tileHtml(TILES[i],i); if(!$('musicSheet').hidden) paintSongs(); }
+  Music.on(redrawMusic);
+  Music.onTick(()=>{ const m=Music.state(), i=document.querySelector('#tiles .tile.music .mbar i'); if(!i||!m.dur) return; i.style.width=Math.min(100,m.pos/m.dur*100)+'%'; const p=document.querySelector('#tiles .tile.music .mpos'); if(p) p.textContent=fmtT(m.pos); });
 
   // TRY TODAY (.98): the recipe of this opening is picked as soon as the data is loaded, and again when recipes arrive later (meals.js sends `risen-try`)
   const tryReady=()=>{ if(!app.classList.contains('hidden')&&!$('view-home').hidden) drawHome(); };       // (also under a pop-up: it only draws the tiles behind it)
@@ -415,6 +458,8 @@
     return {refresh};
   })();
   $('tiles').onclick=e=>{
+    const mu=e.target.closest('[data-music]');                                           // the buttons on the MUSIC card
+    if(mu){ const c=mu.dataset.music; if(c==='play') Music.toggle(); else if(c==='next') Music.next(); else if(c==='prev') Music.prev(); else if(c==='shuffle') Music.setShuffle(!Music.state().shuffle); else if(c==='set') openSongs(); else if(c==='add'){ openSongs(); $('musicFile').click(); } return; }
     if(e.target.closest('[data-prayer]')){ openPrayer(); return; }                      // the gear on the PRAYER card
     const w=e.target.closest('[data-water]');                                        // the − and the gear never add a glass
     if(w){ if(w.dataset.water==='minus'&&waterToday()>0){ setWaterToday(waterToday()-1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); } else if(w.dataset.water==='goal') openWaterGoal(); return; }

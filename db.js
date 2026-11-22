@@ -41,8 +41,10 @@
 // SCHEMA VERSION: raise DB_VERSION and add a new `if (old < N)` step in upgrade().
 // Never delete or rename a store in an upgrade, so updates never lose data.
 const RisenDB = (() => {
-  const DB_NAME = 'risen', DB_VERSION = 8;
+  const DB_NAME = 'risen', DB_VERSION = 9;
   const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs', 'recipes', 'body', 'waterlogs', 'coffeelogs'];
+  // Music (.112, Siza's Home): `songs` = the list (id, name, size, added), `songdata` = the audio file itself ({id, blob}). Both stay OUT of Export / Import (heavy; a restore keeps the songs); Reset clears them.
+  const EXTRA = ['songs', 'songdata'];
   let dbp;
 
   function upgrade(db, old) {
@@ -79,6 +81,10 @@ const RisenDB = (() => {
     }
     if (old < 8) {                                                  // v8: Coffee (one record per drink bought)
       db.createObjectStore('coffeelogs', { keyPath: 'id' });
+    }
+    if (old < 9) {                                                  // v9: Music (Siza's Home): the song list and the audio files, kept apart so listing never loads the audio
+      db.createObjectStore('songs', { keyPath: 'id' });
+      db.createObjectStore('songdata', { keyPath: 'id' });
     }
   }
 
@@ -488,10 +494,22 @@ const RisenDB = (() => {
     try { localStorage.removeItem('risen'); } catch (e) {}
   }
 
+  // ---- Music (Siza's Home): the list is small records; the audio file is read only when a song is played ----
+  async function songs() { return all('songs'); }
+  async function addSong(meta, blob) {
+    const db = await open(), t = db.transaction(['songs', 'songdata'], 'readwrite');
+    t.objectStore('songdata').put({ id: meta.id, blob }); t.objectStore('songs').put(meta); await done(t); return meta;
+  }
+  async function songBlob(id) { const r = await get('songdata', id); return r ? r.blob : null; }
+  async function deleteSong(id) {
+    const db = await open(), t = db.transaction(['songs', 'songdata'], 'readwrite');
+    t.objectStore('songs').delete(id); t.objectStore('songdata').delete(id); await done(t);
+  }
+
   // ---- Reset: empty every store (back to first launch) ----
   async function resetAll() {
-    const db = await open(), t = db.transaction(STORES, 'readwrite');
-    for (const s of STORES) t.objectStore(s).clear();
+    const db = await open(), t = db.transaction(STORES.concat(EXTRA), 'readwrite');
+    for (const s of STORES.concat(EXTRA)) t.objectStore(s).clear();
     await done(t);
   }
 
@@ -504,5 +522,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, migrateLibrary, adoptSeedClasses, saveWorkout, workoutsOf,
-    saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, saveBody, deleteBody, setWater, putCoffee, deleteCoffee, exportAll, exportBlob, importAll };
+    songs, addSong, songBlob, deleteSong, saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, saveBody, deleteBody, setWater, putCoffee, deleteCoffee, exportAll, exportBlob, importAll };
 })();

@@ -264,6 +264,18 @@
       <button class="primary nogl" type="button" id="prDone">DONE</button>
     </div>
   </div>
+  <!-- Home (me.html only) > MUSIC card: the songs on this phone -->
+  <div class="sheet-wrap" id="musicSheet" hidden>
+    <div class="sheet">
+      <h2>My songs</h2>
+      <button class="prtopdone" type="button" id="muDone">DONE</button>
+      <p>Your own songs, kept on this phone only (not in the backup). Audio files up to 30 MB.</p>
+      <div class="mulist" id="muList"></div>
+      <button class="primary nogl" type="button" id="muAdd">+ ADD SONGS</button>
+      <input type="file" id="musicFile" accept="audio/*,.mp3,.m4a,.wav,.aac" multiple hidden>
+      <button class="ghost mudone2" type="button" id="muDone2">DONE</button>
+    </div>
+  </div>
   <!-- Home > COFFEE card: the drink name and its price (the small gear on the card) -->
   <div class="sheet-wrap" id="coffeeSheet" hidden>
     <div class="sheet">
@@ -301,6 +313,7 @@
 <script src="shared.js"></script>
 <script src="photo.js"></script>
 <script src="prayer.js"></script>
+<script src="music.js"></script>
 <script src="app.js"></script>
 <script src="library.js"></script>
 <script src="media.js"></script>

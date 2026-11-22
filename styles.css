@@ -931,3 +931,35 @@
 #prayerSheet .saved{top:62px;right:20px;font-size:12px}
 .prtopdone{position:absolute;top:14px;right:14px;height:40px;padding:0 18px;border-radius:999px;border:0;background:var(--volt);color:#0B0B0B;font:600 14px Oswald,sans-serif;letter-spacing:.08em;cursor:pointer}
 .prtopdone:active{background:var(--volt-press)}
+
+/* MUSIC card (.112, me.html only) */
+.tile.music{position:relative}
+.tile.music .tile-body{display:block;margin-top:8px}
+.tile.music .wtools{top:4px;right:4px}
+.mbody{width:100%}
+.mname{font-family:Oswald,sans-serif;font-weight:600;font-size:24px;line-height:1.15;text-transform:uppercase;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:1.15em}
+.mname.on{color:var(--volt)}
+.msub{margin-top:4px;font-size:13px;color:var(--muted)}
+.mctl{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.mbtn{flex:none;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--press);color:var(--text);display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
+.mbtn .icon{width:22px;height:22px}
+.mbtn:active{background:var(--line)}
+.mbtn.sh{color:var(--muted)}.mbtn.sh.on{color:var(--volt);border-color:var(--volt)}
+.mbtn.big{width:64px;height:64px;background:var(--volt);border-color:var(--volt);color:#0B0B0B}
+.mbtn.big .icon{width:28px;height:28px}
+.mbtn.big:active{background:var(--volt-press)}
+.mbar{height:4px;border-radius:2px;background:var(--off);margin-top:14px;overflow:hidden}
+.mbar i{display:block;height:100%;background:var(--volt);width:0}
+.mtimes{display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:var(--muted);min-height:14px}
+.madd{margin-top:12px}
+#musicSheet{padding-top:calc(env(safe-area-inset-top) + 10px);padding-bottom:10px}
+#musicSheet .sheet{max-height:calc(100vh - env(safe-area-inset-top) - 20px);max-height:calc(100dvh - env(safe-area-inset-top) - 20px);overflow-y:auto;overscroll-behavior:contain;padding-top:20px}
+.mulist{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow-y:auto}
+.murow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.muname{flex:1;min-width:0}
+.muname b{display:block;font-family:Inter,sans-serif;font-weight:500;font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.muname span{font-size:12px;color:var(--muted)}
+.mudel{flex:none;width:44px;height:44px;border:0;background:none;color:var(--danger);display:grid;place-items:center;cursor:pointer}
+.mudel .icon{width:20px;height:20px}
+#musicSheet .primary{margin-top:14px}
+.mudone2{width:100%;margin-top:10px}
