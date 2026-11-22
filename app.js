@@ -187,7 +187,8 @@
   let homeDrawn=false, homeDay=dayKey(new Date());
   const tileText=html=>html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();       // what a tile SAYS (to tell whether it really changed)
   const tileSaid={};
-  const shown=t=>!t.show||t.show();                   // a tile with a `show()` appears only while it says so (the numbers then close up)
+  const HOME_VARIANT=window.RISEN_HOME||'friends';           // .107: index.html = 'friends', me.html = 'me' (Siza's own Home). A tile with `only:'me'` appears only on me.html
+  const shown=t=>(!t.only||t.only===HOME_VARIANT)&&(!t.show||t.show());                   // a tile with a `show()` appears only while it says so (the numbers then close up)
   const tileNo=i=>1+TILES.slice(0,i).filter(shown).length;
   function tileHtml(t,i){                            // one tile; a picture tile has the image flush left over the tile's full height, the head and the text to its right
     const h=t.html(), pic=h&&h.__pic, head=`<div class="tile-head"><b>${String(tileNo(i)).padStart(2,'0')}</b>${t.title}${pic&&h.tag||''}</div>`;

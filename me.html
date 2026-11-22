@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0B0B0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="RISEN">
+<title>RISEN</title>
+<link rel="manifest" href="manifest-me.json">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="preload" href="assets/fonts/oswald.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <section id="intro" class="screen">
+    <video class="photo" poster="assets/bg.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+    <div class="brand"><img src="assets/mark.png" alt=""><span>RISEN</span></div>
+    <button id="login" type="button" aria-label="Enter RISEN">ENTER</button>
+    <div class="hero">
+      <h1>Stronger<em>Every day</em></h1>
+      <p>Train &bull; Track &bull; Progress<br>Rise again</p>
+    </div>
+  </section>
+
+  <section id="app" class="screen hidden">
+    <!-- THE TOP BAR: one bar for Home, Gym, Meals, Supps and Classes (R mark · page title · profile button). It never scrolls and never moves; only the title changes (show() in app.js).
+         What each tab used to show up there (date, WEEK ...) is the small line right under it. Sub-pages cover it with their own "<" bar. -->
+    <header class="tbar" id="tbar">
+      <img class="tb-mark" src="assets/mark.png" alt="">
+      <h1 id="tbTitle">Home</h1>
+      <button class="profbtn" type="button" aria-label="Profile"></button>
+    </header>
+    <!-- Pull down to refresh (.97): drawn by Pull in app.js -->
+    <div class="ptr" id="ptr" data-s="pull" aria-live="polite">
+      <svg class="ptra" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+      <svg class="ptrs" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
+      <span class="ptrt">Pull to refresh</span>
+    </div>
+    <!-- HOME -->
+    <div class="view" id="view-home">
+      <div class="greet">
+        <div class="date" id="today"></div>
+        <h1 id="hello">Hello Siza</h1>
+      </div>
+      <div class="tiles" id="tiles"></div>
+      <button class="backup-line" id="backupLine" hidden></button>
+    </div>
+
+    <!-- GYM, MEALS, SUPPS (meds.js), CLASSES: each tab draws itself (gym.js, meals.js, meds.js, classes.js) -->
+    <div class="view" id="view-gym" hidden>
+      <div id="gymWeek"></div>
+      <div id="gymLog" hidden></div>
+    </div>
+    <div class="view" id="view-meals" hidden><div id="mealCats"></div></div>
+    <div class="view" id="view-meds" hidden><div id="medsBody"></div></div>
+    <div class="view" id="view-classes" hidden><div id="clsWeek"></div></div>
+
+    <!-- Rest timer: starts when a set is ticked -->
+    <div class="restbar" id="restbar" aria-live="polite">
+      <div><div class="lbl">REST</div></div>
+      <div class="cd" id="restCd">1:30</div>
+      <button type="button" data-rest="-15">&minus;15</button>
+      <button type="button" data-rest="15">+15</button>
+      <button type="button" data-rest="skip">Skip</button>
+    </div>
+
+    <!-- Gym sub-pages -->
+    <section class="subpage" id="gymPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-close="gymPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="gymPageTitle"></h1><span class="gcount" id="gymPageCount"></span>
+        <span class="saved" id="savedMark" aria-live="polite">✓ Saved</span></div>
+      <div id="gymPageBody"></div>
+    </section>
+    <section class="subpage" id="exPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-close="exPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="exTitle"></h1>
+        <span class="saved" id="exSaved" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" data-close="exPage">DONE</button></div>
+      <div id="exBody"></div>
+    </section>
+    <section class="subpage" id="mealPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-meal-close="mealPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="mealPageTitle"></h1></div>
+      <div id="mealPageBody"></div>
+    </section>
+    <section class="subpage" id="recipePage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-meal-close="recipePage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="recipeTitle">Recipe</h1>
+        <span class="saved" id="recipeSaved" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" data-meal-close="recipePage">DONE</button></div>
+      <div id="recipeBody"></div>
+    </section>
+    <section class="subpage" id="clsEditPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-cls-close="clsEditPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="clsEditTitle">Class</h1>
+        <span class="saved" id="clsSaved" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" data-cls-close="clsEditPage">DONE</button></div>
+      <div id="clsEditBody"></div>
+    </section>
+    <section class="subpage" id="instViewPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-cls-close="instViewPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1>Instructor</h1></div>
+      <div id="instViewBody"></div>
+    </section>
+    <section class="subpage" id="instPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-cls-close="instPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1>Instructors</h1></div>
+      <div id="instBody"></div>
+    </section>
+    <section class="subpage" id="instEditPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-cls-close="instEditPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="instEditTitle">Instructor</h1>
+        <span class="saved" id="instSaved" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" data-cls-close="instEditPage">DONE</button></div>
+      <div id="instEditBody"></div>
+    </section>
+    <section class="subpage" id="medPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" id="medBack" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="medTitle">Supplement</h1>
+        <span class="saved" id="medSaved" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" id="medDone">DONE</button></div>
+      <div id="medBody"></div>
+    </section>
+    <section class="subpage" id="libPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" data-close="libPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1>Add exercise</h1></div>
+      <div class="search"><input class="field" id="libSearch" type="search" placeholder="Search exercises" autocomplete="off" enterkeyhint="search"></div>
+      <div id="libBody"></div>
+    </section>
+
+    <!-- Floating glass tab bar: icons only (names are in aria-label); .tabpill is the lighter glass that slides behind the active icon -->
+    <nav class="tabbar" id="tabbar" role="tablist" aria-label="Main" style="--i:0">
+      <span class="tabpill" aria-hidden="true"></span>
+      <button class="tab" role="tab" data-view="home" aria-label="Home" aria-selected="true">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg></button>
+      <button class="tab" role="tab" data-view="gym" aria-label="Gym" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg></button>
+      <button class="tab" role="tab" data-view="meals" aria-label="Meals" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v5a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V3M9 3v5"/><path d="M17 21V3c-2 1-3 3.5-3 7 0 2 1 3 3 3"/></svg></button>
+      <button class="tab" role="tab" data-view="meds" aria-label="Supps" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="2.8" y="8.2" width="18.4" height="7.6" rx="3.8" transform="rotate(-45 12 12)"/><path d="m8.6 8.6 6.8 6.8"/></svg></button>
+      <button class="tab" role="tab" data-view="classes" aria-label="Classes" aria-selected="false">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 20v-1a5.5 5.5 0 0 1 11 0v1"/><path d="M16 5.2a3 3 0 0 1 0 5.6"/><path d="M17.5 14a5.5 5.5 0 0 1 3 4.9V20"/></svg></button>
+    </nav>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="settings" aria-hidden="true">
+    <div class="settings-top">
+      <button class="iconbtn" id="settingsBack" aria-label="Back">
+        <svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <div class="segs" role="tablist" aria-label="Profile">
+        <button type="button" role="tab" data-seg="settings" aria-selected="true">SETTINGS</button>
+        <button type="button" role="tab" data-seg="info" aria-selected="false">PERSONAL INFO</button>
+      </div>
+      <span class="saved" id="setSaved" aria-live="polite">✓ Saved</span>
+    </div>
+
+    <div id="setPane">
+    <div class="group-label" style="margin-top:20px">Workout</div>
+    <div class="group">
+      <div class="row">Default rest timer
+        <div class="stepper">
+          <button type="button" id="restMinus" aria-label="Less rest">&minus;</button>
+          <output id="restVal">1:30</output>
+          <button type="button" id="restPlus" aria-label="More rest">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="group-label">Backup</div>
+    <div class="group">
+      <button class="row" id="exportBtn">Export backup <svg class="icon chev" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
+      <button class="row" id="importBtn">Import backup <svg class="icon chev" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
+    </div>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+    <p class="note">Everything is stored only on this phone. Export a backup now and then and keep it in Files or iCloud Drive.</p>
+
+    <div class="group-label">App</div>
+    <div class="group">
+      <button class="row" id="viewIntro">View intro <svg class="icon chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+    </div>
+
+    <div class="group-label">Data</div>
+    <div class="group">
+      <button class="row" id="recipePackBtn">RISEN recipes</button>
+      <button class="row" id="reloadClasses">Reload gym schedule</button>
+      <button class="row danger" id="clearClasses">Clear all classes</button>
+      <button class="row danger" id="resetBtn">Reset all data</button>
+    </div>
+
+    <div class="settings-version" id="version"></div>
+    </div>
+    <div id="infoPane" hidden><div id="infoBody"></div></div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Gym pop-ups -->
+  <div class="sheet-wrap" id="gymSheet" hidden><div class="sheet" id="gymSheetBody"></div></div>
+
+  <!-- Meals: move a recipe to another category -->
+  <div class="sheet-wrap" id="mealSheet" hidden><div class="sheet" id="mealSheetBody"></div></div>
+
+  <!-- Classes: asked when the tab opens, until it is answered YES or START EMPTY. x / NOT NOW = ask again next time.
+       It stops above the tab bar so the tabs stay usable. -->
+  <div class="sheet-wrap" id="clsSheet" hidden>
+    <div class="sheet">
+      <button class="sheet-x" type="button" id="clsX" aria-label="Not now"><svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <h2>Load Fitness Zone schedule?</h2>
+      <p>Fills in the weekly classes and instructors. Afterwards everything is yours to edit, delete or add to.</p>
+      <button class="primary" type="button" id="clsYes">YES</button>
+      <button class="textbtn" type="button" id="clsNo">START EMPTY</button>
+      <button class="textbtn" type="button" id="clsLater">NOT NOW</button>
+    </div>
+  </div>
+
+  <!-- Install pop-up: only in a browser, never in the home-screen app (see "Install pop-up" in app.js) -->
+  <div class="sheet-wrap" id="installSheet" hidden><div class="sheet install" id="installBody"></div></div>
+
+  <!-- Shown instead of the app when the phone's storage can't be opened -->
+  <section class="storagefail" id="storageFail" role="alert" hidden>
+    <h2>RISEN can't open your data</h2>
+    <p>Your data has not been deleted. This usually clears up by itself: close RISEN completely and open it again, or tap the button.</p>
+    <button class="primary" type="button" id="storageRetry">TRY AGAIN</button>
+    <p class="why" id="storageWhy"></p>
+  </section>
+
+  <!-- The app's one "are you sure?" sheet (ask() in shared.js) -->
+  <div class="sheet-wrap" id="askSheet" hidden><div class="sheet" id="askBody"></div></div>
+
+  <!-- Reset all data (Settings) -->
+  <div class="sheet-wrap" id="resetSheet" hidden>
+    <div class="sheet">
+      <h2>Reset all data?</h2>
+      <p>Deletes everything on this phone: programs, workouts, meds, water, coffee, classes, recipes, history, photos, body measurements, name and settings. Export a backup first if you might want it back.</p>
+      <button class="primary" type="button" id="resetExport">EXPORT BACKUP FIRST</button>
+      <button class="dangerbtn" type="button" id="resetGo">RESET EVERYTHING</button>
+      <button class="textbtn" type="button" id="resetCancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Home > WATER card: the daily goal (the small gear on the card) -->
+  <div class="sheet-wrap" id="waterSheet" hidden>
+    <div class="sheet">
+      <h2>Water goal</h2><span class="saved" id="wgSaved" aria-live="polite">✓ Saved</span>
+      <p>Glasses per day (250 ml each).</p>
+      <div class="wgoal"><button type="button" class="stepbtn" id="wgMinus" aria-label="Fewer glasses">&minus;</button>
+        <div class="wgval"><b id="wgN">10</b><span>glasses</span></div>
+        <button type="button" class="stepbtn" id="wgPlus" aria-label="More glasses">+</button></div>
+      <p class="wgl" id="wgL">= 2.5 L a day</p>
+      <button class="primary nogl" type="button" id="wgDone">DONE</button>
+    </div>
+  </div>
+  <!-- Home > COFFEE card: the drink name and its price (the small gear on the card) -->
+  <div class="sheet-wrap" id="coffeeSheet" hidden>
+    <div class="sheet">
+      <h2>Coffee</h2><span class="saved" id="cfSaved" aria-live="polite">✓ Saved</span>
+      <div class="label" style="margin-top:14px">Drink</div>
+      <input class="field" id="cfName" type="text" maxlength="30" autocomplete="off" autocapitalize="sentences" enterkeyhint="done" placeholder="Coffee">
+      <div class="label">Price</div>
+      <div class="wgoal" style="margin-top:6px"><button type="button" class="stepbtn" id="cfMinus" aria-label="Lower the price">&minus;</button>
+        <div class="wgval"><b id="cfPrice">$3.50</b></div>
+        <button type="button" class="stepbtn" id="cfPlus" aria-label="Raise the price">+</button></div>
+      <p class="wgl">New drinks are added at this price; earlier ones keep theirs.</p>
+      <button class="primary nogl" type="button" id="cfDone">DONE</button>
+    </div>
+  </div>
+  <!-- Profile > Personal info: history of one value, and a new custom measurement -->
+  <div class="sheet-wrap" id="histSheet" hidden>
+    <div class="sheet">
+      <h2 id="histTitle"></h2>
+      <div class="hlist" id="histList"></div>
+      <button class="primary nogl" type="button" id="histDone">DONE</button>
+      <button class="textbtn danger" type="button" id="histDelAll" hidden>Delete this measurement</button>
+    </div>
+  </div>
+  <div class="sheet-wrap" id="addMeasSheet" hidden>
+    <form class="sheet" id="addMeasForm" autocomplete="off">
+      <h2>New measurement</h2>
+      <input class="field" id="addName" type="text" maxlength="24" placeholder="Name (e.g. Shoulders)" autocapitalize="sentences" enterkeyhint="next">
+      <input class="field" id="addVal" type="text" inputmode="decimal" placeholder="Value (cm)" style="margin-top:10px" enterkeyhint="done">
+      <button class="primary" type="submit">ADD</button>
+      <button class="textbtn" type="button" id="addCancel">Cancel</button>
+    </form>
+  </div>
+
+<script>window.RISEN_HOME='me';</script>
+<script src="db.js"></script>
+<script src="shared.js"></script>
+<script src="photo.js"></script>
+<script src="app.js"></script>
+<script src="library.js"></script>
+<script src="media.js"></script>
+<script src="gym.js"></script>
+<script src="meds.js"></script>
+<script src="classes.js"></script>
+<script src="meals.js"></script>
+<script src="profile.js"></script>
+</body>
+</html>
