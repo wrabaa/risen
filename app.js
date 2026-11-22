@@ -266,9 +266,30 @@
   const collapsed=t=>(S.settings.homeCollapsed||[]).includes(t.title);                     // .114: a card can be made small (only its title line) and back, per phone, remembered
   const MI={prev:'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 20 9 12l10-8z" fill="currentColor"/><path d="M5 19V5"/></svg>',next:'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l10 8-10 8z" fill="currentColor"/><path d="M19 5v14"/></svg>',play:'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5 19 12 7 19.5z" fill="currentColor"/></svg>',pause:'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" stroke-width="3.2"/></svg>'};
   const CHEV='<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  // .117 the PEEK: what a minimized card still says, in one short line at the right of its title (nothing for Try today / This week / Streak / Week summary)
+  function peekOf(t){
+    try{
+      const e=x=>esc(String(x));
+      if(t.title==='Training'){
+        if(S.settings.activeSession) return {html:'In progress'};
+        if(!activeRoutine()) return null;
+        const today=new Date(), list=plannedOn(today); if(!list.length) return {html:'Rest'};
+        const ids=doneIds(today), sk=skippedIds(today), w=list.find(x=>!ids.has(x.id)&&!sk.has(x.id));
+        if(!w) return {html:'Done ✓'};
+        return {html:e(wTitle(w).split(' · ').slice(0,3).join(' · '))};
+      }
+      if(t.title==='Prayer'&&typeof Prayer!=='undefined'){ const now=new Date(), nx=Prayer.next(now,prayerPlace(),prayerOffs()); return {red:true,html:'<small>to go</small> '+Prayer.left(nx.inMin)}; }
+      if(t.title==='Supplements'&&typeof Meds!=='undefined'){ const s=Meds.homeInfo(); if(!s.hasMeds||!s.total) return null; return s.pick?{html:e(s.pick.m.name)}:{html:'All done ✓'}; }
+      if(t.title==='Water'){ const g=waterToday(), goal=waterGoal(); return g>=goal?{html:'Done ✓'}:{html:(goal-g)+' to go'}; }
+      if(t.title==='Coffee'){ const total=coffeeMonth().reduce((n,c)=>n+(Number(c.price)||0),0); return {html:'$'+total.toFixed(2)}; }
+      if(t.title==='Classes'&&typeof Classes!=='undefined'){ if(!S.classes.length) return null; const n=Classes.next(); return n.none?null:{html:e(n.c.name)}; }
+    }catch(_){}
+    return null;
+  }
   function tileHtml(t,i){                            // one tile; a picture tile has the image flush left over the tile's full height, the head and the text to its right
     const min=collapsed(t), chev=`<button type="button" class="tchev" data-chev="${t.title}" aria-label="${min?'Show':'Minimize'} ${t.title}" aria-expanded="${!min}">${CHEV}</button>`;
-    if(min){ let mini=''; if(t.title==='Music'&&typeof Music!=='undefined'){ const m=Music.state(); if(m.count) mini=`<div class="mmini"><button type="button" class="mbtn s" data-music="prev" aria-label="Previous song">${MI.prev}</button><button type="button" class="mbtn s big" data-music="play" aria-label="${m.playing?'Pause':'Play'}">${m.playing?MI.pause:MI.play}</button><button type="button" class="mbtn s" data-music="next" aria-label="Next song">${MI.next}</button></div>`; }       // .116: a minimized MUSIC card keeps back / play / next
+    if(min){ let mini=''; const pk=peekOf(t); if(pk) mini=`<span class="tpeek${pk.red?' red':''}">${pk.html}</span>`;       // .117: one short peek on a minimized card (same font, size and place on every card)
+       if(t.title==='Music'&&typeof Music!=='undefined'){ const m=Music.state(); if(m.count) mini=`<div class="mmini"><button type="button" class="mbtn s" data-music="prev" aria-label="Previous song">${MI.prev}</button><button type="button" class="mbtn s big" data-music="play" aria-label="${m.playing?'Pause':'Play'}">${m.playing?MI.pause:MI.play}</button><button type="button" class="mbtn s" data-music="next" aria-label="Next song">${MI.next}</button></div>`; }       // .116: a minimized MUSIC card keeps back / play / next
       const html=`<article class="tile min" data-tile="${t.title}"><div class="tile-head"><b>${String(tileNo(i)).padStart(2,'0')}</b>${t.title}${chev}${mini}</div></article>`; tileSaid[t.title]=tileText(html); return html; }
     const h=t.html(), pic=h&&h.__pic, head=`<div class="tile-head"><b>${String(tileNo(i)).padStart(2,'0')}</b>${t.title}${pic&&h.tag||''}${chev}</div>`;
     const cls=`tile${pic?' pic':''}${t.title==='Training'?' train':''}${t.cls?' '+t.cls:''}`, attrs=`data-tile="${t.title}"${t.tap?` data-tap="${t.tap}" role="button" tabindex="0"`:''}`;
