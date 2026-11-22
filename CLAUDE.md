@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-22.1)
+## Status (release 2026-11-22.2)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -286,6 +286,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 
 - `.104` a day with only Day Off shows the picture / clip ON THE DAY PAGE itself, vertical 9:16 under the ADD EXERCISE button (`.dayoff` / `.dayoffm` / `.dayoff-del` in `styles.css`, `renderDay()` in `gym.js`): his own photo first, else `assets/exercises/day-off.*`, else a black block with a lime "DAY OFF" (`DAYOFF_PH`, `.pviewer-ph`). No exercise card, nothing to open, no sets; a small bin in the corner takes Day Off away; swipe right = back (it is a normal sub-page). iPhone test pending.
 - `.105` EXERCISE CLIPS IN BODY-PART FOLDERS + RANDOM DAY OFF (Siza, planner chat; `media.js`): the clips now sit in `assets/exercises/<chest|back|shoulders|legs|glutes|arms|core|cardio|flexibility|rest>/` (the muscle group of each exercise in `library.js`, lower case; each folder has an empty `.gitkeep` so it exists on GitHub). `RepoFolder` got `deep:true` for exercises: ONE ask to GitHub's tree API (`git/trees/main?recursive=1`) lists the folder and all subfolders (the recipes folder stays on the flat listing, which is also the fallback); each file keeps its `path`, downloaded from `assets/exercises/<path>`. A clip is matched by its FILE NAME (case-insensitive), wherever it sits, so a clip in the wrong folder or loose in `assets/exercises/` still works; the keys on the phones are unchanged, so nothing is downloaded again. The 12 existing clips were moved with `git mv` (names made lower case). DAY OFF may have several clips: `day-off`, `day-off-2`, `day-off-3`, … in `rest/`; `ExMedia.dayOff()` picks one at random each time the app is opened, never the one of the last opening (`localStorage` `risen.dayoff`, try/catch), and keeps it for that opening; his own photo on the day still wins. Tested with a mocked tree (picks vary, offline works, no flat call). iPhone test pending.
+
+- `.106` SEVERAL INTRO CLIPS, SHUFFLED (Siza; `media.js` `IntroMedia`, `index.html`, `sw.js`): extra intro videos go in the repo folder `assets/intro/` (any name, `.mp4` / `.mov`, over 8 MB skipped; `assets/intro/README.md`); they reach the phones by themselves like the exercise clips (`RepoFolder`, cache `risen.intro`, `sw.js` lets `assets/intro/` pass), no release. Each time the app is opened ONE is picked at random from the downloaded clips PLUS the built-in `assets/bg.mp4`, never the one of the last opening (`localStorage` `risen.intro`), and it plays for that whole opening. The intro `<video>` has no `src` in `index.html` any more: `IntroMedia.start()` sets it at once (the poster `bg.jpg` shows for that instant; it is kept only when bg.mp4 itself is chosen). Nothing downloaded yet, offline or any failure = bg.mp4. A pull-down refresh also asks about this folder (`RepoNow`). Tested with a mocked folder (random, never twice in a row, plays, offline OK). iPhone test pending.
 
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)

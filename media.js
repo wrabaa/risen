@@ -196,13 +196,37 @@ const RecipePack = (() => {
   return { list, image, imageBlob, images, sync: force => F.sync([], force), set onChange(fn) { F.onChange = fn; } };
 })();
 
+// ---------- Intro clips: assets/bg.mp4 (built in) + assets/intro/<any name>.mp4 ----------
+//   .106: several intro clips. Each time the app is opened ONE is picked at random (the built-in bg.mp4 is one of them), never the one of the last opening,
+//   and it plays for that whole opening. Clips in assets/intro/ come by themselves like the exercise clips (no release; over 8 MB is skipped).
+//   With no internet, or before they were downloaded, only bg.mp4 is in the draw. The video has no `src` in index.html: this sets it, at once.
+const IntroMedia = (() => {
+  const F = RepoFolder({ dir: 'assets/intro', cache: 'risen.intro', pick(rows) {
+    const want = {};
+    for (const r of rows) { const n = mediaName(r.name); if (!n || (n.ext !== 'mp4' && n.ext !== 'mov') || r.size > 8 * 1024 * 1024 || want[n.base]) continue; want[n.base] = { name: r.name, path: r.name, sha: r.sha, type: MEDIA_TYPES[n.ext] }; }
+    return want;
+  } });
+  async function start() {
+    const v = document.querySelector('#intro video'); if (!v) return;
+    const play = (src, still) => { if (still) v.setAttribute('poster', 'assets/bg.jpg'); else v.removeAttribute('poster'); v.src = src; try { const p = v.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {} };
+    let keys = []; try { keys = await F.keys(); } catch (e) {}
+    const all = ['bg', ...keys.sort()]; let last = ''; try { last = localStorage.getItem('risen.intro') || ''; } catch (e) {}
+    const pool = all.length > 1 ? all.filter(k => k !== last) : all, pick = pool[Math.floor(Math.random() * pool.length)];
+    try { localStorage.setItem('risen.intro', pick); } catch (e) {}
+    if (pick !== 'bg') { let g = null; try { g = await F.get(pick); } catch (e) {} if (g) return play(g.url, false); }
+    play('assets/bg.mp4', true);
+  }
+  start();
+  return { sync: force => F.sync([], force) };
+})();
+
 // When: a few seconds after the app opens and every time it comes back to the front or online (never more often than every 10 minutes).
 // Exercises: the program's own first.
 (() => {
   const mine = () => { try { return [...new Set(S.workouts.flatMap(w => (w.exercises || []).map(e => e.exerciseId)))]; } catch (e) { return []; } };
-  const go = () => { if (!document.hidden) { ExMedia.sync(mine()); RecipePack.sync(); } };
+  const go = () => { if (!document.hidden) { ExMedia.sync(mine()); RecipePack.sync(); IntroMedia.sync(); } };
   // Pull down to refresh (.97, app.js): ask GitHub about both folders NOW, without the 10-minute wait
-  window.RepoNow = () => Promise.all([ExMedia.sync(mine(), true), RecipePack.sync(true)]);
+  window.RepoNow = () => Promise.all([ExMedia.sync(mine(), true), RecipePack.sync(true), IntroMedia.sync(true)]);
   setTimeout(go, 3000);
   document.addEventListener('visibilitychange', go);
   window.addEventListener('online', go);

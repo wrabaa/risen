@@ -1,6 +1,6 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of the APP files (pages, code, data) and delete the old one.
-const VERSION = '2026-11-22.1';
+const VERSION = '2026-11-22.2';
 const CACHE = 'risen-' + VERSION;
 
 // APP FILES: small, change often. All of them are downloaded again on every release, all or nothing.
@@ -102,7 +102,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
   const rel = req.url.split(/[?#]/)[0].slice(SCOPE.length);
-  if (rel.startsWith('assets/exercises/') || rel.startsWith('assets/recipes/')) return;      // exercise pictures / clips and the recipe pack: media.js downloads and keeps them itself (caches `risen.exmedia`, `risen.recipes`), never a second copy here
+  if (rel.startsWith('assets/exercises/') || rel.startsWith('assets/recipes/') || rel.startsWith('assets/intro/')) return;      // exercise pictures / clips and the recipe pack: media.js downloads and keeps them itself (caches `risen.exmedia`, `risen.recipes`), never a second copy here
   if (ASSETS[rel] != null) {
     e.respondWith(caches.open(ASSET_CACHE).then(c => c.match(abs(rel)).then(async hit => {
       if (hit && req.headers.has('range')) {      // a video asks for a slice (iPhone always does): answer with just that slice, or it will not play
