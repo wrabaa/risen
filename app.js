@@ -88,7 +88,9 @@
     navigator.geolocation.getCurrentPosition(p=>{ $('prGps').disabled=false; S.settings.prayerLat=p.coords.latitude; S.settings.prayerLon=p.coords.longitude; RisenDB.setSetting('prayerLat',p.coords.latitude).then(()=>RisenDB.setSetting('prayerLon',p.coords.longitude)).then(()=>savedFlash('prSaved')).catch(e=>toast('Could not save: '+e.message)); paintPrayer(); },
       ()=>{ $('prGps').disabled=false; toast('Could not get the location (needs internet and permission)'); },{timeout:15000,maximumAge:600000}); };
   $('prBaabda').onclick=()=>{ delete S.settings.prayerLat; delete S.settings.prayerLon; Promise.all([RisenDB.setSetting('prayerLat',null),RisenDB.setSetting('prayerLon',null)]).then(()=>savedFlash('prSaved')); paintPrayer(); };
-  $('prDone').onclick=()=>{ $('prayerSheet').hidden=true; renderHome(); };
+  const closePrayer=()=>{ $('prayerSheet').hidden=true; renderHome(); };
+  $('prDone').onclick=closePrayer; $('prDone2').onclick=closePrayer;
+  $('prayerSheet').addEventListener('click',e=>{ if(e.target===$('prayerSheet')) closePrayer(); });          // a tap on the dark area closes it too
 
   // ONE layout for every tile with a picture (SUPPLEMENTS, CLASSES, COFFEE): a square image flush with the tile's left, top and bottom edges (the tile's corners round it), the head and the text to its right
   const picRow=(pic,text,extra='',tools='',tag='')=>({__pic:true,pic,text,extra,tools,tag});      // (a picture tile: drawn by tileHtml(); the picture is a square flush with the tile's left edge, filling its full height)

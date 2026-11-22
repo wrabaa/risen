@@ -926,4 +926,8 @@
 .stepbtn.sm{width:44px;height:44px;font-size:24px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .prbtns{display:flex;gap:10px;margin-bottom:6px}.prbtns .ghost{flex:1}
 #prayerSheet .primary{margin-top:14px}
-#prayerSheet .sheet{max-height:92vh;overflow-y:auto}
+#prayerSheet{padding-top:calc(env(safe-area-inset-top) + 10px);padding-bottom:10px}
+#prayerSheet .sheet{max-height:calc(100vh - env(safe-area-inset-top) - 20px);max-height:calc(100dvh - env(safe-area-inset-top) - 20px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-top:20px}
+#prayerSheet .saved{top:62px;right:20px;font-size:12px}
+.prtopdone{position:absolute;top:14px;right:14px;height:40px;padding:0 18px;border-radius:999px;border:0;background:var(--volt);color:#0B0B0B;font:600 14px Oswald,sans-serif;letter-spacing:.08em;cursor:pointer}
+.prtopdone:active{background:var(--volt-press)}
