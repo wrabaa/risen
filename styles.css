@@ -992,3 +992,5 @@
 .tile.min .tile-head{min-height:22px}
 .tpeek{line-height:22px}
 .tpeek small{line-height:1;vertical-align:baseline}
+.tpeek.red{font-size:22px;font-weight:700}
+.tpeek.red small{font-size:13px;font-weight:600}

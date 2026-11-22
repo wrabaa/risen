@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-22.13)
+## Status (release 2026-11-22.14)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -304,6 +304,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.116` a MINIMIZED MUSIC card keeps three small buttons on its title line (back · play/pause · next; `.mmini` in `styles.css`, drawn by the minimized branch of `tileHtml()` in `app.js`), so he can control the music without opening the card; they work like the big ones (the music buttons are checked BEFORE the "tap a minimized card = open it" rule). Both Homes. iPhone test pending.
 
 - `.117` PEEK on minimized Home cards (Siza; `peekOf()` in `app.js`, `.tpeek` in `styles.css`; both Homes): a minimized card shows ONE short line at the right of its title, same Oswald 16 px / lime on every card, never wraps (cut with …): Training = today's day groups (max 3, "Rest", "Done ✓", "In progress"), Prayer = "TO GO 2:29" in red, Supplements = the next one's name (or "All done ✓"), Water = "N to go" (or "Done ✓"), Coffee = month total "$84.50", Classes = the next class name, Music keeps its 3 buttons; Try today / This week / Streak / Week summary show nothing. All minimized cards are 52 px high. FIX: on the Coffee card the chevron sat under the − button (could not be tapped): slimmer title gap and a 26 px chevron there. iPhone test pending.
+
+- `.118` the red Prayer countdown on a minimized card is bigger and bolder (22 px, bold; its TO GO 13 px). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
