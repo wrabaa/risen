@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-22.17)
+## Status (release 2026-11-22.18)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -312,6 +312,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.120` MUSIC keeps going on a LOCKED screen (Siza confirmed on his iPhone: when a song ended on the lock screen the next did not start): while a song plays, the NEXT one is already read from the database (`prefetch()` / `pre` in `music.js`); when a song ends or Next is pressed, `playUrl()` sets the source and calls `play()` at once with no waiting, which is what iPhone needs. The prepared song is dropped when the order changes (shuffle, delete, reset). Tested in the browser (Next changes song in the same tick). iPhone test pending.
 
 - `.121` DAY OFF page plays and shuffles again (Siza: the pictures were stuck and never changed): since `.115` the day page asked for the exercise's STILL first, and `still/day-off.jpg` exists, so it always showed that one still. `ExMedia.still()` now answers nothing for Day Off, so the page gets `dayOff()`: one of the `day-off`, `day-off-2`, … clips at random per opening (`media.js`). iPhone test pending.
+
+- `.122` the Day Off clip (and any list picture) no longer RESTARTS while the phone downloads new content (Siza: picture, video, picture, then stuck; reproduced with slowed downloads): every finished download used to redraw every built-in row, so a playing clip began again at each of ~20 files. `ExMedia.sigOf(id)` (`media.js`) says which picture / clip a row shows; `ExMedia.onChange` in `gym.js` leaves a row alone when that did not change (`thumbSig`). Day Off diving clip is `rest/day-off-4.mp4` (4 clips shuffle). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

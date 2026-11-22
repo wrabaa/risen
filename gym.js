@@ -174,24 +174,31 @@ const Gym = (() => {
   const thumbKind = new Map();         // exerciseId -> the stored type (a video clip plays in the row, silent and looping)
   const DAYOFF_PH = '<div class="pviewer-ph"><b>Day off</b></div>';       // shown until there is a picture / clip for Day Off
   const thumbHtml = id => thumbs.get(id) ? PhotoSlot.media(thumbs.get(id), thumbKind.get(id)) : I.bar;
+  const thumbSig = new Map();          // id -> code of the built-in picture / clip the row shows (`.122`, `ExMedia.sigOf`)
   const thumbBuiltIn = new Set();      // ids whose row shows the BUILT-IN picture / clip (media.js owns that URL: never revoked here)
-  function dropThumb(id) { if (thumbs.get(id) && !thumbBuiltIn.has(id)) URL.revokeObjectURL(thumbs.get(id)); thumbs.delete(id); thumbKind.delete(id); thumbBuiltIn.delete(id); }
+  function dropThumb(id) { if (thumbs.get(id) && !thumbBuiltIn.has(id)) URL.revokeObjectURL(thumbs.get(id)); thumbs.delete(id); thumbKind.delete(id); thumbBuiltIn.delete(id); thumbSig.delete(id); }
   function clearThumbs() { for (const id of [...thumbs.keys()]) dropThumb(id); }
   async function loadThumbs() {
     const els = [...document.querySelectorAll('#gymPageBody [data-xph]')];
     for (const el of els) { const id = el.dataset.xph; if (thumbs.has(id)) continue; const p = await RisenDB.getPhoto(id);
       if (p) { thumbs.set(id, URL.createObjectURL(p.blob)); thumbKind.set(id, p.type); continue; }
       const b = (await ExMedia.still(id)) || (await ExMedia.get(id));      // no photo of his own: the built-in STILL (.115: light, so the list opens fast), else the built-in picture / clip from assets/exercises/
-      thumbs.set(id, b ? b.url : null); if (b) { thumbKind.set(id, b.type); thumbBuiltIn.add(id); } }
+      thumbs.set(id, b ? b.url : null); if (b) { thumbKind.set(id, b.type); thumbBuiltIn.add(id); thumbSig.set(id, await ExMedia.sigOf(id)); } }
     for (const el of els) { const u = thumbs.get(el.dataset.xph); if (u && !el.querySelector('img,video')) el.innerHTML = thumbHtml(el.dataset.xph); }
     document.querySelectorAll('#gymPageBody .dayoffm').forEach(el => { if (!el.querySelector('img,video')) el.innerHTML = DAYOFF_PH; });
     PhotoSlot.kick($('gymPageBody'));
   }
 
   // A built-in picture / clip just arrived (or changed): rows still showing the icon, or an older built-in, pick it up
-  ExMedia.onChange = () => {
-    for (const id of [...thumbs.keys()]) if (!thumbs.get(id) || thumbBuiltIn.has(id)) dropThumb(id);
-    if (!$('gymPage').hidden && curDay != null) { document.querySelectorAll('#gymPageBody [data-xph]').forEach(el => { if (!thumbs.has(el.dataset.xph)) el.innerHTML = I.bar; }); loadThumbs(); }
+  ExMedia.onChange = async () => {
+    // `.122`: only a row whose built-in picture / clip really changed (or has none yet) is redrawn. A playing clip is never restarted by an unrelated download.
+    let any = false;
+    for (const id of [...thumbs.keys()]) {
+      if (thumbs.get(id) && !thumbBuiltIn.has(id)) continue;                         // his own photo: untouched
+      if (thumbs.get(id) && (await ExMedia.sigOf(id)) === thumbSig.get(id)) continue; // same built-in as before: keep it playing
+      dropThumb(id); any = true;
+    }
+    if (any && !$('gymPage').hidden && curDay != null) { document.querySelectorAll('#gymPageBody [data-xph]').forEach(el => { if (!thumbs.has(el.dataset.xph)) el.innerHTML = I.bar; }); loadThumbs(); }
   };
 
   function openDay(d) {

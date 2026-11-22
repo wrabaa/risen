@@ -155,7 +155,15 @@ const ExMedia = (() => {
   const get = async exerciseId => fileOf(exerciseId) === 'day-off' ? dayOff() : ((await F.get(fileOf(exerciseId))) || F.get('still/' + fileOf(exerciseId)));      // the clip, else (.115) the still as the picture
   const still = exerciseId => { const f = fileOf(exerciseId); return f && f !== 'day-off' ? F.get('still/' + f) : Promise.resolve(null); };         // Day Off has no still: its page plays a (shuffled) clip, `.121`         // .115: the small still of the day list
   const sync = (first = [], force = false) => F.sync([].concat(first.map(fileOf).filter(Boolean).map(f => 'still/' + f), first.map(fileOf).filter(Boolean)), force);
-  return { get, still, sync, fileOf, set onChange(fn) { F.onChange = fn; } };
+  // `.122`: what the list row shows for an exercise right now, as a short code. When a download finishes, a row whose code did not change is left alone
+  // (before, EVERY finished file redrew every built-in row, so a playing Day Off clip started over at each of the ~20 downloads).
+  const sigOf = async exerciseId => {
+    const f = fileOf(exerciseId); if (!f) return null;
+    if (f === 'day-off') { const ks = (await F.keys()).filter(k => /^day-off(-\d+)?$/.test(k)); return dayPick && ks.includes(dayPick) ? dayPick + (await F.sig(dayPick)) : null; }
+    const a = await F.sig('still/' + f); if (a) return 'S' + a;
+    const b = await F.sig(f); return b ? 'C' + b : null;
+  };
+  return { get, still, sigOf, sync, fileOf, set onChange(fn) { F.onChange = fn; } };
 })();
 
 // ---------- Recipes: assets/recipes/recipes.json + assets/recipes/<recipe id>.jpg | .png | .webp ----------
