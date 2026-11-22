@@ -448,6 +448,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   later without breaking recipes. Calories/barcode come later, planned in small steps.
 
 ## How we work (important)
+- **Both Homes (Siza's rule, `.115`):** from now on EVERYTHING is built for both Homes (friends' `index.html` and Siza's `me.html`) unless Siza says "only for me" (then the tile gets `only:'me'`). Shared code (gym, stills, music, minimize…) already reaches both.
 - **Siza + Claude (chat) plan; Claude Code builds; Siza tests on his iPhone.**
 - Build ONLY what the message asks. Do not redesign, rename, move or remove anything else.
   If something is unclear, ask before building.
