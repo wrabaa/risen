@@ -129,6 +129,11 @@ const ExMedia = (() => {
     const known = new Set(LIBRARY.list.map(e => e.file)), want = {};
     for (const r of rows.sort((a, b) => rank(a.name) - rank(b.name))) {
       const n = mediaName(r.name), type = n && MEDIA_TYPES[n.ext];
+      // .115 STILLS: a picture in assets/exercises/still/ is the small still shown in the gym DAY list (stored under the key 'still/<name>'); it is never the exercise's own picture / clip
+      if (/(^|\/)still\//i.test(r.path || '')) {
+        if (n && /^(jpg|jpeg|png|webp)$/.test(n.ext) && type && (known.has(n.base) || /^day-off(-\d+)?$/.test(n.base)) && r.size <= 2 * 1024 * 1024 && !want['still/' + n.base]) want['still/' + n.base] = { name: r.name, path: r.path, sha: r.sha, type };
+        continue;
+      }
       if (!type || !(known.has(n.base) || /^day-off-\d+$/.test(n.base)) || r.size > 8 * 1024 * 1024 || want[n.base]) continue;
       want[n.base] = { name: r.name, path: r.path, sha: r.sha, type };
     }
@@ -147,9 +152,10 @@ const ExMedia = (() => {
     }
     return F.get(dayPick);
   }
-  const get = exerciseId => fileOf(exerciseId) === 'day-off' ? dayOff() : F.get(fileOf(exerciseId));
-  const sync = (first = [], force = false) => F.sync(first.map(fileOf).filter(Boolean), force);
-  return { get, sync, fileOf, set onChange(fn) { F.onChange = fn; } };
+  const get = async exerciseId => fileOf(exerciseId) === 'day-off' ? dayOff() : ((await F.get(fileOf(exerciseId))) || F.get('still/' + fileOf(exerciseId)));      // the clip, else (.115) the still as the picture
+  const still = exerciseId => { const f = fileOf(exerciseId); return f ? F.get('still/' + f) : Promise.resolve(null); };         // .115: the small still of the day list
+  const sync = (first = [], force = false) => F.sync([].concat(first.map(fileOf).filter(Boolean).map(f => 'still/' + f), first.map(fileOf).filter(Boolean)), force);
+  return { get, still, sync, fileOf, set onChange(fn) { F.onChange = fn; } };
 })();
 
 // ---------- Recipes: assets/recipes/recipes.json + assets/recipes/<recipe id>.jpg | .png | .webp ----------

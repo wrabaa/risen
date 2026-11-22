@@ -181,7 +181,7 @@ const Gym = (() => {
     const els = [...document.querySelectorAll('#gymPageBody [data-xph]')];
     for (const el of els) { const id = el.dataset.xph; if (thumbs.has(id)) continue; const p = await RisenDB.getPhoto(id);
       if (p) { thumbs.set(id, URL.createObjectURL(p.blob)); thumbKind.set(id, p.type); continue; }
-      const b = await ExMedia.get(id);                 // no photo of his own: the built-in picture / clip from assets/exercises/, when there is one
+      const b = (await ExMedia.still(id)) || (await ExMedia.get(id));      // no photo of his own: the built-in STILL (.115: light, so the list opens fast), else the built-in picture / clip from assets/exercises/
       thumbs.set(id, b ? b.url : null); if (b) { thumbKind.set(id, b.type); thumbBuiltIn.add(id); } }
     for (const el of els) { const u = thumbs.get(el.dataset.xph); if (u && !el.querySelector('img,video')) el.innerHTML = thumbHtml(el.dataset.xph); }
     document.querySelectorAll('#gymPageBody .dayoffm').forEach(el => { if (!el.querySelector('img,video')) el.innerHTML = DAYOFF_PH; });
