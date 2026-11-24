@@ -98,10 +98,11 @@ const PhotoSlot = (() => {
   const TRASH = ICONS.trash;
   const CAMERA = '<svg class="icon" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
 
-  async function mount(el, exerciseId, { editable = false, onChange, video = false, swap = false, builtIn = null } = {}) {          // builtIn: async () => ({url, type}) | null = the app's own picture for this slot (exercise clip, pack recipe), shown when the user has none          // video:true (exercises) = a short clip may be chosen instead of a photo
+  async function mount(el, exerciseId, { editable = false, onChange, video = false, swap = false, builtIn = null, still = null } = {}) {          // builtIn: async () => ({url, type}) | null = the app's own picture for this slot (exercise clip, pack recipe), shown when the user has none          // video:true (exercises) = a short clip may be chosen instead of a photo
     const p = await RisenDB.getPhoto(exerciseId);
-    let built = null;
-    const again = () => mount(el, exerciseId, { editable, onChange, video, swap, builtIn });
+    let built = null, st = null;
+    if (!p && builtIn) [built, st] = await Promise.all([builtIn(), still ? still() : null]);          // `.123` still: async () => ({url, type}) | null = the built-in still, drawn at once under a clip that is still starting
+    const again = () => mount(el, exerciseId, { editable, onChange, video, swap, builtIn, still });
     async function pick(e) {                          // a file was chosen: store it, then draw the slot again
       const f = e.target.files[0]; if (!f) return;
       const s = el.querySelector('span'); if (s) s.textContent = 'Saving…';
@@ -111,7 +112,7 @@ const PhotoSlot = (() => {
     }
     el.classList.add('pslot');
     if (p) {
-      el.innerHTML = `<button class="pslot-img" aria-label="${isVideo(p.type) ? 'View video' : 'View photo'}">${media(urlFor(exerciseId, p.blob), p.type)}</button>` +
+      el.innerHTML = `<button class="pslot-img${video ? ' fix' : ''}" aria-label="${isVideo(p.type) ? 'View video' : 'View photo'}">${media(urlFor(exerciseId, p.blob), p.type)}</button>` +
         (editable ? `<span class="pslot-size" aria-label="Stored size">${kindText(p.type)} · ${sizeText(p.blob.size)}</span><button class="pslot-del" aria-label="Delete photo">${TRASH}</button>` : '');       // what this photo costs
       kick(el);
       el.querySelector('.pslot-img').onclick = () => openViewer(urls.get(exerciseId), p.type);
@@ -119,11 +120,14 @@ const PhotoSlot = (() => {
         if (!(await ask({ title: 'Delete this photo?', ok: 'DELETE', danger: true }))) return;
         await RisenDB.deletePhoto(exerciseId); await again(); if (onChange) onChange();
       };
-    } else if (builtIn && (built = await builtIn())) {
+    } else if (built) {
       // no photo of the user's own: the BUILT-IN picture / clip (media.js: an exercise's from assets/exercises/, a pack recipe's from assets/recipes/). `swap` (exercise page) adds a quiet way to put his own over it
-      el.innerHTML = `<button class="pslot-img" aria-label="${isVideo(built.type) ? 'View video' : 'View photo'}">${media(built.url, built.type)}</button>` +
+      const clip = isVideo(built.type);
+      el.innerHTML = `<button class="pslot-img${video ? ' fix' : ''}" aria-label="${clip ? 'View video' : 'View photo'}">${clip && st && !isVideo(st.type) ? media(st.url, st.type) + media(built.url, built.type).replace('<video ', '<video class="clip" ') : media(built.url, built.type)}</button>` +
         (editable && swap ? `<label class="pslot-own"><span>${video ? '+ Use my own photo or video' : '+ Use my own photo'}</span><input type="file" accept="${video ? 'image/*,video/mp4,video/quicktime' : 'image/*'}" hidden></label>` : '');
       kick(el);
+      const cv = el.querySelector('video.clip');          // the clip fades in over the still once it really plays; until then (or never, in Low Power Mode) the still stays
+      if (cv) { const on = () => cv.classList.add('on'); cv.addEventListener('playing', on, { once: true }); if (!cv.paused && cv.readyState >= 3) on(); }
       el.querySelector('.pslot-img').onclick = () => openViewer(built.url, built.type);
       const inp = el.querySelector('input'); if (inp) inp.onchange = pick;
     } else if (editable) {

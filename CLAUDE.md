@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-22.18)
+## Status (release 2026-11-24.19)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -314,6 +314,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.121` DAY OFF page plays and shuffles again (Siza: the pictures were stuck and never changed): since `.115` the day page asked for the exercise's STILL first, and `still/day-off.jpg` exists, so it always showed that one still. `ExMedia.still()` now answers nothing for Day Off, so the page gets `dayOff()`: one of the `day-off`, `day-off-2`, … clips at random per opening (`media.js`). iPhone test pending.
 
 - `.122` the Day Off clip (and any list picture) no longer RESTARTS while the phone downloads new content (Siza: picture, video, picture, then stuck; reproduced with slowed downloads): every finished download used to redraw every built-in row, so a playing clip began again at each of ~20 files. `ExMedia.sigOf(id)` (`media.js`) says which picture / clip a row shows; `ExMedia.onChange` in `gym.js` leaves a row alone when that did not change (`thumbSig`). Day Off diving clip is `rest/day-off-4.mp4` (4 clips shuffle). iPhone test pending.
+
+- `.123` SMOOTHNESS (Siza): (1) the intro `<video>` has `src="assets/bg.mp4"` right in `index.html`, so it starts at first paint; `IntroMedia.start()` (`media.js`) changes the src ONLY when an extra clip from `assets/intro/` is picked (bg = nothing touched; poster kept). (2) Exercise photo slots (`PhotoSlot.mount(..., {video:true})`: exercise page, workout log) have a FIXED box (`.pslot-img.fix`: 4:3, same max heights 340 / 260 / 200, `object-fit: cover`), so nothing grows or jumps. A built-in clip is drawn OVER the built-in still (`still:` option = `ExMedia.still`, `gym.js`): the still shows at once, the clip (`video.clip`) fades in when it really plays; Low Power Mode keeps the still. His own photo / clip still wins. Recipe and profile slots unchanged. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

@@ -213,7 +213,7 @@ const RecipePack = (() => {
 // ---------- Intro clips: assets/bg.mp4 (built in) + assets/intro/<any name>.mp4 ----------
 //   .106: several intro clips. Each time the app is opened ONE is picked at random (the built-in bg.mp4 is one of them), never the one of the last opening,
 //   and it plays for that whole opening. Clips in assets/intro/ come by themselves like the exercise clips (no release; over 8 MB is skipped).
-//   With no internet, or before they were downloaded, only bg.mp4 is in the draw. The video has no `src` in index.html: this sets it, at once.
+//   With no internet, or before they were downloaded, only bg.mp4 is in the draw. The video starts on assets/bg.mp4 straight from index.html (`.123`); this only swaps the src when an extra clip is picked.
 const IntroMedia = (() => {
   const F = RepoFolder({ dir: 'assets/intro', cache: 'risen.intro', pick(rows) {
     const want = {};
@@ -222,13 +222,12 @@ const IntroMedia = (() => {
   } });
   async function start() {
     const v = document.querySelector('#intro video'); if (!v) return;
-    const play = (src, still) => { if (still) v.setAttribute('poster', 'assets/bg.jpg'); else v.removeAttribute('poster'); v.src = src; try { const p = v.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {} };
+    const play = src => { v.removeAttribute('poster'); v.src = src; try { const p = v.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {} };      // `.123`: only for an EXTRA clip; bg.mp4 is already the video's own src in index.html, so it starts at first paint
     let keys = []; try { keys = await F.keys(); } catch (e) {}
     const all = ['bg', ...keys.sort()]; let last = ''; try { last = localStorage.getItem('risen.intro') || ''; } catch (e) {}
     const pool = all.length > 1 ? all.filter(k => k !== last) : all, pick = pool[Math.floor(Math.random() * pool.length)];
     try { localStorage.setItem('risen.intro', pick); } catch (e) {}
-    if (pick !== 'bg') { let g = null; try { g = await F.get(pick); } catch (e) {} if (g) return play(g.url, false); }
-    play('assets/bg.mp4', true);
+    if (pick !== 'bg') { let g = null; try { g = await F.get(pick); } catch (e) {} if (g) play(g.url); }      // nothing to change for bg (or when the extra clip is not there): leave the src alone, it keeps playing
   }
   start();
   return { sync: force => F.sync([], force) };

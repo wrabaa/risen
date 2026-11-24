@@ -218,7 +218,7 @@
   .linkbtn{min-height:44px;padding:0 6px;border:0;background:none;color:var(--text);font:500 13px Inter,sans-serif;
     text-decoration:underline;text-decoration-color:var(--dim);text-underline-offset:3px;cursor:pointer}
   #exPhoto{margin-top:4px}
-  #exPhoto .pslot-img img,#exPhoto .pslot-img video{max-height:340px}
+  #exPhoto .pslot-img{max-height:340px}
 
   /* Logging sets */
   .ex h3{font-family:Oswald,sans-serif;font-weight:700;font-size:21px;text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
@@ -242,7 +242,7 @@
   .setbtns .addset{margin-top:0;flex:1 1 0;width:auto;min-width:0}
   .setbtns .addset:disabled{opacity:.35;pointer-events:none}
   .ex .pslot-add{height:56px}
-  .ex .pslot-img img,.ex .pslot-img video{max-height:200px}
+  .ex .pslot-img{max-height:200px}
   .exbar{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
   .finish{margin-top:24px}
   .elapsed{font-variant-numeric:tabular-nums}
@@ -535,6 +535,10 @@
   .pslot-add:active{background:var(--line)}
   .pslot-img{display:block;width:100%;padding:0;border:0;border-radius:14px;overflow:hidden;background:#000;cursor:pointer}
   .pslot-img img,.pslot-img video{display:block;width:100%;max-height:260px;object-fit:cover}
+  .pslot-img.fix{position:relative;aspect-ratio:4/3;max-height:260px}          /* `.123` exercise slots: a fixed box, so nothing jumps when the picture / clip arrives */
+  .pslot-img.fix>img,.pslot-img.fix>video{height:100%;max-height:none}
+  .pslot-img.fix>video.clip{position:absolute;inset:0;opacity:0;transition:opacity .35s var(--ease)}
+  .pslot-img.fix>video.clip.on{opacity:1}
   .pslot-del{position:absolute;top:8px;right:8px;width:40px;height:40px;border:0;border-radius:50%;display:grid;place-items:center;
     background:rgba(0,0,0,.55);color:var(--text);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);cursor:pointer}
   .pslot-del .icon{width:20px;height:20px}
