@@ -24,8 +24,8 @@ Rule of thumb: **one screen, one job, one big button. No manual needed.**
   by 1 · remove an image → delete its line.** Forgetting this means phones keep the old image.
 - Offline safety net (`.46`): a page request with no cached copy and no network serves the cached
   `index.html` instead of the browser's error (`sw.js`); non-page files are unchanged.
-- A new release reloads the app only on the intro or on a quiet Home (nothing open, no
-  keyboard); otherwise it waits until Home is shown again or the app is next opened.
+- A new release never takes the screen away (`.135`): it loads when the intro is tapped (the app reloads straight onto Home, flag
+  `risen.skipIntro` in sessionStorage, no second intro) or when the app goes to the background on a quiet Home / the intro; otherwise it waits.
 - **Fixed IDs — never change, never reuse:** built-in exercises (`library.js`, `lib-…`) and
   schedule classes (`data/gym-classes.json`, `fz-c01…`). History, photos and attendance hang
   on them. Names can change freely. Rebuilding the exercise list: use `aliases` (old → new)
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-24.30)
+## Status (release 2026-11-24.31)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -340,6 +340,10 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   the weekly "Back up now?" question comes right after the Student / Instructor card (it never showed on the public app while the card was asked); the card says "Instructors can change this later in Settings";
   the role card's dim uses `--chip` and the new named colour `--scrim` (no raw codes); a future rename in `library.js` (`aliases`) also moves the exercises in users' programs (`migrateLibrary`, `students`);
   the restore question counts users; a recipe picture already on the phone is never downloaded again just because the list came from the other source (GitHub list ↔ the site's fallback). iPhone test pending.
+- `.135` NO MORE JUMPS ON UPDATE: before, a new release reloaded the app on the intro (the welcome clip flickered and started over) or on a quiet Home (thrown back to the
+  welcome screen); with many releases a day this happened often. Now an update loads only when you tap to enter (straight onto Home, no second intro) or while the app is in the
+  background (`applyUpdate()` / `reloadToHome()` in `app.js`). An EXTRA intro clip (assets/intro/) no longer swaps out the running bg.mp4: it plays on a second video laid over it and
+  fades in once it really plays (`.photo.alt` in `styles.css`, `IntroMedia` in `media.js`); the intro play / pause looks at every intro video. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

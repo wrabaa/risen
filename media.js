@@ -262,7 +262,13 @@ const IntroMedia = (() => {
   } });
   async function start() {
     const v = document.querySelector('#intro video'); if (!v) return;
-    const play = src => { v.removeAttribute('poster'); v.src = src; try { const p = v.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {} };      // `.123`: only for an EXTRA clip; bg.mp4 is already the video's own src in index.html, so it starts at first paint
+    // `.135`: an EXTRA clip never replaces the running bg.mp4 (that flickered and started the intro over): it plays on a second video laid over it and fades in
+    // once it really plays; then bg.mp4 is taken away. If it never plays (Low Power Mode), bg.mp4 simply stays.
+    const play = src => {
+      const x = v.cloneNode(false); x.removeAttribute('poster'); x.classList.add('alt'); x.muted = true; x.src = src; v.after(x);
+      x.addEventListener('playing', () => { x.classList.add('on'); setTimeout(() => { v.pause(); v.remove(); }, 700); }, { once: true });
+      if (!document.querySelector('#intro.hidden') && !document.hidden) { try { const p = x.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {} }
+    };
     let keys = []; try { keys = await F.keys(); } catch (e) {}
     const all = ['bg', ...keys.sort()]; let last = ''; try { last = localStorage.getItem('risen.intro') || ''; } catch (e) {}
     const pool = all.length > 1 ? all.filter(k => k !== last) : all, pick = pool[Math.floor(Math.random() * pool.length)];

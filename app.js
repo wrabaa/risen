@@ -353,7 +353,7 @@
     if(changed&&!tabSlide){ const v=$('view-'+view); v.classList.remove('enter'); void v.offsetWidth; v.classList.add('enter'); setTimeout(()=>v.classList.remove('enter'),400); }   // page change: slide + fade
     if(view!=='classes') $('clsSheet').hidden=true; // the Classes question belongs to the Classes tab only
     if(view==='home'&&!wasHome){ renderHome(); Motion.count($('tiles')); if(loaded) tryStart(); }       // the numbers count up when Home opens (TRY TODAY: only picks when there is no card, e.g. its recipe was just deleted)
-    if(view==='home') applyUpdate(); // a new release that arrived while you were busy loads now
+    if(view==='home') applyUpdate(); // (.135: only does something while the app is in the background; see applyUpdate)
     $('tbTitle').textContent=TAB_TITLES[view]||'';                                                  // the shared top bar shows the page title
     const tabs=[...document.querySelectorAll('.tab')]; tabs.forEach(t=>t.setAttribute('aria-selected',t.dataset.view===view));
     $('tabbar').style.setProperty('--i',Math.max(0,tabs.findIndex(t=>t.dataset.view===view)));          // the glass pill slides to the active tab
@@ -541,13 +541,18 @@
   const tryStart=()=>{ if(typeof Meals!=='undefined') Meals.tryPrep().then(ok=>{ if(ok) tryReady(); }); };
   ready.then(()=>{ if(document.readyState==='complete') tryStart(); else addEventListener('load',tryStart,{once:true}); });
   // The intro picture is a short looping clip (assets/bg.mp4, the still bg.jpg shows first / in Low Power Mode): it plays only while the intro is on screen
-  const introVid=intro.querySelector('video');
-  const introPlay=()=>{ if(!introVid) return; if(intro.classList.contains('hidden')||document.hidden) introVid.pause(); else { const p=introVid.play(); if(p&&p.catch) p.catch(()=>{}); } };
+  // (.135: an extra intro clip fades in on a second video over bg.mp4 (media.js), so every video of the intro is looked at)
+  const introPlay=()=>intro.querySelectorAll('video').forEach(v=>{ if(intro.classList.contains('hidden')||document.hidden) v.pause(); else { const p=v.play(); if(p&&p.catch) p.catch(()=>{}); } });
   new MutationObserver(introPlay).observe(intro,{attributes:true,attributeFilter:['class']});
   document.addEventListener('visibilitychange',introPlay); introPlay();
   // Tap ANYWHERE on the intro enters (the glass ENTER pill is only the hint; it is a real button too, so it works with a keyboard / VoiceOver)
   let entering=false;
+  // .135: after an update the app reloads straight onto Home (no second intro): the flag lives for this one reload only
+  const SKIP_INTRO='risen.skipIntro';
+  let skipIntro=false; try{ skipIntro=sessionStorage.getItem(SKIP_INTRO)==='1'; sessionStorage.removeItem(SKIP_INTRO); }catch(e){}
+  if(skipIntro&&!intro.classList.contains('hidden')){ intro.classList.add('hidden'); app.classList.remove('hidden'); ready.then(()=>{ tryStart(); renderHome(); show('home'); }); }
   intro.onclick=async()=>{
+    if(updateWaiting){ reloadToHome(); return; }          // .135: a new release is waiting: the tap to enter loads it and lands on Home
     if(entering) return; entering=true;
     try{ await ready; tryStart(); renderHome(); show('home');
     intro.classList.add('hidden'); app.classList.remove('hidden'); Motion.count($('tiles'));
@@ -714,16 +719,22 @@ if('serviceWorker' in navigator){
     // see applyUpdate() below.
     if(navigator.serviceWorker.controller) navigator.serviceWorker.addEventListener('controllerchange',()=>{ updateWaiting=true; applyUpdate(); });
   }
-  // A new release reloads the app only on the intro, or on Home with nothing open and no keyboard up. Anywhere else
-  // (a workout, an editor, Settings, a pop-up) it waits until you are back on Home, or until the app is next opened.
+  // .135: a new release NEVER takes the screen away while you look at it (it used to restart the intro, or throw you from Home back to the intro).
+  // It loads (1) when you tap to enter from the intro: the app reloads straight onto Home, no second intro, or (2) when the app goes to the
+  // background on a quiet Home (or on the intro): you come back to Home (or the intro) on the new version. Anywhere else it waits for the next of those moments.
   let updateWaiting=false, reloading=false;
+  function reloadToHome(){ if(reloading) return; reloading=true; try{ sessionStorage.setItem(SKIP_INTRO,'1'); }catch(e){} location.reload(); }
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) applyUpdate(); });
   function quietNow(){
     if(!intro.classList.contains('hidden')) return true;
     if($('view-home').hidden) return false;
     if(document.querySelector('.subpage.open,#settings.open,.sheet-wrap:not([hidden]),.pviewer.open')) return false;
     const a=document.activeElement; return !(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
   }
-  function applyUpdate(){ if(!updateWaiting||reloading||!quietNow()) return; reloading=true; location.reload(); }
+  function applyUpdate(){
+    if(!updateWaiting||reloading||!document.hidden||!quietNow()) return;
+    if(intro.classList.contains('hidden')) reloadToHome(); else { reloading=true; location.reload(); }
+  }
   // ---- Install pop-up ----
   // Opened in a browser instead of from the home-screen icon? On iPhone/iPad a Safari tab and the home-screen app keep SEPARATE
   // data, so anything entered in the wrong one looks "missing" in the other. A pop-up shows how to install RISEN:
