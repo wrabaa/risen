@@ -10,7 +10,7 @@
 //
 //   ExMedia    = built-in exercise pictures / clips: a file named after an exercise's `file` in library.js (chest-press.mp4).
 //   RecipePack = the RISEN recipes: assets/recipes/recipes.json (the text) + one picture per recipe named after its id (tabbouleh.jpg).
-function RepoFolder({ dir, cache: CACHE, pick, deep = false }) {
+function RepoFolder({ dir, cache: CACHE, pick, deep = false, fallback = null }) {
   const API = 'https://api.github.com/repos/wrabaa/risen/contents/' + dir, DIR = dir + '/';
   const TREE = 'https://api.github.com/repos/wrabaa/risen/git/trees/main?recursive=1';      // deep folders (.105): ONE ask lists the folder AND its subfolders
   const INDEX = 'm/index.json', EVERY = 10 * 60 * 1000;                   // GitHub is asked at most every 10 minutes
@@ -22,7 +22,13 @@ function RepoFolder({ dir, cache: CACHE, pick, deep = false }) {
   // Is this file really the one GitHub listed? (.99) The list comes from GitHub at once, the file from the site, which follows a minute or two
   // later: a REPLACED file (same name) would otherwise be stored in its OLD form under the new `sha` and never looked at again.
   // `sha` is git's: SHA-1 of "blob <bytes>\0" + the file. Where the browser cannot hash, the file is taken as it is.
+  async function gitSha(b) {
+    const body = new Uint8Array(await b.arrayBuffer()), head = new TextEncoder().encode('blob ' + body.length + '\0'), all = new Uint8Array(head.length + body.length);
+    all.set(head); all.set(body, head.length);
+    return [...new Uint8Array(await crypto.subtle.digest('SHA-1', all))].map(x => x.toString(16).padStart(2, '0')).join('');
+  }
   async function same(b, sha) {
+    if (/^p\d+$/.test(sha)) return true;                         // .126: a stand-in "sha" from the fallback list (p + size in bytes): nothing to check against
     try {
       if (typeof crypto === 'undefined' || !crypto.subtle) return true;
       const body = new Uint8Array(await b.arrayBuffer()), head = new TextEncoder().encode('blob ' + body.length + '\0'), all = new Uint8Array(head.length + body.length);
@@ -75,9 +81,15 @@ function RepoFolder({ dir, cache: CACHE, pick, deep = false }) {
         } catch (e) {}
       }
       if (!rows) {                                                    // flat listing of the folder itself (recipes; and the fallback when the tree could not be read)
-        const res = await fetch(API, { cache: 'no-store', headers: { accept: 'application/vnd.github+json' } }); if (!res.ok) return;
-        const flat = await res.json(); if (!Array.isArray(flat)) return;
-        rows = flat.filter(r => r && r.type === 'file').map(r => ({ type: 'file', name: r.name, path: r.name, sha: r.sha, size: r.size }));
+        try {
+          const res = await fetch(API, { cache: 'no-store', headers: { accept: 'application/vnd.github+json' } });
+          const flat = res.ok ? await res.json() : null;
+          if (Array.isArray(flat)) rows = flat.filter(r => r && r.type === 'file').map(r => ({ type: 'file', name: r.name, path: r.name, sha: r.sha, size: r.size }));
+        } catch (e) {}
+        // .126 GitHub's list is limited to 60 asks an hour per network (a shared Lebanese connection can use that up): when it does not answer, the folder may
+        // bring its own list from the app's own site (the RISEN recipes do: recipes.json + one picture per recipe id).
+        if (!rows && fallback) { try { rows = await fallback({ gitSha }); } catch (e) {} }
+        if (!rows) return;
       }
       const want = pick(rows) || {};          // key -> { name, path, sha, type }
       const c = await caches.open(CACHE), miss = idx.miss || (idx.miss = {}); let changed = false, complete = true;
@@ -174,7 +186,21 @@ const ExMedia = (() => {
 //   to the recipes (setting `recipePack` = 'yes'). What a phone does with the list is in meals.js (applyPack).
 const RecipePack = (() => {
   const wanted = () => { try { return S.settings.recipePack === 'yes'; } catch (e) { return false; } };
-  const F = RepoFolder({ dir: 'assets/recipes', cache: 'risen.recipes', pick(rows) {
+  const F = RepoFolder({ dir: 'assets/recipes', cache: 'risen.recipes', async fallback({ gitSha }) {
+    // GitHub did not give the list: read recipes.json from the app's own site and look for each recipe's picture there (a 'p<size>' stand-in marks a change)
+    const r = await fetch('assets/recipes/recipes.json?v=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null;
+    const b = await r.blob(), rows = [{ type: 'file', name: 'recipes.json', path: 'recipes.json', sha: await gitSha(b), size: b.size }];
+    if (!wanted()) return rows;
+    let j = null; try { j = JSON.parse(await b.text()); } catch (e) {}
+    const ids = (j && Array.isArray(j.recipes) ? j.recipes : []).map(x => x && x.id).filter(id => typeof id === 'string' && /^[a-z0-9][a-z0-9-]*$/.test(id));
+    const found = await Promise.all(ids.map(async id => {
+      for (const ext of ['jpg', 'png', 'webp']) {
+        try { const h = await fetch('assets/recipes/' + id + '.' + ext, { method: 'HEAD', cache: 'no-store' }); const n = Number(h.headers.get('content-length')); if (h.ok) return { type: 'file', name: id + '.' + ext, path: id + '.' + ext, sha: 'p' + (n > 0 ? n : 1), size: n || 0 }; } catch (e) {}
+      }
+      return null;
+    }));
+    return rows.concat(found.filter(Boolean));
+  }, pick(rows) {
     const want = {};
     for (const r of rows) {
       if (r.name === 'recipes.json') { want['recipes.json'] = { name: r.name, sha: r.sha, type: 'application/json' }; continue; }
