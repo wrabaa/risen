@@ -5,7 +5,7 @@
 // Only the exercise LIST (library.js, the picker) is shared: it is a menu of exercises, not anyone's data.
 // Sending the file to the user and loading it on their phone come in the next releases.
 const Coach = (() => {
-  const on = () => window.RISEN_HOME === 'me';        // .124: Siza's own Home. (A later release also turns it on for the public app's "Instructor" choice.)
+  const on = () => window.RISEN_HOME === 'me' || (window.RisenRole && window.RisenRole() === 'instructor');        // .124: Siza's own Home. (A later release also turns it on for the public app's "Instructor" choice.)
   let list = [], cur = null, curDay = 1, supp = null, suppNew = false, flashId = 'uxSaved';
   const num = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isFinite(n) ? n : null; };
   const fmtN = n => (n === '' || n == null) ? '' : String(Math.round(Number(n) * 100) / 100);

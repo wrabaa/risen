@@ -184,6 +184,11 @@
       </div>
     </div>
 
+    <div id="roleGroup" hidden>
+      <div class="group-label">I am</div>
+      <div class="group"><button class="row" id="roleBtn"><span id="roleVal">Student</span> <svg class="icon chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button></div>
+    </div>
+
     <div id="coachGroup" hidden>
       <div class="group-label">Users</div>
       <div class="group" id="userList" data-hswipe></div>
@@ -248,6 +253,15 @@
   </div>
 
   <!-- Install pop-up: only in a browser, never in the home-screen app (see "Install pop-up" in app.js) -->
+  <!-- Role (.127): public app only, asked once: Student or Instructor -->
+  <div class="rolewrap" id="roleSheet" hidden>
+    <div class="rolecard" role="dialog" aria-label="Who are you?">
+      <h2>WHO ARE YOU?</h2>
+      <p>You can change this later in Settings.</p>
+      <button class="rolebtn" type="button" data-role="student"><b>STUDENT</b><span>I train with my own program</span></button>
+      <button class="rolebtn" type="button" data-role="instructor"><b>INSTRUCTOR</b><span>I also build programs for others</span></button>
+    </div>
+  </div>
   <div class="sheet-wrap" id="installSheet" hidden><div class="sheet install" id="installBody"></div></div>
 
   <!-- Shown instead of the app when the phone's storage can't be opened -->

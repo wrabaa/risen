@@ -551,9 +551,23 @@
     if(entering) return; entering=true;
     try{ await ready; tryStart(); renderHome(); show('home');
     intro.classList.add('hidden'); app.classList.remove('hidden'); Motion.count($('tiles'));
-    backupPrompt();
+    if(S.settings.role||isMe()||installKind()) backupPrompt(); else maybeRole();
     }finally{ entering=false; }
   };
+
+
+  // ---- Role (.127): public app only. Student (the normal app) or Instructor (adds Users in Settings). Asked once, floating over a blurred Home. ----
+  window.RisenRole=()=>S.settings.role||'';
+  const isMe=()=>window.RISEN_HOME==='me';
+  function showRole(){ $('roleSheet').hidden=false; }
+  function maybeRole(){ if(isMe()||S.settings.role||installKind()) return; showRole(); }
+  function paintRole(){ const g=$('roleGroup'); g.hidden=isMe(); $('roleVal').textContent=S.settings.role==='instructor'?'Instructor':'Student'; }
+  $('roleSheet').addEventListener('click',async e=>{
+    const b=e.target.closest('[data-role]'); if(!b) return;
+    S.settings.role=b.dataset.role; try{ await RisenDB.setSetting('role',S.settings.role); }catch(err){ toast('Could not save'); }
+    $('roleSheet').hidden=true; paintRole(); if(typeof Coach!=='undefined') Coach.refresh();
+  });
+  $('roleBtn').onclick=()=>showRole();
 
   // ---- Settings ----
   const fmtRest=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
@@ -562,6 +576,7 @@
     Profile.showPane(seg==='info'?'info':'settings');            // the profile page opens on SETTINGS
     $('restVal').textContent=fmtRest(S.settings.restSec);
     $('settings').classList.add('open'); $('settings').setAttribute('aria-hidden','false'); $('settings').scrollTop=0;
+    paintRole();
     showVersion();                                  // look again each time Settings opens
     if(typeof Coach!=='undefined') Coach.refresh();               // .124: the Users list (instructor), only on Siza's page for now
   }

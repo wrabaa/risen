@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-24.22)
+## Status (release 2026-11-24.23)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -322,6 +322,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.125` DELETE A USER by swiping (Siza): in Settings > Users a user's row swipes LEFT to show a red bin (80 px, colour `--danger`, `.udel`); tap the bin = confirm sheet "Delete user?" then it is gone (cancel closes the row). A short swipe snaps back, swiping another row or tapping an open row only closes it, swiping right closes it; only one row is open at a time. The list has `data-hswipe`, so the Settings swipe-back only starts from the left edge there. The "Delete user" button on the user's own page is REMOVED (it is the only way now). iPhone test pending.
 
 - `.126` RECIPES LOAD EVEN WHEN GITHUB'S LIST SERVICE FAILS (Siza's me.html showed no Try today and no recipe question): `RepoFolder` has a `fallback` option; if GitHub's API answers an error (rate limit 403, blocked network) the RecipePack reads `assets/recipes/recipes.json` straight from the app's own site and checks each picture (`<id>.jpg|png|webp`) with a HEAD request; those files carry a stand-in `p<size>` sha that `same()` accepts. The normal path is unchanged. Tested with the API mocked as 403 on me.html and index.html (31 recipes, Try today appears) and with the normal listing. iPhone test pending.
+
+- `.127` ROLE QUESTION (Siza; public `index.html` only, never `me.html`): the first time the app is entered with no role set (and it is installed, not a Safari tab), a floating glass card over a blurred Home asks "WHO ARE YOU?": STUDENT (the normal app) or INSTRUCTOR (adds the Users group in Settings, `coach.js` `on()` now also true for role 'instructor'). Setting `role` ('student' / 'instructor'); a Settings row "I am" (`#roleGroup`, hidden on me.html) reopens the question; switching back to Student only hides Users, the data stays. The weekly backup question waits until a role is chosen. Not built yet: Send to user and Load coach file (Releases 2 and 3). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
