@@ -80,6 +80,7 @@ function RepoFolder({ dir, cache: CACHE, pick, deep = false, fallback = null }) 
           if (t.ok) { const j = await t.json(); if (j && Array.isArray(j.tree) && !j.truncated) rows = j.tree.filter(x => x && x.type === 'blob' && String(x.path).startsWith(DIR)).map(x => ({ type: 'file', path: x.path.slice(DIR.length), name: x.path.slice(x.path.lastIndexOf('/') + 1), sha: x.sha, size: x.size })); }
         } catch (e) {}
       }
+      let fromFallback = false;                                       // .127: a list from the fallback may be incomplete: it never deletes what is already on the phone
       if (!rows) {                                                    // flat listing of the folder itself (recipes; and the fallback when the tree could not be read)
         try {
           const res = await fetch(API, { cache: 'no-store', headers: { accept: 'application/vnd.github+json' } });
@@ -88,12 +89,12 @@ function RepoFolder({ dir, cache: CACHE, pick, deep = false, fallback = null }) 
         } catch (e) {}
         // .126 GitHub's list is limited to 60 asks an hour per network (a shared Lebanese connection can use that up): when it does not answer, the folder may
         // bring its own list from the app's own site (the RISEN recipes do: recipes.json + one picture per recipe id).
-        if (!rows && fallback) { try { rows = await fallback({ gitSha }); } catch (e) {} }
+        if (!rows && fallback) { try { rows = await fallback({ gitSha }); if (rows) fromFallback = true; } catch (e) {} }
         if (!rows) return;
       }
       const want = pick(rows) || {};          // key -> { name, path, sha, type }
       const c = await caches.open(CACHE), miss = idx.miss || (idx.miss = {}); let changed = false, complete = true;
-      for (const k of Object.keys(idx.files)) if (!want[k]) { await c.delete('m/' + k); delete idx.files[k]; changed = true; }      // taken out of the folder (or no longer wanted)
+      if (!fromFallback) for (const k of Object.keys(idx.files)) if (!want[k]) { await c.delete('m/' + k); delete idx.files[k]; changed = true; }      // taken out of the folder (or no longer wanted)
       for (const k of Object.keys(miss)) if (!want[k] || want[k].sha !== miss[k].sha) delete miss[k];
       const front = new Set(first), order = Object.keys(want).sort((a, b) => front.has(b) - front.has(a));
       for (const k of order) {

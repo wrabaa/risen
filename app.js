@@ -568,6 +568,7 @@
     $('roleSheet').hidden=true; paintRole(); if(typeof Coach!=='undefined') Coach.refresh();
   });
   $('roleBtn').onclick=()=>showRole();
+  function paintPack(){ const on=S.settings.recipePack==='yes'; $('recipePackBtn').innerHTML='<span>RISEN recipes</span><span style="float:right;color:var(--muted)">'+(on?'Loaded':'Not loaded')+'</span>'; }
 
   // ---- Settings ----
   const fmtRest=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
@@ -576,7 +577,7 @@
     Profile.showPane(seg==='info'?'info':'settings');            // the profile page opens on SETTINGS
     $('restVal').textContent=fmtRest(S.settings.restSec);
     $('settings').classList.add('open'); $('settings').setAttribute('aria-hidden','false'); $('settings').scrollTop=0;
-    paintRole();
+    paintRole(); paintPack();
     showVersion();                                  // look again each time Settings opens
     if(typeof Coach!=='undefined') Coach.refresh();               // .124: the Users list (instructor), only on Siza's page for now
   }
