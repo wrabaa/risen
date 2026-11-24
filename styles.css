@@ -998,3 +998,30 @@
 .tpeek small{line-height:1;vertical-align:baseline}
 .tpeek.red{font-size:22px;font-weight:700}
 .tpeek.red small{font-size:13px;font-weight:600}
+
+/* ---- .124 Users (instructor, coach.js): a user's own pages ---- */
+#userPage .subtop h1,#userExPage .subtop h1,#userSuppPage .subtop h1{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#userSuppEdit .subtop h1{flex:1;min-width:0;font-size:19px;letter-spacing:.04em;white-space:nowrap}
+#userExPage .saved,#userSuppEdit .saved,#userSuppEdit .donebtn{display:block}
+.row .ut{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .ut small{display:block;margin-top:2px;color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis}
+button.row.addrow{color:var(--volt);font-weight:600}
+.editbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 16px;padding:8px 8px 8px 14px;border:1px solid var(--volt-edge);border-radius:14px;background:var(--volt-tint);font:500 14px Inter,sans-serif;color:var(--text)}
+.editbar b{color:var(--volt);font-weight:600}
+.editbar button{flex:none;min-height:36px;padding:0 14px;border:1px solid var(--volt);border-radius:999px;background:none;color:var(--volt);font:600 12px Oswald,sans-serif;letter-spacing:.12em;cursor:pointer}
+.editbar button:active{background:var(--press)}
+button.card.ucard{display:flex;align-items:center;gap:12px;min-height:76px;margin-bottom:12px}
+.ucard .uct{flex:1;font:600 22px Oswald,sans-serif;letter-spacing:.04em;text-transform:uppercase}
+.ucard .ucs{color:var(--muted);font-size:14px}
+.ucard .chev{width:18px;height:18px;color:var(--muted)}
+.udays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.udays button{position:relative;min-height:42px;padding:0;border-radius:999px;border:1px solid var(--line);background:var(--field);color:var(--text);font:500 13px Inter,sans-serif;cursor:pointer}
+.udays button[aria-pressed="true"]{background:var(--volt);border-color:var(--volt);color:var(--bg)}
+.udays button.has::after{content:"";position:absolute;top:6px;right:8px;width:5px;height:5px;border-radius:50%;background:var(--volt)}
+.udays button.has[aria-pressed="true"]::after{background:var(--bg)}
+.card.uex{margin-bottom:12px}
+.uexhead{display:flex;align-items:flex-start;gap:8px}
+.uexname{flex:1;min-width:0}
+.uexname .t{font-weight:600;font-size:16px;line-height:1.25}
+.uexname .s{margin-top:2px;color:var(--muted);font-size:13px}
+body.usersopen #app{z-index:11}      /* .124: a user's pages (coach.js) open from Settings, which sits above the app layer */

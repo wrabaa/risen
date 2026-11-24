@@ -35,14 +35,17 @@
 //   recipes    {id, category:'shakes'|'breakfast'|'lunch'|'snacks'|'dinner', name, ingredients:[{text}], method, created, updated}
 //              Each ingredient is an object (not a bare string) so grams / calories can be added to it later; a recipe's photo
 //              lives in `photos` as 'recipe-<id>'.
+//   students   {id, name, created, days:{1..7:[{exerciseId, sets, kg, reps} | {exerciseId, min, speed, incline}]}, supps:[{id, name, dose, times, freq, days, food, notes}]}
+//              A USER of an instructor (.124): their program (one list per weekday, same entries as a day plan) and supplements, stored here and
+//              NOWHERE ELSE: the owner's own routines / workouts / meds / history are never touched by it. No logging, no photos (yet).
 //   settings also holds classesAsked (the one-time "load the schedule?" question has been answered) and classIdsMatched
 //              (classes seeded before release .33 have been given their fixed ids, see adoptSeedClasses)
 //
 // SCHEMA VERSION: raise DB_VERSION and add a new `if (old < N)` step in upgrade().
 // Never delete or rename a store in an upgrade, so updates never lose data.
 const RisenDB = (() => {
-  const DB_NAME = 'risen', DB_VERSION = 9;
-  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs', 'recipes', 'body', 'waterlogs', 'coffeelogs'];
+  const DB_NAME = 'risen', DB_VERSION = 10;
+  const STORES = ['settings', 'routines', 'workouts', 'exercises', 'sessions', 'logs', 'photos', 'meds', 'medlogs', 'classes', 'instructors', 'classlogs', 'recipes', 'body', 'waterlogs', 'coffeelogs', 'students'];
   // Music (.112, Siza's Home): `songs` = the list (id, name, size, added), `songdata` = the audio file itself ({id, blob}). Both stay OUT of Export / Import (heavy; a restore keeps the songs); Reset clears them.
   const EXTRA = ['songs', 'songdata'];
   let dbp;
@@ -85,6 +88,9 @@ const RisenDB = (() => {
     if (old < 9) {                                                  // v9: Music (Siza's Home): the song list and the audio files, kept apart so listing never loads the audio
       db.createObjectStore('songs', { keyPath: 'id' });
       db.createObjectStore('songdata', { keyPath: 'id' });
+    }
+    if (old < 10) {                                                 // v10: Users (instructor): one record per user, kept apart from the owner's own program and supplements
+      db.createObjectStore('students', { keyPath: 'id' });
     }
   }
 
@@ -186,6 +192,9 @@ const RisenDB = (() => {
     if (l) { out = { ...l, id: `${l.medId}|${l.date}|${time}`, time }; st.delete(oldId); st.put(out); }
     await done(t); return out;
   }
+  // ---- Users of an instructor (.124) ----
+  const saveStudent = s => put('students', s);
+  async function deleteStudent(id) { const db = await open(), t = db.transaction('students', 'readwrite'); t.objectStore('students').delete(id); await done(t); }
   // ---- Recipes ----
   const saveRecipe = r => put('recipes', r);
   async function deleteRecipe(id) {         // the recipe and its photo
@@ -522,5 +531,5 @@ const RisenDB = (() => {
   }
 
   return { DB_VERSION, init, all, uid, getSettings, setSetting, activeRoutine, createRoutine, renameRoutine, migrateWeekdays, migrateLibrary, adoptSeedClasses, saveWorkout, workoutsOf,
-    songs, addSong, songBlob, deleteSong, saveExercise, saveMed, deleteMed, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, saveBody, deleteBody, setWater, putCoffee, deleteCoffee, exportAll, exportBlob, importAll };
+    songs, addSong, songBlob, deleteSong, saveExercise, saveMed, deleteMed, saveStudent, deleteStudent, logDose, undoDose, moveDose, saveRecipe, deleteRecipe, saveClass, saveInstructor, deleteClass, deleteInstructor, attendClass, unattendClass, seedClasses, reloadSeedClasses, clearClasses, photoKeys, logSession, skipWorkouts, resetAll, historyOf, setPhoto, getPhoto, deletePhoto, saveBody, deleteBody, setWater, putCoffee, deleteCoffee, exportAll, exportBlob, importAll };
 })();

@@ -677,5 +677,5 @@ const Gym = (() => {
   }
   ready.then(() => followLibrary());
 
-  return { open, openToday, start, reset, flush, followLibrary };
+  return { open, openToday, start, reset, flush, followLibrary, openLibrary };
 })();

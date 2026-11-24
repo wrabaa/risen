@@ -8,7 +8,7 @@ Rule of thumb: **one screen, one job, one big button. No manual needed.**
 
 ## How it runs
 - Files: `index.html` (markup only) · `styles.css` · `shared.js` (helpers every tab uses) ·
-  `app.js` (Home, tabs, Settings, backup, updates) · `profile.js` (profile button, Personal info) · `media.js` (content that comes from repo folders by itself: exercise pictures / clips `.90`, recipe pack `.91`) · one file per tab. A new file must be
+  `app.js` (Home, tabs, Settings, backup, updates) · `profile.js` (profile button, Personal info) · `coach.js` (instructor: Users, `.124`) · `media.js` (content that comes from repo folders by itself: exercise pictures / clips `.90`, recipe pack `.91`) · one file per tab. A new file must be
   added to `CORE` in `sw.js` or it will not work offline.
 - Plain HTML/CSS/JS PWA, no build step, no framework. Hosted on GitHub Pages:
   https://wrabaa.github.io/risen/ (repo `wrabaa/risen`, branch `main`).
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-24.19)
+## Status (release 2026-11-24.20)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -316,6 +316,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.122` the Day Off clip (and any list picture) no longer RESTARTS while the phone downloads new content (Siza: picture, video, picture, then stuck; reproduced with slowed downloads): every finished download used to redraw every built-in row, so a playing clip began again at each of ~20 files. `ExMedia.sigOf(id)` (`media.js`) says which picture / clip a row shows; `ExMedia.onChange` in `gym.js` leaves a row alone when that did not change (`thumbSig`). Day Off diving clip is `rest/day-off-4.mp4` (4 clips shuffle). iPhone test pending.
 
 - `.123` SMOOTHNESS (Siza): (1) the intro `<video>` has `src="assets/bg.mp4"` right in `index.html`, so it starts at first paint; `IntroMedia.start()` (`media.js`) changes the src ONLY when an extra clip from `assets/intro/` is picked (bg = nothing touched; poster kept). (2) Exercise photo slots (`PhotoSlot.mount(..., {video:true})`: exercise page, workout log) have a FIXED box (`.pslot-img.fix`: 4:3, same max heights 340 / 260 / 200, `object-fit: cover`), so nothing grows or jumps. A built-in clip is drawn OVER the built-in still (`still:` option = `ExMedia.still`, `gym.js`): the still shows at once, the clip (`video.clip`) fades in when it really plays; Low Power Mode keeps the still. His own photo / clip still wins. Recipe and profile slots unchanged. iPhone test pending.
+
+- `.124` USERS, Release 1 of the Coach & Students plan (Siza, planner chat; `coach.js` = `Coach`, store `students` (DB 10) in Export / Import / Reset, plan in the project doc `claude/RISEN-COACH-PLAN.md`): on **me.html only** (`window.RISEN_HOME==='me'`; a later release also turns it on for the public app's "Instructor" choice) Settings has a **Users** group: one row per user ("3 exercises · 1 supplement") and **+ New user** (name sheet). A user opens its own pages: EXERCISES (Mon-Sun chips with a dot on days that have exercises, + ADD EXERCISE through the normal exercise picker `Gym.openLibrary`, sets / kg / reps or min / speed / incline inline, up / down / delete) and SUPPLEMENTS (same fields as the owner's supplement editor, no box photo yet), plus RENAME and Delete user. EVERY user page shows a lime bar "Editing: Name  MY ACCOUNT" (one tap closes all user pages back to Settings). THE RULE: a user is ONE record `{id, name, created, days:{1..7:[entries]}, supps:[…]}` and `coach.js` never reads or writes the owner's own routines / workouts / meds / logs / photos, so an owner's workout can never land in a user (tested: owner data byte-identical before / after). No logging for users. Needed a fix: Settings (z 10) sits ABOVE `#app`, so while a user page is open `body.usersopen #app{z-index:11}` (removed 340 ms after the last page closes). Customs the coach makes in the picker are the coach's own exercises: Release 2 (Send) must carry any custom exercise a user's program uses (and decide about photos / sizes). Not built yet: Send to user (Release 2), Load coach file and the Instructor / User choice on the public app (Release 3), copy program between users. Tested at 390 and 375 wide on me.html (create, add, clamp sets 25 to 20, cardio fields, days, supplement with times / days, MY ACCOUNT, reload keeps all, rename, export holds `students`, delete) and index.html (no Users group). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

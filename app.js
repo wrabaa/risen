@@ -563,6 +563,7 @@
     $('restVal').textContent=fmtRest(S.settings.restSec);
     $('settings').classList.add('open'); $('settings').setAttribute('aria-hidden','false'); $('settings').scrollTop=0;
     showVersion();                                  // look again each time Settings opens
+    if(typeof Coach!=='undefined') Coach.refresh();               // .124: the Users list (instructor), only on Siza's page for now
   }
   function closeSettings(){
     if(document.activeElement&&document.activeElement.blur) document.activeElement.blur();

@@ -117,6 +117,26 @@
         <button class="donebtn" id="medDone">DONE</button></div>
       <div id="medBody"></div>
     </section>
+    <!-- Instructor (.124): a USER's own pages. Nothing here ever reads or writes the owner's own program, supplements or history. -->
+    <section class="subpage" id="userPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" id="uBack" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="uTitle">User</h1></div>
+      <div id="userBody"></div>
+    </section>
+    <section class="subpage" id="userExPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" id="uxBack" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1>Exercises</h1>
+        <span class="saved" id="uxSaved" aria-live="polite">✓ Saved</span></div>
+      <div id="userExBody"></div>
+    </section>
+    <section class="subpage" id="userSuppPage" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" id="usBack" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1>Supplements</h1></div>
+      <div id="userSuppBody"></div>
+    </section>
+    <section class="subpage" id="userSuppEdit" aria-hidden="true">
+      <div class="subtop"><button class="iconbtn" id="ueBack" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="ueTitle">Supplement</h1>
+        <span class="saved" id="ueSaved" aria-live="polite">✓ Saved</span>
+        <button class="donebtn" id="ueDone">DONE</button></div>
+      <div id="userSuppEditBody"></div>
+    </section>
     <section class="subpage" id="libPage" aria-hidden="true">
       <div class="subtop"><button class="iconbtn" data-close="libPage" aria-label="Back"><svg class="icon" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h1>Add exercise</h1></div>
       <div class="search"><input class="field" id="libSearch" type="search" placeholder="Search exercises" autocomplete="off" enterkeyhint="search"></div>
@@ -164,6 +184,12 @@
       </div>
     </div>
 
+    <div id="coachGroup" hidden>
+      <div class="group-label">Users</div>
+      <div class="group" id="userList"></div>
+      <p class="note">Build a program and supplements for someone else, in their own pages. Your own account is never touched.</p>
+    </div>
+
     <div class="group-label">Backup</div>
     <div class="group">
       <button class="row" id="exportBtn">Export backup <svg class="icon chev" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
@@ -194,6 +220,16 @@
 
   <!-- Gym pop-ups -->
   <div class="sheet-wrap" id="gymSheet" hidden><div class="sheet" id="gymSheetBody"></div></div>
+
+  <!-- Instructor (.124): a user's name (new / rename) -->
+  <div class="sheet-wrap" id="userSheet" hidden>
+    <div class="sheet">
+      <h2 id="usTitle">New user</h2>
+      <input class="field" id="usName" type="text" maxlength="40" autocapitalize="words" autocomplete="off" enterkeyhint="done" placeholder="Name">
+      <button class="primary nogl" type="button" id="usSave">CREATE</button>
+      <button class="textbtn" type="button" id="usCancel">Cancel</button>
+    </div>
+  </div>
 
   <!-- Meals: move a recipe to another category -->
   <div class="sheet-wrap" id="mealSheet" hidden><div class="sheet" id="mealSheetBody"></div></div>
@@ -229,7 +265,7 @@
   <div class="sheet-wrap" id="resetSheet" hidden>
     <div class="sheet">
       <h2>Reset all data?</h2>
-      <p>Deletes everything on this phone: programs, workouts, meds, water, coffee, classes, recipes, history, photos, body measurements, your songs, name and settings. Songs are not in a backup, so they cannot come back. Export a backup first if you might want it back.</p>
+      <p>Deletes everything on this phone: programs, workouts, meds, water, coffee, classes, recipes, history, photos, body measurements, your users, your songs, name and settings. Songs are not in a backup, so they cannot come back. Export a backup first if you might want it back.</p>
       <button class="primary" type="button" id="resetExport">EXPORT BACKUP FIRST</button>
       <button class="dangerbtn" type="button" id="resetGo">RESET EVERYTHING</button>
       <button class="textbtn" type="button" id="resetCancel">Cancel</button>
@@ -323,5 +359,6 @@
 <script src="classes.js"></script>
 <script src="meals.js"></script>
 <script src="profile.js"></script>
+<script src="coach.js"></script>
 </body>
 </html>
