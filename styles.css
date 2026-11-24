@@ -1025,3 +1025,10 @@ button.card.ucard{display:flex;align-items:center;gap:12px;min-height:76px;margi
 .uexname .t{font-weight:600;font-size:16px;line-height:1.25}
 .uexname .s{margin-top:2px;color:var(--muted);font-size:13px}
 body.usersopen #app{z-index:11}      /* .124: a user's pages (coach.js) open from Settings, which sits above the app layer */
+/* .124 Users list: a row slides left to show the red bin */
+.urow{position:relative;overflow:hidden}
+.urow+.urow,.urow+.addrow{border-top:1px solid var(--hairline)}
+.urow>.row{position:relative;z-index:1;background:var(--card);transition:transform .22s var(--ease)}
+.udel{position:absolute;top:0;right:0;bottom:0;width:80px;border:0;background:var(--danger);color:var(--bg);display:grid;place-items:center;cursor:pointer}
+.udel .icon{width:24px;height:24px}
+.udel:active{filter:brightness(.9)}

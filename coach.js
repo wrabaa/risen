@@ -34,14 +34,50 @@ const Coach = (() => {
     renderList();
   }
   function renderList() {
-    $('userList').innerHTML = list.map(u => `<button class="row" data-u="${esc(u.id)}"><span class="ut">${esc(u.name)}<small>${plural(exCount(u), 'exercise')} · ${plural((u.supps || []).length, 'supplement')}</small></span>${ICONS.chev}</button>`).join('')
+    $('userList').innerHTML = list.map(u => `<div class="urow"><button class="udel" type="button" data-delu="${esc(u.id)}" aria-label="Delete ${esc(u.name)}">${ICONS.trash}</button>`
+      + `<button class="row" data-u="${esc(u.id)}"><span class="ut">${esc(u.name)}<small>${plural(exCount(u), 'exercise')} · ${plural((u.supps || []).length, 'supplement')}</small></span>${ICONS.chev}</button></div>`).join('')
       + `<button class="row addrow" id="newUserBtn">+ New user</button>`;
   }
-  $('userList').addEventListener('click', e => {
+  // Swipe a user's row to the LEFT: it slides over and a red bin shows (80 px); tap the bin to delete (after a confirm). Swipe back, or tap the row, to close it.
+  const BIN = 80;
+  function slide(row, x, dragging) {
+    const b = row.querySelector('.row'); b.style.transition = dragging ? 'none' : ''; b.style.transform = x ? `translateX(${x}px)` : '';
+    row.classList.toggle('open', !dragging && x <= -BIN);
+  }
+  const closeRows = except => document.querySelectorAll('#userList .urow.open').forEach(r => { if (r !== except) slide(r, 0); });
+  let tr = null, swiped = 0;
+  $('userList').addEventListener('touchstart', e => {
+    const row = e.target.closest('.urow'); if (!row) { tr = null; return; }
+    closeRows(row); const t = e.touches[0];
+    tr = { row, x: t.clientX, y: t.clientY, base: row.classList.contains('open') ? -BIN : 0, dir: null, cx: 0 };
+  }, { passive: true });
+  $('userList').addEventListener('touchmove', e => {
+    if (!tr) return; const t = e.touches[0], dx = t.clientX - tr.x, dy = t.clientY - tr.y;
+    if (!tr.dir) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; tr.dir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v'; }
+    if (tr.dir !== 'h') return;
+    tr.cx = Math.max(-BIN, Math.min(0, tr.base + dx)); slide(tr.row, tr.cx, true);
+  }, { passive: true });
+  const endTouch = () => {
+    if (tr && tr.dir === 'h') { slide(tr.row, tr.cx <= -BIN / 2 ? -BIN : 0); swiped = Date.now(); }
+    tr = null;
+  };
+  $('userList').addEventListener('touchend', endTouch); $('userList').addEventListener('touchcancel', endTouch);
+  $('userList').addEventListener('click', async e => {
     const t = e.target.closest('button'); if (!t) return;
-    if (t.id === 'newUserBtn') return nameSheet(null);
-    if (t.dataset.u) openUser(t.dataset.u);
+    if (t.dataset.u && Date.now() - swiped < 350) return;        // the end of a swipe over a name is not a tap on it (the bin is always ready)
+    if (t.id === 'newUserBtn') { closeRows(); return nameSheet(null); }
+    if (t.dataset.delu) return deleteUser(t.dataset.delu);
+    if (t.dataset.u) {
+      const row = t.closest('.urow'); if (row && row.classList.contains('open')) return slide(row, 0);     // an open row only closes
+      openUser(t.dataset.u);
+    }
   });
+  async function deleteUser(id) {
+    const u = list.find(x => x.id === id); if (!u) return;
+    if (!(await ask({ title: 'Delete user?', text: `${u.name}, their program and their supplements are deleted from this phone. Your own account is not affected.`, ok: 'DELETE USER', danger: true }))) return closeRows();
+    try { await RisenDB.deleteStudent(id); } catch (err) { toast(err.message); return; }
+    list = list.filter(x => x.id !== id); renderList();
+  }
 
   // ---- name sheet (new user / rename) ----
   let renaming = null;
@@ -90,20 +126,13 @@ const Coach = (() => {
     $('userBody').innerHTML = bar()
       + `<button class="card ucard" data-go="ex"><span class="uct">Exercises</span><span class="ucs">${plural(exCount(cur), 'exercise')}</span>${ICONS.chev}</button>`
       + `<button class="card ucard" data-go="supp"><span class="uct">Supplements</span><span class="ucs">${plural(cur.supps.length, 'supplement')}</span>${ICONS.chev}</button>`
-      + `<button class="ghost" data-act="rename" style="width:100%;margin-top:26px">RENAME</button>`
-      + `<button class="quiet danger" data-act="del" type="button">Delete user</button>`;
+      + `<button class="ghost" data-act="rename" style="width:100%;margin-top:26px">RENAME</button>`;
   }
   $('userBody').addEventListener('click', async e => {
     const t = e.target.closest('button'); if (!t || !cur) return;
     if (t.dataset.go === 'ex') return openEx();
     if (t.dataset.go === 'supp') return openSupp();
     if (t.dataset.act === 'rename') return nameSheet(cur);
-    if (t.dataset.act === 'del') {
-      if (!(await ask({ title: 'Delete user?', text: `${cur.name}, their program and their supplements are deleted from this phone. Your own account is not affected.`, ok: 'DELETE USER', danger: true }))) return;
-      const id = cur.id; cur = null; persist.flush().catch(() => {});
-      try { await RisenDB.deleteStudent(id); } catch (err) { toast(err.message); return; }
-      list = list.filter(u => u.id !== id); Pages.close('userPage'); renderList();
-    }
   });
   $('uBack').onclick = () => Pages.close('userPage');
 
