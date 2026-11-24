@@ -99,6 +99,14 @@ function RepoFolder({ dir, cache: CACHE, pick, deep = false, fallback = null }) 
       const front = new Set(first), order = Object.keys(want).sort((a, b) => front.has(b) - front.has(a));
       for (const k of order) {
         const w = want[k], have = idx.files[k], kept = have && have.sha === w.sha ? await c.match('m/' + k) : null;
+        if (!kept && have) {                                          // .134: the same file under the other kind of list: keep it, never download it again
+          const m = await c.match('m/' + k), ob = m ? await m.blob() : null;
+          if (ob && /^p\d+$/.test(w.sha) && 'p' + ob.size === w.sha) continue;                  // fallback list, same size as the stored file = that file
+          if (ob && /^p\d+$/.test(have.sha) && !/^p\d+$/.test(w.sha)) {                         // stored from the fallback list, GitHub's list is back: check the bytes once
+            let h = null; try { h = await gitSha(ob); } catch (e) {}
+            if (h === w.sha) { have.sha = w.sha; have.v = 1; changed = true; await save(); continue; }
+          }
+        }
         if (kept && (have.v || Date.now() - (have.u || 0) < DAY)) continue;       // on the phone and checked (or taken unchecked less than a day ago)
         if (kept && !have.u && await same(await kept.blob(), w.sha)) { have.v = 1; continue; }      // stored before .99: checked once, it is the right file
         try {

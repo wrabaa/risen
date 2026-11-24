@@ -43,7 +43,7 @@ Supporting colours (named on `:root` in `styles.css`, use the names, never raw c
 `--danger` #FF6B6B (delete/reset ONLY — the one exception to "one accent") · `--live` #E5252A (the red LIVE tag on Home's CLASSES tile ONLY, white text; Siza asked for red, `.88`) · `--field` #0F0F0F
 (inputs) · `--press` #202020 · `--dash` #3A3A3A · `--mid` #4A4A4A · `--dim` #5A5A5A ·
 `--faint` #6A6A6A · `--off` #2A2A2A · `--soft` #C9C9C9 · `--soft2` #D6D6D6 · `--volt-press` #B8E600 ·
-tab bar glass: `--glass` rgba(26,26,26,.84) (`.58`; it was .62 and let lime show through bright) · `--glass-hi` rgba(255,255,255,.1) (the pill behind the active tab) · `--chip` rgba(11,11,11,.55) (small label chips that sit on a photo, `.82`) ·
+tab bar glass: `--glass` rgba(26,26,26,.84) (`.58`; it was .62 and let lime show through bright) · `--glass-hi` rgba(255,255,255,.1) (the pill behind the active tab) · `--chip` rgba(11,11,11,.55) (small label chips that sit on a photo, `.82`; also the role card's dim) · `--scrim` rgba(11,11,11,.92) (role card background without blur, `.134`) ·
 depth (`.54`): `--bg-top` #141414 + `--glow` (≤4% lime) = the background gradient `--bg-grad` · `--hairline` white 8% (card edge) ·
 `--hilite` white 6% (light along a card's top) · Home (`.57`): `--glass-tile` (frosted tile, no blur) · `--volt-tint` / `--volt-edge`
 (lime tint and edge of the 01 TRAINING tile) · motion (`.56`): `--volt-flash` (lime flash on a ticked set row) · `--ease` / `--spring` (curves) · `--shadow` · `--glass-sheet` · `--glass-bar` · `--glass-solid` (fallback when the
@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-24.29)
+## Status (release 2026-11-24.30)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -334,6 +334,12 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.131` WHILE TESTING, the public app asks Student / Instructor at EVERY opening (`ROLE_ASK_EVERY_OPENING = true` in `app.js`; the answer is still saved and the Settings "I am" row still works). To go back to asking only once: set it to `false`. Not on me.html. iPhone test pending.
 
 - `.133` the Settings "I am" row shows ONLY for an instructor (so he can go back to Student); a student sees no such row. (While `ROLE_ASK_EVERY_OPENING` is true the question comes at every opening anyway; when it goes back to once, a student who chose wrongly would need a new row or a reset: decide then.) iPhone test pending.
+- `.134` review 8 fixes (`REVIEW.md`): a user's supplement typed just before MY ACCOUNT (or before the app is hidden) is saved (`flushAll()` in `coach.js`); a double tap on CREATE makes ONE user;
+  SEND opens the share sheet straight from the tap (nothing awaited first), a second tap while it is open does nothing, a failed share says "Could not open sharing. Try again.", a phone that cannot share files gets a download ("File downloaded");
+  a sideways swipe on a user's name no longer scrolls Settings; while a user's pages are open the app layer shows only those pages (tab page, top bar and tab bar hidden, layer see-through), so closing or swiping one back shows Settings, never Home;
+  the weekly "Back up now?" question comes right after the Student / Instructor card (it never showed on the public app while the card was asked); the card says "Instructors can change this later in Settings";
+  the role card's dim uses `--chip` and the new named colour `--scrim` (no raw codes); a future rename in `library.js` (`aliases`) also moves the exercises in users' programs (`migrateLibrary`, `students`);
+  the restore question counts users; a recipe picture already on the phone is never downloaded again just because the list came from the other source (GitHub list ↔ the site's fallback). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

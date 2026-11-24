@@ -32,6 +32,8 @@ This file does NOT replace the to-do list in `CLAUDE.md`; it comes after it.
   `.48` library 82 + equipment tags, 9 retired exercises now alias to their new match · `.49` Settings version line
   made reliable · `.50` fixes from the first code review (below). `.42`–`.50`: iPhone test pending.
 
+- Review 8 fixes (Users, Send, role card, backup question, recipe lists) — `.134`, iPhone test pending.
+
 **Waiting / on hold**
 - C. Plan the calories screen — WAITING: Siza plans it with the planner first.
 - D. Med reminders — ON HOLD until the native Apple app (Capacitor). Not to be built in the web app.

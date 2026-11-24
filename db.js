@@ -408,9 +408,9 @@ const RisenDB = (() => {
   // Returns true when something was changed.
   async function migrateLibrary({ aliases = {}, retired = [] } = {}) {
     const olds = Object.keys(aliases); if (!olds.length && !retired.length) return false;
-    const db = await open(), t = db.transaction(['workouts', 'logs', 'photos', 'exercises', 'settings'], 'readwrite');
-    const ws = t.objectStore('workouts'), ls = t.objectStore('logs'), ps = t.objectStore('photos'), xs = t.objectStore('exercises'), st = t.objectStore('settings');
-    const [workouts, logs, photoKeysNow, exs, act] = await Promise.all([req(ws.getAll()), req(ls.getAll()), req(ps.getAllKeys()), req(xs.getAll()), req(st.get('activeSession'))]);
+    const db = await open(), t = db.transaction(['workouts', 'logs', 'photos', 'exercises', 'settings', 'students'], 'readwrite');
+    const ws = t.objectStore('workouts'), ls = t.objectStore('logs'), ps = t.objectStore('photos'), xs = t.objectStore('exercises'), st = t.objectStore('settings'), us = t.objectStore('students');
+    const [workouts, logs, photoKeysNow, exs, act, students] = await Promise.all([req(ws.getAll()), req(ls.getAll()), req(ps.getAllKeys()), req(xs.getAll()), req(st.get('activeSession')), req(us.getAll())]);
     const to = id => Object.prototype.hasOwnProperty.call(aliases, id) ? aliases[id] : id;
     let changed = false; const used = new Set();
     // Targets that two or more old exercises map to (e.g. Lying + Seated leg curl -> Leg Curl): a day holding both would list it twice.
@@ -435,6 +435,20 @@ const RisenDB = (() => {
         if (remapped) { hit = true; list.push({ ...it, exerciseId: n }); } else list.push(it);
       }
       if (hit) { ws.put({ ...w, exercises: list }); changed = true; }
+    }
+    // .134 (review 5): an instructor's USERS follow too (their program is a list per weekday); a renamed exercise that the day already has is kept once
+    for (const u of students) {
+      let hit = false; const days = {};
+      for (const [d, l] of Object.entries(u.days || {})) {
+        const have = new Set((l || []).filter(it => to(it.exerciseId) === it.exerciseId).map(it => it.exerciseId)), out = [];
+        for (const it of l || []) {
+          const n = to(it.exerciseId); used.add(n);
+          if (n === it.exerciseId) { out.push(it); continue; }
+          hit = true; if (have.has(n)) continue; have.add(n); out.push({ ...it, exerciseId: n });
+        }
+        days[d] = out;
+      }
+      if (hit) { us.put({ ...u, days }); changed = true; }
     }
     for (const l of logs) { const n = to(l.exerciseId); used.add(n); if (n !== l.exerciseId) { ls.put({ ...l, exerciseId: n }); changed = true; } }
     const draft = act && act.value;

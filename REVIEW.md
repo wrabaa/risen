@@ -3,7 +3,32 @@
 Review-only passes over the commits. No code is changed by a review; findings are listed here and fixed
 (or not) on Siza's go. Each review starts from the "last reviewed" commit below.
 
-**Last reviewed: release 2026-11-16.98 (`ada4a53`); its fixes are release `.99`**
+**Last reviewed: release 2026-11-24.29 (`b3ce669`); its fixes are release `.134` (2026-11-24.30)**
+
+## Review 8 — 24 Nov 2026 — releases `.123` → `.133` (`8e1e338` … `b3ce669`, fixed in `.134`)
+Method: read the full diff of the day (leg / glute clips and stills, Users = coach.js + store `students` (DB 10), swipe to delete, recipe fallback list, Student / Instructor card, Send),
+then (on Siza's go) fixed everything and ran it in Chrome at iPhone 13 and SE size with synthetic taps and touches. Nothing was run on a real iPhone.
+
+🔴 Fixed
+1. **A user's supplement could be lost.** Typing in a user's supplement and tapping MY ACCOUNT within about half a second: the pages closed first, the user was forgotten, the save did nothing. Now everything is saved before the pages close, and also when the app is hidden. (`coach.js`)
+
+🟡 Fixed
+2. The weekly "Back up now?" question never showed on the public app (the Student / Instructor card took its place at every opening). It now follows the card. (`app.js`)
+3. A future rename / merge in `library.js` moved the owner's program and history but not the users' programs (they would show "Unknown exercise"). `migrateLibrary` now follows `students` too. (`db.js`)
+4. SEND: the share sheet was opened after a wait (iPhone may then refuse it), a refused share fell back to a download that may do nothing in the home-screen app but said "File saved", and a double tap made a second file. Now: straight from the tap, one at a time, an honest message. (`coach.js`)
+5. The role card promised "You can change this later in Settings", but since `.133` a student has no such row. Text now: "Instructors can change this later in Settings". (Open: once the question is asked only once again, a student who wants to become an instructor has no way back except Reset; Siza to decide.)
+
+🟢 Fixed (small)
+6. Double tap on CREATE made two users with the same name. 7. Closing a user's page showed the Home / tab page for a moment instead of Settings. 8. Raw colour codes in the role card (now `--chip` / `--scrim`).
+9. A sideways swipe on a user's name also scrolled Settings. 10. The restore question did not count users. 11. Recipe pictures were downloaded again whenever the list switched between GitHub and the fallback.
+
+Left as is: a recipe picture replaced by one of EXACTLY the same size is only noticed once GitHub's own list answers again (the fallback list knows sizes only). A deleted custom exercise in a user's program: custom exercises cannot be deleted in the app, so this cannot happen today.
+
+🟢 Checked and fine
+- 13 leg / glute clips + 13 stills: every name matches an exercise `file` in `library.js`, all under the size limits. DB 10 only adds `students`; it is in Export / Import / Reset.
+- `coach.js` never reads or writes the owner's program, workouts, supplements, logs or photos (only adds to the shared exercise menu via + Custom exercise). Students never see Users; me.html never asks the role.
+- Recipe fallback never deletes stored files; offline it does nothing. `coach.js` is in CORE; every release raised VERSION; me.html matched make-me.sh after every index.html change.
+
 
 ## Review 7 — 16 Nov 2026 — releases `.96` → `.98` (fixed in `.99`)
 Method: read the code of `.96` (recipe pack fixes), `.97` (pull down to refresh) and `.98` (TRY TODAY card), then ran it in Chrome at iPhone 13 and SE size with a

@@ -23,8 +23,10 @@ const Coach = (() => {
     try { await RisenDB.saveStudent(cur); savedFlash(flashId); } catch (err) { toast(err.message); }
   }, 400);
   const flush = () => persist.flush().catch(err => toast(err.message));
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
-  addEventListener('pagehide', flush);
+  // .134 (review 5): a supplement being typed waits 0.3 s before it joins the user; flushAll saves that too, so leaving at once loses nothing
+  const flushAll = async () => { try { await saveSupp.flush(); } catch (err) {} return flush(); };
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushAll(); });
+  addEventListener('pagehide', () => { flushAll(); });
 
   // ---- Settings > Users ----
   async function refresh() {
@@ -55,8 +57,9 @@ const Coach = (() => {
     if (!tr) return; const t = e.touches[0], dx = t.clientX - tr.x, dy = t.clientY - tr.y;
     if (!tr.dir) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; tr.dir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v'; }
     if (tr.dir !== 'h') return;
+    if (e.cancelable) e.preventDefault();                          // .134: a sideways swipe on a name never scrolls Settings up or down
     tr.cx = Math.max(-BIN, Math.min(0, tr.base + dx)); slide(tr.row, tr.cx, true);
-  }, { passive: true });
+  }, { passive: false });
   const endTouch = () => {
     if (tr && tr.dir === 'h') { slide(tr.row, tr.cx <= -BIN / 2 ? -BIN : 0); swiped = Date.now(); }
     tr = null;
@@ -80,7 +83,7 @@ const Coach = (() => {
   }
 
   // ---- name sheet (new user / rename) ----
-  let renaming = null;
+  let renaming = null, naming = false;                 // .134: `naming` = a save is running (a double tap on CREATE makes ONE user)
   function nameSheet(u) {
     renaming = u;
     $('usTitle').textContent = u ? 'Rename user' : 'New user'; $('usSave').textContent = u ? 'SAVE' : 'CREATE';
@@ -90,6 +93,7 @@ const Coach = (() => {
   const closeNameSheet = () => { $('usName').blur(); $('userSheet').hidden = true; renaming = null; };
   async function saveName() {
     const name = $('usName').value.trim(); if (!name) return $('usName').focus();
+    if (naming) return; naming = true;
     try {
       if (renaming) {
         const u = list.find(x => x.id === renaming.id); u.name = name; await RisenDB.saveStudent(u);
@@ -97,7 +101,7 @@ const Coach = (() => {
       }
       const u = { id: RisenDB.uid(), name, created: new Date().toISOString(), days: {}, supps: [] };
       await RisenDB.saveStudent(u); list.push(u); closeNameSheet(); renderList(); openUser(u.id);
-    } catch (err) { toast(err.message); }
+    } catch (err) { toast(err.message); } finally { naming = false; }
   }
   $('usSave').onclick = saveName;
   $('usCancel').onclick = closeNameSheet;
@@ -107,7 +111,7 @@ const Coach = (() => {
   // ---- the bar that always says whose pages these are ----
   const bar = () => `<div class="editbar"><span>Editing: <b>${esc(cur.name)}</b></span><button type="button" data-act="mine">MY ACCOUNT</button></div>`;
   async function mine() {                            // back to the owner's own account: every user page closes
-    await flush();
+    await flushAll();                                // first save everything (also a supplement still being typed), THEN close: closing forgets the user
     for (const id of ['userSuppEdit', 'userSuppPage', 'userExPage', 'userPage']) if (open(id)) Pages.close(id);
   }
   for (const id of ['userBody', 'userExBody', 'userSuppBody', 'userSuppEditBody']) $(id).addEventListener('click', e => { if (e.target.closest('[data-act="mine"]')) mine(); }, true);
@@ -139,8 +143,12 @@ const Coach = (() => {
 
   // ---- Send (.130): ONE small file with this user's program, supplements and the custom exercises the program uses; WhatsApp / AirDrop / Files through the share sheet,
   // a download when the phone cannot share files. One-way: nothing comes back. Loading it on the user's phone is the next release.
+  // .134: the share sheet opens straight from the tap (iPhone allows sharing only right after a tap, so nothing is waited for first); the file is made
+  // from what is on screen and the save runs alongside. A second tap while the share sheet is open does nothing.
+  let sending = false;
   async function send() {
-    await flush();
+    if (sending) return;
+    flushAll();
     const days = {};
     for (let d = 1; d <= 7; d++) if ((cur.days[d] || []).length) days[d] = JSON.parse(JSON.stringify(cur.days[d]));
     const supps = JSON.parse(JSON.stringify(cur.supps || []));
@@ -152,11 +160,14 @@ const Coach = (() => {
     const file = new File([JSON.stringify(data)], 'risen-' + slug + '-' + dayKey(new Date()) + '.json', { type: 'application/json' });
     let can = false; try { can = !!(navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
     if (can) {
-      try { await navigator.share({ files: [file], title: 'RISEN program for ' + cur.name }); return toast('Sent'); }
-      catch (e) { if (e && e.name === 'AbortError') return; }
+      sending = true;
+      try { await navigator.share({ files: [file], title: 'RISEN program for ' + cur.name }); toast('Sent'); }
+      catch (e) { if (!e || e.name !== 'AbortError') toast('Could not open sharing. Try again.'); }
+      finally { sending = false; }
+      return;
     }
-    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast('File saved');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove();      // a phone that cannot share files: a download
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast('File downloaded');
   }
   $('uBack').onclick = () => Pages.close('userPage');
 

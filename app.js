@@ -551,7 +551,7 @@
     if(entering) return; entering=true;
     try{ await ready; tryStart(); renderHome(); show('home');
     intro.classList.add('hidden'); app.classList.remove('hidden'); Motion.count($('tiles'));
-    if(roleDue()) maybeRole(); else backupPrompt();
+    if(roleDue()){ backupAfterRole=true; maybeRole(); } else backupPrompt();          // .134: the weekly backup question comes right after the role card, not never
     }finally{ entering=false; }
   };
 
@@ -561,7 +561,7 @@
   const isMe=()=>window.RISEN_HOME==='me';
   function showRole(){ $('roleSheet').hidden=false; }
   const ROLE_ASK_EVERY_OPENING=true;                 // .131: while Siza tests, the public app asks Student / Instructor at EVERY opening (set to false to ask only once)
-  let roleAsked=false;
+  let roleAsked=false, backupAfterRole=false;
   const roleDue=()=>!isMe()&&!installKind()&&(ROLE_ASK_EVERY_OPENING?!roleAsked:!S.settings.role);
   function maybeRole(){ if(!roleDue()) return; roleAsked=true; showRole(); }
   function paintRole(){ const g=$('roleGroup'); g.hidden=isMe()||S.settings.role!=='instructor'; $('roleVal').textContent=S.settings.role==='instructor'?'Instructor':'Student'; }
@@ -569,6 +569,7 @@
     const b=e.target.closest('[data-role]'); if(!b) return;
     S.settings.role=b.dataset.role; try{ await RisenDB.setSetting('role',S.settings.role); }catch(err){ toast('Could not save'); }
     $('roleSheet').hidden=true; paintRole(); if(typeof Coach!=='undefined') Coach.refresh();
+    if(backupAfterRole){ backupAfterRole=false; backupPrompt(); }
   });
   $('roleBtn').onclick=()=>{ roleAsked=true; showRole(); };
   function paintPack(){ const on=S.settings.recipePack==='yes'; $('recipePackBtn').innerHTML='<span>RISEN recipes</span><span style="float:right;color:var(--muted)">'+(on?'Loaded':'Not loaded')+'</span>'; }
@@ -686,7 +687,7 @@ $('importBtn').onclick=()=>{$('importFile').value=''; $('importFile').click()};
   // Say what is in the file before anything is replaced
   const st=b.stores||{}, cnt=k=>Array.isArray(st[k])?st[k].length:0, plural=(n,w)=>n+' '+w+(n===1?'':w.endsWith('s')?'es':'s');
   const old=b.format===1;
-  const inside=old?'':[[cnt('workouts'),'gym day'],[cnt('sessions'),'workout'],[cnt('meds'),'med'],[cnt('classes'),'class'],[cnt('recipes'),'recipe'],[cnt('body'),'body value'],[cnt('waterlogs'),'water day'],[cnt('coffeelogs'),'drink'],[cnt('photos'),'photo']]
+  const inside=old?'':[[cnt('workouts'),'gym day'],[cnt('sessions'),'workout'],[cnt('meds'),'med'],[cnt('classes'),'class'],[cnt('recipes'),'recipe'],[cnt('body'),'body value'],[cnt('waterlogs'),'water day'],[cnt('coffeelogs'),'drink'],[cnt('students'),'user'],[cnt('photos'),'photo']]
     .filter(x=>x[0]).map(x=>plural(x[0],x[1])).join(', ');
   // One RISEN sheet: what is in the file, and a way to save what is on the phone first
   if(old){
