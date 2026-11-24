@@ -551,7 +551,7 @@
     if(entering) return; entering=true;
     try{ await ready; tryStart(); renderHome(); show('home');
     intro.classList.add('hidden'); app.classList.remove('hidden'); Motion.count($('tiles'));
-    if(S.settings.role||isMe()||installKind()) backupPrompt(); else maybeRole();
+    if(roleDue()) maybeRole(); else backupPrompt();
     }finally{ entering=false; }
   };
 
@@ -560,14 +560,17 @@
   window.RisenRole=()=>S.settings.role||'';
   const isMe=()=>window.RISEN_HOME==='me';
   function showRole(){ $('roleSheet').hidden=false; }
-  function maybeRole(){ if(isMe()||S.settings.role||installKind()) return; showRole(); }
+  const ROLE_ASK_EVERY_OPENING=true;                 // .131: while Siza tests, the public app asks Student / Instructor at EVERY opening (set to false to ask only once)
+  let roleAsked=false;
+  const roleDue=()=>!isMe()&&!installKind()&&(ROLE_ASK_EVERY_OPENING?!roleAsked:!S.settings.role);
+  function maybeRole(){ if(!roleDue()) return; roleAsked=true; showRole(); }
   function paintRole(){ const g=$('roleGroup'); g.hidden=isMe(); $('roleVal').textContent=S.settings.role==='instructor'?'Instructor':'Student'; }
   $('roleSheet').addEventListener('click',async e=>{
     const b=e.target.closest('[data-role]'); if(!b) return;
     S.settings.role=b.dataset.role; try{ await RisenDB.setSetting('role',S.settings.role); }catch(err){ toast('Could not save'); }
     $('roleSheet').hidden=true; paintRole(); if(typeof Coach!=='undefined') Coach.refresh();
   });
-  $('roleBtn').onclick=()=>showRole();
+  $('roleBtn').onclick=()=>{ roleAsked=true; showRole(); };
   function paintPack(){ const on=S.settings.recipePack==='yes'; $('recipePackBtn').innerHTML='<span>RISEN recipes</span><span style="float:right;color:var(--muted)">'+(on?'Loaded':'Not loaded')+'</span>'; }
 
   // ---- Settings ----

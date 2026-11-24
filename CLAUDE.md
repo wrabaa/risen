@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-24.26)
+## Status (release 2026-11-24.27)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -330,6 +330,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.129` RECIPES ROW TELLS WHY (Siza's me.html cannot load the recipes): tapping Settings → Data → RISEN recipes when nothing is loaded now asks GitHub and the app's own site at once (`RecipePack.sync(true)`), and if there is still no list it shows a "Recipes not found" sheet with what the phone could reach (`RecipePack.diag()`: "GitHub list: 403 · Recipe file: 200 · Online: yes"). Tested: normal (question appears), site file blocked (sheet with codes). Version is `.25` (`.24` = `.128`). iPhone test pending.
 
 - `.130` SEND (Coach Release 2, Siza said go and yes to custom exercises; `coach.js` `send()`): on a user's page a lime "SEND TO <NAME>" button builds ONE file `risen-<name>-<date>.json` = `{app:'risen-coach', version:1, coach (the instructor's name from Personal info, else "Your coach"), user, created, days:{1..7:[entries]}, supps:[…with their ids], customs:[{id,name,muscle,notes}] (only the custom exercises the program uses, no photos)}` and opens the phone's share sheet (WhatsApp / AirDrop / Files); a phone that cannot share files downloads it. Nothing to send = "Add an exercise or a supplement first". One-way. The file is NOT yet loadable: Release 3 (Load coach file on the student's phone + the choice screen is already in `.127`). Tested in the browser (download path, content, custom included). iPhone share sheet test pending.
+
+- `.131` WHILE TESTING, the public app asks Student / Instructor at EVERY opening (`ROLE_ASK_EVERY_OPENING = true` in `app.js`; the answer is still saved and the Settings "I am" row still works). To go back to asking only once: set it to `false`. Not on me.html. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
