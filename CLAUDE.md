@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-24.24)
+## Status (release 2026-11-24.25)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -326,6 +326,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.127` ROLE QUESTION (Siza; public `index.html` only, never `me.html`): the first time the app is entered with no role set (and it is installed, not a Safari tab), a floating glass card over a blurred Home asks "WHO ARE YOU?": STUDENT (the normal app) or INSTRUCTOR (adds the Users group in Settings, `coach.js` `on()` now also true for role 'instructor'). Setting `role` ('student' / 'instructor'); a Settings row "I am" (`#roleGroup`, hidden on me.html) reopens the question; switching back to Student only hides Users, the data stays. The weekly backup question waits until a role is chosen. Not built yet: Send to user and Load coach file (Releases 2 and 3). iPhone test pending.
 
 - `.128` safety for `.126`: a list that came from the FALLBACK never deletes files already on the phone (`fromFallback` in `RepoFolder.sync()`, `media.js`); Settings → Data → RISEN recipes shows "Loaded" / "Not loaded" (`paintPack()` in `app.js`). Tested: recipes loaded, then GitHub's list refused: all 33 cached files and Try today stay. iPhone test pending.
+
+- `.129` RECIPES ROW TELLS WHY (Siza's me.html cannot load the recipes): tapping Settings → Data → RISEN recipes when nothing is loaded now asks GitHub and the app's own site at once (`RecipePack.sync(true)`), and if there is still no list it shows a "Recipes not found" sheet with what the phone could reach (`RecipePack.diag()`: "GitHub list: 403 · Recipe file: 200 · Online: yes"). Tested: normal (question appears), site file blocked (sheet with codes). Version is `.25` (`.24` = `.128`). iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

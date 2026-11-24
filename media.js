@@ -234,7 +234,12 @@ const RecipePack = (() => {
   const image = id => F.get('img/' + id);                                             // { url, type } or null
   const imageBlob = id => F.blob('img/' + id);                                        // the picture's bytes (the TRY TODAY card makes its own URL from them)
   const images = async () => new Set((await F.keys()).filter(k => k.startsWith('img/')).map(k => k.slice(4)));
-  return { list, image, imageBlob, images, sync: force => F.sync([], force), set onChange(fn) { F.onChange = fn; } };
+  // .129: what the phone can reach, in plain words (shown when the recipes cannot be found)
+  async function diag() {
+    const t = async (label, url) => { try { const r = await fetch(url, { cache: 'no-store' }); return label + ': ' + r.status; } catch (e) { return label + ': no answer'; } };
+    return [await t('GitHub list', 'https://api.github.com/repos/wrabaa/risen/contents/assets/recipes'), await t('Recipe file', 'assets/recipes/recipes.json?v=' + Date.now()), 'Online: ' + (navigator.onLine ? 'yes' : 'no')].join('\n');
+  }
+  return { list, image, imageBlob, images, diag, sync: force => F.sync([], force), set onChange(fn) { F.onChange = fn; } };
 })();
 
 // ---------- Intro clips: assets/bg.mp4 (built in) + assets/intro/<any name>.mp4 ----------

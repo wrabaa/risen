@@ -136,10 +136,12 @@ const Meals = (() => {
   };
   // Settings row "RISEN recipes"
   async function packSettings() {
-    const pack = await RecipePack.list(), n = pack ? pack.length : 0, on = S.settings.recipePack === 'yes';
+    let pack = await RecipePack.list(), n = pack ? pack.length : 0;
+    const on = S.settings.recipePack === 'yes';
+    if (!on && !n && navigator.onLine) { toast('Looking for recipes…'); try { await RecipePack.sync(true); } catch (e) {} pack = await RecipePack.list(); n = pack ? pack.length : 0; }
     if (on) {
       if (await ask({ title: 'Delete RISEN recipes?', text: 'The RISEN recipes are deleted from this phone. Recipes you added yourself, and RISEN recipes you changed, are kept.', ok: 'DELETE', danger: true })) { await packOff(); toast('RISEN recipes deleted'); }
-    } else if (!n) toast(navigator.onLine ? 'No RISEN recipes yet' : 'No internet: try again later');
+    } else if (!n) { await ask({ title: 'Recipes not found', text: 'This phone could not get the recipe list.\n' + await RecipePack.diag(), ok: 'OK', cancel: 'Close' }); }
     else if (await ask({ title: 'Load RISEN recipes?', text: `${n} ready recipe${n === 1 ? '' : 's'} with pictures. You can edit or delete any of them, and add your own.`, ok: 'YES, LOAD THEM' })) { await packOn(); toast('Recipes loaded'); }
   }
 
