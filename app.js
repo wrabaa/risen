@@ -564,7 +564,7 @@
   let roleAsked=false;
   const roleDue=()=>!isMe()&&!installKind()&&(ROLE_ASK_EVERY_OPENING?!roleAsked:!S.settings.role);
   function maybeRole(){ if(!roleDue()) return; roleAsked=true; showRole(); }
-  function paintRole(){ const g=$('roleGroup'); g.hidden=isMe(); $('roleVal').textContent=S.settings.role==='instructor'?'Instructor':'Student'; }
+  function paintRole(){ const g=$('roleGroup'); g.hidden=isMe()||S.settings.role!=='instructor'; $('roleVal').textContent=S.settings.role==='instructor'?'Instructor':'Student'; }
   $('roleSheet').addEventListener('click',async e=>{
     const b=e.target.closest('[data-role]'); if(!b) return;
     S.settings.role=b.dataset.role; try{ await RisenDB.setSetting('role',S.settings.role); }catch(err){ toast('Could not save'); }
