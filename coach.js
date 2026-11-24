@@ -3,7 +3,7 @@
 // THE RULE: nothing in this file reads or writes the owner's own program, supplements, workouts, history or photos (S.routines / S.workouts /
 // S.meds / logs ...). A user's pages have their own screens and their own data path, so a workout of the owner can never end up in a user.
 // Only the exercise LIST (library.js, the picker) is shared: it is a menu of exercises, not anyone's data.
-// Sending the file to the user and loading it on their phone come in the next releases.
+// Send (.130) builds the file; loading it on the user's phone (Load coach file) is the next release.
 const Coach = (() => {
   const on = () => window.RISEN_HOME === 'me' || (window.RisenRole && window.RisenRole() === 'instructor');        // .124: Siza's own Home. (A later release also turns it on for the public app's "Instructor" choice.)
   let list = [], cur = null, curDay = 1, supp = null, suppNew = false, flashId = 'uxSaved';
@@ -126,14 +126,38 @@ const Coach = (() => {
     $('userBody').innerHTML = bar()
       + `<button class="card ucard" data-go="ex"><span class="uct">Exercises</span><span class="ucs">${plural(exCount(cur), 'exercise')}</span>${ICONS.chev}</button>`
       + `<button class="card ucard" data-go="supp"><span class="uct">Supplements</span><span class="ucs">${plural(cur.supps.length, 'supplement')}</span>${ICONS.chev}</button>`
-      + `<button class="ghost" data-act="rename" style="width:100%;margin-top:26px">RENAME</button>`;
+      + `<button class="primary" data-act="send" style="margin-top:22px">SEND TO ${esc(cur.name.toUpperCase())}</button>`
+      + `<button class="ghost" data-act="rename" style="width:100%;margin-top:14px">RENAME</button>`;
   }
   $('userBody').addEventListener('click', async e => {
     const t = e.target.closest('button'); if (!t || !cur) return;
     if (t.dataset.go === 'ex') return openEx();
     if (t.dataset.go === 'supp') return openSupp();
     if (t.dataset.act === 'rename') return nameSheet(cur);
+    if (t.dataset.act === 'send') return send();
   });
+
+  // ---- Send (.130): ONE small file with this user's program, supplements and the custom exercises the program uses; WhatsApp / AirDrop / Files through the share sheet,
+  // a download when the phone cannot share files. One-way: nothing comes back. Loading it on the user's phone is the next release.
+  async function send() {
+    await flush();
+    const days = {};
+    for (let d = 1; d <= 7; d++) if ((cur.days[d] || []).length) days[d] = JSON.parse(JSON.stringify(cur.days[d]));
+    const supps = JSON.parse(JSON.stringify(cur.supps || []));
+    if (!Object.keys(days).length && !supps.length) return toast('Add an exercise or a supplement first');
+    const used = new Set(Object.values(days).flat().map(x => x.exerciseId));
+    const customs = S.exercises.filter(x => x.custom && used.has(x.id)).map(x => ({ id: x.id, name: x.name, muscle: x.muscle || 'Custom', notes: x.notes || '' }));
+    const data = { app: 'risen-coach', version: 1, coach: (S.settings.name || '').trim() || 'Your coach', user: cur.name, created: new Date().toISOString(), days, supps, customs };
+    const slug = cur.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'user';
+    const file = new File([JSON.stringify(data)], 'risen-' + slug + '-' + dayKey(new Date()) + '.json', { type: 'application/json' });
+    let can = false; try { can = !!(navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
+    if (can) {
+      try { await navigator.share({ files: [file], title: 'RISEN program for ' + cur.name }); return toast('Sent'); }
+      catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast('File saved');
+  }
   $('uBack').onclick = () => Pages.close('userPage');
 
   // ---- level 2a: the user's exercises (one list per weekday) ----
