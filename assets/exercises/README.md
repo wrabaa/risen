@@ -157,3 +157,99 @@ Add `.mp4` for a clip or `.jpg` for a picture.
 | Exercise | File name |
 |---|---|
 | Day Off | `day-off` |
+
+
+---
+
+## PLANNED: more free-weight exercises (41) — NOT in the app yet
+
+This is the plan we follow together. Nothing here is in `library.js` or in the app until Siza picks. Status: **PROPOSED** (tick = approved, then we add them with new fixed ids `lib-fz-<file>` and the clip + still use the file name below, in the body-part folder).
+
+How we go: Siza strikes out what he does not want, adds what is missing, then says GO. Retired old ids (`lib-front-squat`, `lib-preacher-curl`, `lib-jump-rope`) stay as they are; the new ones get their own ids.
+
+### Chest (4)
+
+| Done | Exercise | File name | Equipment |
+|---|---|---|---|
+| [ ] | Incline Dumbbell Fly | `incline-db-fly` | Dumbbell |
+| [ ] | Decline Dumbbell Press | `decline-db-press` | Dumbbell |
+| [ ] | Push-Up | `push-up` | Bodyweight |
+| [ ] | Chest Dip | `chest-dip` | Bodyweight |
+
+### Back (6)
+
+| Done | Exercise | File name | Equipment |
+|---|---|---|---|
+| [ ] | Pull-Up | `pull-up` | Bodyweight |
+| [ ] | Chin-Up | `chin-up` | Bodyweight |
+| [ ] | Pendlay Row | `pendlay-row` | Barbell |
+| [ ] | Rack Pull | `rack-pull` | Barbell |
+| [ ] | Good Morning | `good-morning` | Barbell |
+| [ ] | Dumbbell Pullover | `db-pullover` | Dumbbell |
+
+### Shoulders (5)
+
+| Done | Exercise | File name | Equipment |
+|---|---|---|---|
+| [ ] | Barbell Overhead Press | `barbell-overhead-press` | Barbell |
+| [ ] | Arnold Press | `arnold-press` | Dumbbell |
+| [ ] | Dumbbell Upright Row | `db-upright-row` | Dumbbell |
+| [ ] | Push Press | `push-press` | Barbell |
+| [ ] | Barbell Shrug | `barbell-shrug` | Barbell |
+
+### Legs (4)
+
+| Done | Exercise | File name | Equipment |
+|---|---|---|---|
+| [ ] | Front Squat | `front-squat` | Barbell |
+| [ ] | Walking Lunge | `walking-lunge` | Dumbbell |
+| [ ] | Dumbbell Reverse Lunge | `db-reverse-lunge` | Dumbbell |
+| [ ] | Dumbbell Calf Raise | `db-calf-raise` | Dumbbell |
+
+### Glutes (6)
+
+| Done | Exercise | File name | Equipment |
+|---|---|---|---|
+| [ ] | Dumbbell Hip Thrust | `db-hip-thrust` | Dumbbell |
+| [ ] | Dumbbell Sumo Squat | `db-sumo-squat` | Dumbbell |
+| [ ] | Single-Leg Glute Bridge | `single-leg-glute-bridge` | Bodyweight |
+| [ ] | Single-Leg Romanian Deadlift | `single-leg-rdl` | Dumbbell |
+| [ ] | Curtsy Lunge | `curtsy-lunge` | Dumbbell |
+| [ ] | Kettlebell Swing | `kettlebell-swing` | Kettlebell |
+
+### Biceps (5)
+
+| Done | Exercise | File name | Equipment |
+|---|---|---|---|
+| [ ] | Incline Dumbbell Curl | `incline-db-curl` | Dumbbell |
+| [ ] | EZ-Bar Curl | `ez-bar-curl` | Barbell |
+| [ ] | Preacher Curl (EZ-bar) | `preacher-curl` | Barbell |
+| [ ] | Zottman Curl | `zottman-curl` | Dumbbell |
+| [ ] | Reverse Curl | `reverse-curl` | Barbell |
+
+### Triceps (4)
+
+| Done | Exercise | File name | Equipment |
+|---|---|---|---|
+| [ ] | Dumbbell Kickback | `db-kickback` | Dumbbell |
+| [ ] | Single-Arm Overhead Extension | `one-arm-overhead-extension` | Dumbbell |
+| [ ] | Bench Dip | `bench-dip` | Bodyweight |
+| [ ] | Diamond Push-Up | `diamond-push-up` | Bodyweight |
+
+### Core (6)
+
+| Done | Exercise | File name | Equipment |
+|---|---|---|---|
+| [ ] | Hanging Leg Raise | `hanging-leg-raise` | Bodyweight |
+| [ ] | Russian Twist | `russian-twist` | Dumbbell |
+| [ ] | Ab Wheel Rollout | `ab-wheel-rollout` | Bodyweight |
+| [ ] | Side Plank | `side-plank` | Bodyweight |
+| [ ] | Dead Bug | `dead-bug` | Bodyweight |
+| [ ] | Farmer's Carry | `farmers-carry` | Dumbbell |
+
+### Cardio (1)
+
+| Done | Exercise | File name | Equipment |
+|---|---|---|---|
+| [ ] | Jump Rope | `jump-rope` | Bodyweight |
+
