@@ -1,6 +1,6 @@
 # RISEN exercise pictures and clips
 
-Put ONE file per exercise in the folder of its body part (`chest`, `back`, `shoulders`, `legs`, `glutes`, `arms`, `core`, `cardio`, `flexibility`, `rest`), with the exact name from the list below. The app finds a clip by its NAME, wherever it sits: one in the wrong folder, or loose here, still works. That is all: every phone shows it the next time RISEN is opened with internet (it can take a minute or two after the upload). No code change, no new release.
+Put ONE file per exercise in the folder of its body part (`chest`, `back`, `shoulders`, `legs`, `glutes`, `biceps`, `triceps`, `core`, `cardio`, `flexibility`, `rest`), with the exact name from the list below. The app finds a clip by its NAME, wherever it sits: one in the wrong folder, or loose here, still works. That is all: every phone shows it the next time RISEN is opened with internet (it can take a minute or two after the upload). No code change, no new release.
 
 ## Rules
 
@@ -101,21 +101,26 @@ Add `.mp4` for a clip or `.jpg` for a picture.
 | Barbell Hip Thrust | `barbell-hip-thrust` |
 | Glute Bridge | `glute-bridge` |
 
-### Arms (12)
+### Biceps (6)
 
 | Exercise | File name |
 |---|---|
 | Arm Curl | `arm-curl` |
-| Arm Extension | `arm-extension` |
-| Cable Triceps Pushdown | `cable-pushdown` |
 | Cable Curl | `cable-curl` |
-| Cable Overhead Triceps Extension | `cable-overhead-extension` |
 | Barbell Curl | `barbell-curl` |
-| Skull Crusher | `skull-crusher` |
-| Close-Grip Bench Press | `close-grip-bench` |
 | Dumbbell Curl | `db-curl` |
 | Hammer Curl | `hammer-curl` |
 | Concentration Curl | `concentration-curl` |
+
+### Triceps (6)
+
+| Exercise | File name |
+|---|---|
+| Arm Extension | `arm-extension` |
+| Cable Triceps Pushdown | `cable-pushdown` |
+| Cable Overhead Triceps Extension | `cable-overhead-extension` |
+| Skull Crusher | `skull-crusher` |
+| Close-Grip Bench Press | `close-grip-bench` |
 | Overhead Dumbbell Extension | `overhead-db-extension` |
 
 ### Core (8)

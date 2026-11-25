@@ -143,7 +143,7 @@ const mediaName = n => { const m = /^(.+)\.([a-z0-9]+)$/i.exec(n); return m ? { 
 //   a clip wins over a picture of the same exercise · over 8 MB is skipped · the user's own photo / clip always wins (gym.js, photo.js)
 const ExMedia = (() => {
   const rank = n => /\.(mp4|mov)$/i.test(n) ? 0 : 1;                 // a clip before a picture
-  // .105: the clips sit in body-part folders (assets/exercises/chest/…, back/, shoulders/, legs/, glutes/, arms/, core/, cardio/, flexibility/, rest/).
+  // .105: the clips sit in body-part folders (assets/exercises/chest/…, back/, shoulders/, legs/, glutes/, biceps/, triceps/, core/, cardio/, flexibility/, rest/).
   // A clip is found by its FILE NAME wherever it sits (a clip in the wrong folder, or loose in assets/exercises/, still works). Day Off may have
   // several clips: day-off, day-off-2, day-off-3 … (one is picked at random each time the app opens, `dayOff()`).
   const F = RepoFolder({ dir: 'assets/exercises', cache: 'risen.exmedia', deep: true, pick(rows) {

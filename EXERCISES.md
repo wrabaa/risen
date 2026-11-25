@@ -10,7 +10,7 @@ Source: `RISEN_Master_Gym_Equipment_Inventory.pdf` + Siza's photos of the Techno
 - Old generic exercises: same movement → `aliases` to the new one; otherwise `retired`.
   Plans, history and photos on the phone must follow. Nothing is lost.
 - Every exercise has TWO tags:
-  - `muscle` = the group heading below (Chest, Back, Shoulders, Legs, Glutes, Arms, Core, Cardio,
+  - `muscle` = the group heading below (Chest, Back, Shoulders, Legs, Glutes, Biceps, Triceps, Core, Cardio,
     Flexibility) — used for the day title and the library groups.
   - `equipment` = one of: **Machine · Cable · Dumbbell · Barbell · Bodyweight · Cardio**
     (Smith machine counts as Machine). Stored now, filter chips come later.

@@ -81,18 +81,18 @@ const LIBRARY = (() => {
     { id: 'lib-fz-barbell-hip-thrust', name: 'Barbell Hip Thrust', muscle: 'Glutes', equipment: 'Barbell', file: 'barbell-hip-thrust' },
     { id: 'lib-fz-glute-bridge', name: 'Glute Bridge', muscle: 'Glutes', equipment: 'Bodyweight', file: 'glute-bridge' },
     // Arms
-    { id: 'lib-fz-arm-curl', name: 'Arm Curl', muscle: 'Arms', equipment: 'Machine', file: 'arm-curl' },
-    { id: 'lib-fz-arm-extension', name: 'Arm Extension', muscle: 'Arms', equipment: 'Machine', file: 'arm-extension' },
-    { id: 'lib-fz-cable-pushdown', name: 'Cable Triceps Pushdown', muscle: 'Arms', equipment: 'Cable', file: 'cable-pushdown' },
-    { id: 'lib-fz-cable-curl', name: 'Cable Curl', muscle: 'Arms', equipment: 'Cable', file: 'cable-curl' },
-    { id: 'lib-fz-cable-overhead-extension', name: 'Cable Overhead Triceps Extension', muscle: 'Arms', equipment: 'Cable', file: 'cable-overhead-extension' },
-    { id: 'lib-fz-barbell-curl', name: 'Barbell Curl', muscle: 'Arms', equipment: 'Barbell', file: 'barbell-curl' },
-    { id: 'lib-fz-skull-crusher', name: 'Skull Crusher', muscle: 'Arms', equipment: 'Barbell', file: 'skull-crusher' },
-    { id: 'lib-fz-close-grip-bench', name: 'Close-Grip Bench Press', muscle: 'Arms', equipment: 'Barbell', file: 'close-grip-bench' },
-    { id: 'lib-fz-db-curl', name: 'Dumbbell Curl', muscle: 'Arms', equipment: 'Dumbbell', file: 'db-curl' },
-    { id: 'lib-fz-hammer-curl', name: 'Hammer Curl', muscle: 'Arms', equipment: 'Dumbbell', file: 'hammer-curl' },
-    { id: 'lib-fz-concentration-curl', name: 'Concentration Curl', muscle: 'Arms', equipment: 'Dumbbell', file: 'concentration-curl' },
-    { id: 'lib-fz-overhead-db-extension', name: 'Overhead Dumbbell Extension', muscle: 'Arms', equipment: 'Dumbbell', file: 'overhead-db-extension' },
+    { id: 'lib-fz-arm-curl', name: 'Arm Curl', muscle: 'Biceps', equipment: 'Machine', file: 'arm-curl' },
+    { id: 'lib-fz-arm-extension', name: 'Arm Extension', muscle: 'Triceps', equipment: 'Machine', file: 'arm-extension' },
+    { id: 'lib-fz-cable-pushdown', name: 'Cable Triceps Pushdown', muscle: 'Triceps', equipment: 'Cable', file: 'cable-pushdown' },
+    { id: 'lib-fz-cable-curl', name: 'Cable Curl', muscle: 'Biceps', equipment: 'Cable', file: 'cable-curl' },
+    { id: 'lib-fz-cable-overhead-extension', name: 'Cable Overhead Triceps Extension', muscle: 'Triceps', equipment: 'Cable', file: 'cable-overhead-extension' },
+    { id: 'lib-fz-barbell-curl', name: 'Barbell Curl', muscle: 'Biceps', equipment: 'Barbell', file: 'barbell-curl' },
+    { id: 'lib-fz-skull-crusher', name: 'Skull Crusher', muscle: 'Triceps', equipment: 'Barbell', file: 'skull-crusher' },
+    { id: 'lib-fz-close-grip-bench', name: 'Close-Grip Bench Press', muscle: 'Triceps', equipment: 'Barbell', file: 'close-grip-bench' },
+    { id: 'lib-fz-db-curl', name: 'Dumbbell Curl', muscle: 'Biceps', equipment: 'Dumbbell', file: 'db-curl' },
+    { id: 'lib-fz-hammer-curl', name: 'Hammer Curl', muscle: 'Biceps', equipment: 'Dumbbell', file: 'hammer-curl' },
+    { id: 'lib-fz-concentration-curl', name: 'Concentration Curl', muscle: 'Biceps', equipment: 'Dumbbell', file: 'concentration-curl' },
+    { id: 'lib-fz-overhead-db-extension', name: 'Overhead Dumbbell Extension', muscle: 'Triceps', equipment: 'Dumbbell', file: 'overhead-db-extension' },
     // Core
     { id: 'lib-fz-abdominal-crunch', name: 'Abdominal Crunch', muscle: 'Core', equipment: 'Machine', file: 'abdominal-crunch' },
     { id: 'lib-fz-total-abdominal', name: 'Total Abdominal', muscle: 'Core', equipment: 'Machine', file: 'total-abdominal' },
@@ -113,7 +113,7 @@ const LIBRARY = (() => {
     // Rest (.101): a "day" to put on a rest day, with its own picture or clip (assets/exercises/day-off.mp4 or .jpg)
     { id: 'lib-fz-day-off', name: 'Day Off', muscle: 'Rest', equipment: 'Bodyweight', file: 'day-off' },
   ];
-  const groups = ['Chest', 'Back', 'Shoulders', 'Legs', 'Glutes', 'Arms', 'Core', 'Cardio', 'Flexibility', 'Rest'];          // order of the groups on screen
+  const groups = ['Chest', 'Back', 'Shoulders', 'Legs', 'Glutes', 'Biceps', 'Triceps', 'Core', 'Cardio', 'Flexibility', 'Rest'];          // order of the groups on screen
   // Old (generic, pre-.47) exercise -> the same movement in the new list. Plans, history, notes and photos follow.
   const aliases = {
     'lib-bench-press': 'lib-fz-bench-press',   // Bench press -> Bench Press
@@ -179,7 +179,7 @@ const LIBRARY = (() => {
     { id: 'lib-overhead-press', name: 'Overhead press', muscle: 'Shoulders' },
     { id: 'lib-arnold-press', name: 'Arnold press', muscle: 'Shoulders' },
     { id: 'lib-front-squat', name: 'Front squat', muscle: 'Legs' },
-    { id: 'lib-preacher-curl', name: 'Preacher curl', muscle: 'Arms' },
+    { id: 'lib-preacher-curl', name: 'Preacher curl', muscle: 'Biceps' },
     { id: 'lib-side-plank', name: 'Side plank', muscle: 'Core' },
     { id: 'lib-hanging-leg-raise', name: 'Hanging leg raise', muscle: 'Core' },
     { id: 'lib-russian-twist', name: 'Russian twist', muscle: 'Core' },
