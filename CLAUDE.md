@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-24.32)
+## Status (release 2026-11-24.33)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -346,6 +346,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   fades in once it really plays (`.photo.alt` in `styles.css`, `IntroMedia` in `media.js`); the intro play / pause looks at every intro video. iPhone test pending.
 
 - `.136` ARMS SPLIT (Siza): the library group "Arms" is now two groups, **Biceps** (arm-curl, cable-curl, barbell-curl, db-curl, hammer-curl, concentration-curl) and **Triceps** (arm-extension, cable-pushdown, cable-overhead-extension, skull-crusher, close-grip-bench, overhead-db-extension); ids, `file` names and stills unchanged, so plans, history, photos and clips follow. The 12 clips moved from `assets/exercises/arms/` to `biceps/` and `triceps/` (clips match by file name anywhere, so phones keep working with no re-download). A custom exercise that was filed under "Arms" stays in My exercises (its muscle chip is simply unlit; pick Biceps or Triceps). iPhone test pending.
+
+- `.137` Adductor and Abductor moved from the Legs group to Glutes in `library.js` (ids, file names, clips and stills unchanged; their clips already sat in `glutes/`). Library: Glutes 7, Legs 13. iPhone test pending.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back

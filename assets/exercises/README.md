@@ -71,7 +71,7 @@ Add `.mp4` for a clip or `.jpg` for a picture.
 | Rear Delt Fly | `rear-delt-fly` |
 | Shrugs | `shrugs` |
 
-### Legs (15)
+### Legs (13)
 
 | Exercise | File name |
 |---|---|
@@ -79,8 +79,6 @@ Add `.mp4` for a clip or `.jpg` for a picture.
 | Leg Extension | `leg-extension` |
 | Leg Curl | `leg-curl` |
 | Rotary Calf | `rotary-calf` |
-| Adductor (inner thigh) | `adductor` |
-| Abductor (outer thigh) | `abductor` |
 | Plate-Loaded Leg Machine | `plate-leg-machine` |
 | Smith Machine Squat | `smith-squat` |
 | Squat (rack) | `squat` |
@@ -91,7 +89,7 @@ Add `.mp4` for a clip or `.jpg` for a picture.
 | Dumbbell Step-Up | `db-step-up` |
 | Standing Calf Raise | `standing-calf-raise` |
 
-### Glutes (5)
+### Glutes (7)
 
 | Exercise | File name |
 |---|---|
@@ -100,6 +98,8 @@ Add `.mp4` for a clip or `.jpg` for a picture.
 | Cable Glute Kickback | `cable-glute-kickback` |
 | Barbell Hip Thrust | `barbell-hip-thrust` |
 | Glute Bridge | `glute-bridge` |
+| Adductor (inner thigh) | `adductor` |
+| Abductor (outer thigh) | `abductor` |
 
 ### Biceps (6)
 
