@@ -349,6 +349,8 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 
 - `.137` Adductor and Abductor moved from the Legs group to Glutes in `library.js` (ids, file names, clips and stills unchanged; their clips already sat in `glutes/`). Library: Glutes 7, Legs 13. iPhone test pending.
 
+- **REMINDER (Siza, 25 Nov):** when ALL the current exercise videos / stills are finished, remind him and ask to ADD MORE FREE-WEIGHT exercises for every body part (Glutes is thinnest, then Triceps, Core, Back; see the count by group). Write the list, he picks, then add with new ids and file names. Do not start before he says.
+
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
 1. ✅ DONE (`.35`) **Settings: "Reload gym schedule"** → confirm → schedule classes go back
    to the latest `data/gym-classes.json` (by fixed ID). Kept: attendance, notes on a class,
