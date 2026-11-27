@@ -4,7 +4,8 @@
 // WHERE THINGS LIVE
 //   - The recipe TEXT: his own file magnolia-recipes.json (made from his books; NEVER put it on GitHub, the repo is public). Loaded once with LOAD RECIPE FILE,
 //     kept in this phone's database `risen-baking` (store `kv`, key `book`). Replace it any time from the line at the bottom of the menu.
-//   - The AI pictures: repo folder assets/baking/<category id>/<recipe id>.jpg (also .png / .webp), and assets/baking/<category id>/_cover.jpg for a category card.
+//   - The AI pictures: repo folder assets/baking/<category id>/<recipe id>.jpg (also .png / .webp); the 14 category cards of the menu: assets/baking/main/<category id>.jpg
+//     (no card picture yet: the category's first recipe picture is shown).
 //     They come to the phone by themselves (repofolder.js, cache `risen.baking`), no release needed, and stay for offline use.
 //   - His own photo (one per recipe) and the ★ list: the same database (`photos`, keyed by recipe id; `kv` key `favs`). Only on this phone, not in RISEN's backup.
 (() => {
@@ -97,7 +98,7 @@
   function renderMenu() {
     const n = book.recipes.length, fv = [...favs].filter(id => byId[id]).length;
     const cats = book.categories.map(c => { const k = inCat(c.id).length;
-      return `<button type="button" class="cat" data-go="#/c/${c.id}"><div class="ph" data-pic="${c.id}/_cover" data-first="${c.id}">${ICON}</div><div class="fade"></div><div class="t"><b>${esc(c.name)}</b><small>${k} recipe${k === 1 ? '' : 's'}</small></div></button>`; }).join('');
+      return `<button type="button" class="cat" data-go="#/c/${c.id}"><div class="ph" data-pic="main/${c.id}" data-first="${c.id}">${ICON}</div><div class="fade"></div><div class="t"><b>${esc(c.name)}</b><small>${k} recipe${k === 1 ? '' : 's'}</small></div></button>`; }).join('');
     const favCard = fv ? `<button type="button" class="cat fav" data-go="#/fav"><div class="ph" style="color:var(--volt)"><svg class="ico" viewBox="0 0 24 24" style="fill:var(--volt);stroke:var(--volt)" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></div><div class="t"><b>My favourites</b><small>${fv} recipe${fv === 1 ? '' : 's'}</small></div></button>` : '';
     main.innerHTML = `${bar('Baking', 'home', 'Back to Home')}
       <div class="subline">${book.categories.length} categories · ${n} recipes</div>
@@ -198,7 +199,7 @@
       let url = null;
       if (key0) {                                             // the AI picture (a category card with no cover yet shows its first recipe's picture)
         let key = key0;
-        if (!aiKeys.has(key) && el.dataset.first) key = keys.find(x => x.startsWith(el.dataset.first + '/') && !x.endsWith('/_cover')) || key;
+        if (!aiKeys.has(key) && el.dataset.first) key = [el.dataset.first + '/_cover'].find(x => aiKeys.has(x)) || keys.find(x => x.startsWith(el.dataset.first + '/') && !x.endsWith('/_cover')) || key;
         if (aiKeys.has(key)) { const g = await Pics.get(key); url = g && g.url; }
       }
       if (!url && ownId && own.has(ownId)) url = await ownUrl(ownId);      // his own photo (alone, or where there is no AI picture yet)
