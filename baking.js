@@ -268,6 +268,40 @@
     finally { fileBusy = false; }
   };
 
+
+  // ---------- swipe right = back (`.142`, like SwipeBack in RISEN): the page follows the finger; back when dragged past half the width,
+  // or flicked fast past a quarter; anything less springs back. It then presses the page's own "<" (so it does exactly what that button does). ----------
+  (() => {
+    let x0 = 0, y0 = 0, t0 = 0, on = false, dead = false, dx = 0, lastX = 0, lastT = 0, v = 0;
+    const W = () => window.innerWidth || 375;
+    const reset = anim => { main.style.transition = anim ? 'transform .25s cubic-bezier(.2,.8,.2,1)' : ''; main.style.transform = ''; };
+    main.addEventListener('touchstart', e => {
+      if (e.touches.length !== 1 || !$('bkSheet').hidden || e.target.closest('input,textarea,select,[data-noswipe]') || document.activeElement && document.activeElement.matches('input,textarea')) { dead = true; return; }
+      const t = e.touches[0]; x0 = lastX = t.clientX; y0 = t.clientY; t0 = lastT = e.timeStamp; on = false; dead = false; dx = 0; v = 0;
+    }, { passive: true });
+    main.addEventListener('touchmove', e => {
+      if (dead) return;
+      const t = e.touches[0], mx = t.clientX - x0, my = t.clientY - y0;
+      if (!on) {
+        if (Math.abs(mx) < 10 && Math.abs(my) < 10) return;
+        if (mx > 0 && Math.abs(mx) > Math.abs(my) * 1.2) { on = true; main.style.transition = ''; }
+        else { dead = true; return; }
+      }
+      dx = Math.max(0, mx); const dt = e.timeStamp - lastT; if (dt > 0) v = (t.clientX - lastX) / dt; lastX = t.clientX; lastT = e.timeStamp;
+      main.style.transform = `translateX(${dx}px)`;
+      if (e.cancelable) e.preventDefault();
+    }, { passive: false });
+    const end = () => {
+      if (!on) { dead = false; return; }
+      on = false; const w = W();
+      if (dx > w * .5 || (dx > w * .25 && v >= .3)) {
+        main.style.transition = 'transform .2s ease-out'; main.style.transform = `translateX(${w}px)`;
+        setTimeout(() => { const b = main.querySelector('[data-act="up"],[data-act="home"]'); reset(false); if (b) b.click(); }, 200);
+      } else reset(true);
+    };
+    main.addEventListener('touchend', end); main.addEventListener('touchcancel', () => { if (on) { on = false; reset(true); } });
+  })();
+
   // the RISEN "are you sure?" sheet (never the system confirm)
   function ask(title, text) {
     return new Promise(done => {

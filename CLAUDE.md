@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-27.4)
+## Status (release 2026-11-27.5)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -356,7 +356,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   `.141` the Home BAKING card is a big picture card like TRY TODAY (`cls:'tryit bake'`, 280 px tall): ONE baking picture per opening (never the last one, `localStorage` `risen.bakepic`), the recipe's name big (from the `risen-baking` database, read only; "Magnolia" without a picture), "276 recipes · Your baking book", OPEN pill; the whole card opens baking.html. `BakingPics()` (the baking folder, one definition for both pages) lives in `repofolder.js`; app.js sets the card up after all scripts load and also syncs the folder (same cache `risen.baking`).
   `RepoFolder`, `MEDIA_TYPES`, `mediaName` moved unchanged from media.js to the new `repofolder.js` (loaded before media.js in index.html / me.html, and by baking.html). Tested at 375 (his iPhone X), 390 and 402 (iPhone 17) wide: load file, menu, category, recipe, 2× batch, tick, ★, own photo add, favourites card after reload, search, fake AI pictures via a mocked tree; me.html / index.html load with no errors, the tile shows on me.html only. iPhone test pending.
 
-- **TO DO LATER (Siza, 27 Nov): BAKING swipe navigation.** baking.html has no swipe yet (only the "<" buttons). Add swipe right = back (like `SwipeBack` in the rest of RISEN) and ask Siza whether swipe left / right on a recipe should move to the next / previous recipe of the same category.
+- `.142` BAKING swipe back (Siza): on every Baking screen a swipe RIGHT = its "<" (recipe → category → menu → his Home), the page follows the finger; back past 50% of the width or a fast flick past 25%, else it springs back (same feel as `SwipeBack`; own small copy at the end of `baking.js`, presses the page's `[data-act="up"|"home"]`). Never from the search field or under the delete sheet. Open question for Siza: swipe left / right on a recipe = next / previous recipe of the category? Tested with simulated touches at 375 wide. iPhone test pending.
 - **REMINDER (Siza, 25 Nov):** when ALL the current exercise videos / stills are finished, remind him and ask to ADD MORE FREE-WEIGHT exercises for every body part (Glutes is thinnest, then Triceps, Core, Back; see the count by group). The proposed list (41) is written at the bottom of `assets/exercises/README.md` ("PLANNED: more free-weight exercises"); he picks, then add with new ids and file names. Do not add to `library.js` before he says GO.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
