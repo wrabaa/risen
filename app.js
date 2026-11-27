@@ -209,6 +209,9 @@
       const t=Meals.tryInfo(); if(!t) return '';
       return `<img class="tryimg" alt="" decoding="sync" src="${esc(t.url)}"><div class="trytxt"><div class="trynm">${esc(t.name)}</div><div class="sub">${esc(t.cat)}${t.kcal?' · '+t.kcal+' kcal':''}</div></div><span class="trygo">TRY IT</span>`;
     }},
+    {title:'Baking', only:'me', tap:'baking', html(){       // .138 (Siza's Home only): opens his Magnolia baking book, baking.html (its own page; the recipe text lives only on his phone)
+      return `<div><div class="wname">Magnolia</div><div class="sub">Your baking book · tap to open</div></div>`;
+    }},
     {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
       if(typeof Classes==='undefined') return '';
       if(!S.classes.length) return `<div><div class="wname">No classes yet</div><div class="sub">Add them in Classes</div></div>`;
@@ -508,6 +511,7 @@
     if(e.target.closest('[data-tap="water"]')){ setWaterToday(waterToday()+1); renderHome(); Motion.count(document.querySelector('.tile.water'),380); return; }
     const m=e.target.closest('[data-tab]'); if(m) return Meds.open();
     if(e.target.closest('[data-tap="try"]')) return Meals.openTry();
+    if(e.target.closest('[data-tap="baking"]')){ location.href='baking.html'; return; }
     if(e.target.closest('[data-tap="today"]')) Gym.openToday();
     if(e.target.closest('[data-tap="classes"]')) Classes.openToday();
     if(e.target.closest('[data-tap="meds"]')) Meds.open();

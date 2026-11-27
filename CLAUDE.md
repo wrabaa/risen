@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-24.33)
+## Status (release 2026-11-27.1)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -348,6 +348,11 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
 - `.136` ARMS SPLIT (Siza): the library group "Arms" is now two groups, **Biceps** (arm-curl, cable-curl, barbell-curl, db-curl, hammer-curl, concentration-curl) and **Triceps** (arm-extension, cable-pushdown, cable-overhead-extension, skull-crusher, close-grip-bench, overhead-db-extension); ids, `file` names and stills unchanged, so plans, history, photos and clips follow. The 12 clips moved from `assets/exercises/arms/` to `biceps/` and `triceps/` (clips match by file name anywhere, so phones keep working with no re-download). A custom exercise that was filed under "Arms" stays in My exercises (its muscle chip is simply unlit; pick Biceps or Triceps). iPhone test pending.
 
 - `.137` Adductor and Abductor moved from the Legs group to Glutes in `library.js` (ids, file names, clips and stills unchanged; their clips already sat in `glutes/`). Library: Glutes 7, Legs 13. iPhone test pending.
+
+- `.138` BAKING BOOK (Siza, planner chat; **me.html only**): new tile 07 BAKING ("Magnolia · Your baking book", `only:'me'`, `tap:'baking'`) opens its OWN page `baking.html` (+ `baking.js`, `baking.css`; all three in `CORE`). Screens: MENU (search by name or ingredient, ★ MY FAVOURITES card when there are some, 14 category cards) → CATEGORY (2-column recipe grid) → RECIPE (big picture, thumbs AI + MINE (ONE own photo per recipe, `+` adds it, bin deletes it), ★, chips yield / oven °C, batch ½× 1× 2× scales every amount incl. grams and sticks, tap an ingredient to tick it (this opening only), "Open ›" on a linked sub-recipe, numbered steps). Navigation by hash (`#/c/<cat>`, `#/r/<id>`, `#/fav`); "<" on the menu goes back to me.html straight onto Home (`risen.skipIntro`).
+  **The recipe TEXT is NOT in the repo (public; it comes from Siza's own Magnolia books):** he loads `magnolia-recipes.json` once (LOAD RECIPE FILE / "Replace recipe file" at the bottom of the menu); it lives in its OWN database `risen-baking` (stores `kv`: `book`, `favs`; `photos`: his own photo per recipe id). Deliberately separate from RISEN's database: not in Export / Import / Reset; the master copy of the file is on his Mac (Documents/Magnolia + backup/). NEVER commit that file.
+  AI pictures: repo folder `assets/baking/<category id>/<recipe id>.jpg|png|webp` (≤3 MB) and optional `_cover.jpg` per category (else the card shows its first recipe's picture); names listed in `assets/baking/README.md`; they reach the phone by themselves (`RepoFolder`, deep, cache `risen.baking`; sw.js lets `assets/baking/` pass), no release needed.
+  `RepoFolder`, `MEDIA_TYPES`, `mediaName` moved unchanged from media.js to the new `repofolder.js` (loaded before media.js in index.html / me.html, and by baking.html). Tested at 375 (his iPhone X), 390 and 402 (iPhone 17) wide: load file, menu, category, recipe, 2× batch, tick, ★, own photo add, favourites card after reload, search, fake AI pictures via a mocked tree; me.html / index.html load with no errors, the tile shows on me.html only. iPhone test pending.
 
 - **REMINDER (Siza, 25 Nov):** when ALL the current exercise videos / stills are finished, remind him and ask to ADD MORE FREE-WEIGHT exercises for every body part (Glutes is thinnest, then Triceps, Core, Back; see the count by group). The proposed list (41) is written at the bottom of `assets/exercises/README.md` ("PLANNED: more free-weight exercises"); he picks, then add with new ids and file names. Do not add to `library.js` before he says GO.
 

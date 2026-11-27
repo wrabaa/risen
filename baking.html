@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0B0B0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Baking">
+<title>RISEN · Baking</title>
+<link rel="manifest" href="manifest-me.json">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="preload" href="assets/fonts/oswald.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="baking.css">
+</head>
+<body>
+  <!-- RISEN BAKING (`.138`): Siza's private Magnolia baking book. The recipe TEXT is loaded once from his own file (magnolia-recipes.json, never on GitHub)
+       and kept on the phone; the pictures come from the repo folder assets/baking/<category>/<recipe id>.jpg by themselves (repofolder.js). All drawn by baking.js. -->
+  <main id="bk" aria-live="polite"></main>
+  <input type="file" id="bkFile" accept=".json,application/json" hidden>
+  <input type="file" id="bkPhoto" accept="image/*" hidden>
+  <div class="bksheet" id="bkSheet" hidden><div class="bkcard" role="dialog" aria-modal="true" aria-labelledby="bkSheetT"><h2 id="bkSheetT"></h2><p id="bkSheetP"></p><div class="bkrow"><button type="button" class="bkghost" id="bkNo">CANCEL</button><button type="button" class="bkdanger" id="bkYes">DELETE</button></div></div></div>
+  <div class="bktoast" id="bkToast" hidden></div>
+<script src="repofolder.js"></script>
+<script src="baking.js"></script>
+</body>
+</html>

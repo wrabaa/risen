@@ -1,10 +1,10 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of the APP files (pages, code, data) and delete the old one.
-const VERSION = '2026-11-24.33';
+const VERSION = '2026-11-27.1';
 const CACHE = 'risen-' + VERSION;
 
 // APP FILES: small, change often. All of them are downloaded again on every release, all or nothing.
-const CORE = ['./', 'index.html', 'me.html', 'manifest-me.json', 'styles.css', 'shared.js', 'prayer.js', 'music.js', 'app.js', 'db.js', 'photo.js', 'library.js', 'media.js', 'gym.js', 'meds.js', 'classes.js', 'meals.js', 'profile.js', 'coach.js', 'manifest.json', 'data/gym-classes.json'];
+const CORE = ['./', 'index.html', 'me.html', 'manifest-me.json', 'styles.css', 'shared.js', 'prayer.js', 'music.js', 'app.js', 'db.js', 'photo.js', 'library.js', 'repofolder.js', 'media.js', 'baking.html', 'baking.js', 'baking.css', 'gym.js', 'meds.js', 'classes.js', 'meals.js', 'profile.js', 'coach.js', 'manifest.json', 'data/gym-classes.json'];
 
 // IMAGES AND FONTS: big, change rarely. They live in their own cache that survives releases, so an update only
 // downloads the ones that are new or changed.
@@ -102,7 +102,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
   const rel = req.url.split(/[?#]/)[0].slice(SCOPE.length);
-  if (rel.startsWith('assets/exercises/') || rel.startsWith('assets/recipes/') || rel.startsWith('assets/intro/')) return;      // exercise pictures / clips and the recipe pack: media.js downloads and keeps them itself (caches `risen.exmedia`, `risen.recipes`), never a second copy here
+  if (rel.startsWith('assets/exercises/') || rel.startsWith('assets/recipes/') || rel.startsWith('assets/intro/') || rel.startsWith('assets/baking/')) return;      // exercise pictures / clips and the recipe pack: media.js downloads and keeps them itself (caches `risen.exmedia`, `risen.recipes`), never a second copy here
   if (ASSETS[rel] != null) {
     e.respondWith(caches.open(ASSET_CACHE).then(c => c.match(abs(rel)).then(async hit => {
       if (hit && req.headers.has('range')) {      // a video asks for a slice (iPhone always does): answer with just that slice, or it will not play
@@ -126,6 +126,6 @@ self.addEventListener('fetch', e => {
     if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
     return res;
   })).catch(() => req.mode === 'navigate'
-    ? caches.match(abs(/me\.html$/.test(new URL(req.url).pathname) ? 'me.html' : 'index.html'), { cacheName: CACHE })     // safety net: a page with no copy and no network opens the app, not the browser's error
+    ? caches.match(abs(/me\.html$/.test(new URL(req.url).pathname) ? 'me.html' : /baking\.html$/.test(new URL(req.url).pathname) ? 'baking.html' : 'index.html'), { cacheName: CACHE })     // safety net: a page with no copy and no network opens the app, not the browser's error
     : Response.error()));
 });
