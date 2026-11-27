@@ -30,17 +30,7 @@
   })();
 
   // ---------- the AI pictures from the repo ----------
-  const PIC_TYPES = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
-  const Pics = RepoFolder({ dir: 'assets/baking', cache: 'risen.baking', deep: true, pick(rows) {
-    const want = {};
-    for (const r of rows) {
-      const m = /^([a-z0-9-]+)\/([a-z0-9_-]+)\.(jpg|jpeg|png|webp)$/i.exec(r.path || '');
-      if (!m || r.size > 3 * 1024 * 1024) continue;
-      const k = (m[1] + '/' + m[2]).toLowerCase(); if (want[k]) continue;
-      want[k] = { name: r.name, path: r.path, sha: r.sha, type: PIC_TYPES[m[3].toLowerCase()] };
-    }
-    return want;
-  } });
+  const Pics = BakingPics();
   let picTimer = 0;
   Pics.onChange = () => { clearTimeout(picTimer); picTimer = setTimeout(fillPics, 300); };
   const syncPics = force => { if (!document.hidden) Pics.sync([], force).catch(() => {}); };

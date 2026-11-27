@@ -129,3 +129,19 @@ function RepoFolder({ dir, cache: CACHE, pick, deep = false, fallback = null }) 
 const MEDIA_TYPES = { mp4: 'video/mp4', mov: 'video/quicktime', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif' };
 const mediaName = n => { const m = /^(.+)\.([a-z0-9]+)$/i.exec(n); return m ? { base: m[1].toLowerCase(), ext: m[2].toLowerCase() } : null; };
 
+
+// The baking pictures (`.138`/`.141`): assets/baking/<category id>/<recipe id>.jpg|png|webp and assets/baking/main/<category id>.jpg (≤3 MB).
+// Used by baking.html (all screens) and by Siza's Home card 07 BAKING (one picture per opening). Same cache, so a picture is downloaded once.
+function BakingPics() {
+  const TYPES = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+  return RepoFolder({ dir: 'assets/baking', cache: 'risen.baking', deep: true, pick(rows) {
+    const want = {};
+    for (const r of rows) {
+      const m = /^([a-z0-9-]+)\/([a-z0-9_-]+)\.(jpg|jpeg|png|webp)$/i.exec(r.path || '');
+      if (!m || r.size > 3 * 1024 * 1024) continue;
+      const k = (m[1] + '/' + m[2]).toLowerCase(); if (want[k]) continue;
+      want[k] = { name: r.name, path: r.path, sha: r.sha, type: TYPES[m[3].toLowerCase()] };
+    }
+    return want;
+  } });
+}

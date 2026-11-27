@@ -978,6 +978,7 @@
 .tile.min{padding:14px 20px;cursor:pointer}
 .tile.min .tile-head{align-items:center}
 .tile.tryit .tchev{position:relative;z-index:2}
+.tile.tryit.bake{min-height:280px}                                  /* .141 BAKING card: like TRY TODAY, taller */
 .tileopen{animation:fade .25s ease both}
 @media (prefers-reduced-motion:reduce){.tchev .icon{transition:none}}
 

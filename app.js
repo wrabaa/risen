@@ -146,6 +146,7 @@
 
   // ---- Tiles: add a new tile by adding an entry here ----
   const PLAY=ICONS.play;
+  const bakeCard={url:null,name:'',count:0,key:null};      // .141 the BAKING card's picture of this opening (filled further down, me.html only)
   const TILES=[
     {title:'Training', tap:'today', html(){          // the whole tile opens today's day in Gym
       const today=new Date(), day=`<div class="wname">${today.toLocaleDateString('en-GB',{weekday:'long'})}</div>`, go=`<span class="play" aria-hidden="true">${PLAY}</span>`;
@@ -209,8 +210,9 @@
       const t=Meals.tryInfo(); if(!t) return '';
       return `<img class="tryimg" alt="" decoding="sync" src="${esc(t.url)}"><div class="trytxt"><div class="trynm">${esc(t.name)}</div><div class="sub">${esc(t.cat)}${t.kcal?' · '+t.kcal+' kcal':''}</div></div><span class="trygo">TRY IT</span>`;
     }},
-    {title:'Baking', only:'me', tap:'baking', html(){       // .138 (Siza's Home only): opens his Magnolia baking book, baking.html (its own page; the recipe text lives only on his phone)
-      return `<div><div class="wname">Magnolia</div><div class="sub">Your baking book · tap to open</div></div>`;
+    {title:'Baking', only:'me', tap:'baking', cls:'tryit bake', html(){       // .138/.141 (Siza's Home only): a big picture card like TRY TODAY; one baking picture per opening (bakeCard); the whole card opens baking.html
+      const c=bakeCard;
+      return `${c.url?`<img class="tryimg" alt="" decoding="sync" src="${esc(c.url)}">`:''}<div class="trytxt"><div class="trynm">${esc(c.name||'Magnolia')}</div><div class="sub">${c.count?c.count+' recipes · ':''}Your baking book</div></div><span class="trygo">OPEN</span>`;
     }},
     {title:'Classes', tap:'classes', html(){        // the whole tile opens today's classes
       if(typeof Classes==='undefined') return '';
@@ -340,6 +342,33 @@
   function redrawMusic(){ const i=TILES.findIndex(x=>x.title==='Music'), art=document.querySelector('#tiles [data-tile="Music"]'); if(i<0||!art||$('view-home').hidden) return; art.outerHTML=tileHtml(TILES[i],i); if(!$('musicSheet').hidden) paintSongs(); }
   Music.on(redrawMusic);
   Music.onTick(()=>{ const m=Music.state(), i=document.querySelector('#tiles .tile.music .mbar i'); if(!i||!m.dur) return; i.style.width=Math.min(100,m.pos/m.dur*100)+'%'; const p=document.querySelector('#tiles .tile.music .mpos'); if(p) p.textContent=fmtT(m.pos); });
+
+  // BAKING card (.141, me.html only): ONE picture from the baking folder per opening (never the one of the last opening), with that recipe's name when the
+  // recipe file is on the phone (database `risen-baking`, read only). The pictures come by themselves (BakingPics, the same cache as baking.html).
+  setTimeout(()=>{ if((window.RISEN_HOME||'friends')==='me'&&typeof BakingPics==='function'){      // (after all scripts: repofolder.js loads after app.js)
+    const BP=BakingPics();
+    const bookOf=()=>new Promise(res=>{ try{ const r=indexedDB.open('risen-baking',1);
+      r.onupgradeneeded=()=>{ const d=r.result; if(!d.objectStoreNames.contains('kv')) d.createObjectStore('kv'); if(!d.objectStoreNames.contains('photos')) d.createObjectStore('photos'); };
+      r.onsuccess=()=>{ try{ const g=r.result.transaction('kv').objectStore('kv').get('book'); g.onsuccess=()=>{ res(g.result||null); r.result.close(); }; g.onerror=()=>{ res(null); r.result.close(); }; }catch(e){ res(null); } };
+      r.onerror=()=>res(null); }catch(e){ res(null); } });
+    const bakePrep=async()=>{
+      if(bakeCard.url) return;
+      let keys=[]; try{ keys=await BP.keys(); }catch(e){}
+      const book=await bookOf(); if(book&&Array.isArray(book.recipes)) bakeCard.count=book.recipes.length;
+      if(keys.length){
+        let last=''; try{ last=localStorage.getItem('risen.bakepic')||''; }catch(e){}
+        const pool=keys.length>1?keys.filter(k=>k!==last):keys, k=pool[Math.floor(Math.random()*pool.length)];
+        const g=await BP.get(k).catch(()=>null);
+        if(g){ bakeCard.url=g.url; bakeCard.key=k; try{ localStorage.setItem('risen.bakepic',k); }catch(e){}
+          const [cat,id]=k.split('/'), rec=book&&book.recipes&&book.recipes.find(r=>r.id===id), ct=book&&book.categories&&book.categories.find(c=>c.id===(cat==='main'?id:cat));
+          bakeCard.name=rec?rec.name:(ct?ct.name:''); }
+      }
+      if(!$('view-home').hidden&&!app.classList.contains('hidden')) drawHome();
+    };
+    BP.onChange=()=>{ if(!bakeCard.url) bakePrep(); };
+    setTimeout(()=>{ bakePrep(); BP.sync().catch(()=>{}); },2500);
+    document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ BP.sync().catch(()=>{}); bookOf().then(b=>{ const n=b&&b.recipes?b.recipes.length:0; if(n!==bakeCard.count){ bakeCard.count=n; if(!$('view-home').hidden) drawHome(); } }); } });
+  } },0);
 
   // TRY TODAY (.98): the recipe of this opening is picked as soon as the data is loaded, and again when recipes arrive later (meals.js sends `risen-try`)
   const tryReady=()=>{ if(!app.classList.contains('hidden')&&!$('view-home').hidden) drawHome(); };       // (also under a pop-up: it only draws the tiles behind it)

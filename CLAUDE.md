@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-27.3)
+## Status (release 2026-11-27.4)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -353,6 +353,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **The recipe TEXT is NOT in the repo (public; it comes from Siza's own Magnolia books):** he loads `magnolia-recipes.json` once (LOAD RECIPE FILE / "Replace recipe file" at the bottom of the menu); it lives in its OWN database `risen-baking` (stores `kv`: `book`, `favs`; `photos`: his own photo per recipe id). Deliberately separate from RISEN's database: not in Export / Import / Reset; the master copy of the file is on his Mac (Documents/Magnolia + backup/). NEVER commit that file.
   AI pictures: repo folder `assets/baking/<category id>/<recipe id>.jpg|png|webp` (≤3 MB) and optional `_cover.jpg` per category (else the card shows its first recipe's picture); names listed in `assets/baking/README.md`; they reach the phone by themselves (`RepoFolder`, deep, cache `risen.baking`; sw.js lets `assets/baking/` pass), no release needed.
   `.139` menu card pictures come from `assets/baking/main/<category id>.jpg` (else `<category>/_cover.jpg`, else the first recipe picture). `.140` the recipe picture on the recipe page is SQUARE, full width (`aspect-ratio:1/1`, max 560 px), so the whole AI picture shows (sizes: menu cards 1024², recipe pictures 1200², in `assets/baking/README.md`).
+  `.141` the Home BAKING card is a big picture card like TRY TODAY (`cls:'tryit bake'`, 280 px tall): ONE baking picture per opening (never the last one, `localStorage` `risen.bakepic`), the recipe's name big (from the `risen-baking` database, read only; "Magnolia" without a picture), "276 recipes · Your baking book", OPEN pill; the whole card opens baking.html. `BakingPics()` (the baking folder, one definition for both pages) lives in `repofolder.js`; app.js sets the card up after all scripts load and also syncs the folder (same cache `risen.baking`).
   `RepoFolder`, `MEDIA_TYPES`, `mediaName` moved unchanged from media.js to the new `repofolder.js` (loaded before media.js in index.html / me.html, and by baking.html). Tested at 375 (his iPhone X), 390 and 402 (iPhone 17) wide: load file, menu, category, recipe, 2× batch, tick, ★, own photo add, favourites card after reload, search, fake AI pictures via a mocked tree; me.html / index.html load with no errors, the tile shows on me.html only. iPhone test pending.
 
 - **TO DO LATER (Siza, 27 Nov): BAKING swipe navigation.** baking.html has no swipe yet (only the "<" buttons). Add swipe right = back (like `SwipeBack` in the rest of RISEN) and ask Siza whether swipe left / right on a recipe should move to the next / previous recipe of the same category.
