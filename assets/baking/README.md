@@ -83,11 +83,11 @@ One picture per category for the 14 cards on the Baking menu: a beautiful group 
 | [ ] | Razzy Cake | `razzy-cake.jpg` | super-rich chocolate cake, raspberry jam, recipe chocolate ganache, pint raspberries |
 | [ ] | Coconut Cake | `coconut-cake.jpg` | cake flour, granulated sugar, pure vanilla extract, grated lemon zest, eggs |
 | [ ] | Red Velvet Cake | `red-velvet-cake.jpg` | cake flour, granulated sugar, eggs, liquid red food coloring, unsweetened dark cocoa powder |
-| [ ] | S'Mores Cake | `smores-cake.jpg` | all-purpose flour, finely processed graham cracker crumbs, ground cinnamon, plus 2 tablespoons  granulated sugar, light brown sugar |
+| [ ] | S'Mores Cake | `smores-cake.jpg` | all-purpose flour, finely processed graham cracker crumbs, ground cinnamon, granulated sugar, light brown sugar |
 | [ ] | Carrot Cake | `carrot-cake.jpg` | all-purpose flour, ground cinnamon, grated nutmeg, raisins, lightly packed shredded carrots |
 | [ ] | Hummingbird Cake | `hummingbird-cake.jpg` | very ripe bananas, all-purpose flour, ground cinnamon, eggs, granulated sugar |
 | [ ] | Lemon Cake | `lemon-cake.jpg` | cake flour, granulated sugar, grated lemon zest, egg whites, buttermilk |
-| [ ] | Caramel Cake | `caramel-cake.jpg` | cake flour, light brown sugar, granulated sugar, eggs, plus 1½ teaspoons pure vanilla extract |
+| [ ] | Caramel Cake | `caramel-cake.jpg` | cake flour, light brown sugar, granulated sugar, eggs, pure vanilla extract |
 | [ ] | Caramel Pecan Layer Cake | `caramel-pecan-layer-cake.jpg` | self-rising flour, all-purpose flour, sugar, eggs, milk |
 | [ ] | Banana Chocolate Chip Cake with Nutella Buttercream | `banana-chocolate-chip-cake-with-nutella-buttercream.jpg` | all-purpose flour, cake flour, very ripe bananas, granulated sugar, eggs |
 | [ ] | Banana Cake with White Chocolate Cream Cheese Icing | `banana-cake-with-white-chocolate-cream-cheese-icing.jpg` | cake flour, sugar, eggs, mashed very ripe bananas, buttermilk |
@@ -111,7 +111,7 @@ One picture per category for the 14 cards on the Baking menu: a beautiful group 
 | [ ] | Poppy Seed Coffee Cake | `poppy-seed-coffee-cake.jpg` | all-purpose flour, eggs, solid vegetable shortening, sugar, milk |
 | [ ] | Apple Cake with Cinnamon Sugar Topping | `apple-cake-with-cinnamon-sugar-topping.jpg` | all-purpose flour, vegetable oil, sugar, eggs, milk |
 | [ ] | Brown Sugar Pecan Cake | `brown-sugar-pecan-cake.jpg` | cake flour, firmly packed light brown sugar, eggs, milk, vanilla extract |
-| [ ] | Pear Pecan Cake | `pear-pecan-cake.jpg` | all-purpose flour, sugar, plus 2 tablespoons vegetable oil, eggs, vanilla extract |
+| [ ] | Pear Pecan Cake | `pear-pecan-cake.jpg` | all-purpose flour, sugar, vegetable oil, eggs, vanilla extract |
 | [ ] | Buttermilk Cake with Nectarines | `buttermilk-cake-with-nectarines.jpg` | cake flour, sugar, buttermilk, vanilla extract, egg whites |
 | [ ] | Dump Cake | `dump-cake.jpg` | twenty-one-ounce can cherry pie filling, sixteen-ounce can crushed pineapple, box white cake mix, coarsely chopped pecans |
 | [ ] | Aunt Daisy's Fresh Fruit Torte | `aunt-daisys-fresh-fruit-torte.jpg` | sugar, eggs, all-purpose flour, vanilla extract, bosc pear |
@@ -135,7 +135,7 @@ One picture per category for the 14 cards on the Baking menu: a beautiful group 
 | [ ] | Peanut Butter Reese's Pieces Cookies | `peanut-butter-reeses-pieces-cookies.jpg` | all-purpose flour, skippy creamy peanut butter, light brown sugar, granulated sugar, eggs |
 | [ ] | White Chocolate Coconut Macadamia Cookies | `white-chocolate-coconut-macadamia-cookies.jpg` | all-purpose flour, sugar, firmly packed light brown sugar, egg, milk |
 | [ ] | White Chocolate Pecan Drop Cookies | `white-chocolate-pecan-drop-cookies.jpg` | all-purpose flour, sugar, firmly packed light brown sugar, egg, vanilla extract |
-| [ ] | Cranberry White Chocolate Chunk Cookies | `cranberry-white-chocolate-chunk-cookies.jpg` | unsweetened chocolate chunks, semisweet chocolate chips, all-purpose flour, eggs, plus 1 teaspoon pure vanilla extract |
+| [ ] | Cranberry White Chocolate Chunk Cookies | `cranberry-white-chocolate-chunk-cookies.jpg` | unsweetened chocolate chunks, semisweet chocolate chips, all-purpose flour, eggs, pure vanilla extract |
 | [ ] | Toffee Pecan Drop Cookies | `toffee-pecan-drop-cookies.jpg` | all-purpose flour, firmly packed light brown sugar, sugar, egg, vanilla extract |
 | [ ] | Orange Vanilla Chip Cookies | `orange-vanilla-chip-cookies.jpg` | all-purpose flour, sugar, firmly packed light brown sugar, egg, grated orange zest |
 | [ ] | Pumpkin Walnut Cookies with Brown Butter Frosting | `pumpkin-walnut-cookies-with-brown-butter-frosting.jpg` | all-purpose flour, allspice, cinnamon, ginger, firmly packed light brown sugar |
@@ -144,9 +144,9 @@ One picture per category for the 14 cards on the Baking menu: a beautiful group 
 | [ ] | Cracked Sugar Cookies | `cracked-sugar-cookies.jpg` | all-purpose flour, granulated sugar, egg yolks, pure vanilla extract |
 | [ ] | Confetti Cookies | `confetti-cookies.jpg` | all-purpose flour, granulated sugar, egg yolks, pure vanilla extract, confetti sprinkles |
 | [ ] | Cut-Out Sugar Cookies | `cut-out-sugar-cookies.jpg` | all-purpose flour, granulated sugar, eggs, pure vanilla extract, magnolia bakery vanilla buttercream |
-| [ ] | Christmas Vanilla Sugar Cookies | `christmas-vanilla-sugar-cookies.jpg` | all-purpose flour, sugar, egg yolks, vanilla extract, plus 2 tablespoons confectioners’ sugar |
+| [ ] | Christmas Vanilla Sugar Cookies | `christmas-vanilla-sugar-cookies.jpg` | all-purpose flour, sugar, egg yolks, vanilla extract, confectioners’ sugar |
 | [ ] | Iced Molasses Cookies | `iced-molasses-cookies.jpg` | all-purpose flour, allspice, cinnamon, sugar, egg |
-| [ ] | Iced Ginger Cookies | `iced-ginger-cookies.jpg` | all-purpose flour, ginger, cinnamon, vegetable oil, sugar plus 1 tablespoon |
+| [ ] | Iced Ginger Cookies | `iced-ginger-cookies.jpg` | all-purpose flour, ginger, cinnamon, vegetable oil, sugar |
 | [ ] | Gingersnap Cookies | `gingersnap-cookies.jpg` | all-purpose flour, ground cinnamon, ground ginger, ground cloves, light brown sugar |
 | [ ] | Almond Crescent Cookies | `almond-crescent-cookies.jpg` | sugar, vanilla extract, almond extract, finely ground almonds, all-purpose flour |
 | [ ] | Raspberry Hazelnut Linzer Cookies | `raspberry-hazelnut-linzer-cookies.jpg` | all-purpose flour, sugar, vanilla extract, finely chopped  toasted hazelnuts, raspberry preserves |
@@ -288,11 +288,11 @@ One picture per category for the 14 cards on the Baking menu: a beautiful group 
 
 | Done | Recipe | File name | What it is (main ingredients) |
 |---|---|---|---|
-| [ ] | Blueberry Muffins | `blueberry-muffins.jpg` | all-purpose flour, plus 1 tablespoon  sugar, eggs, buttermilk, vanilla extract |
+| [ ] | Blueberry Muffins | `blueberry-muffins.jpg` | all-purpose flour, sugar, eggs, buttermilk, vanilla extract |
 | [ ] | Berry-Buttermilk Crumb Muffins | `berry-buttermilk-crumb-muffins.jpg` | all-purpose flour, egg, vegetable oil, light brown sugar, pure vanilla extract |
 | [ ] | Corn Muffins | `corn-muffins.jpg` | yellow cornmeal, all-purpose flour, sugar, eggs, milk |
 | [ ] | Oatmeal Muffins | `oatmeal-muffins.jpg` | rolled oats, milk, all-purpose flour, cinnamon, eggs |
-| [ ] | Cappuccino Chip Muffins | `cappuccino-chip-muffins.jpg` | all-purpose flour, instant espresso powder, ground cinnamon, plus 2 tablespoons  sugar, egg |
+| [ ] | Cappuccino Chip Muffins | `cappuccino-chip-muffins.jpg` | all-purpose flour, instant espresso powder, ground cinnamon, sugar, egg |
 | [ ] | Chocolate Chip Cherry Muffins | `chocolate-chip-cherry-muffins.jpg` | all-purpose flour, unsweetened dark cocoa powder, dried sour cherries, granulated sugar, egg |
 | [ ] | Lemon Zest Muffins | `lemon-zest-muffins.jpg` | all-purpose flour, granulated sugar, eggs, fresh lemon juice, grated lemon zest |
 | [ ] | Apple Walnut Muffins | `apple-walnut-muffins.jpg` | unpeeled granny smith apple chunks, granulated sugar, eggs, vegetable oil, pure vanilla extract |
@@ -316,7 +316,7 @@ One picture per category for the 14 cards on the Baking menu: a beautiful group 
 | [ ] | Banana Bread with Coconut and Pecans | `banana-bread-with-coconut-and-pecans.jpg` | flour, cinnamon, canola oil, sugar, eggs |
 | [ ] | Chocolate Chip Peanut Banana Loaf | `chocolate-chip-peanut-banana-loaf.jpg` | sugar, eggs, mashed ripe bananas, milk, sifted self-rising flour |
 | [ ] | Apple Pecan Quick Bread | `apple-pecan-quick-bread.jpg` | all-purpose flour, sugar, orange juice, eggs, coarsely chopped pecans |
-| [ ] | Cranberry Orange Bread | `cranberry-orange-bread.jpg` | all-purpose flour, plus 1 tablespoon  sugar, plus 2 tablespoons orange juice, egg, grated orange zest |
+| [ ] | Cranberry Orange Bread | `cranberry-orange-bread.jpg` | all-purpose flour, sugar, orange juice, egg, grated orange zest |
 | [ ] | Poppy Seed Bread | `poppy-seed-bread.jpg` | all-purpose flour, vegetable oil, sugar, eggs, evaporated milk |
 | [ ] | Zucchini Walnut Bread | `zucchini-walnut-bread.jpg` | all-purpose flour, cinnamon, vegetable oil, sugar, eggs |
 
@@ -368,15 +368,15 @@ One picture per category for the 14 cards on the Baking menu: a beautiful group 
 | [ ] | Classic Pie Dough | `classic-pie-dough.jpg` | all-purpose flour |
 | [ ] | Graham Cracker Crust | `graham-cracker-crust.jpg` | graham cracker crumbs, brown sugar |
 | [ ] | Chocolate Wafer Crust | `chocolate-wafer-crust.jpg` | chocolate wafer crumbs, light brown sugar |
-| [ ] | Gingersnap Crust | `gingersnap-crust.jpg` | plus 3 tablespoons  gingersnap crumbs |
+| [ ] | Gingersnap Crust | `gingersnap-crust.jpg` | gingersnap crumbs |
 | [ ] | Shortbread Cookie Crust | `shortbread-cookie-crust.jpg` | all-purpose flour, powdered sugar |
 | [ ] | Pecan Shortbread Crust | `pecan-shortbread-crust.jpg` | all-purpose flour, coarsely chopped pecans |
 | [ ] | Brown Sugar Shortbread Crust | `brown-sugar-shortbread-crust.jpg` | light brown sugar, all-purpose flour |
 | [ ] | Cinnamon Crumb Topping | `cinnamon-crumb-topping.jpg` | all-purpose flour, light brown sugar, granulated sugar, ground cinnamon |
 | [ ] | Streusel Topping | `streusel-topping.jpg` | all-purpose flour, old-fashioned rolled oats, light brown sugar, coarsely chopped pecans |
-| [ ] | Vanilla Custard Filling | `vanilla-custard-filling.jpg` | sugar, all-purpose flour, milk, egg yolks, plus 1 teaspoon vanilla extract |
+| [ ] | Vanilla Custard Filling | `vanilla-custard-filling.jpg` | sugar, all-purpose flour, milk, egg yolks, vanilla extract |
 | [ ] | Lemon Curd | `lemon-curd.jpg` | egg yolks, grated lemon zest, fresh lemon juice, lemon extract, sugar |
-| [ ] | Lemon Cream Filling | `lemon-cream-filling.jpg` | sugar, plus 1 teaspoon grated lemon zest, eggs, plus 1 tablespoon  fresh lemon juice |
+| [ ] | Lemon Cream Filling | `lemon-cream-filling.jpg` | sugar, grated lemon zest, eggs, fresh lemon juice |
 | [ ] | Butterscotch Filling | `butterscotch-filling.jpg` | firmly packed dark brown sugar, milk, all-purpose flour, eggs, vanilla extract |
 | [ ] | Coconut Filling | `coconut-filling.jpg` | whole milk, granulated sugar, all-purpose flour, sweetened shredded coconut, pure vanilla extract |
 | [ ] | Apple Filling | `apple-filling.jpg` | light brown sugar, grated nutmeg, ground cinnamon, ground ginger |
