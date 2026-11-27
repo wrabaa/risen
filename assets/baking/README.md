@@ -9,10 +9,19 @@
 3. Track progress: when an image is done, change its `[ ]` to `[x]`. When Siza asks "where are we?", count the `[x]` per section and say what is next.
 4. Work one category at a time, in the order of this file.
 
+## Image sizes — 2 kinds
+
+| | 🟩 MENU CARDS (outside) | 🍰 RECIPE PICTURES (inside) |
+|---|---|---|
+| Where it shows | The 14 big cards on the Baking menu | The recipe page (big, full width) + the small grid card |
+| Folder | `assets/baking/main/` | `assets/baking/<category>/` |
+| Size | **1024 × 1024 px** (square 1:1) | **1200 × 1200 px** (square 1:1) |
+| File | JPG, about **150 KB** (max 300 KB) | JPG, about **250 KB** (max 400 KB) |
+| Composition | A group shot of the category (several cupcakes, a stack of cookies). Keep the **bottom third calm and darker**: the category name is written there in white. | ONE bake, the hero, centred and close, filling about 70% of the frame. It is shown big and square on the recipe page, so make it **rich and detailed** (crumb, frosting, glaze, a slice cut open). |
+
 ## Image style (the same for every image, so the book looks like one set)
 
-- **Square 1:1**, about **1024 × 1024 px**, saved as **JPG under ~300 KB** (the app accepts up to 3 MB, but small is faster on the phone).
-- Real food photography, appetising, homemade bakery look; the finished bake is the hero, centred, filling most of the frame.
+- Real food photography, appetising, homemade bakery look.
 - **Dark background** (dark slate, black stone or dark wood) with soft warm side light, so it matches the app's black design.
 - Same camera angle across the set: 3/4 view at about 45° (flat lay from above for bars, cookies and pies is fine).
 - **No text, no logos, no brand names, no packaging, no hands or people.**
