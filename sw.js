@@ -1,10 +1,10 @@
 // RELEASE: change VERSION every time you push a change (e.g. 2026-11-11.2).
 // A new version makes the phone download a fresh copy of the APP files (pages, code, data) and delete the old one.
-const VERSION = '2026-11-27.5';
+const VERSION = '2026-11-27.6';
 const CACHE = 'risen-' + VERSION;
 
 // APP FILES: small, change often. All of them are downloaded again on every release, all or nothing.
-const CORE = ['./', 'index.html', 'me.html', 'manifest-me.json', 'styles.css', 'shared.js', 'prayer.js', 'music.js', 'app.js', 'db.js', 'photo.js', 'library.js', 'repofolder.js', 'media.js', 'baking.html', 'baking.js', 'baking.css', 'gym.js', 'meds.js', 'classes.js', 'meals.js', 'profile.js', 'coach.js', 'manifest.json', 'data/gym-classes.json'];
+const CORE = ['./', 'index.html', 'me.html', 'manifest-me.json', 'styles.css', 'shared.js', 'prayer.js', 'music.js', 'app.js', 'db.js', 'photo.js', 'library.js', 'repofolder.js', 'media.js', 'baking.html', 'baking.js', 'baking.css', 'manifest-baking.json', 'gym.js', 'meds.js', 'classes.js', 'meals.js', 'profile.js', 'coach.js', 'manifest.json', 'data/gym-classes.json'];
 
 // IMAGES AND FONTS: big, change rarely. They live in their own cache that survives releases, so an update only
 // downloads the ones that are new or changed.

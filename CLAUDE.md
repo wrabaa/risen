@@ -77,7 +77,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   **SETTINGS**: rest timer, Export/Import backup, View intro, Reload gym schedule, Clear all classes, Reset all data, version line.
   **PERSONAL INFO**: name, profile photo, height, weight, body measurements (dated, with history).
 
-## Status (release 2026-11-27.5)
+## Status (release 2026-11-27.6)
 - ✅ Intro, Home, Settings, backup, full-screen fix.
 - ✅ SUPPS (was MEDS) — done.
 - ✅ CLASSES — done (new instructor portraits since `.45`; Cesar still has none).
@@ -357,6 +357,7 @@ Intro → Home. Tab bar (a floating glass pill, icons only): **HOME · GYM · ME
   `RepoFolder`, `MEDIA_TYPES`, `mediaName` moved unchanged from media.js to the new `repofolder.js` (loaded before media.js in index.html / me.html, and by baking.html). Tested at 375 (his iPhone X), 390 and 402 (iPhone 17) wide: load file, menu, category, recipe, 2× batch, tick, ★, own photo add, favourites card after reload, search, fake AI pictures via a mocked tree; me.html / index.html load with no errors, the tile shows on me.html only. iPhone test pending.
 
 - `.142` BAKING swipe back (Siza): on every Baking screen a swipe RIGHT = its "<" (recipe → category → menu → his Home), the page follows the finger; back past 50% of the width or a fast flick past 25%, else it springs back (same feel as `SwipeBack`; own small copy at the end of `baking.js`, presses the page's `[data-act="up"|"home"]`). Never from the search field or under the delete sheet. Open question for Siza: swipe left / right on a recipe = next / previous recipe of the category? Tested with simulated touches at 375 wide. iPhone test pending.
+- `.143` baking.html has its OWN manifest `manifest-baking.json` (start_url / id = baking.html, name "Baking"), so "Add to Home Screen" from wrabaa.github.io/risen/baking.html makes an icon that opens Baking itself (it used manifest-me.json and opened RISEN). On iPhone that icon keeps its OWN data (load the recipe file once there; its ★ and own photos are separate from the ones inside RISEN). In `CORE`.
 - **REMINDER (Siza, 25 Nov):** when ALL the current exercise videos / stills are finished, remind him and ask to ADD MORE FREE-WEIGHT exercises for every body part (Glutes is thinnest, then Triceps, Core, Back; see the count by group). The proposed list (41) is written at the bottom of `assets/exercises/README.md` ("PLANNED: more free-weight exercises"); he picks, then add with new ids and file names. Do not add to `library.js` before he says GO.
 
 ## To-do (in this order — do ONLY what Siza / the planner sends, one step at a time)
